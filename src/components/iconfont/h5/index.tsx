@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { CSSProperties, DOMAttributes, FunctionComponent } from 'react';
+import { CSSProperties, DOMAttributes, FunctionComponent } from 'react';
 import Iconxiayiye1 from './Iconxiayiye1';
 import IconfaxianA from './IconfaxianA';
 import IconfaxianB from './IconfaxianB';
@@ -42,7 +42,7 @@ import Iconxiangshang from './Iconxiangshang';
 import Iconshouhou from './Iconshouhou';
 import Iconyouhuiquan from './Iconyouhuiquan';
 
-export type IconNames = 'iconxiayiye1' | 'iconfaxianA' | 'iconfaxianB' | 'iconmobanA' | 'iconmobanB' | 'iconwodeB' | 'iconwodeA' | 'iconcaozuotiyan' | 'iconchuanshuwenti' | 'icongongnengjianyi' | 'iconyemianshantui' | 'iconjiemianshenmei' | 'iconqitajianyi' | 'iconbaocundaoxiangce' | 'iconbianji' | 'icondaifahuo' | 'icondaishouhuo' | 'icondaifukuan' | 'icongengduo' | 'iconfenxiang' | 'iconerweima' | 'icongouwuche' | 'icongengduofenlei' | 'iconjianhao' | 'iconguanbi' | 'iconjiahao' | 'iconqubaocun' | 'iconqubianji' | 'iconshangyiye' | 'iconsaoyisao' | 'iconshezhi' | 'iconshanchu' | 'iconshoucangB' | 'iconshoucangA' | 'iconxiayiye' | 'iconxiangxia' | 'iconxiangshang' | 'iconshouhou' | 'iconyouhuiquan';
+export type IconNames = 'xiayiye1' | 'faxianA' | 'faxianB' | 'mobanA' | 'mobanB' | 'wodeB' | 'wodeA' | 'caozuotiyan' | 'chuanshuwenti' | 'gongnengjianyi' | 'yemianshantui' | 'jiemianshenmei' | 'qitajianyi' | 'baocundaoxiangce' | 'bianji' | 'daifahuo' | 'daishouhuo' | 'daifukuan' | 'gengduo' | 'fenxiang' | 'erweima' | 'gouwuche' | 'gengduofenlei' | 'jianhao' | 'guanbi' | 'jiahao' | 'qubaocun' | 'qubianji' | 'shangyiye' | 'saoyisao' | 'shezhi' | 'shanchu' | 'shoucangB' | 'shoucangA' | 'xiayiye' | 'xiangxia' | 'xiangshang' | 'shouhou' | 'youhuiquan';
 
 interface Props extends DOMAttributes<SVGElement> {
   name: IconNames;
@@ -54,83 +54,83 @@ interface Props extends DOMAttributes<SVGElement> {
 
 const IconFont: FunctionComponent<Props> = ({ name, ...rest }) => {
   switch (name) {
-    case 'iconxiayiye1':
+    case 'xiayiye1':
       return <Iconxiayiye1 {...rest} />;
-    case 'iconfaxianA':
+    case 'faxianA':
       return <IconfaxianA {...rest} />;
-    case 'iconfaxianB':
+    case 'faxianB':
       return <IconfaxianB {...rest} />;
-    case 'iconmobanA':
+    case 'mobanA':
       return <IconmobanA {...rest} />;
-    case 'iconmobanB':
+    case 'mobanB':
       return <IconmobanB {...rest} />;
-    case 'iconwodeB':
+    case 'wodeB':
       return <IconwodeB {...rest} />;
-    case 'iconwodeA':
+    case 'wodeA':
       return <IconwodeA {...rest} />;
-    case 'iconcaozuotiyan':
+    case 'caozuotiyan':
       return <Iconcaozuotiyan {...rest} />;
-    case 'iconchuanshuwenti':
+    case 'chuanshuwenti':
       return <Iconchuanshuwenti {...rest} />;
-    case 'icongongnengjianyi':
+    case 'gongnengjianyi':
       return <Icongongnengjianyi {...rest} />;
-    case 'iconyemianshantui':
+    case 'yemianshantui':
       return <Iconyemianshantui {...rest} />;
-    case 'iconjiemianshenmei':
+    case 'jiemianshenmei':
       return <Iconjiemianshenmei {...rest} />;
-    case 'iconqitajianyi':
+    case 'qitajianyi':
       return <Iconqitajianyi {...rest} />;
-    case 'iconbaocundaoxiangce':
+    case 'baocundaoxiangce':
       return <Iconbaocundaoxiangce {...rest} />;
-    case 'iconbianji':
+    case 'bianji':
       return <Iconbianji {...rest} />;
-    case 'icondaifahuo':
+    case 'daifahuo':
       return <Icondaifahuo {...rest} />;
-    case 'icondaishouhuo':
+    case 'daishouhuo':
       return <Icondaishouhuo {...rest} />;
-    case 'icondaifukuan':
+    case 'daifukuan':
       return <Icondaifukuan {...rest} />;
-    case 'icongengduo':
+    case 'gengduo':
       return <Icongengduo {...rest} />;
-    case 'iconfenxiang':
+    case 'fenxiang':
       return <Iconfenxiang {...rest} />;
-    case 'iconerweima':
+    case 'erweima':
       return <Iconerweima {...rest} />;
-    case 'icongouwuche':
+    case 'gouwuche':
       return <Icongouwuche {...rest} />;
-    case 'icongengduofenlei':
+    case 'gengduofenlei':
       return <Icongengduofenlei {...rest} />;
-    case 'iconjianhao':
+    case 'jianhao':
       return <Iconjianhao {...rest} />;
-    case 'iconguanbi':
+    case 'guanbi':
       return <Iconguanbi {...rest} />;
-    case 'iconjiahao':
+    case 'jiahao':
       return <Iconjiahao {...rest} />;
-    case 'iconqubaocun':
+    case 'qubaocun':
       return <Iconqubaocun {...rest} />;
-    case 'iconqubianji':
+    case 'qubianji':
       return <Iconqubianji {...rest} />;
-    case 'iconshangyiye':
+    case 'shangyiye':
       return <Iconshangyiye {...rest} />;
-    case 'iconsaoyisao':
+    case 'saoyisao':
       return <Iconsaoyisao {...rest} />;
-    case 'iconshezhi':
+    case 'shezhi':
       return <Iconshezhi {...rest} />;
-    case 'iconshanchu':
+    case 'shanchu':
       return <Iconshanchu {...rest} />;
-    case 'iconshoucangB':
+    case 'shoucangB':
       return <IconshoucangB {...rest} />;
-    case 'iconshoucangA':
+    case 'shoucangA':
       return <IconshoucangA {...rest} />;
-    case 'iconxiayiye':
+    case 'xiayiye':
       return <Iconxiayiye {...rest} />;
-    case 'iconxiangxia':
+    case 'xiangxia':
       return <Iconxiangxia {...rest} />;
-    case 'iconxiangshang':
+    case 'xiangshang':
       return <Iconxiangshang {...rest} />;
-    case 'iconshouhou':
+    case 'shouhou':
       return <Iconshouhou {...rest} />;
-    case 'iconyouhuiquan':
+    case 'youhuiquan':
       return <Iconyouhuiquan {...rest} />;
 
   }

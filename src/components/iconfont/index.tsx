@@ -1,10 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from '@tarojs/taro';
 
 interface Props {
-  name: 'iconxiayiye1' | 'iconfaxianA' | 'iconfaxianB' | 'iconmobanA' | 'iconmobanB' | 'iconwodeB' | 'iconwodeA' | 'iconcaozuotiyan' | 'iconchuanshuwenti' | 'icongongnengjianyi' | 'iconyemianshantui' | 'iconjiemianshenmei' | 'iconqitajianyi' | 'iconbaocundaoxiangce' | 'iconbianji' | 'icondaifahuo' | 'icondaishouhuo' | 'icondaifukuan' | 'icongengduo' | 'iconfenxiang' | 'iconerweima' | 'icongouwuche' | 'icongengduofenlei' | 'iconjianhao' | 'iconguanbi' | 'iconjiahao' | 'iconqubaocun' | 'iconqubianji' | 'iconshangyiye' | 'iconsaoyisao' | 'iconshezhi' | 'iconshanchu' | 'iconshoucangB' | 'iconshoucangA' | 'iconxiayiye' | 'iconxiangxia' | 'iconxiangshang' | 'iconshouhou' | 'iconyouhuiquan';
+  name: 'xiayiye1' | 'faxianA' | 'faxianB' | 'mobanA' | 'mobanB' | 'wodeB' | 'wodeA' | 'caozuotiyan' | 'chuanshuwenti' | 'gongnengjianyi' | 'yemianshantui' | 'jiemianshenmei' | 'qitajianyi' | 'baocundaoxiangce' | 'bianji' | 'daifahuo' | 'daishouhuo' | 'daifukuan' | 'gengduo' | 'fenxiang' | 'erweima' | 'gouwuche' | 'gengduofenlei' | 'jianhao' | 'guanbi' | 'jiahao' | 'qubaocun' | 'qubianji' | 'shangyiye' | 'saoyisao' | 'shezhi' | 'shanchu' | 'shoucangB' | 'shoucangA' | 'xiayiye' | 'xiangxia' | 'xiangshang' | 'shouhou' | 'youhuiquan';
   size?: number;
   color?: string | string[];
 }

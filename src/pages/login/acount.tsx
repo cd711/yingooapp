@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import { ComponentType } from 'react'
+import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';

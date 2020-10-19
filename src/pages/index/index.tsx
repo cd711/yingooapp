@@ -4,6 +4,7 @@ import { View, Button, Text } from '@tarojs/components'
 import { observer, inject } from '@tarojs/mobx'
 
 import './index.less'
+import IconFont from '../../components/iconfont'
 
 type PageStateProps = {
   counterStore: {
@@ -69,6 +70,7 @@ class Index extends Component {
         <Button onClick={this.increment}>+</Button>
         <Button onClick={this.decrement}>-</Button>
         <Button onClick={this.incrementAsync}>Add Async</Button>
+
         <Text>{counter}</Text>
       </View>
     )

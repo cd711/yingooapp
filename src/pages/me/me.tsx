@@ -7,7 +7,7 @@ import IconFont from '../../components/iconfont';
 // import {TaroPopover} from '../../components/popmenu';
 // import { AtModal } from 'taro-ui';
 // / npx iconfont-taro
-const switchBottom = require("../../source/switchBottom.png").default;
+const switchBottom = require("../../source/switchBottom.png");
 const list=[
     {
       id: 1,
@@ -60,9 +60,9 @@ export default class Me extends Component<any,{
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                         <View className="ops">
-                            <View className='cart'><IconFont name={"icongouwuche"} size={48} color="#121314"/></View>
-                            <View className='coupon'><IconFont name={"iconyouhuiquan"} size={48} color="#121314"/></View>
-                            <View className='set'><IconFont name={"iconshezhi"} size={48} color="#121314"/></View>
+                            <View className='cart'><IconFont name={"gouwuche"} size={24} color="#121314"/></View>
+                            <View className='coupon'><IconFont name={"youhuiquan"} size={24} color="#121314"/></View>
+                            <View className='set'><IconFont name={"shezhi"} size={24} color="#121314"/></View>
                         </View>
                     </View>
                     <View className='baseInfo' onClick={()=>{
@@ -78,24 +78,24 @@ export default class Me extends Component<any,{
                             <Text className='myorder'>我的订单</Text>
                             <View className='allorder'>
                                 <Text>全部订单</Text>
-                                <IconFont name={"iconxiayiye1"} size={18} color="#9C9DA6"/>
+                                <IconFont name={"xiayiye1"} size={18} color="#9C9DA6"/>
                             </View>
                         </View>
                         <View className='orderstate'>
                             <View className='oitem'>
-                                <IconFont name={"icondaifukuan"} size={48} color="#121314"/>
+                                <IconFont name={"daifukuan"} size={24} color="#121314"/>
                                 <Text className='orderText'>待付款</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"icondaifahuo"} size={48} color="#121314"/>
+                                <IconFont name={"daifahuo"} size={24} color="#121314"/>
                                 <Text className='orderText'>待发货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"icondaishouhuo"} size={48} color="#121314"/>
+                                <IconFont name={"daishouhuo"} size={24} color="#121314"/>
                                 <Text className='orderText'>待收货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"iconshouhou"} size={48} color="#121314"/>
+                                <IconFont name={"shouhou"} size={24} color="#121314"/>
                                 <Text className='orderText'>售后</Text>
                             </View>
                         </View>
@@ -128,7 +128,7 @@ export default class Me extends Component<any,{
                                 <Text className='date'>9月23日</Text>
                                 <View className='more'>
                                     {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="icongengduo" size={48} color="#9C9DA6"/>
+                                        <IconFont name="gengduo" size={24} color="#9C9DA6"/>
                                     {/* </TaroPopover> */}
                                 </View>
                                 
@@ -155,7 +155,7 @@ export default class Me extends Component<any,{
                                 <Text className='date'>9月23日</Text>
                                 <View className='more'>
                                     {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="icongengduo" size={48} color="#9C9DA6"/>
+                                        <IconFont name="gengduo" size={24} color="#9C9DA6"/>
                                     {/* </TaroPopover> */}
                                 </View>
                             </View>

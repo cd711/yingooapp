@@ -4,6 +4,6 @@
     "use_typescript": true,
     "platforms": ["h5"],
     "use_rpx": true,
-    "trim_icon_prefix": "",
+    "trim_icon_prefix": "icon",
     "default_icon_size": 18
 }
