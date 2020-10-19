@@ -1,0 +1,9 @@
+{
+    "symbol_url": "https://at.alicdn.com/t/font_2129198_g8arfszo7yo.js",
+    "save_dir": "./src/components/iconfont",
+    "use_typescript": true,
+    "platforms": ["h5"],
+    "use_rpx": true,
+    "trim_icon_prefix": "",
+    "default_icon_size": 18
+}

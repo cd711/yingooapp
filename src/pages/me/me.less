@@ -1,0 +1,241 @@
+.me{
+    background-color: #F5F6F9;
+    min-height: 90vh;
+
+}
+.topBox{
+    position: relative;
+    padding: 0 16px;
+    height: 287px;
+    background: linear-gradient(180deg, rgba(244, 175, 175, 0.55) 0%, #F5F6F950 100%);
+    .baseInfo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 26px;
+        margin-bottom: 24px;
+        z-index: 1;
+        .avator{
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: blue;
+        }
+        .nickname{
+            font-size: 24px;
+            padding-left: 22px;
+            color: #121314;
+        }
+    }
+    .orderWarp{
+        width: 343px;
+        border-radius: 15px;
+        background: #FFFFFF;
+        padding-top: 12px;
+        padding-bottom: 14px;
+        .myorall{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 16px;
+            padding-right: 22px;
+            margin-bottom: 14px;
+            .myorder{
+                color: #121314;
+                font-size: 16px;
+            }
+            .allorder{
+                display: flex;
+                align-items: center;
+                color: #9C9DA6;
+                font-size: 12px;
+            }
+
+        }
+        .orderstate{
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            .oitem{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .orderText{
+                color: #121314;
+                font-size: 12px;
+                padding-top: 7px;
+            }
+        }
+    }
+}
+
+.top{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 28px 0 0;
+    .ops{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .coupon{
+            margin-left: 20px;
+        }
+        .set{
+            margin-left: 20px;
+        }
+    }
+}
+.me{
+    .container{
+        width: 375px;
+        min-height: 200vh;
+        background: #FFFFFF;
+        border-radius: 24px 24px 0px 0px;
+        margin-top: 16px;
+        padding-bottom: 20px;
+        .switchBox{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 9px;
+            border-bottom: 1px solid #EDEDEF;
+            margin-bottom: 16px;
+            .switchBar{
+                display: flex;
+                align-items: flex-start;
+                &>.item{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    .text{
+                        color: #707177;
+                        font-size: 16px;
+                        margin-right: 24px;
+                    }
+                }
+                .active{
+
+                    .text{
+                        color: #121314;
+                    }
+                    .icon{
+                        width: 32px;
+                        height: 8px;
+                    }
+                }
+            }
+            .total{
+                color:#9C9DA6;
+                font-size: 12px;
+            }
+        }
+        .content{
+            padding: 0 16px;
+            &>.item{
+                margin-bottom: 4px;
+                .dates{
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 3px;
+                    .day{
+                        width: 36px;
+                        height: 36px;
+                        background: rgba(255, 73, 102, 0.1);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        .circle{
+                            width: 24px;
+                            height: 24px; 
+                            background: rgba(255, 73, 102, 1);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            .text{
+                                color: rgba(255, 255, 255, 1);
+                                font-size: 14px;
+                            }
+                        }
+
+                    }
+                    .date{
+                        font-size: 14px;
+                        color: #121314;
+                        padding-left: 12px;
+                    }
+                    .more{
+                        margin-left: auto;
+                        margin-right: 0;
+                    }
+                }
+                .box{
+                    margin-left: 18px;
+                    border-left: 1px solid #EDEDEF;
+                    padding-top: 1px;
+                    display: flex;
+                    line-height: 0;
+                    padding-bottom: 20px;
+                    
+                    .cns{
+                        margin-top: -8px;
+                        padding-left: 29px;
+
+
+                        .neir{
+                            color: #9C9DA6;
+                            font-size: 14px;
+                            display: block;
+                            line-height: 16px;
+                            margin-bottom: 12px;
+                        }
+                        .pic{
+                            width: 250px;
+                            height: 180px;
+                            background: blue;
+                            border-radius: 8px;
+                            z-index: 1;
+                        }
+                        .docker{
+                            position: relative;
+                            overflow: hidden;
+                            width: 250px;
+                            height: 180px;
+                            .nook {
+                                display: block;
+                                width:100px;
+                                height:22px;
+                                background: #FF4966;
+                                transform:rotate(-45deg);
+                                position:absolute;
+                                left:-26px;
+                                top:13px;
+                                color:#fff;
+                                line-height: 21px;
+                                font-size:14px;
+                                text-align:center;
+                                z-index: 99;
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            .years{
+                margin-bottom: 12px;
+                &>text{
+                    font-size: 24px;
+                    color: #121314;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+
