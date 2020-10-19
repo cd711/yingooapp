@@ -38,7 +38,9 @@ export default class Me extends Component<any,{
     componentWillMount() { }
 
     componentDidMount() { 
-
+        Taro.createSelectorQuery().selectViewport().scrollOffset((e)=>{
+            console.log(e)
+        }).exec();
     }
 
     componentWillUnmount() { }
@@ -66,7 +68,7 @@ export default class Me extends Component<any,{
                         </View>
                     </View>
                     <View className='baseInfo' onClick={()=>{
-                        Taro.navigateTo({
+                        Taro.redirectTo({
                             url:'/pages/login/index'
                         })
                     }}>
