@@ -31,6 +31,7 @@ const config = {
     ]
   },
   plugins: [
+    '@tarojs/plugin-sass',
     '@tarojs/plugin-less',
     '@tarojs/plugin-terser'
   ],
@@ -72,6 +73,7 @@ const config = {
   h5: {
     publicPath: '/',
     staticDirectory: 'static',
+    esnextModules: ['taro-ui'],
     postcss: {
       autoprefixer: {
         enable: true,
