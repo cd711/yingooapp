@@ -2,18 +2,20 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
 
-import counterStore from './store/counter'
+import {userStore} from './store/user'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
-
+import { options } from './utils/net';
+import config from './config';
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
 // if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
 //   require('nerv-devtools')
 // }
-
+options.apiUrl = config.apiUrl;
+options.sourceUrl = config.sourceUrl;
 const store = {
-    counterStore
+    userStore
 }
 
 class App extends Component {
@@ -30,7 +32,8 @@ class App extends Component {
             'pages/index/index',
             'pages/me/me',
             'pages/template/index',
-            'pages/login/index'
+            'pages/login/index',
+            'pages/login/acount'
         ],
         window: {
             backgroundTextStyle: 'light',

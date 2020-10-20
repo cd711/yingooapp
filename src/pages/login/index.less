@@ -1,10 +1,10 @@
 
-.top{
+.tops{
     padding: 22px 12px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 111px;
+    margin-bottom: 60px;
     .acount-login{
         display: flex;
         align-items: center;
@@ -15,7 +15,8 @@
     }
 }
 .container{
-
+    height: 62vh;
+    min-height: 400px;
     .title{
         display: flex;
         flex-direction: column;
@@ -29,26 +30,32 @@
     }
     .acount{
         padding: 0 32px;
-        text-align: right;
         margin-bottom: 54px;
+        position: relative;
         .acount-input{
             font-size: 14px;
             padding-bottom: 14px;
             border-bottom: 1PX solid #EDEDEF;
             text-align: left;
         }
-        .forget{
-            font-size: 12px;
-            color: #9C9DA6;
-            padding-right: 8px;
+        .acount-input-active{
+            border-bottom-color: #FF4966;
         }
-
+        .clearIcon{
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 32px;
+            top: 0;
+        }
     }
     .getcode{
         background: #FFC4C8;
         height: 45px;
         border-radius: 45/2px;
-        
         margin: 0 32px;
         display: flex;
         align-items: center;
@@ -58,11 +65,15 @@
             font-size: 16px;
         }
     }
+    .codeActive{
+        background: #FF4966;
+        box-shadow: 0px 10px 24px -7px rgba(255, 73, 102, 0.5);
+    }
 }
 .footer{
-    position: fixed;
-    left: 0;
-    bottom: 54px;
+    // position: fixed;
+    // left: 0;
+    // bottom: 54px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -90,10 +101,18 @@
         justify-content: space-between;
         align-items: center;
         .qq,.wechat{
-            width: 48px;
-            height: 48px;
-            background: #F5F6F9;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wechat{
+            background: #0AD78A;
+        }
+        .qq{
+            background: #50AFFE;
         }
     }
     .xieyi{

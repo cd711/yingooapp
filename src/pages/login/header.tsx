@@ -1,17 +1,25 @@
-import { ComponentType } from 'react'
+
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
 
-export const HeaderTop: React.FC<any> = ({rightText}) => {
-    return <View className='top'>
-        <View className='close'>
-            <IconFont name='guanbi' size={24} color="#121314" />
+export const HeaderTop: React.FC<any> = ({rightText,url}) => {
+    return <View className='tops'>
+        <View className='close' onClick={()=>{
+            Taro.redirectTo({
+                url:'/pages/index/index'
+            });
+        }}>
+            <IconFont name='24_guanbi' size={24} color="#121314" />
         </View>
-        <View className='acount-login'>
+        <View className='acount-login' onClick={()=>{
+            Taro.navigateTo({
+                url:url
+            })
+        }}>
             <Text className='text'>{rightText}</Text>
-            <IconFont name='xiayiye1' size={24} color="#9C9DA6" />
+            <IconFont name='16_xiayiye' size={24} color="#121314" />
         </View>
     </View>
 }
