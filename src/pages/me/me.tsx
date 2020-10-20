@@ -4,7 +4,7 @@ import { View, Text,Image } from '@tarojs/components'
 import './me.less'
 import IconFont from '../../components/iconfont';
 
-// import {TaroPopover} from '../../components/popmenu';
+import {TaroPopover} from '../../components/popmenu';
 // import { AtModal } from 'taro-ui';
 // / npx iconfont-taro
 const switchBottom = require("../../source/switchBottom.png");
@@ -38,9 +38,7 @@ export default class Me extends Component<any,{
     componentWillMount() { }
 
     componentDidMount() { 
-        Taro.createSelectorQuery().selectViewport().scrollOffset((e)=>{
-            console.log(e)
-        }).exec();
+
     }
 
     componentWillUnmount() { }
@@ -62,13 +60,13 @@ export default class Me extends Component<any,{
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                         <View className="ops">
-                            <View className='cart'><IconFont name={"gouwuche"} size={24} color="#121314"/></View>
-                            <View className='coupon'><IconFont name={"youhuiquan"} size={24} color="#121314"/></View>
-                            <View className='set'><IconFont name={"shezhi"} size={24} color="#121314"/></View>
+                            <View className='cart'><IconFont name={"24_gouwuche"} size={24} color="#121314"/></View>
+                            <View className='coupon'><IconFont name={"24_youhuiquan"} size={24} color="#121314"/></View>
+                            <View className='set'><IconFont name={"24_shezhi"} size={24} color="#121314"/></View>
                         </View>
                     </View>
                     <View className='baseInfo' onClick={()=>{
-                        Taro.redirectTo({
+                        Taro.navigateTo({
                             url:'/pages/login/index'
                         })
                     }}>
@@ -80,24 +78,24 @@ export default class Me extends Component<any,{
                             <Text className='myorder'>我的订单</Text>
                             <View className='allorder'>
                                 <Text>全部订单</Text>
-                                <IconFont name={"xiayiye1"} size={18} color="#9C9DA6"/>
+                                <IconFont name={"16_xiayiye"} size={18} color="#9C9DA6"/>
                             </View>
                         </View>
                         <View className='orderstate'>
                             <View className='oitem'>
-                                <IconFont name={"daifukuan"} size={24} color="#121314"/>
+                                <IconFont name={"24_daifukuan"} size={24} color="#121314"/>
                                 <Text className='orderText'>待付款</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"daifahuo"} size={24} color="#121314"/>
+                                <IconFont name={"24_daifahuo"} size={24} color="#121314"/>
                                 <Text className='orderText'>待发货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"daishouhuo"} size={24} color="#121314"/>
+                                <IconFont name={"24_daishouhuo"} size={24} color="#121314"/>
                                 <Text className='orderText'>待收货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"shouhou"} size={24} color="#121314"/>
+                                <IconFont name={"24_shouhou"} size={24} color="#121314"/>
                                 <Text className='orderText'>售后</Text>
                             </View>
                         </View>
@@ -128,9 +126,16 @@ export default class Me extends Component<any,{
                                     </View>
                                 </View>
                                 <Text className='date'>9月23日</Text>
-                                <View className='more'>
+                                <View className='more' onClick={(e)=>{
+                                    // @ts-ignore
+                                    console.log(e.y,e.currentTarget.clientWidth)
+                                    Taro.createSelectorQuery().select(".taro-tabbar__panel").scrollOffset((_view: any) => {
+
+                                        console.log(_view.scrollTop)
+                                    }).exec();
+                                }}>
                                     {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="gengduo" size={24} color="#9C9DA6"/>
+                                        <IconFont name="24_gengduo" size={24} color="#9C9DA6"/>
                                     {/* </TaroPopover> */}
                                 </View>
                                 
@@ -156,9 +161,9 @@ export default class Me extends Component<any,{
                                 </View>
                                 <Text className='date'>9月23日</Text>
                                 <View className='more'>
-                                    {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="gengduo" size={24} color="#9C9DA6"/>
-                                    {/* </TaroPopover> */}
+                                    <TaroPopover list={list} label='label' onTabItem={this.onTabItem}>
+                                        <IconFont name="24_gengduo" size={24} color="#9C9DA6"/>
+                                    </TaroPopover>
                                 </View>
                             </View>
                             <View className="box">
@@ -177,16 +182,25 @@ export default class Me extends Component<any,{
                     </View>
 
                 </View>
-                {/* <AtModal
-                    isOpened
-                    title='标题'
-                    cancelText='取消'
-                    confirmText='确认'
-                    onClose={ ()=>{} }
-                    onCancel={ ()=>{} }
-                    onConfirm={ ()=>{} }
-                    content='欢迎加入京东凹凸实验室\n\r欢迎加入京东凹凸实验室'
-                /> */}
+
+                <View className='sub-menu'>
+                    <View className='list'>
+                        <View className='triangle'></View>
+                        <View className='item'>
+                            <IconFont name='24_baocundaoxiangce' size={20} color='#121314' />
+                            <Text className='item-text'>保存到相册</Text>
+                        </View>
+                        <View className='item'>
+                            <IconFont name='24_fenxiang' size={20} color='#121314' />
+                            <Text className='item-text'>分享</Text>
+                        </View>
+                        <View className='item'>
+                            <IconFont name='24_shanchu' size={20} color='#FF4966' />
+                            <Text className='item-text'>删除</Text>
+                        </View>
+                    </View>
+                </View>
+
             </View>
         )
     }

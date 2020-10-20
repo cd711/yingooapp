@@ -71,7 +71,7 @@
     }
 }
 
-.top{
+.topBox .top{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -237,5 +237,77 @@
             }
         }
     }
+}
+.sub-menu{
+    position: absolute;
+    top: 414px;
+    // left: 221px;
+    z-index: 999;
+    right: 8px;
+    .list{
+        background: #FFF;
+        // border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 140px;
+        
+        box-shadow: 0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px 0 rgba(0,0,0,.08), 0 9px 28px 8px rgba(0,0,0,.05);
+        .triangle{
+            position: absolute;
+            z-index: 1;
+            display: block;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px;
+            transform: rotate(45deg);
+            top: -5px;
+            left: 90%;
+            margin-left: -10px;
+            border-color: #fff transparent transparent #fff;
+            box-shadow: -2px -2px 5px rgba(0,0,0,.06);
+        }
+        // .triangle::before{
+        //     content: "";
+        //     border:10px solid transparent;
+        //     border-bottom-color: #FFF;
+        //     position: absolute;
+        //     top: -9px;
+        //     left: 85%;
+        //     margin-left: -10px;
+        // }
+        .item{
+            display: flex;
+            align-items: center;
+            padding: 10px 0 10px 12px;
+            .item-text{
+                font-size: 14px;
+                color: #121314;
+                padding-left: 10px;
+            }
+        }
+        .item:last-child{
+            border-top: 1px solid #EDEDEF;
+            padding: 13px 0 13px 12px;
+            .item-text{
+                color: #FF4966;
+            }
+        }
+    }
+    // .list::before{
+    //     position: absolute;
+    //     display: inline-block;
+    //     width: 0;
+    //     height: 0px;
+    //     content: '';
+    //     border-style: solid;
+    //     border-width: 6px;
+    //     border-color: #fff #fff transparent transparent;
+    //     box-shadow: -2px -2px 5px rgba(0,0,0,.06);
+    //     top: -6px;
+    //     left: 85%;
+    //     transform: rotate(-45deg);
+    //     z-index: 1;
+    // }
+
 }
 
