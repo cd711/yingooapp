@@ -25,6 +25,7 @@ export default class SMS extends Component<any,{
         
     }
     onCodeInput = ({detail:{value}})=>{
+        console.log(value)
         this.setState({
             smsCode:value
         })
