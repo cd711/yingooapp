@@ -71,16 +71,17 @@ export default class Login extends Component<any,{
     sendSMS = () => {
         const { codeBtnActive,inputValue } = this.state;
         if (codeBtnActive && inputValue.length == 11) {
-            Taro.showLoading({title:"正在发送..."});
-            api("sms/send",{
-                mobile:"13340631853",
-                event:"login"
-            }).then(()=>{
-                Taro.hideLoading();
-                Taro.navigateTo({
-                    url:""
-                })
+            Taro.navigateTo({
+                url:`/pages/login/sms?mobile=${inputValue}`
             })
+            // Taro.showLoading({title:"正在发送..."});
+            // api("sms/send",{
+            //     mobile:"13340631853",
+            //     event:"login"
+            // }).then(()=>{
+            //     Taro.hideLoading();
+
+            // })
         }
     }
     render() {
