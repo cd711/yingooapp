@@ -3,9 +3,10 @@ import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
 
 import {userStore} from './store/user'
+import counterStore from './store/counter'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
-import { options } from './utils/net';
+import { options,getUserInfo } from './utils/net';
 import config from './config';
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -15,7 +16,8 @@ import config from './config';
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
 const store = {
-    userStore
+    userStore,
+    counterStore
 }
 
 class App extends Component {
@@ -70,7 +72,17 @@ class App extends Component {
         }
     }
 
-    componentDidMount() { }
+    componentDidMount() {
+        console.log("app");
+        
+        if (userStore.id<=0) {
+            const info = getUserInfo();
+            if (info) {
+                userStore.setInfo(info);
+            }
+        }
+
+    }
 
     componentDidShow() { }
 
