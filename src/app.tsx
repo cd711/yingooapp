@@ -1,10 +1,19 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
+<<<<<<< HEAD
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
 import {userStore} from './store/user'
 import { options } from './utils/net';
+=======
+
+import {userStore} from './store/user'
+import counterStore from './store/counter'
+import 'taro-ui/dist/style/index.scss'
+import './app.less'
+import { options,getUserInfo } from './utils/net';
+>>>>>>> 978f17500a94f9d2ce765d679660576ced822729
 import config from './config';
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -15,7 +24,8 @@ import config from './config';
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
 const store = {
-    userStore
+    userStore,
+    counterStore
 }
 
 class App extends Component {
@@ -34,7 +44,8 @@ class App extends Component {
             'pages/template/index',
             'pages/login/index',
             'pages/editor/index',
-            'pages/login/acount'
+            'pages/login/acount',
+            'pages/login/sms'
         ],
         window: {
             backgroundTextStyle: 'light',
@@ -69,6 +80,20 @@ class App extends Component {
             ]
         }
     }
+
+    componentDidMount() {
+        console.log("app");
+        
+        if (userStore.id<=0) {
+            const info = getUserInfo();
+            if (info) {
+                userStore.setInfo(info);
+            }
+        }
+
+    }
+
+    
 
     // 在 App 类中的 render() 函数没有实际作用
     // 请勿修改此函数

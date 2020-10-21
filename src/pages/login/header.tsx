@@ -7,7 +7,7 @@ import IconFont from '../../components/iconfont';
 export const HeaderTop: React.FC<any> = ({rightText,url}) => {
     return <View className='tops'>
         <View className='close' onClick={()=>{
-            Taro.redirectTo({
+            Taro.switchTab({
                 url:'/pages/index/index'
             });
         }}>

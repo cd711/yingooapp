@@ -1,5 +1,6 @@
 import Taro, { getSystemInfoSync } from '@tarojs/taro';
 import { userStore } from "../store/user";
+import { Base64 } from 'js-base64';
 export let options: {
     apiUrl: string;
     sourceUrl:string
@@ -8,17 +9,29 @@ export let options: {
     sourceUrl:''
 }
 let accessToken;
-export function setToken(token, ext) {
+
+export function setUserInfo(info) {
     accessToken = {
-        token: token,
-        expires: parseInt(ext)
+        token: info.token,
+        expires: parseInt(info.expiretime)
     };
-    
     Taro.setStorage({
         key: "token",
         data: accessToken
     });
+    Taro.setStorage({
+        key: "TaroInfoKey",
+        data: Base64.encode(JSON.stringify(info))
+    });
 }
+export function getUserInfo() {
+   let info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
+   if (info) {
+       return JSON.parse(info);
+   }
+   return null;
+}
+
 export function getToken(): string {
     let now = new Date().getTime() / 1000;
     if (!accessToken) {
@@ -56,22 +69,26 @@ export function api(name: string, params?: any): Promise<any> {
         }).then(function (res: any) {
             console.log(res);
             if(res.data.code == 401){
-                userStore.auth().then(res=>{
-                    setToken(res.access_token,res.expired_at);
-                    api(name,params).then(()=>{
-                        Taro.showLoading({title:"加载中"});
-                        resolve(res.data.data);
-                    }).catch((e)=>{
-                        Taro.hideLoading();
-                        reject(e.errMsg || e.message || e);
-                    })
-                }).catch(()=>{
-                    Taro.showToast({
-                        title:"登录失败!",
-                        icon:'none',
-                        duration:2000
-                    })
-                })
+                // userStore.auth().then(res=>{
+                //     // setToken(res.access_token,res.expired_at);
+                //     api(name,params).then(()=>{
+                //         Taro.showLoading({title:"加载中"});
+                //         resolve(res.data.data);
+                //     }).catch((e)=>{
+                //         Taro.hideLoading();
+                //         reject(e.errMsg || e.message || e);
+                //     })
+                // }).catch(()=>{
+                //     Taro.showToast({
+                //         title:"登录失败!",
+                //         icon:'none',
+                //         duration:2000
+                //     })
+                // })
+                Taro.redirectTo({
+                    url:"/pages/login/index"
+                });
+                return;
             } else {
 
                 if (res.data.code == 1) {

@@ -7,6 +7,10 @@ import IconFont from '../../components/iconfont';
 import {TaroPopover} from '../../components/popmenu';
 // import { AtModal } from 'taro-ui';
 // / npx iconfont-taro
+import {userStore} from "../../store/user";
+import { observer, inject } from '@tarojs/mobx'
+
+
 const switchBottom = require("../../source/switchBottom.png");
 const list=[
     {
@@ -21,7 +25,10 @@ const list=[
       id: 3,
       label: 'item3'
     }
-  ];
+];
+
+@inject("userStore")
+@observer
 export default class Me extends Component<any,{
     switchActive:number;
 }> {
@@ -52,10 +59,11 @@ export default class Me extends Component<any,{
     
     render() {
         const {switchActive} = this.state;
+        const {id,nickname} = userStore;
         return (
             <View className='me'>
                 <View className='topBox' ref={(node) =>{
-                    console.log(node)
+                    // console.log(node)
                 }}>
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
@@ -66,12 +74,18 @@ export default class Me extends Component<any,{
                         </View>
                     </View>
                     <View className='baseInfo' onClick={()=>{
-                        Taro.navigateTo({
+                        if (id>0) {
+                            return;
+                        }
+                        Taro.redirectTo({
                             url:'/pages/login/index'
                         })
                     }}>
-                        <View className="avator"></View>
-                        <Text className='nickname'>Hi，未登录</Text>
+                        <View className="avator">
+                            <Image src={require('../../source/defaultAvatar.png')} className='avatarImg'/>
+                        </View>
+                        {/* todo: 昵称6个字 */}
+                        <Text className='nickname'>{nickname.length>0?`Hi，${nickname}`:"Hi，未登录"}</Text>
                     </View>
                     <View className='orderWarp'>
                         <View className='myorall'>
