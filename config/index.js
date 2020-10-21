@@ -71,6 +71,13 @@ const config = {
     }
   },
   h5: {
+    router: {
+      mode: 'browser',
+      customRoutes: {
+        '/pages/index/index': '/',
+        '/pages/editor/index': '/editor'
+      }
+    },
     publicPath: '/',
     staticDirectory: 'static',
     esnextModules: ['taro-ui'],
@@ -80,8 +87,8 @@ const config = {
         config: {
           browsers: [
             'last 3 versions',
-            'Android >= 4.1',
-            'ios >= 8'
+            'Android >= 4.4',
+            'ios >= 9'
           ]
         }
       },
