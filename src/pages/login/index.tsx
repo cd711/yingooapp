@@ -95,7 +95,9 @@ export default class Login extends Component<any,{
                         <Text className='ttext'>欢迎来到映果定制</Text>
                     </View>
                     <View className='acount'>
-                        <Input type='number' placeholder='请输入手机号' className={codeBtnActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} value={inputValue}/>
+                        <Input type='number' placeholder='请输入手机号' className={codeBtnActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
+                            
+                        }} value={inputValue}/>
                         {/* <Text className='forget'>忘记密码</Text> */}
                         {
                             showMobileClear?<View className='clearIcon' onClick={this.onInputClear}><IconFont name='16_qingkong' size={16} color='#999999' /></View>:null
