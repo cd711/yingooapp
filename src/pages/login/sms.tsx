@@ -103,7 +103,7 @@ export default class SMS extends Component<any,{
             <View className='back' onClick={()=>{
                 Taro.navigateBack();
             }}>
-                <IconFont name='24_shangyiye' size={24} color='#121314'/>
+                <IconFont name='24_shangyiye' size={48} color='#121314'/>
             </View>
             <View className='box'>
                 <Text className='title'>输入短信验证码</Text>

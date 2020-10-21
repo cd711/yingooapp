@@ -13,10 +13,10 @@ export const LoginFooter: React.FC<any> = () => {
         </View>
         <View className='qw'>
             <View className='wechat'>
-                <IconFont name='24_weixin' size={24} color='#FFF'/>
+                <IconFont name='24_weixin' size={48} color='#FFF'/>
             </View>
             <View className='qq'>
-                <IconFont name='24_QQ' size={24} color='#FFF'/>
+                <IconFont name='24_QQ' size={48} color='#FFF'/>
             </View>
         </View>
         <View className='xieyi'>

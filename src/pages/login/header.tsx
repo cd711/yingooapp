@@ -11,7 +11,7 @@ export const HeaderTop: React.FC<any> = ({rightText,url}) => {
                 url:'/pages/index/index'
             });
         }}>
-            <IconFont name='24_guanbi' size={24} color="#121314" />
+            <IconFont name='24_guanbi' size={48} color="#121314" />
         </View>
         <View className='acount-login' onClick={()=>{
             Taro.navigateTo({
@@ -19,7 +19,7 @@ export const HeaderTop: React.FC<any> = ({rightText,url}) => {
             })
         }}>
             <Text className='text'>{rightText}</Text>
-            <IconFont name='16_xiayiye' size={24} color="#121314" />
+            <IconFont name='16_xiayiye' size={48} color="#121314" />
         </View>
     </View>
 }

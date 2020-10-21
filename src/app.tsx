@@ -38,7 +38,9 @@ class App extends Component {
             'pages/login/index',
             'pages/editor/index',
             'pages/login/acount',
-            'pages/login/sms'
+            'pages/login/sms',
+            'pages/me/setting',
+            'pages/me/profile'
         ],
         window: {
             backgroundTextStyle: 'light',

@@ -40,6 +40,8 @@ export function getToken(): string {
     if (accessToken && accessToken.expires > now) {
         return accessToken.token
     }
+    Taro.removeStorage({key:'token'});
+    Taro.removeStorage({key:'TaroInfoKey'});
     return "";
 }
 export function api(name: string, params?: any): Promise<any> {

@@ -68,9 +68,13 @@ export default class Me extends Component<any,{
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                         <View className="ops">
-                            <View className='cart'><IconFont name={"24_gouwuche"} size={24} color="#121314"/></View>
-                            <View className='coupon'><IconFont name={"24_youhuiquan"} size={24} color="#121314"/></View>
-                            <View className='set'><IconFont name={"24_shezhi"} size={24} color="#121314"/></View>
+                            <View className='cart'><IconFont name={"24_gouwuche"} size={48} color="#121314"/></View>
+                            <View className='coupon'><IconFont name={"24_youhuiquan"} size={48} color="#121314"/></View>
+                            <View className='set' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/setting'
+                                })
+                            }}><IconFont name={"24_shezhi"} size={48} color="#121314"/></View>
                         </View>
                     </View>
                     <View className='baseInfo' onClick={()=>{
@@ -92,24 +96,24 @@ export default class Me extends Component<any,{
                             <Text className='myorder'>我的订单</Text>
                             <View className='allorder'>
                                 <Text>全部订单</Text>
-                                <IconFont name={"16_xiayiye"} size={18} color="#9C9DA6"/>
+                                <IconFont name={"16_xiayiye"} size={36} color="#9C9DA6"/>
                             </View>
                         </View>
                         <View className='orderstate'>
                             <View className='oitem'>
-                                <IconFont name={"24_daifukuan"} size={24} color="#121314"/>
+                                <IconFont name={"24_daifukuan"} size={48} color="#121314"/>
                                 <Text className='orderText'>待付款</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"24_daifahuo"} size={24} color="#121314"/>
+                                <IconFont name={"24_daifahuo"} size={48} color="#121314"/>
                                 <Text className='orderText'>待发货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"24_daishouhuo"} size={24} color="#121314"/>
+                                <IconFont name={"24_daishouhuo"} size={48} color="#121314"/>
                                 <Text className='orderText'>待收货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"24_shouhou"} size={24} color="#121314"/>
+                                <IconFont name={"24_shouhou"} size={48} color="#121314"/>
                                 <Text className='orderText'>售后</Text>
                             </View>
                         </View>
@@ -149,7 +153,7 @@ export default class Me extends Component<any,{
                                     }).exec();
                                 }}>
                                     {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="24_gengduo" size={24} color="#9C9DA6"/>
+                                        <IconFont name="24_gengduo" size={48} color="#9C9DA6"/>
                                     {/* </TaroPopover> */}
                                 </View>
                                 
@@ -176,7 +180,7 @@ export default class Me extends Component<any,{
                                 <Text className='date'>9月23日</Text>
                                 <View className='more'>
                                     <TaroPopover list={list} label='label' onTabItem={this.onTabItem}>
-                                        <IconFont name="24_gengduo" size={24} color="#9C9DA6"/>
+                                        <IconFont name="24_gengduo" size={48} color="#9C9DA6"/>
                                     </TaroPopover>
                                 </View>
                             </View>
@@ -201,15 +205,15 @@ export default class Me extends Component<any,{
                     <View className='list'>
                         <View className='triangle'></View>
                         <View className='item'>
-                            <IconFont name='24_baocundaoxiangce' size={20} color='#121314' />
+                            <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
                             <Text className='item-text'>保存到相册</Text>
                         </View>
                         <View className='item'>
-                            <IconFont name='24_fenxiang' size={20} color='#121314' />
+                            <IconFont name='24_fenxiang' size={40} color='#121314' />
                             <Text className='item-text'>分享</Text>
                         </View>
                         <View className='item'>
-                            <IconFont name='24_shanchu' size={20} color='#FF4966' />
+                            <IconFont name='24_shanchu' size={40} color='#FF4966' />
                             <Text className='item-text'>删除</Text>
                         </View>
                     </View>
