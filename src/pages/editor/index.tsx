@@ -58,7 +58,7 @@ export default class Index extends Component<{}, {
 
       
       return <View>
-        <View className={`editor ${editorAnim ? ' anim' : ''}`} style={size ? {width: size.width, height: size.height} : undefined}>
+        <View className={`editor ${editorAnim ? ' anim' : ''}`} style={size ? {height: size.height} : undefined}>
           {/* eslint-disable-next-line react/forbid-elements */}
           <iframe className={`${editorAnim ? 'anim' : ''}`} src='http://192.168.0.100:8080/mobile?tpl_id=20200826&amp;id=12'></iframe>
         </View>
