@@ -18,6 +18,8 @@ export class UserStore {
     public nickname:string = "";
     @observable
     public gender:number = 0;
+    @observable
+    public bio:string = "";
 
     public get sex() {
         let s = sexList[this.gender||0];
@@ -32,6 +34,7 @@ export class UserStore {
         this.avatar = info.avatar;
         this.nickname = info.nickname;
         this.gender = info.gender;
+        this.bio = info.bio;
     }
 
     @action

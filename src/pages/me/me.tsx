@@ -59,7 +59,7 @@ export default class Me extends Component<any,{
     
     render() {
         const {switchActive} = this.state;
-        const {id,nickname} = userStore;
+        const {id,nickname,avatar} = userStore;
         return (
             <View className='me'>
                 <View className='topBox' ref={(node) =>{
@@ -86,7 +86,7 @@ export default class Me extends Component<any,{
                         })
                     }}>
                         <View className="avator">
-                            <Image src={require('../../source/defaultAvatar.png')} className='avatarImg'/>
+                            <Image src={avatar.length>0?avatar:require('../../source/defaultAvatar.png')} className='avatarImg'/>
                         </View>
                         {/* todo: 昵称6个字 */}
                         <Text className='nickname'>{nickname.length>0?`Hi，${nickname}`:"Hi，未登录"}</Text>
@@ -179,9 +179,9 @@ export default class Me extends Component<any,{
                                 </View>
                                 <Text className='date'>9月23日</Text>
                                 <View className='more'>
-                                    <TaroPopover list={list} label='label' onTabItem={this.onTabItem}>
+                                    {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
                                         <IconFont name="24_gengduo" size={48} color="#9C9DA6"/>
-                                    </TaroPopover>
+                                    {/* </TaroPopover> */}
                                 </View>
                             </View>
                             <View className="box">
