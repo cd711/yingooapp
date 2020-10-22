@@ -1,9 +1,7 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
-
 import {userStore} from './store/user'
-import counterStore from './store/counter'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
 import { options,getUserInfo } from './utils/net';
@@ -17,8 +15,7 @@ import config from './config';
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
 const store = {
-    userStore,
-    counterStore
+    userStore
 }
 
 class App extends Component {
