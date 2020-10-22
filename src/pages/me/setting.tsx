@@ -124,8 +124,11 @@ export default class Setting extends Component<any,{
                     })
                     console.log(e)
                 }} onOK={(e)=>{
-                    console.log(e)
-                }}/>
+                    console.log(e);
+                    Taro.removeStorage({key:"TaroInfoKey"});
+                    Taro.removeStorage({key:"token"});
+                    Taro.switchTab({url:"/pages/index/index"});
+                }} cancelText="不退出" okText="退出"/>
             </View>
         )
     }

@@ -11,7 +11,7 @@ export class UserStore {
     @observable
     public id:number = 0;
     @observable
-    public mobile:number = 0;
+    public mobile:string = "";
     @observable
     public avatar:string = "";
     @observable

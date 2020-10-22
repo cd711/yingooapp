@@ -1,5 +1,5 @@
 const config = {
-    apiUrl: "http://47.108.199.135/api/",
+    apiUrl: "http://192.168.0.166/api/",
     //静态资源地址
     sourceUrl:""
 };

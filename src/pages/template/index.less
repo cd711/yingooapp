@@ -1,0 +1,112 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.template{
+    .tops{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+    }
+    .top-search{
+        height: 104px;
+        background: #FFFFFF;
+        box-sizing: border-box;
+        padding: 14px 32px;
+        .search-box{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 76px;
+            background: #F5F6F9;
+            border-radius: 38px;
+            .placeholders{
+                color: #9C9DA6;
+                font-size: 28px;
+                padding-left: 2px;
+            }
+        }
+    }
+    .top-switch{
+        height: 104px;
+        background: #FFFFFF;
+        display: flex;
+        box-sizing: border-box;
+        .switch-scroll{
+            box-sizing: border-box;
+            .warp{
+                display: flex;
+                align-items: flex-start;
+                padding-top: 24px;
+                padding-left: 48px;
+            }
+            .item{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding-right: 48px;
+                min-width: 64px;
+                .text{
+                    color: #707177;
+                    font-size: 32px;
+                }
+            }
+            .active{
+                .text{
+                    color: #121314;
+                }
+                .icon{
+                    width: 64px;
+                    height: 16px;
+                }
+            }
+
+        }
+
+        .all{
+            width: 128px;
+            height: 104px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+    .main{
+        display: flex;
+        position: fixed;
+        .left-menu{
+            min-width: 172px;
+            .item{
+                height: 96px;
+                
+                text-align: center;
+                line-height: 96px;
+                padding: 0 44px;
+                min-width: 172px;
+                box-sizing: border-box;
+                .txt{
+                    color: #9C9DA6;
+                    font-size: 28px;
+                }
+            }
+            .active{
+                background: #F5F6F9;
+            }
+        }
+        .right-scroll{
+            .warp{
+                column-count:2;
+                column-gap: 26px;
+                display:inline-block;
+                padding-left: 26px;
+                
+            }
+            .pic-box{
+                
+                overflow: hidden;
+                margin-bottom: 26px;
+            }
+        }
+    }
+}
