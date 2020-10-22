@@ -1,7 +1,7 @@
 const config = {
   projectName: 'yingooShop',
   date: '2020-10-19',
-  designWidth: 375,
+  designWidth: 750,
   deviceRatio: {
     '640': 2.34 / 2,
     '750': 1,

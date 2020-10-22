@@ -1,0 +1,132 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.profile{
+    .base-info{
+        margin-bottom: 16px;
+        .item{
+            height: 128px;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px 0 32px;
+            position: relative;
+            .upload{
+                position: absolute;
+                opacity: 0;
+                width: 100%;
+                height: 128px;
+                z-index: 99;
+                filter: alpha(opacity=0);
+            }
+            .title{
+                font-size: 32px;
+                color: #121314;
+            }
+            .right{
+                display: flex;
+                align-items: center;
+
+                .img{
+                    width: 88px;
+                    height: 88px;
+                    border-radius: 50%;
+                    margin-right: 20px;
+                }
+                .txt{
+                    color: #9C9DA6;
+                    font-size: 28px;
+                    padding-right: 8px;
+                }
+            }
+        }
+        .picker-item{
+            .weui-picker__hd {
+                border-radius: 32px 32px 0px 0px;
+            }
+            .weui-picker__action:last-child {
+                color: #FF4966;
+                font-size: 32px;
+            }
+            .weui-picker__item{
+                font-size: 36px;
+            }
+        }
+
+    }
+    .er-item{
+        height: 128px;
+        background: #FFFFFF;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px 0 32px;
+        .title{
+            font-size: 32px;
+            color: #121314;
+        }
+        .right{
+            display: flex;
+            align-items: center;
+            .img{
+                width: 88px;
+                height: 88px;
+                border-radius: 50%;
+                margin-right: 20px;
+            }
+            .txt{
+                color: #9C9DA6;
+                font-size: 28px;
+                padding-right: 8px;
+            }
+        }        
+    }
+    .float-layout{
+        .at-float-layout__container {
+            border-radius: 16px 16px 0px 0px;
+            min-height: 361px;
+            max-height: 361px;
+            height: 361px;
+        }
+        .at-float-layout .layout-body{
+            padding: 40px;
+        }
+        .fixBox{
+            .input{
+                // width: 670px;
+                height: 156px;
+                background: #F5F6F9;
+                border-radius: 8px;
+                margin: 0 auto;
+                padding: 16px 0 92px 24px;
+                box-sizing: border-box;
+                margin-bottom: 40px;
+            }
+            .ops{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                .plce-text{
+                    color: #9C9DA6;
+                    font-size: 24px;
+                }
+                .ok{
+                    width: 120px;
+                    height: 56px;
+                    background: #FF4966;
+                    border-radius: 48px;
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #FFFFFF;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    line-height: 56px;
+                    text-align: center;
+                    margin: 0;
+                }
+            }
+        }
+    }
+}

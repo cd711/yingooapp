@@ -10,18 +10,21 @@ import { api } from '../../utils/net'
 export default class Login extends Component<any,{
     codeBtnActive:boolean;
     showMobileClear:boolean;
+    inputActive:boolean
     inputValue:string;
 }> {
 
     config: Config = {
         navigationBarTitleText: '首页'
     }
+    private inputRef;
     constructor(props){
         super(props);
         this.state = {
             codeBtnActive:false,
             showMobileClear:false,
-            inputValue:""
+            inputValue:"",
+            inputActive:false
         }
     }
     componentWillMount() { }
@@ -65,8 +68,10 @@ export default class Login extends Component<any,{
         this.setState({
             inputValue:"",
             showMobileClear:false,
-            codeBtnActive:false
-        })
+            codeBtnActive:false,
+            inputActive:false
+        });
+        this.inputRef.inputRef.focus();
     }
     sendSMS = () => {
         const { codeBtnActive,inputValue } = this.state;
@@ -85,7 +90,7 @@ export default class Login extends Component<any,{
         }
     }
     render() {
-        const { codeBtnActive,showMobileClear,inputValue } = this.state;
+        const { codeBtnActive,showMobileClear,inputValue,inputActive } = this.state;
         return (
             <View className='login'>
                 <HeaderTop rightText="账号登录" url='/pages/login/acount' />
@@ -95,10 +100,16 @@ export default class Login extends Component<any,{
                         <Text className='ttext'>欢迎来到映果定制</Text>
                     </View>
                     <View className='acount'>
-                        <Input type='number' placeholder='请输入手机号' className={codeBtnActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} value={inputValue}/>
+                        <Input type='number' placeholder='请输入手机号' className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
+                            this.setState({inputActive:true})
+                        }} onBlur={()=>{
+                            if (inputValue.length<=0) {
+                                this.setState({inputActive:false})
+                            }
+                        }} ref={(node)=>{this.inputRef = node}} value={inputValue}/>
                         {/* <Text className='forget'>忘记密码</Text> */}
                         {
-                            showMobileClear?<View className='clearIcon' onClick={this.onInputClear}><IconFont name='16_qingkong' size={16} color='#999999' /></View>:null
+                            showMobileClear?<View className='clearIcon' onClick={this.onInputClear}><IconFont name='16_qingkong' size={32} color='#999999' /></View>:null
                         }
                     </View>
                     <View className={codeBtnActive?'getcode codeActive':'getcode'} onClick={this.sendSMS}>

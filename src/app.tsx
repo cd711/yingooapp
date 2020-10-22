@@ -1,9 +1,9 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
+import {userStore} from './store/user'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
-import {userStore} from './store/user'
 import { options,getUserInfo } from './utils/net';
 import config from './config';
 
@@ -35,7 +35,10 @@ class App extends Component {
             'pages/login/index',
             'pages/editor/index',
             'pages/login/acount',
-            'pages/login/sms'
+            'pages/login/sms',
+            'pages/me/setting',
+            'pages/me/profile',
+            'pages/me/acount'
         ],
         window: {
             backgroundTextStyle: 'light',

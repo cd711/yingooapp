@@ -24,6 +24,18 @@ export function setUserInfo(info) {
         data: Base64.encode(JSON.stringify(info))
     });
 }
+export function updateLocalUserInfo(feild,context) {
+    let info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
+    if (info) {
+        let user = JSON.parse(info);
+        user[feild] = context;
+        Taro.setStorage({
+            key: "TaroInfoKey",
+            data: Base64.encode(JSON.stringify(user))
+        });
+    }
+
+}
 export function getUserInfo() {
    let info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
    if (info) {
@@ -40,6 +52,8 @@ export function getToken(): string {
     if (accessToken && accessToken.expires > now) {
         return accessToken.token
     }
+    Taro.removeStorage({key:'token'});
+    Taro.removeStorage({key:'TaroInfoKey'});
     return "";
 }
 export function api(name: string, params?: any): Promise<any> {

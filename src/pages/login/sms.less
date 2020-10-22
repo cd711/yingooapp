@@ -1,35 +1,38 @@
+.taro_page{
+    background: #FFF;
+}
 .sms{
     .back{
-        width: 24px;
-        height: 24px;
-        padding-top: 22px;
-        padding-left: 16px;
-        margin-bottom: 60px;
+        width: 48px;
+        height: 48px;
+        padding-top: 44px;
+        padding-left: 32px;
+        margin-bottom: 120px;
     }
     .box{
-        padding:0 32px;
+        padding:0 64px;
         .title{
             color: #121314;
-            font-size: 24px;
+            font-size: 48px;
         }
         .subtitle{
-            margin-bottom: 50px;
+            margin-bottom: 100px;
             .sendto{
-                font-size: 12px;
+                font-size: 24px;
                 color: #9C9DA6;
-                padding-right: 8px;
+                padding-right: 16px;
             }
             .mobile-number{
                 color: #FF4966;
-                font-size: 14px;
+                font-size: 28px;
             }
         }
         .inputBox{
             position: relative;
-            height: 46px;
+            height: 92px;
             .smscode{
                 color: #FFF;
-                height: 46px;
+                height: 92px;
                 caret-color:transparent;
             }
             .inputrow{
@@ -42,38 +45,38 @@
                 width: 100%;
 
                 .code-box{
-                    width: 46px;
-                    height: 46px;
+                    width: 92px;
+                    height: 92px;
                     background: #F5F6F9;
-                    border-radius: 8px;
+                    border-radius: 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     .intput-code-box{
-                        width: 46px;
-                        height: 46px;
+                        width: 92px;
+                        height: 92px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: #fff;
-                        font-size: 24px;
+                        font-size: 48px;
                     }
                 }
                 .code-box-on{
                     background: #FFFFFF;
-                    box-shadow: 0px 10px 24px -7px rgba(0, 0, 0, 0.15);
-                    border-radius: 8px;
+                    box-shadow: 0px 20px 48px -14px rgba(0, 0, 0, 0.15);
+                    border-radius: 16px;
                 }
                 .code-box-on::before {
                     float: right;
                     content: "";
                     background-color: #ff4e58;
                     letter-spacing: 0.88px;
-                    width: 3px;
-                    height: 20px;
+                    width: 6px;
+                    height: 40px;
                     border-radius: 1px;
                     animation: cursor-blinks 1.5s infinite steps(1, start);
-                    margin-left: 10px;
+                    margin-left: 20px;
                 }
                 @keyframes cursor-blinks {
                     0% {
@@ -91,29 +94,29 @@
                 }
                 .code-box-active{
                     background: #FF4966;
-                    box-shadow: 0px 8px 16px -4px rgba(255, 74, 101, 0.4);
-                    border-radius: 8px;
+                    box-shadow: 0px 16px 32px -8px rgba(255, 74, 101, 0.4);
+                    border-radius: 16px;
                 }
             }
         }
         .opTips{
             display: flex;
             justify-content: center;
-            margin-top: 48px;
+            margin-top: 96px;
             .tipLine{
                 .tl1{
-                    font-size: 14px;
+                    font-size: 28px;
                     color: #FF4966;
                 }
                 .tl2{
-                    font-size: 14px;
+                    font-size: 28px;
                     color: #707177;
-                    padding-left: 4px;
+                    padding-left: 8px;
                 }
             }
             .resend{
                 color: #FF4966;
-                font-size: 14px;
+                font-size: 28px;
             }
         }
     }
