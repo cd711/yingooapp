@@ -14,7 +14,7 @@ export default class Index extends Component<{}, {
 
   constructor(p) {
     super(p);
-    this.tplId = this.$router.params.query ? this.$router.params.query['tpl_id'] : '20200960';
+    this.tplId = this.$router.params.query ? this.$router.params.query['tpl_id'] : '20200826';
     this.productId = this.$router.params.query ? this.$router.params.query['id'] : '12';
   
   }
@@ -49,16 +49,15 @@ export default class Index extends Component<{}, {
   }
 
   setEditorSize: { (size: { width: number; height: number }): void } = ({ width, height }) => {
-
     let w = width;
     let h = height;
-    if (w > 270) {
-      w = 270;
-      h = 360 / width * h;
+    if (w > 540) {
+      w = 540;
+      h = 620 / width * h;
     }
-    if (h > 480) {
-      h = 480;
-      w = 480 / h * w;
+    if (h > 960) {
+      h = 960;
+      w = 960 / h * w;
     }
 
     // document.body.querySelector(".editor").addEventListener("")
@@ -80,6 +79,7 @@ export default class Index extends Component<{}, {
     if (!this.tplId && !this.productId) {
       return null;
     }
+
     return <View>
       <View className={`editor ${editorAnim ? ' anim' : ''}`} style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
