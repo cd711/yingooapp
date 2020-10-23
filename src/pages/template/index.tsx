@@ -143,11 +143,11 @@ export default class Template extends Component<any,{
                         </ScrollView>
                     </View>
                     <ScrollView scrollY className='right-scroll' style={`height:${otherHeight}px;flex:1`}>
-                        <View className='warp'>
+                        <View className='warp' style={'background:red;width:100%'}>
                             {
                                 tagList.map((item)=>(
                                     <View className='pic-box' style={`width:${Taro.pxTransform(244)};height:${Taro.pxTransform(244/(item.attr.width/item.attr.height))};`}>
-                                        <Image src={item.thumb_image} className='item' style={`width:${Taro.pxTransform(244)};height:${Taro.pxTransform(244/(item.attr.width/item.attr.height))};border-radius: 16px;`}/>
+                                        <Image src={item.thumb_image} className='item' style={`width:${Taro.pxTransform(244)};height:${Taro.pxTransform(244/(item.attr.width/item.attr.height))};border-radius: ${Taro.pxTransform(16)};`}/>
                                     </View>
                                     
                                 ))
