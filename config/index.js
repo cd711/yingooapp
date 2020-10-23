@@ -75,6 +75,7 @@ const config = {
       mode: 'browser',
       customRoutes: {
         '/pages/index/index': '/',
+        '/pages/template/index': '/template',
         '/pages/editor/index': '/editor'
       }
     },
