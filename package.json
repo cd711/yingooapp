@@ -51,6 +51,7 @@
     "nerv-devtools": "^1.5.5",
     "nervjs": "^1.5.5",
     "regenerator-runtime": "0.11.1",
+    "rgbaster": "^2.1.1",
     "taro-ui": "^2.3.4"
   },
   "devDependencies": {

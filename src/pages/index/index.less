@@ -2,6 +2,7 @@
     background: #F5F6F9;
 }
 .index{
+    height: 200vh;
     .top-search{
         height: 104px;
         background: #FFFFFF;
@@ -19,6 +20,87 @@
                 font-size: 28px;
                 padding-left: 2px;
             }
+        }
+    }
+    .container{
+        .temp-warp{
+            width: 670px;
+            // height: 912px;
+            background: #FFFFFF;
+            box-shadow: 0px 20px 60px 0px rgba(10, 36, 99, 0.04);
+            border-radius: 32px;
+            box-sizing: border-box;
+            margin: 40px auto 0;
+            overflow: hidden;
+            .title{
+                text-align: center;
+                margin-bottom: 30px;
+                padding: 40px 42px 0;
+                .txt{
+                    display: block;
+                    font-size: 48px;
+                    color: #121314;
+                }
+                .sub-title{
+                    font-size: 24px;
+                    color:#9C9DA6;
+                }
+            }
+            .temp-swiper{
+                width: 574px;
+                height: 366px;
+                border-radius: 8px;
+                margin: 0 auto;
+                overflow: hidden;
+                .photo{
+                    width: 574px;
+                    height: 366px;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+            }
+            .grid{
+                display: flex;
+                flex-wrap: wrap;
+                padding: 40px 42px 0;
+                .photo-warp{
+                    width: 174px;
+                    height: 250px;
+                    border-radius: 8px;
+                    margin-bottom: 24px;
+                    margin-right: 31px;
+                    .photo{
+                        width: 174px;
+                        height: 250px;
+                        border-radius: 8px;
+                    }
+                }
+                .photo-warp:nth-child(3n){
+                    margin-right: 0;
+                }
+            }
+            .seemore{
+                
+                width: 590px;
+                height: 96px;
+                background: #F5F6F9;
+                border-radius: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 24px;
+                margin: 0 auto 40px;
+                .txt{
+                    font-size: 28px;
+                    color: #9C9DA6;
+                }
+            }
+
+        }
+        .design{
+            width: 200px;
+            height: 200px;
+            background: red;
         }
     }
     

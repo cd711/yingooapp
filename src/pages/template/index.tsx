@@ -248,7 +248,7 @@ export default class Template extends Component<any,{
                                     <View className='nook'>
                                         <Text className='ntxt'>快速</Text>
                                     </View>
-                                </View>:<AtActivityIndicator isOpened={true} mode='center'></AtActivityIndicator>
+                                </View>:<AtActivityIndicator isOpened={showTemplateLoading} mode='center'></AtActivityIndicator>
                             }
                             
                             {
