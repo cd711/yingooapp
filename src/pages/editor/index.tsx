@@ -53,25 +53,24 @@ export default class Index extends Component<{}, {
           break;
 
         case "mainSize":
-          // setTimeout(() => this.setEditorSize(data.data), 3000);
+          this.setEditorSize(data.data);
           break;
       }
     }
   }
 
   setEditorSize: { (size: { width: number; height: number }): void } = ({ width, height }) => {
+
     let w = width;
     let h = height;
-    if (w > 540) {
-      w = 540;
-      h = 620 / width * h;
-    }
+    w = 750;
+    h = 750 / width * h;
+  
     if (h > 960) {
       h = 960;
       w = 960 / h * w;
     }
 
-    // document.body.querySelector(".editor").addEventListener("")
     this.setState({
       editorAnim: true,
       size: {
