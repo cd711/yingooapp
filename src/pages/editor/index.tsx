@@ -53,7 +53,7 @@ export default class Index extends Component<{}, {
           break;
 
         case "mainSize":
-          setTimeout(() => this.setEditorSize(data.data), 3000);
+          // setTimeout(() => this.setEditorSize(data.data), 3000);
           break;
       }
     }
