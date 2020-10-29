@@ -5,6 +5,9 @@ import './index.less'
 import IconFont from '../../components/iconfont'
 import { api } from '../../utils/net'
 import {AtActivityIndicator} from 'taro-ui'
+import { templateStore } from '../../store/template'
+import { observer, inject } from '@tarojs/mobx'
+
 
 interface TagData{
     list:Array<any>,
@@ -13,6 +16,8 @@ interface TagData{
     total:number
 }
 
+@inject("templateStore")
+@observer
 export default class Template extends Component<any,{
     switchActive:number;
     cates:Array<any>;
@@ -236,7 +241,7 @@ export default class Template extends Component<any,{
                     <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`}>
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
                             {
-                                !showTemplateLoading?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
+                                !showTemplateLoading && switchActive == 0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
                                     // Taro.navigateTo({
                                     //     url:`/pages/editor/index`
                                     // })
@@ -254,9 +259,11 @@ export default class Template extends Component<any,{
                             {
                                 tagList.map((item)=>(
                                     <View className='pic-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
+
+                                        templateStore.selectItem = item;
                                         Taro.navigateTo({
-                                            url:`/pages/editor/index?tpl_id=${item.id}`
-                                        })
+                                            url:`/pages/template/detail`
+                                        });
                                     }}>
                                         <Image src={item.thumb_image} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`}/>
                                     </View>

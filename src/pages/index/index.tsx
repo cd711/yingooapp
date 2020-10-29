@@ -1,6 +1,6 @@
 import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Swiper, SwiperItem, Text,Image } from '@tarojs/components'
+import { View, Swiper, SwiperItem, Text,Image, Button } from '@tarojs/components'
 import { observer, inject } from '@tarojs/mobx'
 import analyze from 'rgbaster'
 import './index.less'
@@ -21,6 +21,7 @@ const pics = [
 class Index extends Component<any,{
     tempColors:Array<string>;
     colorWarp:string;
+    swiperCurrent:number;
 }> {
 
     /**
@@ -37,7 +38,8 @@ class Index extends Component<any,{
         super(props);
         this.state = {
             tempColors:[],
-            colorWarp:""
+            colorWarp:"",
+            swiperCurrent:0
         }
     }
 
@@ -75,7 +77,7 @@ class Index extends Component<any,{
 
     render() {
         const { } = userStore;
-        const {colorWarp} = this.state;
+        const {colorWarp,swiperCurrent} = this.state;
         return (
             <View className='index'>
                 <View className='top-search'>
@@ -105,34 +107,66 @@ class Index extends Component<any,{
                         </View>
                     </View>
                     <View className='temp-warp' style={`background:${colorWarp}`}>
-                        <View style={'background:rgba(0, 0, 0, 0.15);'} className='mask'>
+                        <View style={'background:rgba(0, 0, 0, 0.03);'} className='mask'>
                             <View className='title'>
                                 <Text className='txt'>大胆的色彩和创意</Text>
                                 <Text className='sub-title'>将色彩与创意做到极致</Text>
                             </View>
-                            <Swiper
-                                className='temp-swiper'
-                                // indicatorColor='#000000'
-                                // indicatorActiveColor='#FF4966'
-                                vertical
-                                circular={true}
-                                indicatorDots={false}
-                                onChange = {({detail:{current}})=>{
-                                    this.setState({
-                                        colorWarp:this.state.tempColors[current]
-                                    })
-                                }}
-                                >
+                            <View className='swiper-back'>
+                                <Swiper
+                                    className='temp-swiper'
+                                    vertical
+                                    circular={false}
+                                    indicatorDots={false}
+                                    onChange = {({detail:{current}})=>{
+                                        this.setState({
+                                            colorWarp:this.state.tempColors[current],
+                                            swiperCurrent:current
+                                        })
+                                    }}
+                                    >
+                                    {
+                                        pics.map((item)=>(
+                                            <SwiperItem>
+                                                <Image src={item} className='photo' mode='aspectFill'/>
+                                            </SwiperItem>
+                                        ))
+                                    }
+                                </Swiper>
+
+                                <View className='indicatorDots'>
+                                    {
+                                        pics.map((_,index)=>(
+                                            <View className={swiperCurrent==index?'dot active':'dot'} key={index}></View>
+                                        ))
+                                    }
+                                </View>
+                            </View>
+                            {/* <View className='coverflow'>
                                 {
-                                    pics.map((item)=>(
-                                        <SwiperItem>
+                                    pics.map((item,index)=>(
+                                        <View className='item' key={index}>
                                             <Image src={item} className='photo' mode='aspectFill'/>
-                                        </SwiperItem>
+                                        </View>
                                     ))
                                 }
-                            </Swiper>
+                            </View> */}
+                            <Button className='now-design-btn'>立即设计</Button>
                         </View>
                     </View>
+                    <View className='product-item'>
+                        <Image src={pics[0]} className='image' mode='aspectFill'/>
+                        <View className='bottom'>
+                            <View className='left'>
+                                <Text className='title'>Nike耐克空军一号</Text>
+                                <Text className='subtitle'>定制你的专属耐克</Text>
+                            </View>
+                            <View className='right-btn'>
+                                <Text className='txt'>我要定制</Text>
+                            </View>
+                        </View>
+                    </View>
+
                 </View>
             </View>
         )

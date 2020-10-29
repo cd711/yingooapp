@@ -1,0 +1,210 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.order-detail{
+    .top{
+        height: 400px;
+        background: #FF4966;
+        padding: 0 32px;
+        .status{
+            padding-top: 192px;
+            margin-bottom: 26px;
+            .statustxt{
+                font-size: 48px;
+                font-weight: 500;
+                color: #FFFFFF;
+                padding-left: 8px;
+            }
+            .time-tip{
+                padding-left: 8px;
+                .waiting-pay{
+                    display: flex;
+                    align-items: center;
+                    .waiting-pay-txt{
+                        font-size: 28px;
+                        font-weight: 400;
+                        color: #FFFFFF;
+                    }
+                    .time{
+                        display: flex;
+                        align-items: center;
+                        color: #FFF;
+                        padding: 0 4px;
+                        .sym{
+                            font-size: 24px;
+                            padding: 0 5px;
+                        }
+                        .item{
+                            width: 38px;
+                            height: 34px;
+                            background: #FFFFFF;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            
+                            .txt{
+                                font-size: 24px;
+                                font-weight: 500;
+                                color: #FF4966;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .address-info{
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            .icon{
+                margin-right: 24px;
+            }
+            .info{
+                display: flex;
+                flex-direction: column;
+                .youi{
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 8px;
+                    .name,.phone{
+                        font-size: 32px;
+                        font-weight: 500;
+                        color: #121314;
+                    }
+                    .name{
+                        padding-right: 32px;
+                    }
+                    .phone{
+                        padding-right: 16px;
+                    }
+                    .default{
+                        width: 64px;
+                        height: 40px;
+                        background: #FFF0F0;
+                        border-radius: 4px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .txt{
+                            font-size: 24px;
+                            font-weight: 400;
+                            color: #FF4966;
+                        }
+                    }
+                }
+                .address{
+                    font-size: 28px;
+                    font-weight: 400;
+                    color: #9C9DA6;
+                }
+            }
+        }
+    }
+    .plist{
+        padding: 110px 32px 24px;
+        .order-info{
+            padding: 24px;
+            display: flex;
+            align-items: flex-start;
+            background: #FFF;
+            border-radius: 16px;
+            .order-img{
+                position: relative;
+                width: 160px;
+                height: 160px;
+                border-radius: 16px;
+                margin-right: 24px;
+                .img{
+                    width: 160px;
+                    height: 160px;
+                    border-radius: 16px;
+                    background-color: red;
+                }
+                .big{
+                    width: 40px;
+                    height: 40px;
+                    position: absolute;
+                    right: 8px;
+                    bottom: 8px;
+                }
+            }
+            .order-name{
+                display: flex;
+                flex-direction: column;
+                width: 310px;
+                height: 160px;
+                .name{
+                    font-size: 28px;
+                    color: #121314;
+                    margin-bottom: 8px;
+                }
+                .gg{
+                    font-size: 24px;
+                    font-weight: 400;
+                    color: #9C9DA6;
+                    // margin-bottom: 8px;
+                }
+                .num{
+                    color: #9C9DA6;
+                    font-size: 24px;
+                }
+            }
+            .price{
+                color: #FF4966;
+                display: flex;
+                align-items: flex-end;
+                margin-left: auto;
+                margin-right: 0;
+                .symbol{
+                    font-size: 24px;
+                    margin-right: 4px;
+                }
+                .n{
+                    font-size: 36px;
+                }
+            }
+        }
+    }
+    .price-list{
+        padding: 0 24px;
+        .box{
+            background: #FFFFFF;
+            border-radius: 16px;
+            .top-part{
+                padding: 24px 24px 0;
+                border-bottom: 1px solid #EDEDEF;
+                .line{
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 32px;
+                    .name{
+                        font-size: 28px;
+                        font-weight: 400;
+                        color: #707177;
+                    }
+                    .price{
+                        font-size: 28px;
+                        font-weight: 500;
+                        color: #121314;
+                    }
+                }
+            }
+            .bottom-part{
+                padding: 24px;
+                text-align: right;
+                font-size: 28px;
+                .name{
+                    color: #121314;
+                }
+                .price{
+                    color: #FF4966;
+                }
+            }
+        }
+    }
+
+}
