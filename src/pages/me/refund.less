@@ -1,4 +1,9 @@
+.taro_page{
+    background: #FFF;
+}
 .refund{
+    background: #FFF;
+    padding-bottom: 100px;
     .plist{
         border-bottom: 1px solid #EDEDEF;
         .order-info{
@@ -120,8 +125,73 @@
             .at-textarea__textarea{
                 background: #F5F6F9;
                 font-size: 28px;
+            }
+            .at-textarea__counter{
+                font-size: 22px;
+                font-weight: 400;
                 color: #9C9DA6;
             }
         }
+    }
+    .upload-pic{
+        padding: 0 32px 40px;
+        border-bottom: 1px solid #EDEDEF;
+        .upload{
+            width: 160px;
+            height: 160px;
+            background: #F5F6F9;
+            border-radius: 16px;
+            border: 2px dashed #DFDFE0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            .input{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 160px;
+                height: 160px;
+                background: transparent;
+                border: 0;
+                opacity: 0;
+            }   
+        }
+    }
+    .contact{
+        display: flex;
+        flex-direction: column;
+        padding: 32px;
+        box-sizing: border-box;
+        .name{
+            font-size: 32px;
+            font-weight: 500;
+            color: #121314;
+            padding-bottom: 24px;
+        }
+        .phone{
+            padding: 0;
+            margin: 0;
+            background: #F5F6F9;
+            border-radius: 16px;
+            font-size: 28px;
+            padding: 28px 24px;
+            width: 686px;
+            height: 100px;
+            box-sizing: border-box;
+        }
+    }
+    .submit{
+        width: 686px;
+        height: 96px;
+        background: #FF91A3;
+        border-radius: 48px;
+        font-size: 32px;
+        font-weight: 500;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 120px auto 0;
     }
 }

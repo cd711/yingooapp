@@ -44,7 +44,9 @@ class App extends Component {
             'pages/me/acount',
             'pages/me/order',
             'pages/me/orderdetail',
-            'pages/me/refund'
+            'pages/me/refund',
+            'pages/me/address/index',
+            'pages/me/address/editor'
         ],
         window: {
             backgroundTextStyle: 'light',

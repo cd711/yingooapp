@@ -88,7 +88,11 @@ export default class Setting extends Component<any,{
                         <Text className='name'>素材库</Text>
                         <IconFont name='20_xiayiye' size={40} color="#9C9DA6" />
                     </View>
-                    <View className='item'>
+                    <View className='item' onClick={()=>{
+                        Taro.navigateTo({
+                            url:'/pages/me/address/index'
+                        })
+                    }}>
                         <Text className='name'>收货地址</Text>
                         <IconFont name='20_xiayiye' size={40} color="#9C9DA6" />
                     </View>

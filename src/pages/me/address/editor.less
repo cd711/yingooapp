@@ -1,0 +1,121 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.editor{
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        // justify-content: space-between;
+        height: 88px;
+        position: relative;
+        box-sizing: border-box;
+        background: #FFF;
+        .left{
+            padding-left: 32px;
+            z-index: 1;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            width: 100vw;
+            z-index: 0;
+            .title{
+                font-size: 36px;
+                font-weight: 500;
+                color: #121314;
+            }
+        }
+    }
+    .container{
+        border-top: 1px solid #EDEDEF;
+        .item{
+            display: flex;
+            align-items: center;
+
+            padding: 30px 32px;
+            background: #FFF;
+            .name{
+                font-size: 32px;
+                font-weight: 400;
+                color: #121314;
+                padding-right: 24px;
+            }
+            Input{
+                max-width: 436px;
+                font-size: 32px;
+            }
+            .right{
+                display: flex;
+                align-items: center;
+                flex: 1;
+                .region{
+                    font-size: 32px;
+                    font-weight: 400;
+                    color: #9C9DA6;
+                }
+                .sym{
+                    margin-left: auto;
+                    margin-right: 0;
+                }
+            }
+            .at-switch{
+                padding: 0;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+            .at-switch__title{
+                font-size: 32px;
+                font-weight: 400;
+                color: #121314;
+                padding-right: 24px;                
+            }
+        }
+        .column{
+            flex-direction: column;
+            align-items: flex-start;
+            .name{
+                padding-bottom: 30px;
+            }
+            .at-textarea{
+                border: none;
+                background: #F5F6F9;
+                border-radius: 16px;
+                padding: 24px;
+                .at-textarea__textarea{
+                    background: #F5F6F9;
+                    font-size: 32px;
+                    height: 80px;
+                }
+                .at-textarea__counter{
+                    font-size: 22px;
+                    font-weight: 400;
+                    color: #9C9DA6;
+                }
+            }
+        }
+    }
+    .save-btn{
+        position: fixed;
+        bottom: 100px;
+        width: 686px;
+        height: 96px;
+        background: #FF4966;
+        box-shadow: 0px 20px 48px -14px rgba(255, 74, 101, 0.5);
+        border-radius: 48px;
+        font-size: 32px;
+        font-weight: 500;
+        color: #FFFFFF;
+        text-shadow: 0px 20px 48px rgba(255, 74, 101, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        left: 50%;
+        transform: translate(-50%,0);
+    }
+
+}

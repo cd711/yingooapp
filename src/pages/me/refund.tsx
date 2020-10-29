@@ -1,6 +1,6 @@
 import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image } from '@tarojs/components'
+import { View, Text,Image,Input, Button } from '@tarojs/components'
 import './refund.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
@@ -90,6 +90,20 @@ export default class Refund extends Component<any,{
                         placeholder='你想说点什么？'
                     />
                 </View>
+                <View className='upload-pic'>
+                    <View className='upload'>
+                        {/* @ts-ignore */}
+                        <Input type='file' accept="image/*;" className='input' onChange={(e)=>{
+                            console.log(e.detail.value)
+                        }}/>
+                        <IconFont name='24_jiahao' size={48} color='#D7D7DA' />
+                    </View>
+                </View>
+                <View className='contact'>
+                    <Text className='name'>联系方式</Text>
+                    <Input type='text' className='phone' placeholder='请留下您的联系方式' onInput={(e)=>{}} />
+                </View>
+                <Button className='submit'>提交</Button>
             </View>
         )
     }
