@@ -7,7 +7,7 @@ import { api } from '../../utils/net'
 import {AtActivityIndicator} from 'taro-ui'
 import { templateStore } from '../../store/template'
 import { observer, inject } from '@tarojs/mobx'
-
+import {ossUrl} from '../../utils/common'
 
 interface TagData{
     list:Array<any>,
@@ -258,13 +258,16 @@ export default class Template extends Component<any,{
                             
                             {
                                 tagList.map((item)=>(
-                                    <View className='pic-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
+
+                                    <View className='pic-box' style={switchActive == 1 ?`width:138px;height:246px;background:url(${require('../../source/ke.png')}) no-repeat; background-size: 138px 246px;padding:3px 4px`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
                                         templateStore.selectItem = item;
                                         Taro.navigateTo({
                                             url:`/pages/template/detail`
                                         });
                                     }}>
-                                        <Image src={item.thumb_image} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`}/>
+                                        {
+                                            switchActive == 1 ?<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:100%;height:100%;border-radius: ${Taro.pxTransform(24)};`} mode='aspectFill'/>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`}/>
+                                        }                                        
                                     </View>
                                 ))
                             }

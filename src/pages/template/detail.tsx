@@ -10,6 +10,7 @@ import { observer, inject } from '@tarojs/mobx';
 import { AtLoadMore } from 'taro-ui';
 import lodash from 'lodash';
 import moment from 'moment';
+import {ossUrl} from '../../utils/common'
 interface LikeData{
     list:Array<any>,
     size:number,
@@ -119,7 +120,7 @@ export default class Detail extends Component<any,{
                     }}
                 />
                 {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
-                <Image src={selectItem.thumb_image} className='thumb' mode="aspectFill" />
+                <Image src={ossUrl(selectItem.thumb_image,1)} className='thumb' mode="aspectFill" />
                 <View className='doyoulike'>
                     <View className='opsline'></View>
                     <Text className='liketxt'>猜你喜欢</Text>
@@ -129,7 +130,7 @@ export default class Detail extends Component<any,{
                                 <View className='item' onClick={()=>{
 
                                 }}>
-                                    <Image src={item.thumb_image} className='image' mode='aspectFill'/>
+                                    <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill'/>
                                 </View>
                             ))
                         }

@@ -24,7 +24,7 @@ export default class OrderDetail extends Component<any,{
 
     componentDidMount() { }
 
-
+    handle(){}
 
     render() {
         const { } = this.state;
@@ -105,7 +105,6 @@ export default class OrderDetail extends Component<any,{
                         </View>
                         <View className='bottom-part'>
                             <Text className='name'>实付：</Text>
-
                             <View className='price'><Text className='sym'>￥</Text>49.00</View>
                         </View>
                     </View>
@@ -124,6 +123,11 @@ export default class OrderDetail extends Component<any,{
                 <View className='ops'>
                     <Button className='red-border-btn'>取消订单</Button>
                     <Button className='red-border-btn'>修改地址</Button>
+                    <Button className='gray-border-btn' onClick={()=>{
+                        Taro.navigateTo({
+                            url:'/pages/me/refund'
+                        })
+                    }}>申请退款</Button>
                     <Button className='red-full-btn'>去支付</Button>
                 </View>
             </View>

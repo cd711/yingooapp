@@ -43,7 +43,8 @@ class App extends Component {
             'pages/me/profile',
             'pages/me/acount',
             'pages/me/order',
-            'pages/me/orderdetail'
+            'pages/me/orderdetail',
+            'pages/me/refund'
         ],
         window: {
             backgroundTextStyle: 'light',
