@@ -115,7 +115,7 @@
         }
 
         .all{
-            width: 128px;
+            width: 148px;
             height: 104px;
             display: flex;
             align-items: center;
@@ -144,7 +144,11 @@
         .right-scroll{
             .warp{
                 column-count:2;
-                
+                position: relative;
+                .at-activity-indicator--center {
+                    top:100px;
+                    // transform: none;
+                }
             }
             .print-box{
                 break-inside: avoid;

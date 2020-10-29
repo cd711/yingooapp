@@ -94,21 +94,37 @@ export default class Me extends Component<any,{
                     <View className='orderWarp'>
                         <View className='myorall'>
                             <Text className='myorder'>我的订单</Text>
-                            <View className='allorder'>
+                            <View className='allorder' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/order'
+                                })
+                            }}>
                                 <Text>全部订单</Text>
                                 <IconFont name={"16_xiayiye"} size={36} color="#9C9DA6"/>
                             </View>
                         </View>
                         <View className='orderstate'>
-                            <View className='oitem'>
+                            <View className='oitem' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/order?switch=1'
+                                })
+                            }}>
                                 <IconFont name={"24_daifukuan"} size={48} color="#121314"/>
                                 <Text className='orderText'>待付款</Text>
                             </View>
-                            <View className='oitem'>
+                            <View className='oitem' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/order?switch=2'
+                                })
+                            }}>
                                 <IconFont name={"24_daifahuo"} size={48} color="#121314"/>
                                 <Text className='orderText'>待发货</Text>
                             </View>
-                            <View className='oitem'>
+                            <View className='oitem' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/order?switch=3'
+                                })
+                            }}>
                                 <IconFont name={"24_daishouhuo"} size={48} color="#121314"/>
                                 <Text className='orderText'>待收货</Text>
                             </View>

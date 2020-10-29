@@ -76,7 +76,8 @@ const config = {
       customRoutes: {
         '/pages/index/index': '/',
         '/pages/template/index': '/template',
-        '/pages/editor/index': '/editor'
+        '/pages/editor/index': '/editor',
+        '/pages/me/me':'/me'
       }
     },
     publicPath: '/',

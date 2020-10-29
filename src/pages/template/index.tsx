@@ -4,6 +4,10 @@ import { View, Text,Image,ScrollView } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont'
 import { api } from '../../utils/net'
+import {AtActivityIndicator} from 'taro-ui'
+import { templateStore } from '../../store/template'
+import { observer, inject } from '@tarojs/mobx'
+
 
 interface TagData{
     list:Array<any>,
@@ -12,6 +16,8 @@ interface TagData{
     total:number
 }
 
+@inject("templateStore")
+@observer
 export default class Template extends Component<any,{
     switchActive:number;
     cates:Array<any>;
@@ -21,6 +27,7 @@ export default class Template extends Component<any,{
     tagData:TagData | any;
     mainRightWidth:number;
     showAllCates:boolean;
+    showTemplateLoading:boolean;
 }> {
     config: Config = {
         navigationBarTitleText: '模板'
@@ -40,7 +47,8 @@ export default class Template extends Component<any,{
                 total:0
             },
             mainRightWidth:0,
-            showAllCates:false
+            showAllCates:false,
+            showTemplateLoading:false
         }
     }
     componentWillMount() { }
@@ -56,10 +64,12 @@ export default class Template extends Component<any,{
             this.setState({
                 cates:res,
             },()=>{
+                Taro.hideLoading();
+                
                 this.getTagContext(res[0].tags[0])
             })
             this.calcDeviceRota();
-            Taro.hideLoading();
+            
         }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
@@ -101,19 +111,27 @@ export default class Template extends Component<any,{
     componentDidHide() { }
     getTagContext = (tag) => {
         const {switchActive,cates} = this.state;
-        api("app.product_tpl/list",{
-            start:0,
-            size:20,
-            category_id:cates[switchActive].tpl_category_id,
-            tag_id:tag.id
-        }).then((res)=>{
+        if (tag) {
             this.setState({
-                tagData:res
+                showTemplateLoading:true
             })
-        })
+            api("app.product_tpl/list",{
+                start:0,
+                size:20,
+                category_id:cates[switchActive].tpl_category_id,
+                tag_id:tag.id
+            }).then((res)=>{
+                this.setState({
+                    tagData:res,
+                    showTemplateLoading:false
+                });
+                Taro.hideLoading();
+            })           
+        }
+
     }
     render() {
-        const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates} = this.state;
+        const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,showTemplateLoading} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
         console.log(tags)
         const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
@@ -141,7 +159,19 @@ export default class Template extends Component<any,{
                                 <View className='all-item'>
                                     {
                                         cates.length>0 && cates.map((item,index)=>(
-                                            <View className='item' key={item.id}>
+                                            <View className='item' key={item.id} onClick={()=>{
+                                                this.setState({
+                                                    switchActive:index,
+                                                    switchTagActive:0,
+                                                    tagData:{},
+                                                    showAllCates:false
+                                                },()=>{
+                                                    const tags = cates && cates[index]?cates[index].tags:[];
+                                                    if (tags.length>0) {
+                                                        this.getTagContext(tags[0]);
+                                                    }
+                                                });
+                                            }}>
                                                 <Image src={item.image} className='img'/>
                                                 <Text className='name'>{item.name}</Text>
                                             </View>
@@ -194,11 +224,13 @@ export default class Template extends Component<any,{
                             {
                                 tags && tags.map((item,index)=>(
                                     <View className={switchTagActive==index?'item active':"item"} key={item.id} onClick={()=>{
-                                        this.setState({
-                                            switchTagActive:index,
-                                            tagData:{}
-                                        });
-                                        this.getTagContext(item)
+                                        if (switchTagActive != index) {
+                                            this.setState({
+                                                switchTagActive:index,
+                                                tagData:{}
+                                            });
+                                            this.getTagContext(item)
+                                        }
                                     }}>
                                         <Text className='txt'>{item.name}</Text>
                                     </View>
@@ -208,25 +240,30 @@ export default class Template extends Component<any,{
                     </View>
                     <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`}>
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
-                            <View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
-                                // Taro.navigateTo({
-                                //     url:`/pages/editor/index`
-                                // })
-                            }}>
-                                <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>
-                                    <Image src={require("../../source/editor-print.png")} className='print'/>
-                                    <Text className='print-txt'>直接冲印</Text>
-                                </View>
-                                <View className='nook'>
-                                    <Text className='ntxt'>快速</Text>
-                                </View>
-                            </View>
+                            {
+                                !showTemplateLoading && switchActive == 0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
+                                    // Taro.navigateTo({
+                                    //     url:`/pages/editor/index`
+                                    // })
+                                }}>
+                                    <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>
+                                        <Image src={require("../../source/editor-print.png")} className='print'/>
+                                        <Text className='print-txt'>直接冲印</Text>
+                                    </View>
+                                    <View className='nook'>
+                                        <Text className='ntxt'>快速</Text>
+                                    </View>
+                                </View>:<AtActivityIndicator isOpened={showTemplateLoading} mode='center'></AtActivityIndicator>
+                            }
+                            
                             {
                                 tagList.map((item)=>(
                                     <View className='pic-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
+
+                                        templateStore.selectItem = item;
                                         Taro.navigateTo({
-                                            url:`/pages/editor/index?tpl_id=${item.id}`
-                                        })
+                                            url:`/pages/template/detail`
+                                        });
                                     }}>
                                         <Image src={item.thumb_image} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`}/>
                                     </View>

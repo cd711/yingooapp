@@ -2,6 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
 import {userStore} from './store/user'
+import {templateStore} from './store/template'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
 import { options,getUserInfo } from './utils/net';
@@ -15,7 +16,8 @@ import config from './config';
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
 const store = {
-    userStore
+    userStore,
+    templateStore
 }
 
 class App extends Component {
@@ -32,13 +34,16 @@ class App extends Component {
             'pages/index/index',
             'pages/me/me',
             'pages/template/index',
+            'pages/template/detail',
             'pages/login/index',
             'pages/editor/index',
             'pages/login/acount',
             'pages/login/sms',
             'pages/me/setting',
             'pages/me/profile',
-            'pages/me/acount'
+            'pages/me/acount',
+            'pages/me/order',
+            'pages/me/orderdetail'
         ],
         window: {
             backgroundTextStyle: 'light',

@@ -1,0 +1,98 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.detail{
+    .at-nav-bar__title{
+        color: #707177;
+        font-size: 32px;
+        font-weight: 400;
+    }
+    padding-top: 120px;
+    .thumb{
+        width: 472px;
+        height: 868px;
+        border-radius: 16px;
+        margin: 0 auto;
+        display: block;
+        &>img{
+            width: 472px;
+            height: 868px;
+            border-radius: 16px;
+        }
+    }
+    .doyoulike{
+        // height: 80vh;
+        background: #FFFFFF;
+        border-radius: 32px 32px 0 0;
+        padding: 20px 32px 128px;
+        margin-top: 48px;
+        .opsline{
+            width: 64px;
+            height: 8px;
+            background: #EDEDEF;
+            border-radius: 4px;
+            margin: 0 auto;
+        }
+        .liketxt{
+            display: block;
+            font-size: 36px;
+            font-weight: 500;
+            color: #121314;
+            margin-bottom: 24px;
+        }
+        .like-list{
+            display: flex;
+            flex-wrap: wrap;
+            // justify-content: space-around;
+            .item{
+                width: 330px;
+                height: 376px;
+                border-radius: 16px;
+                margin-bottom: 26px;
+                .image{
+                    width: 330px;
+                    height: 376px;
+                    border-radius: 16px;
+                }                
+            }
+            .item:nth-child(2n){
+                margin-left: 26px;
+            }
+        }
+    }
+    .bottom_bar{
+        display: flex;
+        align-items: center;
+        justify-content:space-around;
+        background: #FFF;
+        height: 128px;
+        position: fixed;
+        bottom: 0;
+        width: 100vw;
+        .favorite{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            .txt{
+                font-size: 24px;
+                color: #707177;
+            }
+        }
+        .now-editor{
+            width: 574px;
+            height: 96px;
+            background: #FF4966;
+            border-radius: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .txt{
+                font-size: 32px;
+                font-weight: 500;
+                color: #FFFFFF;                
+            }
+        }
+    }
+}
