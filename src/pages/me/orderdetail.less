@@ -155,7 +155,7 @@
             .price{
                 color: #FF4966;
                 display: flex;
-                align-items: flex-end;
+                align-items: baseline;
                 margin-left: auto;
                 margin-right: 0;
                 .symbol{
@@ -169,7 +169,7 @@
         }
     }
     .price-list{
-        padding: 0 24px;
+        padding: 0 32px;
         .box{
             background: #FFFFFF;
             border-radius: 16px;
@@ -195,15 +195,94 @@
             }
             .bottom-part{
                 padding: 24px;
-                text-align: right;
-                font-size: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                font-size: 36px;
                 .name{
                     color: #121314;
                 }
                 .price{
                     color: #FF4966;
+                    .sym{
+                        font-size: 24px;
+                    }
                 }
             }
+        }
+    }
+    .order-plist{
+        padding: 24px 32px 30px;
+        .box{
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 24px;
+            color: #707177;
+            font-size: 28px;
+            display: flex;
+            flex-direction: column;
+            .order-num{
+                display: flex;
+                align-items: center;
+                margin-bottom: 24px;
+                .txt{
+                    padding-right: 8px;
+                }
+            }
+            .order-time{
+                margin-bottom: 24px;
+            }
+        }
+    }
+    .order-tips{
+        font-size: 22px;
+        font-weight: 400;
+        color: #9C9DA6;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 200px;
+    }
+    .ops{
+        position: fixed;
+        bottom: 0;
+        width: 100vw;
+        height: 112px;
+        background: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 32px;
+        box-sizing: border-box;
+        Button{
+            margin: 0;
+        }
+        Button+Button{
+            margin-left: 16px;
+        }
+        .red-border-btn{
+            width: 170px;
+            height: 64px;
+            border-radius: 48px;
+            border: 1px solid #FF4966;
+            font-size: 28px;
+            font-weight: 500;
+            color: #FF4966;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+        }
+        .red-full-btn{
+            width: 170px;
+            height: 64px;
+            background: #FF4966;
+            border-radius: 48px;
+            font-size: 28px;
+            font-weight: 500;
+            color: #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 

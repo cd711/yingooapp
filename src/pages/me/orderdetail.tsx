@@ -1,6 +1,6 @@
 import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image } from '@tarojs/components'
+import { View, Text,Image,Button } from '@tarojs/components'
 import './orderdetail.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
@@ -105,9 +105,26 @@ export default class OrderDetail extends Component<any,{
                         </View>
                         <View className='bottom-part'>
                             <Text className='name'>实付：</Text>
-                            <Text className='price'>￥49.00</Text>
+
+                            <View className='price'><Text className='sym'>￥</Text>49.00</View>
                         </View>
                     </View>
+                </View>
+                <View className='order-plist'>
+                    <View className='box'>
+                        <View className='order-num'>
+                            <Text className='txt'>订单编号：212312454366436643</Text>
+                            <IconFont name='20_fuzhi' size={40} color='#9C9DA6' />
+                        </View>
+                        <Text className='order-time'>下单时间：2020-09-24 12:30:24</Text>
+                        <Text className='pay-way'>支付方式：微信支付</Text>
+                    </View>
+                </View>
+                <Text className='order-tips'>如收到商品出现质量、错发、漏发，可申请售后退款</Text>
+                <View className='ops'>
+                    <Button className='red-border-btn'>取消订单</Button>
+                    <Button className='red-border-btn'>修改地址</Button>
+                    <Button className='red-full-btn'>去支付</Button>
                 </View>
             </View>
         )

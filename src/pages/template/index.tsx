@@ -259,7 +259,6 @@ export default class Template extends Component<any,{
                             {
                                 tagList.map((item)=>(
                                     <View className='pic-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
-
                                         templateStore.selectItem = item;
                                         Taro.navigateTo({
                                             url:`/pages/template/detail`
