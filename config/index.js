@@ -76,7 +76,7 @@ const config = {
       customRoutes: {
         '/pages/index/index': '/',
         '/pages/template/index': '/template',
-        '/pages/editor/index': '/editor',
+        '/pages/editor/shell': '/editor/shell',
         '/pages/me/me':'/me'
       }
     },

@@ -36,7 +36,7 @@ class App extends Component {
             'pages/template/index',
             'pages/template/detail',
             'pages/login/index',
-            'pages/editor/index',
+            'pages/editor/shell',
             'pages/login/acount',
             'pages/login/sms',
             'pages/me/setting',

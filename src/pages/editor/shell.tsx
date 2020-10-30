@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { AtActivityIndicator } from "taro-ui";
-import './index.less';
+import './shell.less';
 
 
 export default class Index extends Component<{}, {
@@ -93,7 +93,7 @@ export default class Index extends Component<{}, {
     return <View>
       <View className={`editor ${editorAnim ? ' anim' : ''}`} style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
-        <iframe className={`${editorAnim ? 'anim' : ''}`} src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&amp;id=${this.productId}`}></iframe>
+        <iframe className={`${editorAnim ? 'anim' : ''}`} src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&amp;id=${this.productId}&t=999}`}></iframe>
         {loadingTemplate ? <View className='loading'><AtActivityIndicator size={64} mode='center' /></View> : null}
       </View>
     </View>
