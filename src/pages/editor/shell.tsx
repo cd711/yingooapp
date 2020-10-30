@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { AtActivityIndicator } from "taro-ui";
-import './shell.less';
+import './editor.less';
 
 
 export default class Index extends Component<{}, {
