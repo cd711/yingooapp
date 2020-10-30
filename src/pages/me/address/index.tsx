@@ -1,12 +1,13 @@
 import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input } from '@tarojs/components'
+import { View, Text,Image, Button } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../../components/iconfont';
 import { api } from '../../../utils/net';
-import { AtNavBar } from 'taro-ui'
-export default class Address extends Component<any,{
 
+
+export default class Address extends Component<any,{
+    addressList:Array<any>
 }> {
 
     config: Config = {
@@ -16,20 +17,44 @@ export default class Address extends Component<any,{
     constructor(props){
         super(props);
         this.state = {
-
+            addressList:[]
         }
     }
     componentWillMount() { }
 
-    componentDidMount() { 
-
+    componentDidMount() {
+        
     }
-
+    componentDidShow(){
+        this.getList();
+    }
+    getList(){
+        Taro.showLoading({title:"加载中..."});
+        api("app.address/list").then((res)=>{
+            Taro.hideLoading();
+            console.log(res)
+            this.setState({
+                addressList:res
+            });
+            
+        }).catch((e)=>{
+            Taro.hideLoading();
+            setTimeout(() => {
+                Taro.navigateBack();
+            }, 2000);
+            Taro.showToast({
+                title:e,
+                icon:'none',
+                duration:2000,
+            })
+        });
+    }
     componentWillUnmount() { }
 
 
     render() {
-        const {  } = this.state;
+        const { addressList } = this.state;
+        console.log(addressList)
         return (
             <View className='address'>
                 {/* <AtNavBar
@@ -64,23 +89,37 @@ export default class Address extends Component<any,{
                     </View>
                 </View>
                 <View className='alist'>
-                    <View className='item'>
-                        <View className='left'>
-                            <View className='info'>
-                                <Text className='name'>邵奇</Text>
-                                <Text className='phone'>13388888888</Text>
-                                <View className='default'>
-                                    <Text className='txt'>默认</Text>
+                    {
+                        addressList.length>0?addressList.map((item)=>(
+                            <View className='item' key={item.id}>
+                                <View className='left'>
+                                    <View className='info'>
+                                        <Text className='name'>{item.contactor_name}</Text>
+                                        <Text className='phone'>{item.phone}</Text>
+                                        {
+                                            item.is_default>0?<View className='default'>
+                                                <Text className='txt'>默认</Text>
+                                            </View>:null
+                                        }
+                                    </View>
+                                    <View className='addr'>
+                                        <Text className='txt'>{item.address}</Text>
+                                    </View>
+                                </View>
+                                <View className='right' onClick={()=>{
+                                    Taro.navigateTo({
+                                        url:`/pages/me/address/editor?id=${item.id}`
+                                    })
+                                }}>
+                                    <IconFont name='24_qubianji' size={48} color='#121314' />
                                 </View>
                             </View>
-                            <View className='addr'>
-                                <Text className='txt'>四川省 成都市 高新区 天府大道北段1700号新世纪环球购物中心E5</Text>
-                            </View>
+                        )):<View className='black'>
+                            <Image src={require('../../../source/empty/noaddress.png')} className='img'/>
+                            <Text className='txt'>暂无收货地址</Text>
+                            <Button className='add-btn'>新增地址</Button>
                         </View>
-                        <View className='right'>
-                            <IconFont name='24_qubianji' size={48} color='#121314' />
-                        </View>
-                    </View>
+                    }
                 </View>
             </View>
         )
