@@ -22,7 +22,7 @@ interface LikeData{
 @observer
 export default class Detail extends Component<any,{
     isLike:boolean;
-    likeList:LikeData;
+    likeList:Array<any>;
     loadLikeList:boolean;
 }> {
 
@@ -33,12 +33,7 @@ export default class Detail extends Component<any,{
         super(props);
         this.state = {
             isLike:false,
-            likeList:{
-                list:[],
-                size:20,
-                start:0,
-                total:0
-            },
+            likeList:[],
             loadLikeList:false
         }
     }
@@ -55,18 +50,12 @@ export default class Detail extends Component<any,{
     }
 
     getLikeList = () => {
-        const {likeList} = this.state;
-        const {list,size,total} = likeList
-        if (list && list.length>0 && list.length>=total) {
-            return;
-        }
         Taro.showLoading({title:"加载中..."});
         api("app.product_tpl/like",{
-            size,
-            start:list && list.length>0 ? list.length : 0
+            size:20,
+            start:0
         }).then((res)=>{
             Taro.hideLoading();
-            res.list = list && list.length>0 ? list.concat(res.list) : res.list;
             this.setState({
                 likeList:res
             })
@@ -93,7 +82,7 @@ export default class Detail extends Component<any,{
             const nowUnixTime = moment().unix();
             if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
                 this.lastBottomTime = nowUnixTime;
-                this.getLikeList();
+                // this.getLikeList();
             }
           }).exec();        
     }
@@ -101,7 +90,6 @@ export default class Detail extends Component<any,{
 
     render() {
         const { isLike,likeList } = this.state;
-        const list = likeList.list;
         const {selectItem} = templateStore;
         return (
             <View className='detail'>
@@ -126,7 +114,7 @@ export default class Detail extends Component<any,{
                     <Text className='liketxt'>猜你喜欢</Text>
                     <View className='like-list'>
                         {
-                            list && list.map((item)=>(
+                            likeList && likeList.map((item)=>(
                                 <View className='item' onClick={()=>{
 
                                 }}>
