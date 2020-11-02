@@ -262,7 +262,7 @@ export default class Template extends Component<any,{
                                     <View className='pic-box' style={switchActive == 1 ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
                                         templateStore.selectItem = item;
                                         Taro.navigateTo({
-                                            url:`/pages/template/detail`
+                                            url:`/pages/template/detail?id=${item.id}`
                                         });
                                     }}>
                                         {

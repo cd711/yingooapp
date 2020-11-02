@@ -24,6 +24,7 @@ export default class Detail extends Component<any,{
     isLike:boolean;
     likeList:Array<any>;
     loadLikeList:boolean;
+    currentItem:any;
 }> {
 
     config: Config = {
@@ -34,17 +35,27 @@ export default class Detail extends Component<any,{
         this.state = {
             isLike:false,
             likeList:[],
-            loadLikeList:false
+            loadLikeList:false,
+            currentItem:{}
         }
     }
     private lastBottomTime = 0;
     componentWillMount() { }
 
     componentDidMount() { 
-        const {selectItem} = templateStore;
-        if (!selectItem.id) {
+        // const {selectItem} = templateStore;
+        const { id } = this.$router.params
+        if (!id) {
             Taro.navigateBack();
         }
+        api('app.product_tpl/info',{id}).then((res)=>{
+            console.log(res);
+            this.setState({
+                currentItem:res
+            })
+        }).catch((e)=>{
+            console.log(e);
+        })
         this.lastBottomTime = moment().unix();
         this.getLikeList();
     }
@@ -83,14 +94,17 @@ export default class Detail extends Component<any,{
             if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
                 this.lastBottomTime = nowUnixTime;
                 // this.getLikeList();
+                console.log("触及底线了...")
+                // Taro.setNavigationBarTitle({
+                //     title:`${nowUnixTime}`
+                // })
             }
           }).exec();        
     }
     
 
     render() {
-        const { isLike,likeList } = this.state;
-        const {selectItem} = templateStore;
+        const { isLike,likeList,currentItem } = this.state;
         return (
             <View className='detail'>
                 <AtNavBar
@@ -98,7 +112,7 @@ export default class Detail extends Component<any,{
                         Taro.navigateBack();
                     }}
                     color='#121314'
-                    title={`ID:${selectItem.id}`}
+                    title={`ID:${currentItem.id}`}
                     border={false}
                     fixed
                     leftIconType={{
@@ -108,7 +122,7 @@ export default class Detail extends Component<any,{
                     }}
                 />
                 {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
-                <Image src={ossUrl(selectItem.thumb_image,1)} className='thumb' mode="aspectFill" />
+                <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode="aspectFill" />
                 <View className='doyoulike'>
                     <View className='opsline'></View>
                     <Text className='liketxt'>猜你喜欢</Text>
@@ -135,7 +149,7 @@ export default class Detail extends Component<any,{
                     </View>
                     <View className='now-editor' onClick={()=>{
                         Taro.navigateTo({
-                            url:`/pages/editor/index?tpl_id=${selectItem.id}`
+                            url:`/pages/editor/index?tpl_id=${currentItem.id}`
                         })
                     }}>
                         <Text className='txt'>立即编辑</Text>
