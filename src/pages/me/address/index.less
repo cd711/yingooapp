@@ -14,6 +14,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
             .title{
                 font-size: 36px;
                 font-weight: 500;
@@ -33,14 +36,34 @@
         border-top: 1px solid #EDEDEF;
         .black{
             background: #FFF;
-            height: 80vh;
+            height: 92vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            border-top: 16px solid #F5F6F9;
             .img{
                 width: 400px;
                 height: 284px;
+                margin-bottom: 8px;
+            }
+            .txt{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+                margin-bottom: 24px;
+            }
+            .add-btn{
+                width: 208px;
+                height: 64px;
+                background: #FF4966;
+                border-radius: 48px;
+                font-size: 28px;
+                font-weight: 500;
+                color: #FFFFFF;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
         .item{

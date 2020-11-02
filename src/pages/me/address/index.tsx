@@ -80,13 +80,15 @@ export default class Address extends Component<any,{
                     <View className='center'>
                         <Text className='title'>我的收货地址</Text>
                     </View>
-                    <View className='right' onClick={()=>{
-                        Taro.navigateTo({
-                            url:'/pages/me/address/editor'
-                        })
-                    }}>
-                        <Text className='txt'>新增地址</Text>
-                    </View>
+                    {
+                        addressList.length>0?<View className='right' onClick={()=>{
+                            Taro.navigateTo({
+                                url:'/pages/me/address/editor'
+                            })
+                        }}>
+                            <Text className='txt'>新增地址</Text>
+                        </View>:null
+                    }
                 </View>
                 <View className='alist'>
                     {
@@ -117,7 +119,11 @@ export default class Address extends Component<any,{
                         )):<View className='black'>
                             <Image src={require('../../../source/empty/noaddress.png')} className='img'/>
                             <Text className='txt'>暂无收货地址</Text>
-                            <Button className='add-btn'>新增地址</Button>
+                            <Button className='add-btn' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/address/editor'
+                                })
+                            }}>新增地址</Button>
                         </View>
                     }
                 </View>
