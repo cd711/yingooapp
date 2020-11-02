@@ -1,0 +1,92 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.photos{
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 88px;
+        position: relative;
+        box-sizing: border-box;
+        background: #FFF;
+        .left{
+            padding-left: 32px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
+            .nav-switch{
+                width: 268px;
+                height: 64px;
+                background: #F5F6F9;
+                border-radius: 32px;
+                display: flex;
+                align-items: center;
+                box-sizing: border-box;
+                padding: 1px 2px;
+                .item{
+                    width: 132px;
+                    height: 60px;
+                    border-radius: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    
+                    .txt{
+                        font-size: 32px;
+                        font-weight: 400;
+                        color: #9C9DA6;
+                    }
+                }
+                .active{
+                    background: #FFF;
+                    transition: all 1s;
+                    .txt{
+                        font-size: 32px;
+                        color: #121314;
+                        transition: all 0.5s;
+                    }
+                }
+            }
+        }
+    }
+    .container{
+        padding-top: 16px;
+        .empty{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 92vh;
+            background: #FFF;
+            .img{
+                width: 400px;
+                height: 284px;
+                margin-bottom: 8px;
+            }
+            .txt{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+                margin-bottom: 24px;
+            }
+            .btn{
+                width: 208px;
+                height: 64px;
+                background: #FF4966;
+                border-radius: 48px;
+                font-size: 28px;
+                font-weight: 500;
+                color: #FFFFFF;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+}
