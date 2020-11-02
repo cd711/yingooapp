@@ -48,18 +48,27 @@ export default class Detail extends Component<any,{
         if (!id) {
             Taro.navigateBack();
         }
+        this.getCurrentItem(id);
+        this.lastBottomTime = moment().unix();
+        this.getLikeList();
+    }
+    getCurrentItem(id){
         api('app.product_tpl/info',{id}).then((res)=>{
-            console.log(res);
             this.setState({
                 currentItem:res
             })
         }).catch((e)=>{
-            console.log(e);
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                icon:'none',
+                duration:2000
+            })
+            setTimeout(() => {
+                Taro.navigateBack();
+            }, 2000);
         })
-        this.lastBottomTime = moment().unix();
-        this.getLikeList();
     }
-
     getLikeList = () => {
         Taro.showLoading({title:"加载中..."});
         api("app.product_tpl/like",{
@@ -93,11 +102,7 @@ export default class Detail extends Component<any,{
             const nowUnixTime = moment().unix();
             if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
                 this.lastBottomTime = nowUnixTime;
-                // this.getLikeList();
-                console.log("触及底线了...")
-                // Taro.setNavigationBarTitle({
-                //     title:`${nowUnixTime}`
-                // })
+                console.log("触及底线了...");
             }
           }).exec();        
     }
@@ -130,7 +135,11 @@ export default class Detail extends Component<any,{
                         {
                             likeList && likeList.map((item)=>(
                                 <View className='item' onClick={()=>{
-
+                                    this.getCurrentItem(item.id);
+                                    Taro.pageScrollTo({
+                                        scrollTop:0,
+                                        duration:100
+                                    })
                                 }}>
                                     <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill'/>
                                 </View>

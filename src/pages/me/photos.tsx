@@ -20,9 +20,7 @@ export default class Photos extends Component<any,{
     }
     componentWillMount() { }
 
-    componentDidMount() { 
-
-    }
+    componentDidMount() { }
 
     componentWillUnmount() { }
 
