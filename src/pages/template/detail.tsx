@@ -7,16 +7,16 @@ import { api } from '../../utils/net'
 import { AtNavBar} from 'taro-ui'
 import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-import { AtLoadMore } from 'taro-ui';
-import lodash from 'lodash';
+// import { AtLoadMore } from 'taro-ui';
+// import lodash from 'lodash';
 import moment from 'moment';
 import {ossUrl} from '../../utils/common'
-interface LikeData{
-    list:Array<any>,
-    size:number,
-    start:number,
-    total:number
-}
+// interface LikeData{
+//     list:Array<any>,
+//     size:number,
+//     start:number,
+//     total:number
+// }
 
 @inject("templateStore")
 @observer
