@@ -84,7 +84,11 @@ export default class Setting extends Component<any,{
                 </View>
                 <View className='slist'>
                     <Text className='title'>通用</Text>
-                    <View className='item'>
+                    <View className='item' onClick={()=>{
+                        Taro.navigateTo({
+                            url:'/pages/me/photos'
+                        })
+                    }}>
                         <Text className='name'>素材库</Text>
                         <IconFont name='20_xiayiye' size={40} color="#9C9DA6" />
                     </View>

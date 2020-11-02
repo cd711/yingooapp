@@ -31,6 +31,7 @@ class App extends Component {
      */
     config: Config = {
         pages: [
+            'pages/template/preview',
             'pages/index/index',
             'pages/me/me',
             'pages/template/index',
@@ -48,6 +49,7 @@ class App extends Component {
             'pages/me/address/index',
             'pages/me/address/editor',
             'pages/me/photos',
+            
         ],
         window: {
             backgroundTextStyle: 'light',
