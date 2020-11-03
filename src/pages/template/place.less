@@ -12,6 +12,8 @@
     }
     
     .float-container{
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
         .swiper-container-horizontal>.swiper-pagination-bullets{
             bottom: 16px;
         }
@@ -76,7 +78,7 @@
         }
         .param-part{
             padding: 30px 38px;
-            max-height: 380px;
+            max-height: 300px;
             .param{
                 .title{
                     display: flex;
@@ -122,34 +124,13 @@
                 font-weight: 500;
                 color: #121314;
             }
-            .number{
-                display: flex;
-                align-items: center;
-                .reduce,.add{
-                    width: 44px;
-                    height: 44px;
-                    .img{
-                        width: 44px;
-                        height: 44px;
-                    }
-                }
-                .num{
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 72px;
-                    font-size: 36px;
-                    font-weight: 500;
-                    color: #121314;
-                }
-            }
+        
         }
         .ops{
             display: flex;
             align-items: center;
             padding: 16px 40px;
-            padding-bottom: constant(safe-area-inset-bottom);
-            padding-bottom: env(safe-area-inset-bottom);
+
             Button{
                 width: 336px;
                 height: 88px;

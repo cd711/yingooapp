@@ -2,6 +2,38 @@
 /* eslint-disable */
 
 import { CSSProperties, DOMAttributes, FunctionComponent } from 'react';
+import Icon52Guan from './Icon52Guan';
+import Icon52Kai from './Icon52Kai';
+import Icon22Danxiangjinzhitianjia from './Icon22Danxiangjinzhitianjia';
+import Icon22Danxiangjinzhijianshao from './Icon22Danxiangjinzhijianshao';
+import Icon22Danxiangtianjia from './Icon22Danxiangtianjia';
+import Icon22Danxiangjianshao from './Icon22Danxiangjianshao';
+import Icon22ToumingWeixuanzhong from './Icon22ToumingWeixuanzhong';
+import Icon22Yixuanzhong from './Icon22Yixuanzhong';
+import Icon24Lianjie from './Icon24Lianjie';
+import Icon20Zhongzuo from './Icon20Zhongzuo';
+import Icon20Chexiao from './Icon20Chexiao';
+import Icon24BianjiqiHuantu from './Icon24BianjiqiHuantu';
+import Icon24BianjiqiFuzhi from './Icon24BianjiqiFuzhi';
+import Icon24BianjiqiMoban from './Icon24BianjiqiMoban';
+import Icon24BianjiqiChuizhifanzhuan from './Icon24BianjiqiChuizhifanzhuan';
+import Icon24BianjiqiJixing from './Icon24BianjiqiJixing';
+import Icon24BianjiqiJinzhi from './Icon24BianjiqiJinzhi';
+import Icon24BianjiqiChongyin from './Icon24BianjiqiChongyin';
+import Icon24BianjiqiJuzhongduiqi from './Icon24BianjiqiJuzhongduiqi';
+import Icon24BianjiqiShuipingfanzhuan from './Icon24BianjiqiShuipingfanzhuan';
+import Icon24BianjiqiShubiaodian from './Icon24BianjiqiShubiaodian';
+import Icon24BianjiqiYangshi2 from './Icon24BianjiqiYangshi2';
+import Icon24BianjiqiYangshi1 from './Icon24BianjiqiYangshi1';
+import Icon24BianjiqiShanchu from './Icon24BianjiqiShanchu';
+import Icon24BianjiqiYangshi4 from './Icon24BianjiqiYangshi4';
+import Icon24BianjiqiYangshi3 from './Icon24BianjiqiYangshi3';
+import Icon24BianjiqiYifu from './Icon24BianjiqiYifu';
+import Icon24BianjiqiYouduiqi from './Icon24BianjiqiYouduiqi';
+import Icon24BianjiqiZuoduiqi from './Icon24BianjiqiZuoduiqi';
+import Icon24BianjiqiZiti from './Icon24BianjiqiZiti';
+import Icon24BianjiqiYangshi from './Icon24BianjiqiYangshi';
+import Icon24Gouxuan from './Icon24Gouxuan';
 import Icon48Dianjibofang from './Icon48Dianjibofang';
 import Icon32Guanbi from './Icon32Guanbi';
 import Icon32Shangyiye from './Icon32Shangyiye';
@@ -67,7 +99,7 @@ import Icon16Xiangxiazhankai from './Icon16Xiangxiazhankai';
 import Icon16Shaixuan from './Icon16Shaixuan';
 import Icon16Xiayiye from './Icon16Xiayiye';
 
-export type IconNames = '48_dianjibofang' | '32_guanbi' | '32_shangyiye' | '32_weixinzhifu' | '32_zhifubaozhifu' | '24_baocundaoxiangce' | '24_bianji' | '24_daifukuan' | '24_daifahuo' | '24_erweima' | '24_gengduo' | '24_fenxiang' | '24_gouwuche' | '24_gengduofenlei' | '24_guanbi' | '24_jianhao' | '24_kefu' | '24_mimaxianshi' | '24_jiahao' | '24_qubaocun' | '24_mimayincang' | '24_paizhaoshangchuan' | '24_qubianji' | '24_daishouhuo' | '24_shangyiye' | '24_saoyisao' | '24_shanchu' | '24_shezhi' | '24_xiayiye' | '24_shouhou' | '24_shoucangB' | '24_xiangceshangchuan' | '24_tupianpaixu' | '24_xiangshang' | '24_xiangxia' | '24_shoucangA' | '24_youhuiquan' | '24_caozuotiyan' | '24_gongnengjianyi' | '24_qitajianyi' | '24_yemianshantui' | '24_chuanshuwenti' | '24_jiemianshenmei' | '24_shouji' | '24_weixin-Color' | '24_weixin' | '24_QQ-Color' | '24_QQ' | '20_sousuo' | '20_zhongfutianjia' | '20_fangdayulan' | '20_congyunduanxiazai' | '20_maikefeng' | '20_fuzhi' | '20_xiayiye' | '20_dingwei' | '20_guanbi' | '16_shouqi' | '16_re' | '16_qingkong' | '16_zhankai' | '16_xiangxiazhankai' | '16_shaixuan' | '16_xiayiye';
+export type IconNames = '52_guan' | '52_kai' | '22_danxiangjinzhitianjia' | '22_danxiangjinzhijianshao' | '22_danxiangtianjia' | '22_danxiangjianshao' | '22_touming-weixuanzhong' | '22_yixuanzhong' | '24_lianjie' | '20_zhongzuo' | '20_chexiao' | '24_bianjiqi_huantu' | '24_bianjiqi_fuzhi' | '24_bianjiqi_moban' | '24_bianjiqi_chuizhifanzhuan' | '24_bianjiqi_jixing' | '24_bianjiqi_jinzhi' | '24_bianjiqi_chongyin' | '24_bianjiqi_juzhongduiqi' | '24_bianjiqi_shuipingfanzhuan' | '24_bianjiqi_shubiaodian' | '24_bianjiqi_yangshi2' | '24_bianjiqi_yangshi1' | '24_bianjiqi_shanchu' | '24_bianjiqi_yangshi4' | '24_bianjiqi_yangshi3' | '24_bianjiqi_yifu' | '24_bianjiqi_youduiqi' | '24_bianjiqi_zuoduiqi' | '24_bianjiqi_ziti' | '24_bianjiqi_yangshi' | '24_gouxuan' | '48_dianjibofang' | '32_guanbi' | '32_shangyiye' | '32_weixinzhifu' | '32_zhifubaozhifu' | '24_baocundaoxiangce' | '24_bianji' | '24_daifukuan' | '24_daifahuo' | '24_erweima' | '24_gengduo' | '24_fenxiang' | '24_gouwuche' | '24_gengduofenlei' | '24_guanbi' | '24_jianhao' | '24_kefu' | '24_mimaxianshi' | '24_jiahao' | '24_qubaocun' | '24_mimayincang' | '24_paizhaoshangchuan' | '24_qubianji' | '24_daishouhuo' | '24_shangyiye' | '24_saoyisao' | '24_shanchu' | '24_shezhi' | '24_xiayiye' | '24_shouhou' | '24_shoucangB' | '24_xiangceshangchuan' | '24_tupianpaixu' | '24_xiangshang' | '24_xiangxia' | '24_shoucangA' | '24_youhuiquan' | '24_caozuotiyan' | '24_gongnengjianyi' | '24_qitajianyi' | '24_yemianshantui' | '24_chuanshuwenti' | '24_jiemianshenmei' | '24_shouji' | '24_weixin-Color' | '24_weixin' | '24_QQ-Color' | '24_QQ' | '20_sousuo' | '20_zhongfutianjia' | '20_fangdayulan' | '20_congyunduanxiazai' | '20_maikefeng' | '20_fuzhi' | '20_xiayiye' | '20_dingwei' | '20_guanbi' | '16_shouqi' | '16_re' | '16_qingkong' | '16_zhankai' | '16_xiangxiazhankai' | '16_shaixuan' | '16_xiayiye';
 
 interface Props extends DOMAttributes<SVGElement> {
   name: IconNames;
@@ -79,6 +111,70 @@ interface Props extends DOMAttributes<SVGElement> {
 
 const IconFont: FunctionComponent<Props> = ({ name, ...rest }) => {
   switch (name) {
+    case '52_guan':
+      return <Icon52Guan {...rest} />;
+    case '52_kai':
+      return <Icon52Kai {...rest} />;
+    case '22_danxiangjinzhitianjia':
+      return <Icon22Danxiangjinzhitianjia {...rest} />;
+    case '22_danxiangjinzhijianshao':
+      return <Icon22Danxiangjinzhijianshao {...rest} />;
+    case '22_danxiangtianjia':
+      return <Icon22Danxiangtianjia {...rest} />;
+    case '22_danxiangjianshao':
+      return <Icon22Danxiangjianshao {...rest} />;
+    case '22_touming-weixuanzhong':
+      return <Icon22ToumingWeixuanzhong {...rest} />;
+    case '22_yixuanzhong':
+      return <Icon22Yixuanzhong {...rest} />;
+    case '24_lianjie':
+      return <Icon24Lianjie {...rest} />;
+    case '20_zhongzuo':
+      return <Icon20Zhongzuo {...rest} />;
+    case '20_chexiao':
+      return <Icon20Chexiao {...rest} />;
+    case '24_bianjiqi_huantu':
+      return <Icon24BianjiqiHuantu {...rest} />;
+    case '24_bianjiqi_fuzhi':
+      return <Icon24BianjiqiFuzhi {...rest} />;
+    case '24_bianjiqi_moban':
+      return <Icon24BianjiqiMoban {...rest} />;
+    case '24_bianjiqi_chuizhifanzhuan':
+      return <Icon24BianjiqiChuizhifanzhuan {...rest} />;
+    case '24_bianjiqi_jixing':
+      return <Icon24BianjiqiJixing {...rest} />;
+    case '24_bianjiqi_jinzhi':
+      return <Icon24BianjiqiJinzhi {...rest} />;
+    case '24_bianjiqi_chongyin':
+      return <Icon24BianjiqiChongyin {...rest} />;
+    case '24_bianjiqi_juzhongduiqi':
+      return <Icon24BianjiqiJuzhongduiqi {...rest} />;
+    case '24_bianjiqi_shuipingfanzhuan':
+      return <Icon24BianjiqiShuipingfanzhuan {...rest} />;
+    case '24_bianjiqi_shubiaodian':
+      return <Icon24BianjiqiShubiaodian {...rest} />;
+    case '24_bianjiqi_yangshi2':
+      return <Icon24BianjiqiYangshi2 {...rest} />;
+    case '24_bianjiqi_yangshi1':
+      return <Icon24BianjiqiYangshi1 {...rest} />;
+    case '24_bianjiqi_shanchu':
+      return <Icon24BianjiqiShanchu {...rest} />;
+    case '24_bianjiqi_yangshi4':
+      return <Icon24BianjiqiYangshi4 {...rest} />;
+    case '24_bianjiqi_yangshi3':
+      return <Icon24BianjiqiYangshi3 {...rest} />;
+    case '24_bianjiqi_yifu':
+      return <Icon24BianjiqiYifu {...rest} />;
+    case '24_bianjiqi_youduiqi':
+      return <Icon24BianjiqiYouduiqi {...rest} />;
+    case '24_bianjiqi_zuoduiqi':
+      return <Icon24BianjiqiZuoduiqi {...rest} />;
+    case '24_bianjiqi_ziti':
+      return <Icon24BianjiqiZiti {...rest} />;
+    case '24_bianjiqi_yangshi':
+      return <Icon24BianjiqiYangshi {...rest} />;
+    case '24_gouxuan':
+      return <Icon24Gouxuan {...rest} />;
     case '48_dianjibofang':
       return <Icon48Dianjibofang {...rest} />;
     case '32_guanbi':

@@ -32,6 +32,7 @@ class App extends Component {
     config: Config = {
         pages: [
             'pages/template/preview',
+            'pages/template/confirm',
             'pages/index/index',
             'pages/me/me',
             'pages/template/index',

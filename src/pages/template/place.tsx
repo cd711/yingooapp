@@ -4,12 +4,10 @@ import { View, Text,Button,Swiper, SwiperItem,Image,ScrollView } from '@tarojs/c
 import './place.less'
 import { AtFloatLayout } from "taro-ui"
 import IconFont from '../../components/iconfont'
+import { Counter } from '../../components/counter/counter'
 
 export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,onBuyNumberChange}) => {
-    const [number,setNumber] = useState(1);
-    useEffect(()=>{
-        onBuyNumberChange(number)
-    },[number])
+
     return <View className='placeOrder'>
         <AtFloatLayout isOpened={isShow} onClose={onClose}>
             <View className='float-container'>
@@ -83,23 +81,15 @@ export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,o
                 </ScrollView>
                 <View className='buy-number'>
                     <Text className='title'>购买数量</Text>
-                    <View className='number'>
-                        <View className='reduce' onClick={()=>{
-                            number>1?setNumber(number-1):setNumber(1)
-                        }}>
-                            <Image src={require("../../source/reduce.png")} className='img'/>
-                        </View>
-                        <Text className='num'>{number}</Text>
-                        <View className="add" onClick={()=>{
-                            setNumber(number+1)
-                        }}>
-                            <Image src={require("../../source/add.png")} className='img'/>
-                        </View>
-                    </View>
+                    <Counter onCounterChange={onBuyNumberChange} />
                 </View>
                 <View className='ops'>
                     <Button className='add-cart-btn'>加入购物车</Button>
-                    <Button className='now-buy-btn'>立即购买</Button>
+                    <Button className='now-buy-btn' onClick={()=>{
+                        Taro.navigateTo({
+                            url:'/pages/template/confirm'
+                        })
+                    }}>立即购买</Button>
                 </View>
             </View>
         </AtFloatLayout>
