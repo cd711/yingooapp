@@ -260,14 +260,14 @@ export default class Template extends Component<any,{
                                 tagList.map((item)=>(
 
                                     <View className='pic-box' style={switchActive == 1 ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
-                                        templateStore.selectItem = item;
+                                        // templateStore.selectItem = item;
                                         Taro.navigateTo({
-                                            url:`/pages/template/detail`
+                                            url:`/pages/template/detail?id=${item.id}`
                                         });
                                     }}>
                                         {
                                             switchActive == 1 ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>
-                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(34)};`} mode='aspectFill'/>
+                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='aspectFill'/>
                                                 <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='aspectFill'/>
                                             </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`}/>
                                         }                                        

@@ -24,6 +24,7 @@ export default class Detail extends Component<any,{
     isLike:boolean;
     likeList:Array<any>;
     loadLikeList:boolean;
+    currentItem:any;
 }> {
 
     config: Config = {
@@ -34,21 +35,40 @@ export default class Detail extends Component<any,{
         this.state = {
             isLike:false,
             likeList:[],
-            loadLikeList:false
+            loadLikeList:false,
+            currentItem:{}
         }
     }
     private lastBottomTime = 0;
     componentWillMount() { }
 
     componentDidMount() { 
-        const {selectItem} = templateStore;
-        if (!selectItem.id) {
+        // const {selectItem} = templateStore;
+        const { id } = this.$router.params
+        if (!id) {
             Taro.navigateBack();
         }
+        this.getCurrentItem(id);
         this.lastBottomTime = moment().unix();
         this.getLikeList();
     }
-
+    getCurrentItem(id){
+        api('app.product_tpl/info',{id}).then((res)=>{
+            this.setState({
+                currentItem:res
+            })
+        }).catch((e)=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                icon:'none',
+                duration:2000
+            })
+            setTimeout(() => {
+                Taro.navigateBack();
+            }, 2000);
+        })
+    }
     getLikeList = () => {
         Taro.showLoading({title:"加载中..."});
         api("app.product_tpl/like",{
@@ -82,15 +102,14 @@ export default class Detail extends Component<any,{
             const nowUnixTime = moment().unix();
             if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
                 this.lastBottomTime = nowUnixTime;
-                // this.getLikeList();
+                console.log("触及底线了...");
             }
           }).exec();        
     }
     
 
     render() {
-        const { isLike,likeList } = this.state;
-        const {selectItem} = templateStore;
+        const { isLike,likeList,currentItem } = this.state;
         return (
             <View className='detail'>
                 <AtNavBar
@@ -98,7 +117,7 @@ export default class Detail extends Component<any,{
                         Taro.navigateBack();
                     }}
                     color='#121314'
-                    title={`ID:${selectItem.id}`}
+                    title={`ID:${currentItem.id}`}
                     border={false}
                     fixed
                     leftIconType={{
@@ -108,7 +127,7 @@ export default class Detail extends Component<any,{
                     }}
                 />
                 {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
-                <Image src={ossUrl(selectItem.thumb_image,1)} className='thumb' mode="aspectFill" />
+                <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode="aspectFill" />
                 <View className='doyoulike'>
                     <View className='opsline'></View>
                     <Text className='liketxt'>猜你喜欢</Text>
@@ -116,7 +135,11 @@ export default class Detail extends Component<any,{
                         {
                             likeList && likeList.map((item)=>(
                                 <View className='item' onClick={()=>{
-
+                                    this.getCurrentItem(item.id);
+                                    Taro.pageScrollTo({
+                                        scrollTop:0,
+                                        duration:100
+                                    })
                                 }}>
                                     <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill'/>
                                 </View>
@@ -135,7 +158,7 @@ export default class Detail extends Component<any,{
                     </View>
                     <View className='now-editor' onClick={()=>{
                         Taro.navigateTo({
-                            url:`/pages/editor/index?tpl_id=${selectItem.id}`
+                            url:`/pages/editor/index?tpl_id=${currentItem.id}`
                         })
                     }}>
                         <Text className='txt'>立即编辑</Text>

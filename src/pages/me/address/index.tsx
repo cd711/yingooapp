@@ -4,8 +4,11 @@ import { View, Text,Image, Button } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../../components/iconfont';
 import { api } from '../../../utils/net';
+import {templateStore} from '../../../store/template';
+import { observer, inject } from '@tarojs/mobx';
 
-
+@inject("templateStore")
+@observer
 export default class Address extends Component<any,{
     addressList:Array<any>
 }> {
@@ -26,6 +29,7 @@ export default class Address extends Component<any,{
         
     }
     componentDidShow(){
+        console.log(this.$router.params)
         this.getList();
     }
     getList(){
@@ -54,6 +58,7 @@ export default class Address extends Component<any,{
 
     render() {
         const { addressList } = this.state;
+        const {t} = this.$router.params;
         console.log(addressList)
         return (
             <View className='address'>
@@ -94,7 +99,10 @@ export default class Address extends Component<any,{
                     {
                         addressList.length>0?addressList.map((item)=>(
                             <View className='item' key={item.id}>
-                                <View className='left'>
+                                <View className='left' onClick={()=>{
+                                    templateStore.address = item;
+                                    Taro.navigateBack();
+                                }}>
                                     <View className='info'>
                                         <Text className='name'>{item.contactor_name}</Text>
                                         <Text className='phone'>{item.phone}</Text>
@@ -108,7 +116,8 @@ export default class Address extends Component<any,{
                                         <Text className='txt'>{item.address}</Text>
                                     </View>
                                 </View>
-                                <View className='right' onClick={()=>{
+                                <View className='right' onClick={(e)=>{
+                                    e.stopPropagation();
                                     Taro.navigateTo({
                                         url:`/pages/me/address/editor?id=${item.id}`
                                     })

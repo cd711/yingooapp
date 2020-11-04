@@ -23,7 +23,8 @@ interface TemplateItem{
 export class TemplateStore {
     @observable
     public selectItem:TemplateItem|any = {};
- 
+    @observable
+    public address:any = null;
 
 
 }
