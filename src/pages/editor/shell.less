@@ -1,0 +1,86 @@
+.mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, .4);
+  transition: background-color 0.2s;
+}
+
+
+@keyframes showToolBox {
+  from {
+    height: 104px;
+  }
+}
+
+.switch-brank,  .switch-template {
+  height: 60%;
+  bottom: 0;
+  position: fixed;
+  z-index: 99999;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  animation: showToolBox 0.2s;
+  .optBar {
+    height: 104px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 32px;
+    .icon {
+      padding: 24px;
+    }
+  }
+  .brand {
+    width: 750px;
+    box-sizing: border-box;
+    padding: 0 16px;
+    height: 104px;
+  }
+  
+  .list {
+    background: #F5F6F9;
+    padding: 32px;
+    flex: 1;
+    .phoneLoading {
+      margin: 25vh 0 0 0;
+    }
+    .head {
+      font-size: 32px;
+      color: #121314;
+    }
+    .phone {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      .item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 120px;
+        height: 64px;
+        margin: 16px;
+        padding: 0 24px;
+        background: #FFFFFF;
+        border-radius: 32px;
+        color: #9C9DA6;
+        font-size: 28px;
+      }
+      .item.act {
+        background: #FF4966;
+        color: #fff;
+      }
+    }
+  }
+}
+
+
+.switch-template {
+  position: static;
+  height: 50%;
+}
