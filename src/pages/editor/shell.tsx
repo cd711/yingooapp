@@ -2,9 +2,16 @@ import Taro, { Component } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { AtActivityIndicator } from "taro-ui";
 import './editor.less';
+import { api } from '../../utils/net';
 
 
-export default class Index extends Component<{}, {
+export const sentMessage: {(proxy: WindowProxy | null | undefined, type: string, data: any): void} = (proxy, type, data) => {
+  proxy && proxy.postMessage({from: "parent", type: type, data: data}, "*");
+
+}
+
+
+export default class Shell extends Component<{}, {
   size?: { width: string | number; height: string | number };
   editorAnim?: boolean;
   data?: number;
@@ -24,9 +31,16 @@ export default class Index extends Component<{}, {
     };
   }
 
-  componentDidMount() {
-    window.addEventListener("message", this.onMsg);
+  private editorProxy: WindowProxy | null | undefined;
 
+  componentDidMount() {
+    
+    // @ts-ignore
+    this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
+    
+    window.addEventListener("message", this.onMsg);
+    
+    
     if (!this.tplId && !this.productId) {
       Taro.showToast({
         title: "参数错误！",
@@ -39,8 +53,22 @@ export default class Index extends Component<{}, {
     window.removeEventListener("message", this.onMsg);
   }
 
+  onLoad = async ()=> {
+    try {
+      const phoneList = await api("/editor.phone_shell/smartphones", {
+        brand_id: 1202,
+        series_id: 1392
+      });
+      if (phoneList.list && phoneList.list.length > 0) {
+        sentMessage(this.editorProxy, "phoneshell", phoneList.list[0].phoneshell);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   onMsg: { (e: MessageEvent<any>): void } = ({ data }) => {
-    console.log("msg", data);
+    // console.log("msg", data);
     if (!data) {
       return;
     }
@@ -50,6 +78,7 @@ export default class Index extends Component<{}, {
           this.setState({
             loadingTemplate: false
           });
+          this.onLoad();
           break;
 
         case "mainSize":
@@ -93,7 +122,7 @@ export default class Index extends Component<{}, {
     return <View>
       <View className={`editor ${editorAnim ? ' anim' : ''}`} style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
-        <iframe className={`${editorAnim ? 'anim' : ''}`} src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&amp;id=${this.productId}&t=999}`}></iframe>
+        <iframe className={`editor_frame ${editorAnim ? 'anim' : ''}`} src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&amp;id=${this.productId}&t=999}`}></iframe>
         {loadingTemplate ? <View className='loading'><AtActivityIndicator size={64} mode='center' /></View> : null}
       </View>
     </View>
