@@ -5,10 +5,13 @@
     "import/first": false,
     "react/sort-comp": false,
     "@typescript-eslint/no-explicit-any": false,
-    
+    "@typescript-eslint/ban-ts-ignore": false,
+    "@typescript-eslint/camelcase": false,
+    "@typescript-eslint/no-unused-vars": [],
+    "@typescript-eslint/type-annotation-spacing": false,
+
     "no-unused-vars": ["error", { "varsIgnorePattern": "Taro" }],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
-    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "Taro" }],
     "@typescript-eslint/member-delimiter-style": false,
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/no-empty-function": ["warn"]

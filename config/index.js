@@ -76,7 +76,11 @@ const config = {
       customRoutes: {
         '/pages/index/index': '/',
         '/pages/template/index': '/template',
-        '/pages/editor/index': '/editor',
+        '/pages/editor/shell': '/editor/shell',
+        '/pages/editor/index': '/editor/shell',
+        // '/pages/editor/photos': '/editor/photos',
+        // '/pages/editor/pillow': '/editor/pillow',
+        // '/pages/editor/mousepad': '/editor/mousepad',
         '/pages/me/me':'/me'
       }
     },
