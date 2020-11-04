@@ -11,12 +11,14 @@ import { observer, inject } from '@tarojs/mobx';
 // import moment from 'moment';
 // import {ossUrl} from '../../utils/common'
 import Counter from '../../components/counter/counter';
+import FloatModal from '../../components/floatModal/FloatModal';
+import Ticket from '../../components/ticket/Ticket';
 
 
 @inject("templateStore")
 @observer
 export default class Confirm extends Component<any,{
-
+    showTickedModal:boolean
 }> {
 
     config: Config = {
@@ -26,18 +28,16 @@ export default class Confirm extends Component<any,{
     constructor(props){
         super(props);
         this.state = {
-
+            showTickedModal: false
         }
     }
 
     componentDidMount() { 
         console.log(templateStore.address);
-     }
+    }
 
-
-    
     render() {
-        const {  } = this.state;
+        const { showTickedModal } = this.state;
         const {address} = templateStore;
         return (
             <View className='confirm'>
@@ -112,7 +112,11 @@ export default class Confirm extends Component<any,{
                         <Text className='num'>49.00</Text>
                     </View>
                 </View>
-                <View className='goods-item'>
+                <View className='goods-item' onClick={()=>{
+                    this.setState({
+                        showTickedModal:true
+                    })
+                }}>
                     <Text className='title'>优惠券</Text>
                     <View className='right'>
                         <Text className='txt'>无优惠券可用</Text>
@@ -149,6 +153,15 @@ export default class Confirm extends Component<any,{
                     </View>
                     <Button className='submit-order-btn'>提交订单</Button>
                 </View>
+                <FloatModal title='优惠卷' isShow={showTickedModal} onClose={()=>{
+                    this.setState({
+                        showTickedModal:false
+                    })
+                }}>
+                    <View className='yhlist'>
+                        <Ticket />
+                    </View>
+                </FloatModal>
                 <View className='opsbar'></View>
             </View>
         )

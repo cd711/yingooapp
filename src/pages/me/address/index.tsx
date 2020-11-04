@@ -5,6 +5,7 @@ import IconFont from '../../../components/iconfont';
 import { api } from '../../../utils/net';
 import {templateStore} from '../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
+import Checkbox from '../../../components/checkbox/checkbox'
 
 @inject("templateStore")
 @observer
@@ -31,7 +32,14 @@ export default class Address extends Component<any,{
         Taro.showLoading({title:"加载中..."});
         api("app.address/list").then((res)=>{
             Taro.hideLoading();
-            console.log(res)
+            res = res.map((item)=>{
+                if (item.is_default>0) {
+                    item["isChecked"] = true;
+                } else {
+                    item["isChecked"] = false;
+                }
+                return item;
+            });
             this.setState({
                 addressList:res
             });
@@ -49,12 +57,25 @@ export default class Address extends Component<any,{
         });
     }
 
-
+    switchChecked = (item,index) => {
+        const { addressList } = this.state;
+        const isCheck = item["isChecked"];
+        const temp = addressList.map((iter)=>{
+            iter["isChecked"] = false;
+            return iter;
+        })
+        temp[index]["isChecked"] = !isCheck;
+        this.setState({
+            addressList:temp
+        })
+        templateStore.address = item;
+        Taro.navigateBack();
+    }
 
     render() {
         const { addressList } = this.state;
-        // const {t} = this.$router.params;
-        console.log(addressList)
+        const {t} = this.$router.params;
+        // console.log(addressList)
         return (
             <View className='address'>
                 {/* <AtNavBar
@@ -93,23 +114,29 @@ export default class Address extends Component<any,{
                 </View>
                 <View className='alist'>
                     {
-                        addressList.length>0?addressList.map((item)=>(
+                        addressList.length>0?addressList.map((item,index)=>(
                             <View className='item' key={item.id}>
-                                <View className='left' onClick={()=>{
-                                    templateStore.address = item;
-                                    Taro.navigateBack();
-                                }}>
-                                    <View className='info'>
-                                        <Text className='name'>{item.contactor_name}</Text>
-                                        <Text className='phone'>{item.phone}</Text>
-                                        {
-                                            item.is_default>0?<View className='default'>
-                                                <Text className='txt'>默认</Text>
-                                            </View>:null
-                                        }
-                                    </View>
-                                    <View className='addr'>
-                                        <Text className='txt'>{item.address}</Text>
+                                <View className='left-part' onClick={this.switchChecked.bind(this,item,index)}>
+                                    {
+                                        t === 'select' ? <Checkbox isChecked={item.isChecked} onChange={(checked)=>{
+                                            if (checked) {
+                                                templateStore.address = item;
+                                            }
+                                        }} />:null
+                                    }
+                                    <View className='left'>
+                                        <View className='info'>
+                                            <Text className='name'>{item.contactor_name}</Text>
+                                            <Text className='phone'>{item.phone}</Text>
+                                            {
+                                                item.is_default>0?<View className='default'>
+                                                    <Text className='txt'>默认</Text>
+                                                </View>:null
+                                            }
+                                        </View>
+                                        <View className='addr'>
+                                            <Text className='txt'>{item.address}</Text>
+                                        </View>
                                     </View>
                                 </View>
                                 <View className='right' onClick={(e)=>{

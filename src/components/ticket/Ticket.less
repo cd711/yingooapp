@@ -1,0 +1,80 @@
+.xy_ticket{
+    position: relative;
+    height: 208px;
+    width: 100%;
+    .bg{
+        width: 100%;
+        height: 208px;
+        position: absolute;
+        
+    }
+    .content-part{
+        height: 208px;
+        width: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        .left-part{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 206px;
+            height: 100%;
+            .price{
+                display: flex;
+                align-items: baseline;
+                color: #FF4966;
+                .left{
+                    font-size: 36px;
+                    font-weight: 500;
+                    padding: 0 4px;
+                }
+                .right{
+                    font-size: 64px;
+                    font-weight: bold;
+                }
+            }
+            .ky{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+            }
+        }
+        .right-part{
+            padding-left: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .name{
+                font-size: 32px;
+                font-weight: 500;
+                color: #121314;
+                line-height: 48px;
+                margin-bottom: 14px;
+            }
+            .time{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+                line-height: 40px;
+                margin-bottom: 14px
+            }
+            .apply{
+                display: flex;
+                align-items: center;
+                .txt{
+                    font-size: 24px;
+                    font-weight: 400;
+                    color: #9C9DA6;
+                    line-height: 40px;
+                    padding-right: 4px;
+                }
+            }
+        }
+        .checkbox{
+            margin-left: auto;
+            margin-right: 40px;
+        }
+    }
+}
