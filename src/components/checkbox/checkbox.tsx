@@ -1,11 +1,12 @@
-
-import Taro, { useEffect,useState } from '@tarojs/taro'
-import { View, Text,Image } from '@tarojs/components'
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import Taro, {  } from '@tarojs/taro'
+import { View } from '@tarojs/components'
 import './checkbox.less'
 import IconFont from '../iconfont';
 
 
-export const Checkbox: React.FC<any> = ({onCounterChange}) => {
+export const Checkbox: React.FC<any> = ({}) => {
     // const [number,setNumber] = useState(1);
     // useEffect(()=>{
     //     onCounterChange(number)

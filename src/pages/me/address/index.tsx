@@ -1,4 +1,3 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image, Button } from '@tarojs/components'
 import './index.less'
@@ -10,7 +9,7 @@ import { observer, inject } from '@tarojs/mobx';
 @inject("templateStore")
 @observer
 export default class Address extends Component<any,{
-    addressList:Array<any>
+    addressList: Array<any>
 }> {
 
     config: Config = {
@@ -58,7 +57,7 @@ export default class Address extends Component<any,{
 
     render() {
         const { addressList } = this.state;
-        const {t} = this.$router.params;
+        // const {t} = this.$router.params;
         console.log(addressList)
         return (
             <View className='address'>
@@ -79,7 +78,8 @@ export default class Address extends Component<any,{
                 <View className='nav-bar'>
                     <View className='left' onClick={()=>{
                         Taro.navigateBack();
-                    }}>
+                    }}
+                    >
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
                     <View className='center'>
@@ -121,7 +121,8 @@ export default class Address extends Component<any,{
                                     Taro.navigateTo({
                                         url:`/pages/me/address/editor?id=${item.id}`
                                     })
-                                }}>
+                                }}
+                                >
                                     <IconFont name='24_qubianji' size={48} color='#121314' />
                                 </View>
                             </View>
@@ -132,7 +133,8 @@ export default class Address extends Component<any,{
                                 Taro.navigateTo({
                                     url:'/pages/me/address/editor'
                                 })
-                            }}>新增地址</Button>
+                            }}
+                            >新增地址</Button>
                         </View>
                     }
                 </View>
