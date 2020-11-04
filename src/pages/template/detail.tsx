@@ -1,11 +1,10 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image } from '@tarojs/components'
+import { View, Text,Image } from '@tarojs/components'
 import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { AtNavBar} from 'taro-ui'
-import {templateStore} from '../../store/template';
+// import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 // import { AtLoadMore } from 'taro-ui';
 // import lodash from 'lodash';
@@ -23,7 +22,6 @@ import {ossUrl} from '../../utils/common'
 export default class Detail extends Component<any,{
     isLike:boolean;
     likeList:Array<any>;
-    loadLikeList:boolean;
     currentItem:any;
 }> {
 
@@ -35,12 +33,10 @@ export default class Detail extends Component<any,{
         this.state = {
             isLike:false,
             likeList:[],
-            loadLikeList:false,
             currentItem:{}
         }
     }
     private lastBottomTime = 0;
-    componentWillMount() { }
 
     componentDidMount() { 
         // const {selectItem} = templateStore;
@@ -95,10 +91,10 @@ export default class Detail extends Component<any,{
             scrollOffset: true,
         },(e)=>{
             // console.log(e.scrollHeight);
-            let scrollHeight = e.scrollHeight;
-            let scrollTop = e.scrollTop;
+            const scrollHeight = e.scrollHeight;
+            const scrollTop = e.scrollTop;
             const clientHeight = Taro.getSystemInfoSync().windowHeight;
-            let distance = 300;  //距离视窗还用50的时候，开始触发；
+            const distance = 300;  //距离视窗还用50的时候，开始触发；
             const nowUnixTime = moment().unix();
             if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
                 this.lastBottomTime = nowUnixTime;
@@ -127,7 +123,7 @@ export default class Detail extends Component<any,{
                     }}
                 />
                 {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
-                <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode="aspectFill" />
+                <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' />
                 <View className='doyoulike'>
                     <View className='opsline'></View>
                     <Text className='liketxt'>猜你喜欢</Text>
@@ -140,8 +136,8 @@ export default class Detail extends Component<any,{
                                         scrollTop:0,
                                         duration:100
                                     })
-                                }}>
-                                    <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill'/>
+                                }} key={item.id}>
+                                    <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill' />
                                 </View>
                             ))
                         }
@@ -153,7 +149,7 @@ export default class Detail extends Component<any,{
                             isLike:!isLike
                         })
                     }}>
-                        <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color="#707177" />
+                        <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color='#707177' />
                         <Text className='txt'>收藏</Text>
                     </View>
                     <View className='now-editor' onClick={()=>{

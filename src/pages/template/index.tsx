@@ -1,11 +1,10 @@
-import { ComponentType } from 'react'
-import Taro, { Component, Config, pxTransform } from '@tarojs/taro'
+import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image,ScrollView } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont'
 import { api } from '../../utils/net'
 import {AtActivityIndicator} from 'taro-ui'
-import { templateStore } from '../../store/template'
+// import { templateStore } from '../../store/template'
 import { observer, inject } from '@tarojs/mobx'
 import {ossUrl} from '../../utils/common'
 
@@ -51,7 +50,6 @@ export default class Template extends Component<any,{
             showTemplateLoading:false
         }
     }
-    componentWillMount() { }
 
     componentDidMount() {
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
@@ -102,13 +100,11 @@ export default class Template extends Component<any,{
     }
     componentWillUnmount() {
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
-            window.removeEventListener("resize",()=>{}, false)
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            window.removeEventListener("resize",()=>{},false)
         }
     }
 
-    componentDidShow() { }
-
-    componentDidHide() { }
     getTagContext = (tag) => {
         const {switchActive,cates} = this.state;
         if (tag) {
@@ -135,9 +131,9 @@ export default class Template extends Component<any,{
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
         console.log(tags)
         const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
-        let searchBox = <View className='top-search'>
+        const searchBox = <View className='top-search'>
             <View className='search-box'>
-                <IconFont name='20_sousuo' size={40} color="#9C9DA6" />
+                <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
                 <Text className='placeholders'>搜索海量模板</Text>
             </View>
         </View>
@@ -166,13 +162,14 @@ export default class Template extends Component<any,{
                                                     tagData:{},
                                                     showAllCates:false
                                                 },()=>{
-                                                    const tags = cates && cates[index]?cates[index].tags:[];
-                                                    if (tags.length>0) {
-                                                        this.getTagContext(tags[0]);
+                                                    
+                                                    const tagsa = cates && cates[index]?cates[index].tags:[];
+                                                    if (tagsa.length>0) {
+                                                        this.getTagContext(tagsa[0]);
                                                     }
                                                 });
                                             }}>
-                                                <Image src={item.image} className='img'/>
+                                                <Image src={item.image} className='img' />
                                                 <Text className='name'>{item.name}</Text>
                                             </View>
                                         ))
@@ -193,10 +190,10 @@ export default class Template extends Component<any,{
                                                 switchTagActive:0,
                                                 tagData:{}
                                             },()=>{
-                                                const tags = cates && cates[index]?cates[index].tags:[];
+                                                const tagsa = cates && cates[index]?cates[index].tags:[];
                                                 
-                                                if (tags.length>0) {
-                                                    this.getTagContext(tags[0]);
+                                                if (tagsa.length>0) {
+                                                    this.getTagContext(tagsa[0]);
                                                 }
                                             });
 
@@ -247,7 +244,7 @@ export default class Template extends Component<any,{
                                     // })
                                 }}>
                                     <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>
-                                        <Image src={require("../../source/editor-print.png")} className='print'/>
+                                        <Image src={require("../../source/editor-print.png")} className='print' />
                                         <Text className='print-txt'>直接冲印</Text>
                                     </View>
                                     <View className='nook'>
@@ -264,12 +261,12 @@ export default class Template extends Component<any,{
                                         Taro.navigateTo({
                                             url:`/pages/template/detail?id=${item.id}`
                                         });
-                                    }}>
+                                    }} key={item.id}>
                                         {
                                             switchActive == 1 ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>
-                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='aspectFill'/>
-                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='aspectFill'/>
-                                            </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`}/>
+                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='aspectFill' />
+                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='aspectFill' />
+                                            </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`} />
                                         }                                        
                                     </View>
                                 ))

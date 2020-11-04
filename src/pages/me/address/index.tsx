@@ -22,11 +22,7 @@ export default class Address extends Component<any,{
             addressList:[]
         }
     }
-    componentWillMount() { }
 
-    componentDidMount() {
-        
-    }
     componentDidShow(){
         console.log(this.$router.params)
         this.getList();
@@ -52,7 +48,7 @@ export default class Address extends Component<any,{
             })
         });
     }
-    componentWillUnmount() { }
+
 
 
     render() {
@@ -127,7 +123,7 @@ export default class Address extends Component<any,{
                                 </View>
                             </View>
                         )):<View className='black'>
-                            <Image src={require('../../../source/empty/noaddress.png')} className='img'/>
+                            <Image src={require('../../../source/empty/noaddress.png')} className='img' />
                             <Text className='txt'>暂无收货地址</Text>
                             <Button className='add-btn' onClick={()=>{
                                 Taro.navigateTo({

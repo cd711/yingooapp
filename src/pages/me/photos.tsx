@@ -1,9 +1,9 @@
-import { ComponentType } from 'react'
+
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image, Button } from '@tarojs/components'
+import { View, Text,Image, Button } from '@tarojs/components'
 import './photos.less'
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
+// import { api } from '../../utils/net'
 
 export default class Photos extends Component<any,{
     navSwitchActive:number;
@@ -18,15 +18,7 @@ export default class Photos extends Component<any,{
             navSwitchActive:0
         }
     }
-    componentWillMount() { }
 
-    componentDidMount() { }
-
-    componentWillUnmount() { }
-
-    componentDidShow() { }
-
-    componentDidHide() { }
 
 
     render() {
@@ -58,7 +50,7 @@ export default class Photos extends Component<any,{
                 </View>
                 <View className='container'>
                     <View className='empty'>
-                        <Image src={require('../../source/empty/nophoto.png')} className='img'/>
+                        <Image src={require('../../source/empty/nophoto.png')} className='img' />
                         <Text className='txt'>暂无素材</Text>
                         <Button className='btn'>上传素材</Button>
                     </View>

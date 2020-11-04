@@ -1,11 +1,12 @@
 
-import Taro, { Component, Config,useEffect,useState } from '@tarojs/taro'
+import Taro, {  } from '@tarojs/taro'
 import { View, Text,Button,Swiper, SwiperItem,Image,ScrollView } from '@tarojs/components'
 import './place.less'
 import { AtFloatLayout } from "taro-ui"
 import IconFont from '../../components/iconfont'
-import { Counter } from '../../components/counter/counter'
+import Counter from '../../components/counter/counter'
 
+// eslint-disable-next-line import/prefer-default-export
 export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,onBuyNumberChange}) => {
 
     return <View className='placeOrder'>
@@ -18,15 +19,15 @@ export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,o
                         circular
                         indicatorDots>
                             {
-                                images && images.map((item)=>(
-                                    <SwiperItem className='swiper-item'>
-                                        <Image src={item} mode='aspectFill' className='pre-image'/>
+                                images && images.map((item,index)=>(
+                                    <SwiperItem className='swiper-item' key={index}>
+                                        <Image src={item} mode='aspectFill' className='pre-image' />
                                     </SwiperItem>
                                 ))
                             }
                     </Swiper>
                     <View className='close' onClick={onButtonClose}>
-                        <IconFont name="32_guanbi" size={64} color='#333' />
+                        <IconFont name='32_guanbi' size={64} color='#333' />
                     </View>
                 </View>
                 <View className='info-part'>
@@ -40,7 +41,7 @@ export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,o
                     </View>
                 </View>
                 <ScrollView scrollY className='scroll'>
-                    <View className="param-part">
+                    <View className='param-part'>
                         <View className='param'>
                             <Text className='title'>尺寸</Text>
                             <View className='params'>

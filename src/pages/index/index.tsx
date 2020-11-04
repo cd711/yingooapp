@@ -43,10 +43,8 @@ class Index extends Component<any,{
         }
     }
 
-    componentWillMount() { }
-
     componentWillReact() {
-        console.log('componentWillReact')
+        console.log('componentWillReact',Taro.getSystemInfoSync().SDKVersion)
     }
     
     componentDidMount() {
@@ -67,11 +65,7 @@ class Index extends Component<any,{
         });
       
     }
-    componentWillUnmount() { }
 
-    componentDidShow() { }
-
-    componentDidHide() { }
 
 
 
@@ -82,7 +76,7 @@ class Index extends Component<any,{
             <View className='index'>
                 <View className='top-search'>
                     <View className='search-box'>
-                        <IconFont name='20_sousuo' size={40} color="#9C9DA6" />
+                        <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
                         <Text className='placeholders'>搜索海量模板</Text>
                     </View>
                 </View>
@@ -94,9 +88,9 @@ class Index extends Component<any,{
                         </View>
                         <View className='grid'>
                             {
-                                pics.map((item)=>(
-                                    <View className='photo-warp'>
-                                        <Image src={item} className='photo' mode='aspectFill'/>
+                                pics.map((item,index)=>(
+                                    <View className='photo-warp' key={index}>
+                                        <Image src={item} className='photo' mode='aspectFill' />
                                     </View>
                                 ))
                             }
@@ -107,7 +101,7 @@ class Index extends Component<any,{
                         </View>
                     </View>
                     <View className='temp-warp' style={`background:${colorWarp}`}>
-                        <View style={'background:rgba(0, 0, 0, 0.03);'} className='mask'>
+                        <View style='background:rgba(0, 0, 0, 0.03);' className='mask'>
                             <View className='title'>
                                 <Text className='txt'>大胆的色彩和创意</Text>
                                 <Text className='sub-title'>将色彩与创意做到极致</Text>
@@ -118,7 +112,7 @@ class Index extends Component<any,{
                                     vertical
                                     circular={false}
                                     indicatorDots={false}
-                                    onChange = {({detail:{current}})=>{
+                                    onChange={({detail:{current}})=>{
                                         this.setState({
                                             colorWarp:this.state.tempColors[current],
                                             swiperCurrent:current
@@ -126,9 +120,9 @@ class Index extends Component<any,{
                                     }}
                                     >
                                     {
-                                        pics.map((item)=>(
-                                            <SwiperItem>
-                                                <Image src={item} className='photo' mode='aspectFill'/>
+                                        pics.map((item,index)=>(
+                                            <SwiperItem key={index}>
+                                                <Image src={item} className='photo' mode='aspectFill' />
                                             </SwiperItem>
                                         ))
                                     }
@@ -155,7 +149,7 @@ class Index extends Component<any,{
                         </View>
                     </View>
                     <View className='product-item'>
-                        <Image src={pics[0]} className='image' mode='aspectFill'/>
+                        <Image src={pics[0]} className='image' mode='aspectFill' />
                         <View className='bottom'>
                             <View className='left'>
                                 <Text className='title'>Nike耐克空军一号</Text>

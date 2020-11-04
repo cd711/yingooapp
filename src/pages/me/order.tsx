@@ -1,4 +1,3 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image, Button } from '@tarojs/components'
 import './order.less'
@@ -29,6 +28,9 @@ export default class Order extends Component<any,{
             list:[]
         }
     }
+    componentDidMount(){
+        console.log(userStore.nickname);
+    }
 
     render() {
         const {switchTabActive,list} = this.state;
@@ -55,7 +57,7 @@ export default class Order extends Component<any,{
                                 this.setState({
                                     switchTabActive:index
                                 })
-                            }}>
+                            }} key={index}>
                                 <Text className='txt'>{item}</Text>
                                 {switchTabActive==index?<Image src={require("../../source/switchBottom.png")} className='img' />:null}
                             </View>
@@ -65,7 +67,7 @@ export default class Order extends Component<any,{
                 <View className='container'>
                     {
                         list.length != 0 ? <View className='empty'>
-                            <Image src={require('../../source/empty/nullorder.png')} className='pic'/>
+                            <Image src={require('../../source/empty/nullorder.png')} className='pic' />
                             <Text className='txt'>暂无订单</Text>
                             <Button className='gofind'>去发现</Button>
                         </View>:null
@@ -84,7 +86,7 @@ export default class Order extends Component<any,{
                         </View>
                         <View className='order-info'>
                             <View className='order-img'>
-                                <Image src='' className='img'/>
+                                <Image src='' className='img' />
                                 <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                             </View>
                             <View className='order-name'>

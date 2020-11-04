@@ -1,4 +1,3 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image, Button, Input,Picker } from '@tarojs/components'
 import './profile.less'
@@ -40,7 +39,6 @@ export default class Profile extends Component<any,{
         }
     }
 
-    componentWillMount() { }
 
     componentDidMount() { 
         // alert(Taro.getSystemInfoSync().statusBarHeight);
@@ -48,11 +46,7 @@ export default class Profile extends Component<any,{
         
     }
 
-    componentWillUnmount() { }
 
-    componentDidShow() { }
-    
-    componentDidHide() { }
 
     onOkFixNickName = () => {
         const {inputNickName} = this.state;
@@ -126,14 +120,10 @@ export default class Profile extends Component<any,{
 
     }
 
-    handleClick = () => {}
-    handleClose = () => {
-
-    }
     // @ts-ignore
     render() {
         const {showNickName,inputNickName,showBio,inputBio} = this.state;
-        const {id,nickname,avatar,bio,gender} = userStore;
+        const {nickname,avatar,bio,gender} = userStore;
         const sex = userStore.sex
         return (
             <View className='profile'>
@@ -153,9 +143,9 @@ export default class Profile extends Component<any,{
                 <View className='base-info'>
                     <View className='item'>
                         {/* @ts-ignore */}
-                        <Input type='file' accept="image/*;" className='upload' onChange={(e)=>{
+                        <Input type='file' accept='image/*;' className='upload' onChange={(e)=>{
                             console.log(e.detail.value)
-                        }}/>
+                        }} />
                         <Text className='title'>头像</Text>
                         <View className='right'>
                             
@@ -191,7 +181,7 @@ export default class Profile extends Component<any,{
                     <View className='picker-item'>
                         <Picker mode='date' onChange={(e)=>{
                             console.log(e)
-                        }} start="1950-01-01" end="2020-01-01" value="2020-01-01">
+                        }} start='1950-01-01' end='2020-01-01' value='2020-01-01'>
                             <View className='item'>
                                 <Text className='title'>生日</Text>
                                 <View className='right'>
@@ -227,9 +217,9 @@ export default class Profile extends Component<any,{
                 <View className='float-layout'>
                     <AtFloatLayout isOpened={showNickName} onClose={()=>{this.setState({showNickName:false})}}>
                         <View className='fixBox'>
-                            <Input type='text' placeholder="请输入昵称" className='input' value={inputNickName} onInput={({detail:{value}})=>{
+                            <Input type='text' placeholder='请输入昵称' className='input' value={inputNickName} onInput={({detail:{value}})=>{
                                 this.setState({inputNickName:value});
-                            }} maxLength={6}/>
+                            }} maxLength={6} />
                             <View className='ops'>
                                 <Text className='plce-text'>1-6个字符，可由中英文、数字组成</Text>
                                 <Button className='ok' onClick={this.onOkFixNickName.bind(this)}>确定</Button>
@@ -241,9 +231,9 @@ export default class Profile extends Component<any,{
                 <View className='float-layout'>
                     <AtFloatLayout isOpened={showBio} onClose={()=>{this.setState({showBio:false})}}>
                         <View className='fixBox'>
-                            <Input type='text' placeholder="请输入个性签名" className='input' value={inputBio} onInput={({detail:{value}})=>{
+                            <Input type='text' placeholder='请输入个性签名' className='input' value={inputBio} onInput={({detail:{value}})=>{
                                 this.setState({inputBio:value});
-                            }} maxLength={10}/>
+                            }} maxLength={10} />
                             <View className='ops'>
                                 <Text className='plce-text'>个性签名在10个字符以内</Text>
                                 <Button className='ok' onClick={this.onOkBio.bind(this)}>确定</Button>

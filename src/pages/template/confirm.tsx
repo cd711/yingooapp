@@ -1,16 +1,16 @@
-import { ComponentType } from 'react'
+
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image, Button } from '@tarojs/components'
+import { View, Text,Image, Button } from '@tarojs/components'
 import './confirm.less';
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
+// import { api } from '../../utils/net'
 import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 // import { AtLoadMore } from 'taro-ui';
 // import lodash from 'lodash';
-import moment from 'moment';
-import {ossUrl} from '../../utils/common'
-import { Counter } from '../../components/counter/counter';
+// import moment from 'moment';
+// import {ossUrl} from '../../utils/common'
+import Counter from '../../components/counter/counter';
 
 
 @inject("templateStore")
@@ -30,8 +30,6 @@ export default class Confirm extends Component<any,{
         }
     }
 
-    componentWillMount() { }
-
     componentDidMount() { 
         console.log(templateStore.address);
      }
@@ -49,7 +47,7 @@ export default class Confirm extends Component<any,{
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
-                    <View className="center">
+                    <View className='center'>
                         <Text className='title'>确认订单</Text>
                     </View>
                 </View>
@@ -59,7 +57,7 @@ export default class Confirm extends Component<any,{
                             url:'/pages/me/address/index?t=select'
                         })
                     }}>
-                        <Image src={require('../../source/addressBackground.png')} className='backimg'/>
+                        <Image src={require('../../source/addressBackground.png')} className='backimg' />
                         <View className='address'>
                             <View className='icon'><IconFont name='20_dingwei' size={40} color='#FF4966' /></View>
                             <View className='info'>
@@ -69,7 +67,7 @@ export default class Confirm extends Component<any,{
                                 </View>
                                 <Text className='details'>{address.address}</Text>
                             </View>
-                            <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
+                            <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6' /></View>
                         </View>
                     </View>:<View className='address-part' onClick={()=>{
                         Taro.navigateTo({
@@ -77,7 +75,7 @@ export default class Confirm extends Component<any,{
                         })
                     }}>
                         <Text className='title'>选择收货地址</Text>
-                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
                 }
 
@@ -85,11 +83,11 @@ export default class Confirm extends Component<any,{
                 <View className='goods-info'>
                     <View className='title'>
                         <Text className='txt'>商品信息</Text>
-                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
                     <View className='info'>
                         <View className='pre-image'>
-                            <Image src='' className='img'/>
+                            <Image src='' className='img' />
                             <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                         </View>
                         <View className='center'>
@@ -118,7 +116,7 @@ export default class Confirm extends Component<any,{
                     <Text className='title'>优惠券</Text>
                     <View className='right'>
                         <Text className='txt'>无优惠券可用</Text>
-                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
                 </View>
                 <View className='goods-item'>
