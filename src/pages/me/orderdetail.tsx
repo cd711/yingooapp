@@ -1,9 +1,8 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image,Button } from '@tarojs/components'
 import './orderdetail.less'
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
+// import { api } from '../../utils/net'
 
 export default class OrderDetail extends Component<any,{
 
@@ -20,11 +19,7 @@ export default class OrderDetail extends Component<any,{
         }
     }
 
-    componentWillMount() { }
 
-    componentDidMount() { }
-
-    handle(){}
 
     render() {
         const { } = this.state;
@@ -73,7 +68,7 @@ export default class OrderDetail extends Component<any,{
                 <View className='plist'>
                     <View className='order-info'>
                         <View className='order-img'>
-                            <Image src='' className='img'/>
+                            <Image src='' className='img' />
                             <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                         </View>
                         <View className='order-name'>

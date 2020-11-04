@@ -13,10 +13,14 @@
     "react/no-multi-comp": false,
     "jsx-quotes": "off",
     "no-unused-vars": ["warn", { "varsIgnorePattern": "Taro" }],
+    "react/jsx-closing-bracket-location": false,
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
     "@typescript-eslint/member-delimiter-style": false,
     "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/no-empty-function": ["warn"]
+    "@typescript-eslint/no-empty-function": ["warn"],
+    "react/jsx-indent-props": [true, 4],
+    "import/no-commonjs": false,
+    "@typescript-eslint/no-var-requires": ["off"]
   },
   "parserOptions": {
     "ecmaFeatures": {

@@ -1,6 +1,5 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image } from '@tarojs/components'
+import { View, Text,Input } from '@tarojs/components'
 import './sms.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
@@ -103,7 +102,7 @@ export default class SMS extends Component<any,{
             <View className='back' onClick={()=>{
                 Taro.navigateBack();
             }}>
-                <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                <IconFont name='24_shangyiye' size={48} color='#121314' />
             </View>
             <View className='box'>
                 <Text className='title'>输入短信验证码</Text>
@@ -115,14 +114,14 @@ export default class SMS extends Component<any,{
                     // document.querySelector(".smscode").focus()
                     this.input.inputRef.focus();
                 }}>
-                    <Input type='number' placeholder='' className="smscode" maxLength={6} onInput={this.onCodeInput} value={smsCode} onBlur={(e)=>{
+                    <Input type='number' placeholder='' className='smscode' maxLength={6} onInput={this.onCodeInput} value={smsCode} onBlur={(e)=>{
                         //@ts-ignore
                         e.target.focus();
                     }} ref={(node)=>{
                         this.input = node;
-                    }}/>
+                    }} />
                     <View className='inputrow'>
-                        {list.map((item,index)=><View key={item} className={smsCode.length>item?"code-box code-box-active":smsCode.length==item?"code-box code-box-on":'code-box'}>
+                        {list.map((item)=><View key={item} className={smsCode.length>item?"code-box code-box-active":smsCode.length==item?"code-box code-box-on":'code-box'}>
                             <View className='intput-code-box'>
                                 <Text>{smsCode[item]}</Text>
                             </View>

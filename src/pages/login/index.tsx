@@ -1,11 +1,10 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input } from '@tarojs/components'
 import './index.less'
-import {HeaderTop} from './header'
+import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import { LoginFooter } from './footer'
-import { api } from '../../utils/net'
+// import { api } from '../../utils/net'
 
 export default class Login extends Component<any,{
     codeBtnActive:boolean;
@@ -27,20 +26,10 @@ export default class Login extends Component<any,{
             inputActive:false
         }
     }
-    componentWillMount() { }
 
-    componentDidMount() { 
-
-    }
-
-    componentWillUnmount() { }
-
-    componentDidShow() { }
-
-    componentDidHide() { }
 
     onMobileInput = ({detail:{value}}) => {
-        var pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
+        const pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
         this.setState({
             inputValue:value
         })
@@ -93,8 +82,8 @@ export default class Login extends Component<any,{
         const { codeBtnActive,showMobileClear,inputValue,inputActive } = this.state;
         return (
             <View className='login'>
-                <HeaderTop rightText="账号登录" url='/pages/login/acount' />
-                <View className="container">
+                <HeaderTop rightText='账号登录' url='/pages/login/acount' />
+                <View className='container'>
                     <View className='title'>
                         <Text className='ttext'>Hi,</Text>
                         <Text className='ttext'>欢迎来到映果定制</Text>
@@ -106,7 +95,7 @@ export default class Login extends Component<any,{
                             if (inputValue.length<=0) {
                                 this.setState({inputActive:false})
                             }
-                        }} ref={(node)=>{this.inputRef = node}} value={inputValue}/>
+                        }} ref={(node)=>{this.inputRef = node}} value={inputValue} />
                         {/* <Text className='forget'>忘记密码</Text> */}
                         {
                             showMobileClear?<View className='clearIcon' onClick={this.onInputClear}><IconFont name='16_qingkong' size={32} color='#999999' /></View>:null

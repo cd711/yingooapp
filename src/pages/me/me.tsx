@@ -1,31 +1,14 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image } from '@tarojs/components'
 import './me.less'
 import IconFont from '../../components/iconfont';
 
-import {TaroPopover} from '../../components/popmenu';
 // import { AtModal } from 'taro-ui';
 // / npx iconfont-taro
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 
-
 const switchBottom = require("../../source/switchBottom.png");
-const list=[
-    {
-      id: 1,
-      label: 'item1'
-    },
-    {
-      id: 2,
-      label: 'item2'
-    },
-    {
-      id: 3,
-      label: 'item3'
-    }
-];
 
 @inject("userStore")
 @observer
@@ -42,39 +25,28 @@ export default class Me extends Component<any,{
         }
     }
 
-    componentWillMount() { }
-
-    componentDidMount() { 
-
-    }
-
-    componentWillUnmount() { }
-
-    componentDidShow() { }
-    
-    componentDidHide() { }
     onTabItem=(item)=>{
         console.log(item)
-      }
+    }
     
     render() {
         const {switchActive} = this.state;
         const {id,nickname,avatar} = userStore;
         return (
             <View className='me'>
-                <View className='topBox' ref={(node) =>{
+                <View className='topBox' ref={() =>{
                     // console.log(node)
                 }}>
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
-                        <View className="ops">
-                            <View className='cart'><IconFont name={"24_gouwuche"} size={48} color="#121314"/></View>
-                            <View className='coupon'><IconFont name={"24_youhuiquan"} size={48} color="#121314"/></View>
+                        <View className='ops'>
+                            <View className='cart'><IconFont name='24_gouwuche' size={48} color='#121314' /></View>
+                            <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314' /></View>
                             <View className='set' onClick={()=>{
                                 Taro.navigateTo({
                                     url:'/pages/me/setting'
                                 })
-                            }}><IconFont name={"24_shezhi"} size={48} color="#121314"/></View>
+                            }}><IconFont name='24_shezhi' size={48} color='#121314' /></View>
                         </View>
                     </View>
                     <View className='baseInfo' onClick={()=>{
@@ -85,8 +57,8 @@ export default class Me extends Component<any,{
                             url:'/pages/login/index'
                         })
                     }}>
-                        <View className="avator">
-                            <Image src={avatar.length>0?avatar:require('../../source/defaultAvatar.png')} className='avatarImg'/>
+                        <View className='avator'>
+                            <Image src={avatar.length>0?avatar:require('../../source/defaultAvatar.png')} className='avatarImg' />
                         </View>
                         {/* todo: 昵称6个字 */}
                         <Text className='nickname'>{nickname.length>0?`Hi，${nickname}`:"Hi，未登录"}</Text>
@@ -100,7 +72,7 @@ export default class Me extends Component<any,{
                                 })
                             }}>
                                 <Text>全部订单</Text>
-                                <IconFont name={"16_xiayiye"} size={36} color="#9C9DA6"/>
+                                <IconFont name='16_xiayiye' size={36} color='#9C9DA6' />
                             </View>
                         </View>
                         <View className='orderstate'>
@@ -109,7 +81,7 @@ export default class Me extends Component<any,{
                                     url:'/pages/me/order?switch=1'
                                 })
                             }}>
-                                <IconFont name={"24_daifukuan"} size={48} color="#121314"/>
+                                <IconFont name='24_daifukuan' size={48} color='#121314' />
                                 <Text className='orderText'>待付款</Text>
                             </View>
                             <View className='oitem' onClick={()=>{
@@ -117,7 +89,7 @@ export default class Me extends Component<any,{
                                     url:'/pages/me/order?switch=2'
                                 })
                             }}>
-                                <IconFont name={"24_daifahuo"} size={48} color="#121314"/>
+                                <IconFont name='24_daifahuo' size={48} color='#121314' />
                                 <Text className='orderText'>待发货</Text>
                             </View>
                             <View className='oitem' onClick={()=>{
@@ -125,17 +97,17 @@ export default class Me extends Component<any,{
                                     url:'/pages/me/order?switch=3'
                                 })
                             }}>
-                                <IconFont name={"24_daishouhuo"} size={48} color="#121314"/>
+                                <IconFont name='24_daishouhuo' size={48} color='#121314' />
                                 <Text className='orderText'>待收货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name={"24_shouhou"} size={48} color="#121314"/>
+                                <IconFont name='24_shouhou' size={48} color='#121314' />
                                 <Text className='orderText'>售后</Text>
                             </View>
                         </View>
                     </View>
                 </View>
-                <View className="container">
+                <View className='container'>
                     <View className='switchBox'>
                         <View className='switchBar'>
                             {
@@ -169,17 +141,17 @@ export default class Me extends Component<any,{
                                     }).exec();
                                 }}>
                                     {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="24_gengduo" size={48} color="#9C9DA6"/>
+                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
                                     {/* </TaroPopover> */}
                                 </View>
                                 
                             </View>
-                            <View className="box">
-                                <View className="cns">
+                            <View className='box'>
+                                <View className='cns'>
                                     <Text className='neir'>发布作品《映果果饮品日记》</Text>
-                                    <View className="docker">
-                                        <Text className="nook">已打印</Text>
-                                        <Image src="" className='pic'/>
+                                    <View className='docker'>
+                                        <Text className='nook'>已打印</Text>
+                                        <Image src='' className='pic' />
                                     </View>
                                     
                                 </View>
@@ -196,20 +168,20 @@ export default class Me extends Component<any,{
                                 <Text className='date'>9月23日</Text>
                                 <View className='more'>
                                     {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name="24_gengduo" size={48} color="#9C9DA6"/>
+                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
                                     {/* </TaroPopover> */}
                                 </View>
                             </View>
-                            <View className="box">
-                                <View className="cns">
+                            <View className='box'>
+                                <View className='cns'>
                                     <Text className='neir'>发布作品《映果果饮品日记》</Text>
-                                    <Image src="" className='pic'/>
+                                    <Image src='' className='pic' />
                                 </View>
                             </View>
                         </View> 
 
-                        <View className="years">
-                            <Text className="text">2019</Text>
+                        <View className='years'>
+                            <Text className='text'>2019</Text>
                         </View>
 
                         

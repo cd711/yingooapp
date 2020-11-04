@@ -1,17 +1,17 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image, Button } from '@tarojs/components'
+import { View, Text,Image, Button } from '@tarojs/components'
 import './preview.less';
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
+// import { api } from '../../utils/net'
 
-import {templateStore} from '../../store/template';
+// import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 // import { AtLoadMore } from 'taro-ui';
 // import lodash from 'lodash';
-import moment from 'moment';
-import {ossUrl} from '../../utils/common'
+// import moment from 'moment';
+// import {ossUrl} from '../../utils/common'
 import { PlaceOrder } from './place';
+
 const pics = [
     "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
     "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
@@ -38,10 +38,6 @@ export default class Preview extends Component<any,{
         }
     }
 
-    componentWillMount() { }
-
-    componentDidMount() {  }
-
     onPlaceOrderClose= () => {
         this.setState({
             placeOrderShow:false
@@ -59,15 +55,15 @@ export default class Preview extends Component<any,{
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
-                    <View className="center">
+                    <View className='center'>
                         <Text className='title'>预览</Text>
                     </View>
                     <View className='right'>
-                        <IconFont name='24_fenxiang' size={48} color='#121314'/>
+                        <IconFont name='24_fenxiang' size={48} color='#121314' />
                     </View>
                 </View>
                 <View className='container'>
-                    <Image src="" className='pre-image'/>
+                    <Image src='' className='pre-image' />
                 </View>
                 <View className='bottom'>
                     <View className='editor'>
@@ -83,7 +79,7 @@ export default class Preview extends Component<any,{
                 </View>
                 <PlaceOrder isShow={placeOrderShow} onClose={this.onPlaceOrderClose} images={pics} onButtonClose={this.onPlaceOrderClose} onBuyNumberChange={(n)=>{
                     console.log(n);
-                }}/>
+                }} />
             </View>
         )
     }

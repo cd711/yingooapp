@@ -1,4 +1,3 @@
-import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input,Picker,Button } from '@tarojs/components'
 import './editor.less'
@@ -6,7 +5,8 @@ import IconFont from '../../../components/iconfont';
 import { api } from '../../../utils/net';
 import { AtTextarea,AtSwitch } from 'taro-ui';
 // import region from '../../../utils/region';
-import {TipModal} from '../../../components/tipmodal/TipModal'
+import TipModal from '../../../components/tipmodal/TipModal'
+
 interface CityModal {
     province:any,
     city:Array<any>
@@ -43,7 +43,6 @@ export default class Editor extends Component<any,{
             tipModalShow:false
         }
     }
-    componentWillMount() { }
 
     componentDidMount() {
 
@@ -106,8 +105,8 @@ export default class Editor extends Component<any,{
     getRegion = () => {     
         Taro.showLoading({title:"加载中..."});   
         api("common/area").then((res)=>{
-            let range = this.state.pickerRange;
-            let temp = this.formatRegion(res);
+            const range = this.state.pickerRange;
+            const temp = this.formatRegion(res);
             range.push(this.getItemName(this.province));
             range.push(this.getItemName(temp[0].city));
             range.push(this.getItemName(temp[0].area[0]));
@@ -129,7 +128,7 @@ export default class Editor extends Component<any,{
     }
 
     getItemName(arr:Array<any>){
-        let temp:Array<any> = [];
+        const temp:Array<any> = [];
         for (const iterator of arr) {
             temp.push(iterator.name);
         }
@@ -137,10 +136,10 @@ export default class Editor extends Component<any,{
     }
 
     formatRegion(regionArray:Array<any>){
-        let region:Array<CityModal> = [];
+        const region:Array<CityModal> = [];
         for (const iterator of regionArray) {
             if (iterator.level == 1) {
-                let data:CityModal = {
+                const data:CityModal = {
                     province:{},
                     city:[],
                     area:[]
@@ -150,7 +149,7 @@ export default class Editor extends Component<any,{
                 for (const citerator of regionArray) {
                     if (iterator.id==citerator.pid && citerator.level == 2) {
                         data.city.push(citerator);
-                        let tempa:Array<any> = [];
+                        const tempa:Array<any> = [];
                         for (const aitem of regionArray) {
                             if (citerator.id==aitem.pid && aitem.level == 3) {
                                 tempa.push(aitem)
@@ -164,11 +163,10 @@ export default class Editor extends Component<any,{
         }
         return region; 
     }
-    componentWillUnmount() { }
 
     onPickerChange = (e) => {
         let regionTemp = this.state.region;
-        let rangeTemp = this.state.pickerRange;
+        const rangeTemp = this.state.pickerRange;
         let valueTemp = this.state.pickerValue;
         // let regionArray = this.state.regionArray;
         valueTemp = e.detail.value;
@@ -184,14 +182,14 @@ export default class Editor extends Component<any,{
 
     onPickerColumnChange = (e) => {
         
-        let rangeTemp = this.state.pickerRange;
-        let valueTemp = this.state.pickerValue;
+        const rangeTemp = this.state.pickerRange;
+        const valueTemp = this.state.pickerValue;
 
-        let column = e.detail.column;
-        let row = e.detail.value;
+        const column = e.detail.column;
+        const row = e.detail.value;
 
         valueTemp[column] = row;
-        let regionArray = this.state.regionArray;
+        const regionArray = this.state.regionArray;
         switch (column) {
             case 0:
                 let cityTemp:Array<any> = [];
@@ -228,7 +226,7 @@ export default class Editor extends Component<any,{
     }
     checkInfo() {
         const { addressValue,inputName,inputNumber,region } = this.state;
-        var pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
+        const pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
         if (inputName.length==0) {
             Taro.showToast({
                 title:'联系人不能为空！',
@@ -265,15 +263,15 @@ export default class Editor extends Component<any,{
     }
     onSave = () => {
         const { pickerValue,addressValue,atSwitchValue,inputName,inputNumber,regionArray } = this.state;
-        let p = regionArray[pickerValue[0]].province;
-        let c = regionArray[pickerValue[0]].city[pickerValue[1]];
-        let a = regionArray[pickerValue[0]].area[pickerValue[1]][pickerValue[2]];
+        const p = regionArray[pickerValue[0]].province;
+        const c = regionArray[pickerValue[0]].city[pickerValue[1]];
+        const a = regionArray[pickerValue[0]].area[pickerValue[1]][pickerValue[2]];
         if (!this.checkInfo()) {
             return;  
         }
         Taro.showLoading({title:"保存中..."});
         let url = "app.address/add";
-        let data = {
+        const data = {
             province_id:p.id,
             city_id:c.id,
             area_id:a.id,
@@ -359,45 +357,45 @@ export default class Editor extends Component<any,{
                     </View>
                 </View>
                 <View className='container'>
-                    <View className="item">
-                        <Text className="name">联系人：</Text>
-                        <Input type='text' className='input-name' placeholder='请输入名称' maxLength={10} value={inputName} onInput={({detail:{value}})=>this.setState({inputName:value})}/>
+                    <View className='item'>
+                        <Text className='name'>联系人：</Text>
+                        <Input type='text' className='input-name' placeholder='请输入名称' maxLength={10} value={inputName} onInput={({detail:{value}})=>this.setState({inputName:value})} />
                     </View>
-                    <View className="item">
-                        <Text className="name">手机号：</Text>
-                        <Input type='number' placeholder='请填写收货手机号' maxLength={11} value={inputNumber} onInput={({detail:{value}})=>this.setState({inputNumber:value})}/>
+                    <View className='item'>
+                        <Text className='name'>手机号：</Text>
+                        <Input type='number' placeholder='请填写收货手机号' maxLength={11} value={inputNumber} onInput={({detail:{value}})=>this.setState({inputNumber:value})} />
                     </View>
                     <Picker
-                        mode='multiSelector' 
-                        onChange={this.onPickerChange}
-                        onColumnChange={this.onPickerColumnChange}
-                        range={pickerRange}
-                        value={pickerValue}
+                      mode='multiSelector' 
+                      onChange={this.onPickerChange}
+                      onColumnChange={this.onPickerColumnChange}
+                      range={pickerRange}
+                      value={pickerValue}
                     >
-                        <View className="item">
-                            <Text className="name">所在地区：</Text>
+                        <View className='item'>
+                            <Text className='name'>所在地区：</Text>
                             <View className='right'>
                                 <Text className={region.length>0?'region selected':'region'}>{region.length>0?region:'请选择省/市/县（区）'}</Text>
                                 <View className='sym'><IconFont name='20_xiayiye' size={40} color='#9C9DA6' /></View>
                             </View>
                         </View>
                     </Picker>
-                    <View className="item column">
-                        <Text className="name">详细地址：</Text>
+                    <View className='item column'>
+                        <Text className='name'>详细地址：</Text>
                         <AtTextarea
-                            value={addressValue}
-                            onChange={(value)=>{
+                          value={addressValue}
+                          onChange={(value)=>{
                                 this.setState({
                                     addressValue:value
                                 })
                             }}
-                            maxLength={30}
-                            placeholder='请输入详细的地址信息'
+                          maxLength={30}
+                          placeholder='请输入详细的地址信息'
                         />
                     </View>
-                    <View className="item">
+                    <View className='item'>
                         {/* <Text className="name">设为默认地址</Text> */}
-                        <AtSwitch title="设为默认地址" color='#42DAC4' border={false} onChange={this.onAtSwitchChange} checked={atSwitchValue}/>
+                        <AtSwitch title='设为默认地址' color='#42DAC4' border={false} onChange={this.onAtSwitchChange} checked={atSwitchValue} />
                     </View>
                     {
                         id && parseInt(id)>0?<View className='item del' onClick={()=>{
@@ -410,16 +408,16 @@ export default class Editor extends Component<any,{
                     }
                 </View>
                 <Button className='save-btn' onClick={this.onSave}>保存</Button>
-                <TipModal isShow={tipModalShow} tip="是否要删除该地址？？" onCancel={(e)=>{
+                <TipModal isShow={tipModalShow} tip='是否要删除该地址？？' onCancel={()=>{
                     this.setState({
                         tipModalShow:false
                     })
-                }} onOK={(e)=>{
+                }} onOK={()=>{
                     this.onDel();
                     this.setState({
                         tipModalShow:false
                     })
-                }} cancelText="取消" okText="删除"/>
+                }} cancelText='取消' okText='删除' />
             </View>
         )
     }

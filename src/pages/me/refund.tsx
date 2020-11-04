@@ -1,10 +1,11 @@
-import { ComponentType } from 'react'
+
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image,Input, Button } from '@tarojs/components'
 import './refund.less'
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
+// import { api } from '../../utils/net'
 import { AtNavBar,AtTextarea} from 'taro-ui'
+
 export default class Refund extends Component<any,{
     textValue:string
 }> {
@@ -19,14 +20,7 @@ export default class Refund extends Component<any,{
             textValue:""
         }
     }
-    componentWillMount() {
-    }
 
-    componentDidMount() { 
-
-    }
-
-    componentWillUnmount() { }
     handleChange = (value) => {
         this.setState({
             textValue:value
@@ -54,7 +48,7 @@ export default class Refund extends Component<any,{
                 <View className='plist'>
                     <View className='order-info'>
                         <View className='order-img'>
-                            <Image src='' className='img'/>
+                            <Image src='' className='img' />
                             <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                         </View>
                         <View className='order-name'>
@@ -79,7 +73,7 @@ export default class Refund extends Component<any,{
                     <Text className='name'>退款类型</Text>
                     <View className='select'>
                         <Text className='txt'>请选择</Text>
-                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
                 </View>
                 <View className='textarea'>
@@ -93,15 +87,15 @@ export default class Refund extends Component<any,{
                 <View className='upload-pic'>
                     <View className='upload'>
                         {/* @ts-ignore */}
-                        <Input type='file' accept="image/*;" className='input' onChange={(e)=>{
+                        <Input type='file' accept='image/*;' className='input' onChange={(e)=>{
                             console.log(e.detail.value)
-                        }}/>
+                        }} />
                         <IconFont name='24_jiahao' size={48} color='#D7D7DA' />
                     </View>
                 </View>
                 <View className='contact'>
                     <Text className='name'>联系方式</Text>
-                    <Input type='text' className='phone' placeholder='请留下您的联系方式' onInput={(e)=>{}} />
+                    <Input type='text' className='phone' placeholder='请留下您的联系方式' />
                 </View>
                 <Button className='submit'>提交</Button>
             </View>
