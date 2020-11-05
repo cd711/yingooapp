@@ -1,7 +1,7 @@
-import Taro, { getSystemInfoSync } from '@tarojs/taro';
-import { userStore } from "../store/user";
+import Taro from '@tarojs/taro';
 import { Base64 } from 'js-base64';
-export let options: {
+
+export const options: {
     apiUrl: string;
     sourceUrl:string
 } = {
@@ -25,9 +25,9 @@ export function setUserInfo(info) {
     });
 }
 export function updateLocalUserInfo(feild,context) {
-    let info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
+    const info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
     if (info) {
-        let user = JSON.parse(info);
+        const user = JSON.parse(info);
         user[feild] = context;
         Taro.setStorage({
             key: "TaroInfoKey",
@@ -37,7 +37,7 @@ export function updateLocalUserInfo(feild,context) {
 
 }
 export function getUserInfo() {
-   let info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
+   const info = Base64.decode(Taro.getStorageSync("TaroInfoKey"));
    if (info) {
        return JSON.parse(info);
    }
@@ -45,7 +45,7 @@ export function getUserInfo() {
 }
 
 export function getToken(): string {
-    let now = new Date().getTime() / 1000;
+    const now = new Date().getTime() / 1000;
     if (!accessToken) {
         accessToken = Taro.getStorageSync("token") as any;
     }
