@@ -37,7 +37,10 @@ export default class Preview extends Component<any,{
             placeOrderShow:false
         }
     }
-
+    componentDidMount() {
+       const draft = Taro.getStorageSync("draft");
+       console.log(draft);
+    }
     onPlaceOrderClose= () => {
         this.setState({
             placeOrderShow:false
@@ -51,8 +54,7 @@ export default class Preview extends Component<any,{
             <View className='preview'>
                 <View className='nav-bar'>
                     <View className='left' onClick={()=>{
-                        Taro.navigateBack();
-                        console.log()
+                        window.location.replace('/editor/shell');
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
