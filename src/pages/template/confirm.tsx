@@ -50,10 +50,13 @@ export default class Confirm extends Component<any,{
     }
 
     componentDidMount() { 
-        
+        console.log(this.$router.params)
     }
     componentDidShow() {
         
+    }
+    componentWillUnmount() {
+        // alert("aaa");
     }
     render() {
         const { showTickedModal,showPayWayModal,payWayArray } = this.state;
@@ -62,6 +65,8 @@ export default class Confirm extends Component<any,{
             <View className='confirm'>
                 <View className='nav-bar'>
                     <View className='left' onClick={()=>{
+
+                        // console.log(Taro.getCurrentPages().length)
                         Taro.navigateBack();
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />

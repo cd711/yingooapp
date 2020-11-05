@@ -52,6 +52,7 @@ export default class Preview extends Component<any,{
                 <View className='nav-bar'>
                     <View className='left' onClick={()=>{
                         Taro.navigateBack();
+                        console.log()
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
