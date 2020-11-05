@@ -156,6 +156,7 @@ export default class Detail extends Component<any,{
                         Taro.redirectTo({
                             url:`/pages/editor/index?tpl_id=${currentItem.id}`
                         });
+                        
                     }}>
                         <Text className='txt'>立即编辑</Text>
                     </View>
