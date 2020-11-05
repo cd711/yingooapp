@@ -38,7 +38,7 @@ export default class Preview extends Component<any,{
         }
     }
     componentDidMount() {
-       const draft = Taro.getStorageSync("draft");
+       const draft = Taro.getStorageSync("doc_draft");
        console.log(draft);
     }
     onPlaceOrderClose= () => {
