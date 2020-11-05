@@ -314,14 +314,15 @@ export default class Shell extends Component<{}, {
 
   private store = new Store();
 
-  private tplId: any;
-  // private productId: string;
+  private tplId: any = 0;
+  private docId: any = 0;
 
   constructor(p) {
     super(p);
     // console.log(this.$router.params);
     this.tplId = this.$router.params['tpl_id'] || 0;
-    // this.productId = this.$router.params['id'];
+    this.docId = this.$router.params['id'] || 0;
+
     this.state = {
       currentBrand: -1,
       loadingTemplate: true
@@ -421,7 +422,7 @@ export default class Shell extends Component<{}, {
             return;
 
         case "onLoadEmpty":
-          if (!this.tplId) {
+          if (!this.tplId && !this.docId) {
             try {
               const {tplId, doc} = Taro.getStorageSync("doc_draft");
               await callEditor("setDoc", doc);
@@ -487,10 +488,11 @@ export default class Shell extends Component<{}, {
     const doc = await callEditor("getDoc");
     Taro.setStorageSync("doc_draft", {
       tplId: this.tplId,
+      docId: this.docId,
       doc: doc
     });
     Taro.hideLoading();
-    window.location.replace("/pages/template/preview");
+    window.location.replace(`/pages/template/preview`);
   }
 
 
@@ -512,7 +514,7 @@ export default class Shell extends Component<{}, {
       </View>
       <View className="editor" style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
-        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&t=999}`}></iframe>
+        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&doc_id=${this.docId}&t=999}`}></iframe>
         {loadingTemplate ? <View className='loading'><AtActivityIndicator size={64} mode='center' /></View> : null}
       </View>
 
