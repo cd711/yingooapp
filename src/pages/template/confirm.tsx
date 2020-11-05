@@ -1,6 +1,6 @@
 
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image, Button } from '@tarojs/components'
+import Taro, { Component, Config,useState,useEffect } from '@tarojs/taro'
+import { View, Text,Image, Button,ScrollView } from '@tarojs/components'
 import './confirm.less';
 import IconFont from '../../components/iconfont';
 // import { api } from '../../utils/net'
@@ -13,12 +13,27 @@ import { observer, inject } from '@tarojs/mobx';
 import Counter from '../../components/counter/counter';
 import FloatModal from '../../components/floatModal/FloatModal';
 import Ticket from '../../components/ticket/Ticket';
+import Checkbox from '../../components/checkbox/checkbox';
 
+const payway = [
+    {
+        icon:'32_weixinzhifu',
+        name:'微信',
+        checked:true
+    },
+    {
+        icon:'32_zhifubaozhifu',
+        name:'支付宝',
+        checked:false
+    }
+]
 
 @inject("templateStore")
 @observer
 export default class Confirm extends Component<any,{
-    showTickedModal:boolean
+    showTickedModal:boolean;
+    showPayWayModal:boolean;
+    payWayArray:Array<any>;
 }> {
 
     config: Config = {
@@ -28,7 +43,9 @@ export default class Confirm extends Component<any,{
     constructor(props){
         super(props);
         this.state = {
-            showTickedModal: false
+            showTickedModal: false,
+            showPayWayModal: false,
+            payWayArray: payway,
         }
     }
 
@@ -37,7 +54,7 @@ export default class Confirm extends Component<any,{
     }
 
     render() {
-        const { showTickedModal } = this.state;
+        const { showTickedModal,showPayWayModal,payWayArray } = this.state;
         const {address} = templateStore;
         return (
             <View className='confirm'>
@@ -151,19 +168,84 @@ export default class Confirm extends Component<any,{
                             <Text className='num'>00.00</Text>
                         </View>
                     </View>
-                    <Button className='submit-order-btn'>提交订单</Button>
+                    <Button className='submit-order-btn' onClick={()=>{
+                        this.setState({
+                            showPayWayModal:true
+                        })
+                    }}>提交订单</Button>
                 </View>
                 <FloatModal title='优惠卷' isShow={showTickedModal} onClose={()=>{
                     this.setState({
                         showTickedModal:false
                     })
                 }}>
-                    <View className='yhlist'>
-                        <Ticket />
+                    <ScrollView scrollY>
+                        <View className='yhlist'>
+                            <Ticket isNew />
+                            <Ticket />
+                            <Ticket />
+                            <Ticket />
+                        </View>
+                    </ScrollView>
+                    <View className='yh_ops'>
+                        <Button className='use-btn'>使用</Button>
                     </View>
                 </FloatModal>
+                <View className='paywaymodal'>
+                    <FloatModal isShow={showPayWayModal} onClose={()=>{
+                        this.setState({
+                            showPayWayModal:false
+                        });
+                    }}>
+                        <View className='pay-way-modal-content'>
+                            <View className='price-item'>
+                                <Text className="txt">您需要支付</Text>
+                                <View className='price'>
+                                    <Text className='left'>¥</Text>
+                                    <Text className='right'>32.00</Text>
+                                </View>
+                            </View>
+                            <View className='way-list'>
+                                {
+                                    payWayArray.map((item,index)=>(
+                                        <PayWay isCheck={item.checked} icon={item.icon} name={item.name} onPress={()=>{
+                                            this.setState({
+                                                payWayArray:payWayArray.map((it,idx)=>{
+                                                    it.checked = idx == index?true:false;
+                                                    return it;
+                                                })
+                                            })
+                                        }} key={index} />
+                                    ))
+                                }
+                            </View>
+                            <Button className='pay-btn'>确定支付</Button>
+                        </View>
+                    </FloatModal>
+                </View>
+
                 <View className='opsbar'></View>
             </View>
         )
     }
 }
+const PayWay: React.FC<any> = ({isCheck,icon,name,onChange,onPress}) => {
+
+    const [isSelect,setIsSelect] = useState(false);
+    useEffect(()=>{
+        if (isCheck != isSelect) {
+            setIsSelect(isCheck);
+        }
+    },[isCheck])
+    return  <View className='xy_pay_way_item' onClick={()=>{
+                setIsSelect(true);
+                onPress && onPress()
+            }}>
+            <View className='name'>
+                <IconFont name={icon} size={64} />
+                <Text className='txt'>{name}</Text>
+            </View>
+            <Checkbox isChecked={isSelect} onChange={onChange} />
+        </View>
+}
+

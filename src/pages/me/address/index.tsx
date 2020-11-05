@@ -33,11 +33,7 @@ export default class Address extends Component<any,{
         api("app.address/list").then((res)=>{
             Taro.hideLoading();
             res = res.map((item)=>{
-                if (item.is_default>0) {
-                    item["isChecked"] = true;
-                } else {
-                    item["isChecked"] = false;
-                }
+                item["isChecked"] = false;
                 return item;
             });
             this.setState({

@@ -5,7 +5,7 @@ import './Ticket.less';
 import IconFont from '../iconfont';
 import Checkbox from '../checkbox/checkbox';
 
-const Ticket: React.FC<any> = ({isSelected,onChange}) => {
+const Ticket: React.FC<any> = ({isNew,isSelected,onChange}) => {
     const [isChecked,setIsChecked] = useState(false);
 
     useEffect(()=>{
@@ -15,7 +15,7 @@ const Ticket: React.FC<any> = ({isSelected,onChange}) => {
     return  <View className='xy_ticket' onClick={()=>{
                 setIsChecked(!isChecked)
             }}>
-        <Image src={require("../../source/ticket/ticket.png")} className='bg' />
+        <Image src={isNew?require("../../source/ticket/newticket.png"):require("../../source/ticket/ticket.png")} className='bg' />
         <View className='content-part'>
             <View className='left-part'>
                 <View className='price'>

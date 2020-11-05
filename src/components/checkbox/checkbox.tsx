@@ -5,13 +5,16 @@ import './checkbox.less'
 import IconFont from '../iconfont';
 
 
-const Checkbox: React.FC<any> = ({className,isChecked,onChange}) => {
+const Checkbox: React.FC<{
+    className?:string;
+    isChecked:boolean;
+    onChange:Function
+}> = ({className,isChecked,onChange}) => {
     const [checked,setChecked] = useState(false);
     useEffect(()=>{
         if (onChange) {
             onChange(checked)
         }
-        
     },[checked,onChange])
     useEffect(()=>{
         setChecked(isChecked)
