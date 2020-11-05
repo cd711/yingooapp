@@ -4,7 +4,7 @@ import { AtActivityIndicator } from "taro-ui";
 import './editor.less';
 import './shell.less';
 
-import { api } from '../../utils/net';
+import { api, getToken } from '../../utils/net';
 import IconFont from '../../components/iconfont';
 import { observable } from 'mobx';
 import { observer } from '@tarojs/mobx';
@@ -514,7 +514,7 @@ export default class Shell extends Component<{}, {
       </View>
       <View className="editor" style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
-        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&doc_id=${this.docId}&t=999}`}></iframe>
+        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=999}`}></iframe>
         {loadingTemplate ? <View className='loading'><AtActivityIndicator size={64} mode='center' /></View> : null}
       </View>
 
