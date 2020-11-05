@@ -87,6 +87,7 @@ export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,o
                 <View className='ops'>
                     <Button className='add-cart-btn'>加入购物车</Button>
                     <Button className='now-buy-btn' onClick={()=>{
+                        
                         Taro.navigateTo({
                             url:'/pages/template/confirm'
                         })
