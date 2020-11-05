@@ -50,9 +50,11 @@ export default class Confirm extends Component<any,{
     }
 
     componentDidMount() { 
-        console.log(templateStore.address);
+        
     }
-
+    componentDidShow() {
+        
+    }
     render() {
         const { showTickedModal,showPayWayModal,payWayArray } = this.state;
         const {address} = templateStore;
@@ -71,7 +73,7 @@ export default class Confirm extends Component<any,{
                 {
                     address?<View className='address-part-has' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/address/index?t=select'
+                            url:`/pages/me/address/index?t=select&id=${address.id}`
                         })
                     }}>
                         <Image src={require('../../source/addressBackground.png')} className='backimg' />
@@ -229,15 +231,14 @@ export default class Confirm extends Component<any,{
         )
     }
 }
-const PayWay: React.FC<any> = ({isCheck,icon,name,onChange,onPress}) => {
-
+const PayWay: React.FC<any> = ({isCheck,icon,name,onPress}) => {
     const [isSelect,setIsSelect] = useState(false);
     useEffect(()=>{
         if (isCheck != isSelect) {
             setIsSelect(isCheck);
         }
     },[isCheck])
-    return  <View className='xy_pay_way_item' onClick={()=>{
+    return  <View className={isSelect?'xy_pay_way_item xy_pay_way_item_active':'xy_pay_way_item'} onClick={()=>{
                 setIsSelect(true);
                 onPress && onPress()
             }}>
@@ -245,7 +246,7 @@ const PayWay: React.FC<any> = ({isCheck,icon,name,onChange,onPress}) => {
                 <IconFont name={icon} size={64} />
                 <Text className='txt'>{name}</Text>
             </View>
-            <Checkbox isChecked={isSelect} onChange={onChange} />
+            <Checkbox isChecked={isSelect} disabled />
         </View>
 }
 

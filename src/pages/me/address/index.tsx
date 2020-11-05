@@ -30,10 +30,15 @@ export default class Address extends Component<any,{
     }
     getList(){
         Taro.showLoading({title:"加载中..."});
+        const {t,id} = this.$router.params;
         api("app.address/list").then((res)=>{
             Taro.hideLoading();
             res = res.map((item)=>{
                 item["isChecked"] = false;
+                if (t && t=="select" && id && parseInt(id)>0 && id == item.id) {
+                    item["isChecked"] = true;
+                    templateStore.address = item;
+                }
                 return item;
             });
             this.setState({
@@ -114,11 +119,7 @@ export default class Address extends Component<any,{
                             <View className='item' key={item.id}>
                                 <View className='left-part' onClick={this.switchChecked.bind(this,item,index)}>
                                     {
-                                        t === 'select' ? <Checkbox isChecked={item.isChecked} onChange={(checked)=>{
-                                            if (checked) {
-                                                templateStore.address = item;
-                                            }
-                                        }} />:null
+                                        t === 'select' ? <Checkbox isChecked={item.isChecked} disabled />:null
                                     }
                                     <View className='left'>
                                         <View className='info'>

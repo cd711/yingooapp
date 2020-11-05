@@ -7,21 +7,26 @@ import IconFont from '../iconfont';
 
 const Checkbox: React.FC<{
     className?:string;
+    disabled?:boolean;
     isChecked:boolean;
-    onChange:Function
-}> = ({className,isChecked,onChange}) => {
+    onChange?:Function
+}> = ({className,disabled=false,isChecked,onChange}) => {
     const [checked,setChecked] = useState(false);
     useEffect(()=>{
-        if (onChange) {
+        if (onChange && checked != isChecked) {
             onChange(checked)
         }
     },[checked,onChange])
     useEffect(()=>{
-        setChecked(isChecked)
+        if (isChecked != checked) {
+            setChecked(isChecked)
+        }
     },[isChecked])
     // 22_yixuanzhong
     return  <View className={`xy-checkbox ${className}`} onClick={()=>{
-                setChecked(!checked);
+                if (!disabled) {
+                    setChecked(!checked);
+                }
             }}>
             <IconFont name={checked?'22_yixuanzhong':'22_touming-weixuanzhong'} size={44} />
         </View>

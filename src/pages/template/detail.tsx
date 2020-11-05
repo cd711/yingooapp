@@ -153,7 +153,7 @@ export default class Detail extends Component<any,{
                         <Text className='txt'>收藏</Text>
                     </View>
                     <View className='now-editor' onClick={()=>{
-                        Taro.navigateTo({
+                        Taro.redirectTo({
                             url:`/pages/editor/index?tpl_id=${currentItem.id}`
                         })
                     }}>
