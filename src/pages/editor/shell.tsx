@@ -36,7 +36,7 @@ function callEditor(name, ...args) {
 
 
 
-
+const defaultBrank = 1201;
 const defaultModel = {
   id: 1586,
   name: "华为 V30 Pro",
@@ -57,6 +57,7 @@ interface BrandType {
   name: string;
   models?: BrandType[];
   phoneshell: any;
+  brandIndex?: number;
 }
 
 const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
@@ -110,7 +111,7 @@ const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
 const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = ({ parent, model, brand }) => {
   const [type, setType] = useState(0);
   const [brandList, setBrandList] = useState<BrandType[]>([]);
-  const [brandIndex, setBrand] = useState<number>(brand);
+  const [brandIndex, setBrand] = useState<number>(-1);
   const [series, setSeries] = useState<BrandType[]>([]);
 
   const [currentModel, setCurrentModel] = useState<BrandType>(model);
@@ -143,9 +144,22 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
         if (!list) {
           return;
         }
+
         setBrandList(list);
-        if (brandIndex == -1) {
+        let bi = -1;
+        for (const i in list ) {
+          if (brandIndex == -1) {
+            if (list[i].id == brand) {
+              bi = i as any
+              setBrand(i as any);
+              break;
+            }
+          }
+        }
+        if (bi == -1 && brandIndex == -1) {
           setBrand(0);
+        } else if (bi != -1) {
+          setBrand(bi);
         }
         if (model && model.phoneshell) {
           sendMessage("phoneshell", { id: model.id, mask: model.phoneshell.image });
@@ -167,9 +181,13 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
     }
     setSeries(null);
     let list = null;
+    let idx = brandIndex
+    if (tempCurrentModel && currentModel && tempCurrentModel.id != currentModel.id) {
+      idx = currentModel.brandIndex || idx;
+    }
     try {
       //@ts-ignore
-      const res = Taro.getStorageSync("phone_series_" + brandList[brandIndex].id);
+      const res = brandList[idx] ?　Taro.getStorageSync("phone_series_" + brandList[idx].id) : null;
       if (res && res.time + 3 * 86400000 > Date.now()) {
         list = res.list;
       }
@@ -205,10 +223,10 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
   const selectPhone = () => {
     setType(0);
     if (currentModel.id == tempCurrentModel.id) {
-
       return;
     }
     const mod = tempCurrentModel;
+    mod.brandIndex = brandIndex;
     setCurrentModel(mod);
     if (mod.phoneshell) {
       sendMessage("phoneshell", { id: mod.id, mask: mod.phoneshell.image });
@@ -218,8 +236,8 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
 
   const cancelMode = () => {
     setType(0);
-    setBrand(0);
-    setTempCurrentModel(currentModel);
+    // setBrand(currentModel.brandIndex);
+    // setTempCurrentModel(currentModel);
   }
 
   return ([type].map((t) => {
@@ -337,23 +355,32 @@ export default class Shell extends Component<{}, {
   componentWillUnmount() {
     callEditor("saveDraft");
     alert(1);
-  }
-  componentWillMount() {
+ 
     window.removeEventListener("message", this.onMsg);
   }
 
   onLoad = async (type?: number) => {
     try {
-      const res = Taro.getStorageSync("myphone") || defaultModel;
+      const res = Taro.getStorageSync("myphone");
       if (res && res.length == 2) {
         this.setState({
-          currentBrand: res[0]
+          currentBrand: res[0],
+          currentModel: res[1],
         });
-        
+        console.log(res)
+        res[1].phoneshell && sendMessage("phoneshell", { id: res[1].id, mask: res[1].phoneshell.image });
+        // defaultModel
+      }
+      else {
+        this.setState({
+          currentBrand: defaultBrank,
+          currentModel: defaultModel,
+        });
+        sendMessage("phoneshell", { id: defaultModel.id, mask: defaultModel.phoneshell.image });
       }
       !type && await callEditor("saveDraft");
     } catch (e) {
-
+      console.error(e);
     }
 
   }
@@ -456,6 +483,10 @@ export default class Shell extends Component<{}, {
     }
   }
   
+  next = async ()=> {
+    await callEditor("saveDraft");
+    window.location.replace("/pages/template/preview");
+  }
 
 
   render() {
@@ -472,7 +503,7 @@ export default class Shell extends Component<{}, {
         <View onClick={this.back}>
           <IconFont name='24_shangyiye' color='#000' size={48} />
           </View>
-        <View className='right'>下一步</View>
+        <View onClick={this.next} className='right'>下一步</View>
       </View>
       <View className="editor" style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
