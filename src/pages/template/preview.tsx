@@ -21,9 +21,39 @@ const pics = [
     "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
 ]
 
+
+
+let editorProxy: WindowProxy | null | undefined;
+
+export const sendMessage: { (type: string, data: any): void } = (type, data) => {
+    editorProxy && editorProxy.postMessage({ from: "parent", type: type, data: data }, "*");
+  }
+  
+  let rpcId = 0;
+  const rpcList = {}
+  
+  function callEditor(name, ...args) {
+    return new Promise((resolve, reject) => {
+      rpcId ++;
+      const id = rpcId;
+      rpcList[id] = [resolve, reject];
+      sendMessage("_req", {
+        id: rpcId,
+        fun: name,
+        args: args
+      });
+    });
+  }
+  
+  
+  
+  
+
+  
+
 @inject("templateStore")
 @observer
-export default class Preview extends Component<any,{
+export default class Preview extends Component<{},{
     placeOrderShow:boolean;
 }> {
 
@@ -38,9 +68,87 @@ export default class Preview extends Component<any,{
         }
     }
     componentDidMount() {
-       const draft = Taro.getStorageSync("doc_draft");
-       console.log(draft);
+        editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
+    
+        window.addEventListener("message", this.onMsg);
+    
+       
     }
+
+
+  _res = (data) =>{
+    const {id, res, err} = data.data;
+    if (rpcList[id]) {
+      const rpc = rpcList[id];
+      delete rpcList[id];
+
+      if (err) {
+        rpc[1](err);
+      } else {
+        rpc[0](res);
+      }
+    }
+  }
+
+  onMsg: { (e: MessageEvent<any>): void } = async ({ data }) => {
+    console.log("msg", data);
+    if (!data) {
+      return;
+    }
+    if (data.from == "editor") {
+      switch (data.type) {
+        case "_req": 
+          const {id, fun, args} = data.data;
+          
+          if (this[`rpc_${fun}`]) {
+            try {
+              const res = await this[`rpc_${fun}`](...args)
+              sendMessage("_res", {
+                id,
+                res
+              });
+            } catch(err) {
+              sendMessage("_res", {
+                id,
+                err
+              });
+            }
+          } else {
+              sendMessage("_res", {
+                id,
+                err: "func not found"
+              });
+          }
+          return;
+        
+          case "_res":
+            this._res(data);
+            return;
+
+        case "onLoadEmpty":
+            const {doc} = Taro.getStorageSync("doc_draft");
+            console.log(doc);
+            
+            callEditor("setDoc", doc);
+            
+          // callEditor("loadDraft")
+          break;
+
+        case "onload":
+          
+        case "mainSize":
+          // this.setEditorSize(data.data);
+          break;
+
+        case "selected":
+          break;
+      }
+    }
+  }
+
+
+
+
     onPlaceOrderClose= () => {
         this.setState({
             placeOrderShow:false
@@ -66,7 +174,7 @@ export default class Preview extends Component<any,{
                     </View>
                 </View>
                 <View className='container'>
-                    <Image src='' className='pre-image' />
+                <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?tpl_id=0`}></iframe>
                 </View>
                 <View className='bottom'>
                     <View className='editor'>

@@ -331,31 +331,17 @@ export default class Shell extends Component<{}, {
   public editorProxy: WindowProxy | null | undefined;
 
   async componentDidMount() {
-
+  // Taro.showLoading({title: "请稍候"});
     // @ts-ignore
     this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
     editorProxy = this.editorProxy;
     window.addEventListener("message", this.onMsg);
-    if (!this.tplId) {
-      try {
-        console.log("ccccccc", await callEditor("loadDraft"));
-      } catch(e) {
-        alert(e);
-      }
-    }
+    
 
-    // if (!this.tplId) {
-    //   Taro.showToast({
-    //     title: "参数错误！",
-    //     mask: true
-    //   });
-    //   setTimeout(() => Taro.navigateBack(), 2000);
-    // }
+    // Taro.hideLoading();
   }
   componentWillUnmount() {
-    callEditor("saveDraft");
-    alert(1);
- 
+    editorProxy = null;
     window.removeEventListener("message", this.onMsg);
   }
 
@@ -378,7 +364,7 @@ export default class Shell extends Component<{}, {
         });
         sendMessage("phoneshell", { id: defaultModel.id, mask: defaultModel.phoneshell.image });
       }
-      !type && await callEditor("saveDraft");
+      // !type && await callEditor("saveDraft");
     } catch (e) {
       console.error(e);
     }
@@ -435,10 +421,20 @@ export default class Shell extends Component<{}, {
             return;
 
         case "onLoadEmpty":
+          if (!this.tplId) {
+            try {
+              const {tplId, doc} = Taro.getStorageSync("doc_draft");
+              await callEditor("setDoc", doc);
+              this.tplId = tplId;
+            } catch(e) {
+              alert(e);
+            }
+          }
+
           this.setState({
             loadingTemplate: false
           });
-          callEditor("loadDraft")
+          // callEditor("loadDraft")
           break;
 
         case "onload":
@@ -484,7 +480,16 @@ export default class Shell extends Component<{}, {
   }
   
   next = async ()=> {
-    await callEditor("saveDraft");
+    Taro.showLoading({
+      title: "请稍候"
+    });
+    // await callEditor("saveDraft");
+    const doc = await callEditor("getDoc");
+    Taro.setStorageSync("doc_draft", {
+      tplId: this.tplId,
+      doc: doc
+    });
+    Taro.hideLoading();
     window.location.replace("/pages/template/preview");
   }
 
