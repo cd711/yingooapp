@@ -15,7 +15,7 @@ const FloatModal: React.FC<any> = ({title,isShow,onClose,children}) => {
     },[isShow]);
 
     return  <View className='xy_float_modal'>
-            <AtFloatLayout isOpened={isOpened} onClose={onClose} customStyle={{backgroundColor:"red"}}>
+            <AtFloatLayout isOpened={isOpened} onClose={onClose}>
                 <View className='xy_modal_container'>
                     <View className='title_bar'>
                         {

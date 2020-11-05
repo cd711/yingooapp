@@ -261,6 +261,100 @@
     }
     .yhlist{
         padding: 0 32px 32px;
+        max-height: 720px;
+    }
+    .yh_ops{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 176px;
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
+        .use-btn{
+            width: 686px;
+            height: 96px;
+            background: #FF4966;
+            box-shadow: 0px 20px 48px -14px rgba(255, 74, 101, 0.5);
+            border-radius: 48px;
+            font-size: 32px;
+            font-weight: 500;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+    .paywaymodal{
+        .at-float-layout__container{
+            background-color: #FFF;
+        }
+    }
+    .pay-way-modal-content{
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
+        .price-item{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            .txt{
+                font-size: 28px;
+                font-weight: 400;
+                color: #9C9DA6;
+            }
+            .price{
+                display: flex;
+                align-items: baseline;
+                .left{
+                    font-size: 42px;
+                    font-weight: 500;
+                    color: #FF4966;
+                    padding: 0 6px;
+                }
+                .right{
+                    font-size: 64px;
+                    font-weight: bold;
+                    color: #FF4966;
+                }
+            }
+        }
+        .way-list{
+            padding: 100px 40px 0;
+        }
+        .pay-btn{
+            width: 686px;
+            height: 96px;
+            background: #FF4966;
+            box-shadow: 0px 20px 48px -14px rgba(255, 74, 101, 0.5);
+            border-radius: 48px;
+            margin: 80px auto;
+            font-size: 32px;
+            font-weight: 500;
+            color: #FFFFFF;
+            line-height: 48px;
+            text-shadow: 0px 20px 48px rgba(255, 74, 101, 0.5);
+        }
+    }
+    .xy_pay_way_item{
+        height: 120px;
+        background: #F5F6F9;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 40px;
+        padding-right: 32px;
+        margin-bottom: 20px;
+        .name{
+            display: flex;
+            align-items: center;
+            .txt{
+                font-size: 32px;
+                font-weight: 500;
+                color: #121314;
+                padding-left: 32px;
+            }
+        }
     }
     .opsbar{
         background: #FFF;
