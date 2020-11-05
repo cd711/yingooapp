@@ -2,7 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text, Image, Button } from '@tarojs/components'
 import './preview.less';
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
+import { api, getToken } from '../../utils/net'
 
 // import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
@@ -161,9 +161,10 @@ export default class Preview extends Component<{}, {
             placeOrderShow: false
         });
     }
-    onSave = () => {
+
+    onSave = (_,callback?:()=>void) => {
         const { doc } = Taro.getStorageSync("doc_draft");
-        Taro.showLoading({title:"加载中"});
+        Taro.showLoading({title:"保存中"});
         api("editor.user_tpl/add",{
             doc:JSON.stringify(doc)
         }).then((res)=>{
@@ -177,9 +178,12 @@ export default class Preview extends Component<{}, {
                 icon:"success",
                 duration:2000
             })
+            
+            callback && callback();
             // console.log("api-----",res);
         }).catch((e)=>{
             Taro.hideLoading();
+            console.log(e);
             Taro.showToast({
                 title:e,
                 icon:"none",
@@ -187,6 +191,7 @@ export default class Preview extends Component<{}, {
             });
         })
     }
+
     onEditor = () => {
         const { saveId } = this.state;
         window.location.replace(`/editor/shell?id=${saveId}`);
@@ -215,7 +220,7 @@ export default class Preview extends Component<{}, {
                 </View>
                 <View className='container'>
                      {/* eslint-disable-next-line react/forbid-elements */}
-                    <iframe className="editor_frame" src="http://192.168.0.100:8080/mobile?tpl_id=0" width="100%" height="100%"></iframe>
+                    <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
                 </View>
                 <View className='bottom'>
                     {
@@ -233,12 +238,20 @@ export default class Preview extends Component<{}, {
                                 placeOrderShow: true
                             })
                         } else {
-                            this.onSave();
+                            this.onSave(null,()=>{
+                                this.setState({
+                                    placeOrderShow: true
+                                })
+                            });
                         }
                     }}>立即下单</Button>
                 </View>
                 <PlaceOrder isShow={placeOrderShow} onClose={this.onPlaceOrderClose} images={pics} onButtonClose={this.onPlaceOrderClose} onBuyNumberChange={(n) => {
                     console.log(n);
+                }} onAddCart={()=>{
+
+                }} onNowBuy={()=>{
+
                 }} />
             </View>
         )

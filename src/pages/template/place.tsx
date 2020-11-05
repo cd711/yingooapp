@@ -7,7 +7,7 @@ import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,onBuyNumberChange}) => {
+export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
 
     return <View className='placeOrder'>
         <AtFloatLayout isOpened={isShow} onClose={onClose}>
@@ -85,13 +85,8 @@ export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,o
                     <Counter onCounterChange={onBuyNumberChange} />
                 </View>
                 <View className='ops'>
-                    <Button className='add-cart-btn'>加入购物车</Button>
-                    <Button className='now-buy-btn' onClick={()=>{
-                        
-                        Taro.navigateTo({
-                            url:'/pages/template/confirm'
-                        })
-                    }}>立即购买</Button>
+                    <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
+                    <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
                 </View>
             </View>
         </AtFloatLayout>
