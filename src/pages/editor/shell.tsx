@@ -8,15 +8,43 @@ import { api } from '../../utils/net';
 import IconFont from '../../components/iconfont';
 import { observable } from 'mobx';
 import { observer } from '@tarojs/mobx';
-import Fragment from '../../components/</Fragment>';
+import Fragment from '../../components/Fragment';
 
+let editorProxy: WindowProxy | null | undefined;
 
-export const sendMessage: { (proxy: WindowProxy | null | undefined, type: string, data: any): void } = (proxy, type, data) => {
-  proxy && proxy.postMessage({ from: "parent", type: type, data: data }, "*");
+export const sendMessage: { (type: string, data: any): void } = (type, data) => {
+  editorProxy && editorProxy.postMessage({ from: "parent", type: type, data: data }, "*");
+}
 
+let rpcId = 0;
+const rpcList = {}
+
+function callEditor(name, ...args) {
+  return new Promise((resolve, reject) => {
+    rpcId ++;
+    const id = rpcId;
+    rpcList[id] = [resolve, reject];
+    sendMessage("_req", {
+      id: rpcId,
+      fun: name,
+      args: args
+    });
+  });
 }
 
 
+
+
+
+
+const defaultModel = {
+  id: 1586,
+  name: "华为 V30 Pro",
+  phoneshell: {
+    id: 37,
+    image: "http://palybox-app.oss-cn-chengdu.aliyuncs.com/uploads/phoneshell/20200911/0e768b37d0f96869abfcca08303dce70.png"
+  }
+};
 
 class Store {
   @observable
@@ -79,10 +107,10 @@ const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
 };
 
 
-const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, model }) => {
+const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = ({ parent, model, brand }) => {
   const [type, setType] = useState(0);
   const [brandList, setBrandList] = useState<BrandType[]>([]);
-  const [brandIndex, setBrand] = useState<number>(-1);
+  const [brandIndex, setBrand] = useState<number>(brand);
   const [series, setSeries] = useState<BrandType[]>([]);
 
   const [currentModel, setCurrentModel] = useState<BrandType>(model);
@@ -98,7 +126,7 @@ const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, mode
         let list = null;
         try {
           //@ts-ignore
-          const res = JSON.parse(localStorage.getItem("phone_brand"));
+          const res = Taro.getStorageSync("phone_brand");
           if (res && res.time + 15 * 86400000 > Date.now()) {
             list = res.list;
           }
@@ -115,28 +143,19 @@ const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, mode
         if (!list) {
           return;
         }
-        localStorage.setItem("phone_brand", JSON.stringify({
-          time: Date.now(),
-          list: list
-        }));
         setBrandList(list);
         if (brandIndex == -1) {
-          try {
-            const res = JSON.parse(localStorage.getItem("myphone"));
-            if (!res) {
-              return;
-            }
-            for (const idx in list) {
-              if (list[idx].id == res[0]) {
-                setBrand(idx as any);
-                break;
-              }
-            }
-          } catch (e) {
-
-          }
-
+          setBrand(0);
         }
+        if (model && model.phoneshell) {
+          sendMessage("phoneshell", { id: model.id, mask: model.phoneshell.image });
+        }
+      
+        Taro.setStorage({key: "phone_brand", data: {
+          time: Date.now(),
+          list: list
+        }});
+        
 
     }
   }) as any, [type])
@@ -150,7 +169,7 @@ const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, mode
     let list = null;
     try {
       //@ts-ignore
-      const res = JSON.parse(localStorage.getItem("phone_series_" + brandList[brandIndex].id));
+      const res = Taro.getStorageSync("phone_series_" + brandList[brandIndex].id);
       if (res && res.time + 3 * 86400000 > Date.now()) {
         list = res.list;
       }
@@ -176,10 +195,10 @@ const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, mode
       setTempCurrentModel(list[0].models[0]);
       setCurrentModel(list[0].models[0]);
     }
-    localStorage.setItem("phone_series_" + brandList[brandIndex].id, JSON.stringify({
+    Taro.setStorage({key: "phone_series_" + brandList[brandIndex].id, data: {
       time: Date.now(),
       list: list
-    }));
+    }});
   }) as any, [brandList, brandIndex]);
 
 
@@ -192,9 +211,9 @@ const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, mode
     const mod = tempCurrentModel;
     setCurrentModel(mod);
     if (mod.phoneshell) {
-      sendMessage(parent.editorProxy, "phoneshell", { id: mod.id, mask: mod.phoneshell.image });
+      sendMessage("phoneshell", { id: mod.id, mask: mod.phoneshell.image });
     }
-    localStorage.setItem("myphone", JSON.stringify([brandList[brandIndex].id, mod]));
+    Taro.setStorage({key: "myphone", data: [brandList[brandIndex].id, mod]});
   };
 
   const cancelMode = () => {
@@ -269,7 +288,7 @@ const ToolBar0: React.FC<{ parent: Shell, model?: BrandType }> = ({ parent, mode
 @observer
 export default class Shell extends Component<{}, {
   size?: { width: string | number; height: string | number };
-  editorAnim?: boolean;
+  currentBrand?: number;
   data?: number;
   loadingTemplate?: boolean;
   currentModel?: BrandType;
@@ -277,68 +296,129 @@ export default class Shell extends Component<{}, {
 
   private store = new Store();
 
-  private tplId: string;
-  private productId: string;
+  private tplId: any;
+  // private productId: string;
 
   constructor(p) {
     super(p);
     // console.log(this.$router.params);
-    this.tplId = this.$router.params['tpl_id'] || '20200826';
-    this.productId = this.$router.params['id'] || '12';
+    this.tplId = this.$router.params['tpl_id'] || 0;
+    // this.productId = this.$router.params['id'];
     this.state = {
+      currentBrand: -1,
       loadingTemplate: true
     };
   }
 
   public editorProxy: WindowProxy | null | undefined;
 
-  componentDidMount() {
+  async componentDidMount() {
 
     // @ts-ignore
     this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
-
+    editorProxy = this.editorProxy;
     window.addEventListener("message", this.onMsg);
-
-
-    if (!this.tplId && !this.productId) {
-      Taro.showToast({
-        title: "参数错误！",
-        mask: true
-      });
-      setTimeout(() => Taro.navigateBack(), 2000);
+    if (!this.tplId) {
+      try {
+        console.log("ccccccc", await callEditor("loadDraft"));
+      } catch(e) {
+        alert(e);
+      }
     }
+
+    // if (!this.tplId) {
+    //   Taro.showToast({
+    //     title: "参数错误！",
+    //     mask: true
+    //   });
+    //   setTimeout(() => Taro.navigateBack(), 2000);
+    // }
+  }
+  componentWillUnmount() {
+    callEditor("saveDraft");
+    alert(1);
   }
   componentWillMount() {
     window.removeEventListener("message", this.onMsg);
   }
 
-  onLoad = async () => {
+  onLoad = async (type?: number) => {
     try {
-      const res = JSON.parse(localStorage.getItem("myphone"));
-      if (res) {
-        if (res[1] && res[1].phoneshell) {
-          this.setState({currentModel: res[1] as any});
-          sendMessage(this.editorProxy, "phoneshell", { id: res[1].id, mask: res[1].phoneshell.image });
-        }
+      const res = Taro.getStorageSync("myphone") || defaultModel;
+      if (res && res.length == 2) {
+        this.setState({
+          currentBrand: res[0]
+        });
+        
       }
+      !type && await callEditor("saveDraft");
     } catch (e) {
 
     }
 
   }
 
-  onMsg: { (e: MessageEvent<any>): void } = ({ data }) => {
+  _res = (data) =>{
+    const {id, res, err} = data.data;
+    if (rpcList[id]) {
+      const rpc = rpcList[id];
+      delete rpcList[id];
+
+      if (err) {
+        rpc[1](err);
+      } else {
+        rpc[0](res);
+      }
+    }
+  }
+
+  onMsg: { (e: MessageEvent<any>): void } = async ({ data }) => {
     console.log("msg", data);
     if (!data) {
       return;
     }
     if (data.from == "editor") {
       switch (data.type) {
+        case "_req": 
+          const {id, fun, args} = data.data;
+          
+          if (this[`rpc_${fun}`]) {
+            try {
+              const res = await this[`rpc_${fun}`](...args)
+              sendMessage("_res", {
+                id,
+                res
+              });
+            } catch(err) {
+              sendMessage("_res", {
+                id,
+                err
+              });
+            }
+          } else {
+              sendMessage("_res", {
+                id,
+                err: "func not found"
+              });
+          }
+          return;
+        
+          case "_res":
+            this._res(data);
+            return;
+
+        case "onLoadEmpty":
+          this.setState({
+            loadingTemplate: false
+          });
+          callEditor("loadDraft")
+          break;
+
         case "onload":
           this.setState({
             loadingTemplate: false
           });
-          this.onLoad();
+          this.onLoad(data.data);
           break;
 
         case "mainSize":
@@ -379,12 +459,10 @@ export default class Shell extends Component<{}, {
 
 
   render() {
-    const { loadingTemplate, size, currentModel, editorAnim } = this.state;
+    const { loadingTemplate, size, currentModel, currentBrand } = this.state;
     const { tool } = this.store;
 
-    if (!this.tplId && !this.productId) {
-      return null;
-    }
+   
 
     return <View className='editor-page'>
       <View
@@ -398,14 +476,14 @@ export default class Shell extends Component<{}, {
       </View>
       <View className="editor" style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
-        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&amp;id=${this.productId}&t=999}`}></iframe>
+        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?tpl_id=${this.tplId}&t=999}`}></iframe>
         {loadingTemplate ? <View className='loading'><AtActivityIndicator size={64} mode='center' /></View> : null}
       </View>
 
       {([tool].map((s) => {
         switch (s) {
           case 0:
-            return <ToolBar0 parent={this} model={currentModel} />;
+            return <ToolBar0 parent={this} brand={currentBrand} model={currentModel} />;
 
           case 1:
             return <View key={s} className='tools'>
