@@ -5,25 +5,30 @@ import './place.less'
 import { AtFloatLayout } from "taro-ui"
 import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
+import Fragment from '../../components/Fragment'
 
 // eslint-disable-next-line import/prefer-default-export
 export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
-    const [itemActive,setItemActive] = useState("")
+    const [itemActive,setItemActive] = useState([])
     const [tags,setTags] = useState([]);
-    const [currentSkus,setCurrentSkus] = useState([])
-    const onItemSelect = (itemId,tagId) => {
-        setItemActive(`${itemId},${tagId}`);
-        let temp: Array<any> = [];
+    const [hasSkus,setHasSkus] = useState("")
+    const onItemSelect = (idx,itemId,tagId) => {
+        const items = itemActive;
+        items[idx] = `${itemId},${tagId}`
+        setItemActive(items);
+        let temp = "";
         const skus = data.skus;
         for (const iterator of skus) {
             if (iterator.value.indexOf(tagId) != -1) {
-                console.log(iterator.value);
                 if (iterator.stock>0) {
-                    temp.push(iterator.value)
+                    temp += `${iterator.value},`
                 }
             }
         }
-        console.log(itemId,tagId)
+        setHasSkus(temp);
+        
+
+        console.log(itemId,tagId,temp)
     }
     useEffect(()=>{
         if (data && data.attrItems) {
@@ -74,11 +79,14 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                                     </View> */}
                                     {
                                         tags && tags[index] && tags[index].map((tag)=>(
-                                            <View className={itemActive==`${item.id},${tag.id}`?'item active':'item'} key={tag.id} onClick={()=>{
-                                                onItemSelect(item.id,tag.id)
-                                            }}>
-                                                <Text className='txt'>{tag.name}</Text>
-                                            </View>
+                                            <Fragment key={tag.id}>
+                                                    <View className={itemActive[index]==`${item.id},${tag.id}`?'item active':'item'} onClick={()=>{
+                                                        onItemSelect(index,item.id,tag.id)
+                                                    }}>
+                                                        <Text className='txt'>{tag.name}</Text>
+                                                    </View>
+                                            </Fragment>
+ 
                                         ))
                                     }
                                 </View>
