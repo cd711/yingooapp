@@ -10,8 +10,13 @@
         position: relative;
         box-sizing: border-box;
         background: #FFF;
+        border-bottom: 1px solid #EDEDEF;
         .left{
             padding-left: 32px;
+        }
+        .right{
+            padding: 0 32px;
+            font-size: 32px;
         }
         .center{
             display: flex;
@@ -36,7 +41,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    
+
                     .txt{
                         font-size: 32px;
                         font-weight: 400;
@@ -56,7 +61,8 @@
         }
     }
     .container{
-        padding-top: 16px;
+        //padding-top: 16px;
+        background: #fff;
         .empty{
             display: flex;
             flex-direction: column;
@@ -88,5 +94,91 @@
                 justify-content: center;
             }
         }
+    }
+}
+.list_container{
+    .list_main{
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        .list_item{
+            width: 248px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 1px;
+            .img_item{
+                width: 248px;
+                height: 248px;
+                overflow: hidden;
+                .img{
+                    width: 248px;
+                    height: 248px;
+                }
+            }
+            .act_btn{
+                position: absolute;
+                top: 24px;
+                left: 24px;
+                z-index: 1000;
+            }
+        }
+    }
+}
+.list_filter{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 104px;
+    padding: 0 32px;
+    .tit{
+        font-size: 32px;
+    }
+}
+.list_scrollview{
+
+}
+.select_all_container{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000001;
+    background: #fff;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: 15px;
+    .left{
+        width: 50%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        flex-direction: column;
+        font-size: 24px;
+        color: #9C9DA6;
+        padding-left: 42px;
+    }
+    .right{
+        width: 50%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        flex-direction: column;
+        padding-right: 42px;
+    }
+    .btn{
+        width: 107px * 2;
+        height: 44px * 2;
+        background: #FF4966;
+        border-radius: 24px * 2;
+        text-align: center;
+        line-height: 44px * 2;
+        font-size: 32px;
+        color: #fff;
     }
 }
