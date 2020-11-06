@@ -40,8 +40,8 @@ export default class Detail extends Component<any,{
 
     componentDidMount() { 
         // const {selectItem} = templateStore;
-        const { id } = this.$router.params
-        if (!id) {
+        const { id,cid } = this.$router.params
+        if (!id || !cid) {
             Taro.navigateBack();
         }
         this.getCurrentItem(id);
@@ -51,8 +51,9 @@ export default class Detail extends Component<any,{
     getCurrentItem(id){
         api('app.product_tpl/info',{id}).then((res)=>{
             if (this.$router.params.id != res.id) {
-                window.history.pushState(null,null,`/pages/template/detail?id=${res.id}`)
+                window.history.pushState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
+            console.log("info",res)
             this.setState({
                 currentItem:res
             })
