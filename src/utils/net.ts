@@ -58,7 +58,7 @@ export function getToken(): string {
 }
 export function api(name: string, params?: any): Promise<any> {
     return new Promise<any>( (resolve, reject) => {
-        
+
         params = {
             ...params
         };

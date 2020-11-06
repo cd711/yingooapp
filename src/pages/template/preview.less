@@ -2,16 +2,21 @@
     background: #F5F6F9;
 }
 .preview{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
     .nav-bar{
         display: flex;
         align-items: center;
         justify-content: space-between;
         height: 88px;
-        position: fixed;
-        z-index: 10;
+        // position: fixed;
+        // z-index: 10;
         width: 100%;
         box-sizing: border-box;
         background: #FFF;
+        position: relative;
         .left{
             padding-left: 32px;
         }
@@ -37,7 +42,8 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        // height: 100vh;
+        flex: 1;
         .pre-image{
             width: 750px;
             height: 750px;
@@ -45,9 +51,9 @@
         }
     }
     .bottom{
-        position: fixed;
-        z-index: 10;
-        bottom: 0;
+        // position: fixed;
+        // z-index: 10;
+        // bottom: 0;
         width: 100%;
         display: flex;
         background: #FFF;

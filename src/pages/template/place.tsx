@@ -5,25 +5,51 @@ import './place.less'
 import { AtFloatLayout } from "taro-ui"
 import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
+import Fragment from '../../components/Fragment'
 
 // eslint-disable-next-line import/prefer-default-export
 export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
-    const [itemActive,setItemActive] = useState("")
+    const [itemActive,setItemActive] = useState([])
     const [tags,setTags] = useState([]);
-    const [currentSkus,setCurrentSkus] = useState([])
-    const onItemSelect = (itemId,tagId) => {
-        setItemActive(`${itemId},${tagId}`);
-        let temp: Array<any> = [];
-        const skus = data.skus;
-        for (const iterator of skus) {
-            if (iterator.value.indexOf(tagId) != -1) {
-                console.log(iterator.value);
-                if (iterator.stock>0) {
-                    temp.push(iterator.value)
-                }
+    const [currentSku,setCurrentSku] = useState({});
+    const onItemSelect = (idx,itemId,tagId) => {
+        const items = itemActive;
+        items[idx] = tagId
+        setItemActive(items);
+        let temp = "";
+        const skus = data.skus.filter(item=>item.value.indexOf(tagId) != -1);
+        let sku = "";
+        let overskus = '';
+        for (let index = 0; index < skus.length; index++) {
+            const iterator = skus[index];
+            if (iterator.stock>0) {
+                temp += temp.length>0?`${iterator.value}`:`,${iterator.value}`
+            } else {
+                overskus += overskus.length>0?`${iterator.value}`:`,${iterator.value}`
             }
         }
-        console.log(itemId,tagId)
+        const t = [];
+        for (let index = 0; index < data.attrGroup.length; index++) {
+            sku += sku.length==0?`${items[index]}`:`,${items[index]}`
+            if (index != idx) {
+                tags[index]=tags[index].map((item)=>{
+                    item["over"]=false;
+                    if (overskus.indexOf(item.id)!=-1) {
+                        item["over"] = true;
+                    }
+                    return item;
+                })
+                const tt = tags[index].filter(item=>overskus.indexOf(item.id)!=-1||temp.indexOf(item.id)!=-1)
+                t.push(tt)
+            } else {
+                t.push(tags[index])
+            }
+        }
+        if (sku.split(',').length==data.attrGroup.length) {
+            const a = data.skus.filter(item=>item.value == sku)[0];
+            setCurrentSku(a);
+        }
+        setTags(t);
     }
     useEffect(()=>{
         if (data && data.attrItems) {
@@ -61,7 +87,7 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                         </View>
                         <Text className='actual'>￥{data.market_price}</Text>
                     </View>
-                </View>
+                </View>                
                 <ScrollView scrollY className='scroll'>
                     <View className='param-part'>
                         {
@@ -74,11 +100,16 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                                     </View> */}
                                     {
                                         tags && tags[index] && tags[index].map((tag)=>(
-                                            <View className={itemActive==`${item.id},${tag.id}`?'item active':'item'} key={tag.id} onClick={()=>{
-                                                onItemSelect(item.id,tag.id)
-                                            }}>
-                                                <Text className='txt'>{tag.name}</Text>
-                                            </View>
+                                            <Fragment key={tag.id}>
+                                                    <View className={itemActive[index]==tag.id?'item active':tag.over?'item over':'item'} onClick={()=>{
+                                                        if (!tag.over) {
+                                                            onItemSelect(index,item.id,tag.id)
+                                                        }
+                                                    }}>
+                                                        <Text className='txt'>{tag.name}</Text>
+                                                    </View>                                                    
+                                            </Fragment>
+ 
                                         ))
                                     }
                                 </View>

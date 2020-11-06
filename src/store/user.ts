@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { api,setUserInfo } from '../utils/net'
+import { setUserInfo } from '../utils/net'
 
 const sexList = {
     0: '保密',
@@ -9,7 +9,7 @@ const sexList = {
 }
 export class UserStore {
     @observable
-    public id:number = 0;
+    public id = 0;
     @observable
     public mobile:string = "";
     @observable

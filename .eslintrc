@@ -21,8 +21,13 @@
     "react/jsx-indent-props": [true, 4],
     "import/no-commonjs": false,
     "@typescript-eslint/no-var-requires": ["off"],
+    "@typescript-eslint/no-inferrable-types":  ["off"],
+    "react/jsx-tag-spacing":  ["off"],
+    "react/no-unused-state":  ["off"],
+    "no-shadow":  ["off"],
     "react/forbid-elements": false,
-    "taro/props-reserve-keyword": false
+    "taro/props-reserve-keyword": false,
+    "@typescript-eslint/no-this-alias": ["off"]
   },
   "parserOptions": {
     "ecmaFeatures": {
