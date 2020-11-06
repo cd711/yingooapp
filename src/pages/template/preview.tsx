@@ -11,6 +11,7 @@ import { observer, inject } from '@tarojs/mobx';
 // import moment from 'moment';
 // import {ossUrl} from '../../utils/common'
 import { PlaceOrder } from './place';
+import { takeWhile } from 'lodash';
 
 
 const pics = [
@@ -53,6 +54,7 @@ function callEditor(name, ...args) {
 export default class Preview extends Component<{}, {
     placeOrderShow: boolean;
     saveId:number;
+    productInfo:any;
 }> {
 
     config: Config = {
@@ -63,7 +65,8 @@ export default class Preview extends Component<{}, {
         super(props);
         this.state = {
             placeOrderShow: false,
-            saveId: 0
+            saveId: 0,
+            productInfo: {}
         }
     }
     componentDidMount() {
@@ -191,13 +194,24 @@ export default class Preview extends Component<{}, {
             });
         })
     }
-
+    getShellInfo = () => {
+        api('app.product/info',{
+            id:30
+        }).then((res)=>{
+            console.log(res);
+            
+            this.setState({
+                productInfo:res,
+                placeOrderShow: true
+            })
+        })
+    }
     onEditor = () => {
         const { saveId } = this.state;
         window.location.replace(`/editor/shell?id=${saveId}`);
     }
      render() {
-        const { placeOrderShow,saveId } = this.state;
+        const { placeOrderShow,saveId,productInfo } = this.state;
 
         return (
             <View className='preview'>
@@ -234,19 +248,16 @@ export default class Preview extends Component<{}, {
                     }
                     <Button className='noworder' onClick={() => {
                         if (saveId) {
-                            this.setState({
-                                placeOrderShow: true
-                            })
+                            this.getShellInfo()
                         } else {
                             this.onSave(null,()=>{
-                                this.setState({
-                                    placeOrderShow: true
-                                })
+                                this.getShellInfo()
+
                             });
                         }
                     }}>立即下单</Button>
                 </View>
-                <PlaceOrder isShow={placeOrderShow} onClose={this.onPlaceOrderClose} images={pics} onButtonClose={this.onPlaceOrderClose} onBuyNumberChange={(n) => {
+                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} images={productInfo.image} onButtonClose={this.onPlaceOrderClose} onBuyNumberChange={(n) => {
                     console.log(n);
                 }} onAddCart={()=>{
 

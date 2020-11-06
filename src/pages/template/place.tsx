@@ -1,5 +1,5 @@
 
-import Taro, {  } from '@tarojs/taro'
+import Taro, { useEffect, useState } from '@tarojs/taro'
 import { View, Text,Button,Swiper, SwiperItem,Image,ScrollView } from '@tarojs/components'
 import './place.less'
 import { AtFloatLayout } from "taro-ui"
@@ -7,7 +7,29 @@ import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
+export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
+    const [itemActive,setItemActive] = useState("")
+    const [tags,setTags] = useState([]);
+    const [currentSkus,setCurrentSkus] = useState([])
+    const onItemSelect = (itemId,tagId) => {
+        setItemActive(`${itemId},${tagId}`);
+        let temp: Array<any> = [];
+        const skus = data.skus;
+        for (const iterator of skus) {
+            if (iterator.value.indexOf(tagId) != -1) {
+                console.log(iterator.value);
+                if (iterator.stock>0) {
+                    temp.push(iterator.value)
+                }
+            }
+        }
+        console.log(itemId,tagId)
+    }
+    useEffect(()=>{
+        if (data && data.attrItems) {
+            setTags(data.attrItems)
+        }
+    },[data])
 
     return <View className='placeOrder'>
         <AtFloatLayout isOpened={isShow} onClose={onClose}>
@@ -31,53 +53,38 @@ export const PlaceOrder: React.FC<any> = ({isShow,onClose,images,onButtonClose,o
                     </View>
                 </View>
                 <View className='info-part'>
-                    <Text className='name'>嘻哈拼接纯棉圆领运动短袖</Text>
+                    <Text className='name'>{data.title}</Text>
                     <View className='price'>
                         <View className='folding'>
                             <Text className='sym'>¥</Text>
-                            <Text className='n'>49</Text>
+                            <Text className='n'>{data.price}</Text>
                         </View>
-                        <Text className='actual'>￥99.9</Text>
+                        <Text className='actual'>￥{data.market_price}</Text>
                     </View>
                 </View>
                 <ScrollView scrollY className='scroll'>
                     <View className='param-part'>
-                        <View className='param'>
-                            <Text className='title'>尺寸</Text>
-                            <View className='params'>
-                                <View className='item active'>
-                                    <Text className='txt'>220*220mm</Text>
-                                </View>
-                                <View className='item'>
-                                    <Text className='txt'>220*220mm</Text>
-                                </View>
-                                <View className='item'>
-                                    <Text className='txt'>220*220mm</Text>
-                                </View>
-                            </View>
-                        </View>
-                        <View className='param'>
-                            <Text className='title'>相纸</Text>
-                            <View className='params'>
-                                <View className='item active'>
-                                    <Text className='txt'>20g超感纸</Text>
-                                </View>
-                                <View className='item'>
-                                    <Text className='txt'>30g超感纸</Text>
+                        {
+                            data && data.attrGroup && data.attrGroup.map((item,index)=>(
+                            <View className='param' key={item.id}>
+                                <Text className='title'>{item.name}</Text>
+                                <View className='params'>
+                                    {/* <View className='item active'>
+                                        <Text className='txt'>220*220mm</Text>
+                                    </View> */}
+                                    {
+                                        tags && tags[index] && tags[index].map((tag)=>(
+                                            <View className={itemActive==`${item.id},${tag.id}`?'item active':'item'} key={tag.id} onClick={()=>{
+                                                onItemSelect(item.id,tag.id)
+                                            }}>
+                                                <Text className='txt'>{tag.name}</Text>
+                                            </View>
+                                        ))
+                                    }
                                 </View>
                             </View>
-                        </View>
-                        <View className='param'>
-                            <Text className='title'>相纸</Text>
-                            <View className='params'>
-                                <View className='item active'>
-                                    <Text className='txt'>20g超感纸</Text>
-                                </View>
-                                <View className='item'>
-                                    <Text className='txt'>30g超感纸</Text>
-                                </View>
-                            </View>
-                        </View>
+                            ))
+                        }
                     </View>
                 </ScrollView>
                 <View className='buy-number'>

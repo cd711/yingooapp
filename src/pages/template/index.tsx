@@ -113,7 +113,7 @@ export default class Template extends Component<any,{
             })
             api("app.product_tpl/list",{
                 start:0,
-                size:20,
+                size:30,
                 category_id:cates[switchActive].tpl_category_id,
                 tag_id:tag.id
             }).then((res)=>{
@@ -185,6 +185,7 @@ export default class Template extends Component<any,{
                                 {
                                     cates.length>0 && cates.map((item,index)=>(
                                         <View className={index==switchActive?'item active':'item'} key={item.id} onClick={()=>{
+                                            
                                             this.setState({
                                                 switchActive:index,
                                                 switchTagActive:0,
@@ -259,7 +260,7 @@ export default class Template extends Component<any,{
                                     <View className='pic-box' style={switchActive == 1 ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
                                         // templateStore.selectItem = item;
                                         Taro.navigateTo({
-                                            url:`/pages/template/detail?id=${item.id}`
+                                            url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
                                         });
                                     }} key={item.id}>
                                         {
