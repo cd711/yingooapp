@@ -215,7 +215,7 @@ export default class Preview extends Component<{}, {
                 </View>
                 <View className='container'>
                      {/* eslint-disable-next-line react/forbid-elements */}
-                    <iframe className="editor_frame" src="http://192.168.0.100:8080/mobile?tpl_id=0" width="100%" height="100%"></iframe>
+                    <iframe className="editor_frame" src="http://192.168.0.166/editor/mobile?tpl_id=0" width="100%" height="100%"></iframe>
                 </View>
                 <View className='bottom'>
                     {
