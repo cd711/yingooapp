@@ -53,7 +53,7 @@ class App extends Component {
             'pages/me/photos',
             'pages/template/preview',
             'pages/template/confirm',
-            
+            'pages/template/success',
         ],
         window: {
             backgroundTextStyle: 'light',
