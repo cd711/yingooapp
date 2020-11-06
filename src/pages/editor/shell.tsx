@@ -426,7 +426,7 @@ export default class Shell extends Component<{}, {
             try {
               const {tplId, doc} = Taro.getStorageSync("doc_draft");
               await callEditor("setDoc", doc);
-              this.tplId = tplId;
+              // this.tplId = tplId;  
             } catch(e) {
               alert(e);
             }
