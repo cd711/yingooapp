@@ -139,6 +139,7 @@ export default class Preview extends Component<{}, {
                             saveId:docId
                         });
                     }
+                    console.log(doc)
                     callEditor("setDoc", doc);
 
                     // callEditor("loadDraft")
@@ -257,12 +258,15 @@ export default class Preview extends Component<{}, {
                         }
                     }}>立即下单</Button>
                 </View>
-                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} images={productInfo.image} onButtonClose={this.onPlaceOrderClose} onBuyNumberChange={(n) => {
+                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose} 
+                onBuyNumberChange={(n) => {
                     console.log(n);
                 }} onAddCart={()=>{
 
                 }} onNowBuy={()=>{
-
+                    
+                }} onSkuChange={(sku)=>{
+                    // console.log(sku)
                 }} />
             </View>
         )

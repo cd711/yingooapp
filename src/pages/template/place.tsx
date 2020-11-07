@@ -7,18 +7,22 @@ import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
 import Fragment from '../../components/Fragment'
 
+
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
+export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onBuyNumberChange,onSkuChange,onAddCart,onNowBuy}) => {
     const [itemActive,setItemActive] = useState([])
     const [tags,setTags] = useState([]);
-    const [currentSku,setCurrentSku] = useState({});
+    const [price,setPrice] = useState(0);
+    const [marketPrice,setMarketPrice] = useState(0);
+    const [selectSku,setSelectSku] = useState({});
+    const [imgs,setImgs] = useState([]);
     const onItemSelect = (idx,itemId,tagId) => {
         const items = itemActive;
-        items[idx] = tagId
+        items[idx] = tagId;
         setItemActive(items);
         let temp = "";
         const skus = data.skus.filter(item=>item.value.indexOf(tagId) != -1);
-        let sku = "";
+        const sku = [];
         let overskus = '';
         for (let index = 0; index < skus.length; index++) {
             const iterator = skus[index];
@@ -30,7 +34,7 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
         }
         const t = [];
         for (let index = 0; index < data.attrGroup.length; index++) {
-            sku += sku.length==0?`${items[index]}`:`,${items[index]}`
+            sku.push(items[index]?`${items[index]}`:"");
             if (index != idx) {
                 tags[index]=tags[index].map((item)=>{
                     item["over"]=false;
@@ -38,24 +42,42 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                         item["over"] = true;
                     }
                     return item;
-                })
-                const tt = tags[index].filter(item=>overskus.indexOf(item.id)!=-1||temp.indexOf(item.id)!=-1)
+                });
+                const tt = tags[index].filter(item=>overskus.indexOf(item.id)!=-1||temp.indexOf(item.id)!=-1);
                 t.push(tt)
             } else {
                 t.push(tags[index])
             }
         }
-        if (sku.split(',').length==data.attrGroup.length) {
-            const a = data.skus.filter(item=>item.value == sku)[0];
-            setCurrentSku(a);
+        
+        if (sku.length==data.attrGroup.length) {
+            
+            const sk = sku.join(",");
+            const a = data.skus.filter(item=>item.value == sk)[0];
+            const imgs = data.imgs.filter(item=>item.value == sk)[0];
+            setImgs(imgs && imgs.image && imgs.image.length>0?imgs.image:data.image)
+            // console.log(imgs.image);
+            if (a) {
+                setPrice(a.price);
+                setMarketPrice(a.market_price);
+                setSelectSku(a);
+            }
         }
         setTags(t);
     }
     useEffect(()=>{
-        if (data && data.attrItems) {
-            setTags(data.attrItems)
+        if (data) {
+            data.attrItems && setTags(data.attrItems);
+            data.price && setPrice(data.price);
+            data.market_price && setMarketPrice(data.market_price);
+            data.image && setImgs(data.image);
         }
-    },[data])
+    },[data]);
+    useEffect(()=>{
+        if (onSkuChange) {
+            onSkuChange(selectSku);
+        }
+    },[selectSku])
 
     return <View className='placeOrder'>
         <AtFloatLayout isOpened={isShow} onClose={onClose}>
@@ -67,7 +89,7 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                         circular
                         indicatorDots>
                             {
-                                images && images.map((item,index)=>(
+                                imgs && imgs.map((item,index)=>(
                                     <SwiperItem className='swiper-item' key={index}>
                                         <Image src={item} mode='aspectFill' className='pre-image' />
                                     </SwiperItem>
@@ -83,9 +105,9 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                     <View className='price'>
                         <View className='folding'>
                             <Text className='sym'>¥</Text>
-                            <Text className='n'>{data.price}</Text>
+                            <Text className='n'>{price}</Text>
                         </View>
-                        <Text className='actual'>￥{data.market_price}</Text>
+                        <Text className='actual'>￥{marketPrice}</Text>
                     </View>
                 </View>                
                 <ScrollView scrollY className='scroll'>
@@ -95,9 +117,6 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                             <View className='param' key={item.id}>
                                 <Text className='title'>{item.name}</Text>
                                 <View className='params'>
-                                    {/* <View className='item active'>
-                                        <Text className='txt'>220*220mm</Text>
-                                    </View> */}
                                     {
                                         tags && tags[index] && tags[index].map((tag)=>(
                                             <Fragment key={tag.id}>
@@ -109,7 +128,6 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                                                         <Text className='txt'>{tag.name}</Text>
                                                     </View>                                                    
                                             </Fragment>
- 
                                         ))
                                     }
                                 </View>
