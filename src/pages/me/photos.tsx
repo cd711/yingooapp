@@ -102,6 +102,10 @@ export default class Photos extends Component<any,{
             this.setState({loadStatus: "noMore"})
             return
         }
+        if (len < 15) {
+            this.setState({loadStatus: "noMore"});
+            return;
+        }
         this.setState({loadStatus: "loading"});
         this.getList({start: len, loadMore: true});
     }
