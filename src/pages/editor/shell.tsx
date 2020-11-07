@@ -50,6 +50,7 @@ class Store {
   @observable
   tool = 0;
 
+  model: any
 }
 
 interface BrandType {
@@ -212,6 +213,7 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
     if (!tempCurrentModel) {
       setTempCurrentModel(list[0].models[0]);
       setCurrentModel(list[0].models[0]);
+      parent.store.model = list[0].models[0].id;
     }
     Taro.setStorage({key: "phone_series_" + brandList[brandIndex].id, data: {
       time: Date.now(),
@@ -228,6 +230,8 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
     const mod = tempCurrentModel;
     mod.brandIndex = brandIndex;
     setCurrentModel(mod);
+
+    parent.store.model = mod.id;
     if (mod.phoneshell) {
       sendMessage("phoneshell", { id: mod.id, mask: mod.phoneshell.image });
     }
@@ -312,7 +316,7 @@ export default class Shell extends Component<{}, {
   currentModel?: BrandType;
 }> {
 
-  private store = new Store();
+  public store = new Store();
 
   private tplId: any = 0;
   private docId: any = 0;
@@ -489,6 +493,7 @@ export default class Shell extends Component<{}, {
     Taro.setStorageSync("doc_draft", {
       tplId: this.tplId,
       docId: this.docId,
+      modelId: this.store.model,
       doc: doc
     });
     Taro.hideLoading();
