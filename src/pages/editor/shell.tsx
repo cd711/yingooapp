@@ -1,6 +1,6 @@
 import Taro, { Component, useEffect, useState } from '@tarojs/taro';
 import { Image, ScrollView, Text, View } from '@tarojs/components';
-import { AtActivityIndicator } from "taro-ui";
+import { AtActivityIndicator, AtSlider } from "taro-ui";
 import './editor.less';
 import './shell.less';
 
@@ -121,14 +121,16 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
 
     const {onClose, onOk} = props;
 
-    const bars = ["素材库", "贴纸", "动效", "形状"];
+    const bars = ["素材库", "贴纸"];
     const [active, setActive] = useState(0);
     const [selected, setSelected] = useState(null);
     const [list, setList] = useState([]);
     const defaultDoc = Taro.useRef(null);
     let total = 0;
+    const stickersTotal = Taro.useRef(0)
 
     async function getList(data) {
+        Taro.showLoading({title: "加载中"})
         const opt = {
             start: data.start || 0,
             size: data.size || 15,
@@ -149,6 +151,34 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
         }catch (e) {
             console.log("获取图库出错：", e)
         }
+        Taro.hideLoading()
+    }
+
+    async function getStickers(data) {
+        Taro.showLoading({title: "加载中"})
+        const opt = {
+            start: data.start || 0,
+            size: data.size || 15,
+            loadMore: data.loadMore || false
+        };
+        try{
+            const res = await api("editor.material/img", {
+                start: opt.start,
+                size: opt.size,
+            });
+            console.log(res)
+            stickersTotal.current = Number(res.total)
+            let tempArr = [];
+            if (opt.loadMore) {
+                tempArr = [...list, ...res.list]
+            } else {
+                tempArr = [...res.list]
+            }
+            setList([...tempArr]);
+        }catch (e) {
+
+        }
+        Taro.hideLoading()
     }
 
     async function getDefaultDoc() {
@@ -194,27 +224,57 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
         getList({start: 0})
     }
 
-    const loadMore = () => {
-        console.log("下拉加载")
-        if (total === list.length || list.length < 15) {
-            return
+    const changeType = idx => {
+        setActive(idx);
+        setList([]);
+        setSelected(null);
+        stickersTotal.current = 0;
+        switch (idx) {
+            case 0: getList({start: 0}); break;
+            case 1: getStickers({start: 0}); break;
         }
-        getList({start: list.length, loadMore: true})
     }
 
-    const onSelect = idx => {
+    const loadMore = () => {
+        if (active === 0) {
+            if (total === list.length || list.length < 15) {
+                return
+            }
+            getList({start: list.length, loadMore: true})
+        } else {
+            console.log(stickersTotal.current, list.length)
+            if (stickersTotal.current === list.length || list.length < 15 || list.length > stickersTotal.current) {
+                return
+            }
+            getStickers({start: list.length, loadMore: true})
+        }
+
+    }
+
+    function getSrc(item) {
+        if (!item) {
+            return ""
+        }
+        if (active === 0) {
+            return item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)
+        } else {
+            return item.thumbnail
+        }
+    }
+
+    const onSelect = (item, idx) => {
         console.log(idx)
         const src = list[idx];
         if (notNull(selected)) {
             setSelected(idx);
             if (src) {
-                changeEditImg(src.url)
+                changeEditImg(getSrc(item))
             }
         } else {
             if (idx !== selected) {
                 setSelected(idx);
                 if (src) {
-                    changeEditImg(src.url)
+                    changeEditImg(getSrc(item))
                 }
             } else {
                 console.log(idx, selected, idx === selected)
@@ -235,7 +295,7 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
         <View className="change_main">
             <View className="filter_bar">
                 {bars.map((value, index) => (
-                    <View className="filter_bar_item" key={index} onClick={() => setActive(index)}>
+                    <View className="filter_bar_item" key={index} onClick={() => changeType(index)}>
                         <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>
                         {active === index ? <Image src={require("../../source/switchBottom.png")} className="filter_bar_img"/> : null}
                     </View>
@@ -243,22 +303,24 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
             </View>
             <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
                 <View className="list_main">
-                    <View className="list_item">
-                        <UploadFile
-                            extraType={0}
-                            type="card"
-                            uploadType="image"
-                            onChange={uploadFile}/>
-                    </View>
+                    {active === 0
+                        ? <View className="list_item">
+                            <UploadFile
+                                extraType={0}
+                                type="card"
+                                uploadType="image"
+                                onChange={uploadFile}/>
+                        </View>
+                        : null}
                     {
                         list.map((item, idx) => {
                             return <View className="list_item" key={idx}>
-                                <View className="img_item" key={idx} onClick={() => onSelect(idx)}>
-                                    <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
+                                <View className="img_item" key={idx} onClick={() => onSelect(item, idx)}>
+                                    <Image src={getSrc(item)} mode="aspectFill" className="img"/>
                                 </View>
                                 {
                                     !notNull(selected) && selected === idx
-                                        ? <View className="selected" onClick={() => onSelect(idx)}><Text className="tit">应用中</Text></View>
+                                        ? <View className="selected" onClick={() => onSelect(item, idx)}><Text className="tit">应用中</Text></View>
                                         : null
                                 }
                             </View>
@@ -266,6 +328,63 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
                     }
                 </View>
             </ScrollView>
+            <View className='optBar'>
+                <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48} /></View>
+                <Text className='txt'>换图</Text>
+                <View className='icon' onClick={onOk}><IconFont name='24_gouxuan' size={48} /></View>
+            </View>
+        </View>
+        <View className="mask" />
+    </View>
+}
+
+// 透明度
+const ChangeAlpha: React.FC<ChangeImageProps> = (props) => {
+
+    const {onClose, onOk} = props;
+
+    const [alpha, setAlpha] = useState(100);
+
+    const onCancel = async () => {
+        try{
+            await callEditor("alpha", 1)
+        }catch (e) {
+
+        }
+        onClose && onClose()
+    }
+
+    async function getDefaultDoc() {
+        try{
+            const doc = await callEditor("getDoc")
+            console.log(doc)
+        }catch (e) {
+
+        }
+    }
+
+    useEffect(() => {
+        getDefaultDoc()
+    }, [])
+
+    const onChange = async val => {
+        console.log(val)
+        setAlpha(val);
+
+        try{
+           await callEditor("alpha", val / 100)
+        }catch (e) {
+
+        }
+    }
+
+    return <View className="change_image_container">
+        <View className="change_main" style={{height: "auto"}}>
+            <View className="alpha_bar">
+                <View className="icon"><Image src={require("../../source/trans.png")} className="img" /></View>
+                <View className="bar"><AtSlider value={alpha} min={0} max={100} step={1}  onChanging={onChange} /></View>
+                <View className="count"><Text>{alpha}</Text></View>
+            </View>
             <View className='optBar'>
                 <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48} /></View>
                 <Text className='txt'>换图</Text>
@@ -693,22 +812,25 @@ export default class Shell extends Component<{}, {
 
     // 水平翻转
     const onFilpY = async () => {
-        console.log(1111)
         try{
-            const res = await callEditor("filpH");
-            console.log("水平点击：", res)
+            await callEditor("flipH");
         }catch (e) {
-
         }
     }
 
     // 垂直翻转
     const onFilpX = async () => {
         try{
-            await callEditor("filpV")
+            await callEditor("flipV")
         }catch (e) {
 
         }
+    }
+
+    const onChangeAlpha = () => {
+        // alpha
+        this.store.tool = 5;
+        this.store.isEdit = true;
     }
 
 
@@ -747,7 +869,7 @@ export default class Shell extends Component<{}, {
                 <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48} />
                 <Text className='txt'>垂直</Text>
               </View>
-              <View className='btn'>
+              <View className='btn' onClick={onChangeAlpha}>
                 <View className='icon'>
                   <Image className="icon_img" src={require("../../source/trans.png")}/>
                 </View>
@@ -766,6 +888,9 @@ export default class Shell extends Component<{}, {
                     onClose={cancelEdit}
                     onOk={onOk}
                 />
+
+            case 5: // 透明度
+                return <ChangeAlpha onClose={cancelEdit} onOk={onOk} />
         }
       }))[0]}
     </View>

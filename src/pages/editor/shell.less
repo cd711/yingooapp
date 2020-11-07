@@ -93,7 +93,7 @@
         flex-direction: column;
         height: 604px;
         background: #fff;
-        z-index: 10000;
+        z-index: 40;
     }
     .mask{
         position: fixed;
@@ -167,7 +167,7 @@
                 left: 0;
                 width: 240px;
                 height: 240px;
-                z-index: 10000;
+                z-index: 40;
                 border: 4px solid #FF4966;
                 display: flex;
                 flex-direction: column;
@@ -184,5 +184,28 @@
                 }
             }
         }
+    }
+}
+
+.alpha_bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    .icon, .count{
+        width: 100px;
+        text-align: center;
+    }
+    .icon{
+        .img{
+            width: 48px;
+            height: 48px;
+        }
+    }
+    .count{
+        font-size: 28px;
+    }
+    .bar{
+        width: 75%;
     }
 }
