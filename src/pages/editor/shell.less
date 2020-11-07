@@ -86,12 +86,26 @@
 }
 
 .change_image_container{
-    display: block;
-    height: 604px;
-    background: #fff;
-    .filter_bar{
-        height: 104px;
+    position: relative;
+    .change_main{
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 604px;
+        background: #fff;
+        z-index: 10000;
+    }
+    .mask{
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
+        height: 100%;
+        z-index: 10;
+        background: transparent;
+    }
+    .filter_bar{
+        height: 120px;
         display: flex;
         align-items: center;
         .filter_bar_item{
@@ -112,6 +126,17 @@
                 width: 64px;
                 height: 16px;
             }
+        }
+    }
+    .optBar {
+        height: 104px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 32px;
+        .icon {
+            padding: 24px;
         }
     }
 }

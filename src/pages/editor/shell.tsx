@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { observer } from '@tarojs/mobx';
 import Fragment from '../../components/Fragment';
 import UploadFile from "../../components/Upload/Upload";
-import {ossUrl} from "../../utils/common";
+import {notNull, ossUrl} from "../../utils/common";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -52,7 +52,10 @@ class Store {
   @observable
   tool = 0;
 
-  model: any
+  model: any;
+
+  @observable
+  isEdit = false;
 }
 
 interface BrandType {
@@ -110,12 +113,19 @@ const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
 </View>;
 };
 
-const ChangeImage: React.FC<{}> = (props) => {
+interface ChangeImageProps {
+    onClose: () => void,
+    onOK?: () => void,
+}
+const ChangeImage: React.FC<ChangeImageProps> = (props) => {
+
+    const {onClose, onOk} = props;
 
     const bars = ["素材库", "贴纸", "动效", "形状"];
     const [active, setActive] = useState(0);
     const [selected, setSelected] = useState(null);
     const [list, setList] = useState([]);
+    const defaultDoc = Taro.useRef(null);
     let total = 0;
 
     async function getList(data) {
@@ -142,8 +152,24 @@ const ChangeImage: React.FC<{}> = (props) => {
     }
 
     useEffect(() => {
-        getList({start: 0})
+        getList({start: 0});
+        getDefaultDoc();
     }, [])
+
+    const uploadFile = async files => {
+        console.log(files)
+        getList({start: 0})
+    }
+
+    async function getDefaultDoc() {
+        try{
+            const doc = await callEditor("getDoc");
+            console.log("doc", doc)
+            defaultDoc.current = doc;
+        }catch (e) {
+
+        }
+    }
 
     const loadMore = () => {
         console.log("下拉加载")
@@ -155,51 +181,98 @@ const ChangeImage: React.FC<{}> = (props) => {
 
     const onSelect = idx => {
         console.log(idx)
-        if (selected != null || selected != '') {
-            setSelected(idx)
+        const src = list[idx];
+        if (notNull(selected)) {
+            setSelected(idx);
+            if (src) {
+                changeEditImg(src.url)
+            }
         } else {
             if (idx !== selected) {
-                setSelected(idx)
+                setSelected(idx);
+                if (src) {
+                    changeEditImg(src.url)
+                }
             } else {
-                setSelected(null)
+                console.log(idx, selected, idx === selected)
+                setSelected(null);
+                if (src) {
+                    changeEditImg(null)
+                }
             }
         }
     }
 
+    const changeEditImg = async (src?: string) => {
+        try{
+            if (!src) {
+                resetImage()
+            } else {
+                const doc = await callEditor("changeImage", src);
+                console.log(doc)
+            }
+        }catch (e) {
+
+        }
+    }
+
+    async function resetImage() {
+        try{
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        }catch (e) {
+            console.log("重置出错：", e)
+        }
+    }
+
+    const onCancel = () => {
+        resetImage();
+        onClose && onClose()
+    }
+
     return <View className="change_image_container">
-        <View className="filter_bar">
-            {bars.map((value, index) => (
-                <View className="filter_bar_item" key={index} onClick={() => setActive(index)}>
-                    <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>
-                    {active === index ? <Image src={require("../../source/switchBottom.png")} className="filter_bar_img"/> : null}
-                </View>
-            ))}
-        </View>
-        <ScrollView className="list_container" scrollY={true} style={{height: 500}} onScrollToLower={loadMore}>
-            <View className="list_main">
-                <View className="list_item">
-                    <UploadFile
-                        extraType={0}
-                        type="card"
-                        uploadType="image"
-                        onChange={this.uploadFile}/>
-                </View>
-                {
-                    list.map((item, idx) => {
-                        return <View className="list_item" key={idx}>
-                            <View className="img_item" key={idx} onClick={() => onSelect(idx)}>
-                                <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
-                            </View>
-                            {
-                                selected && selected === idx
-                                    ? <View className="selected"><Text className="tit">应用中</Text></View>
-                                    : null
-                            }
-                        </View>
-                    })
-                }
+        <View className="change_main">
+            <View className="filter_bar">
+                {bars.map((value, index) => (
+                    <View className="filter_bar_item" key={index} onClick={() => setActive(index)}>
+                        <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>
+                        {active === index ? <Image src={require("../../source/switchBottom.png")} className="filter_bar_img"/> : null}
+                    </View>
+                ))}
             </View>
-        </ScrollView>
+            <ScrollView className="list_container" scrollY={true} style={{height: 280}} onScrollToLower={loadMore}>
+                <View className="list_main">
+                    <View className="list_item">
+                        <UploadFile
+                            extraType={0}
+                            type="card"
+                            uploadType="image"
+                            onChange={uploadFile}/>
+                    </View>
+                    {
+                        list.map((item, idx) => {
+                            return <View className="list_item" key={idx}>
+                                <View className="img_item" key={idx} onClick={() => onSelect(idx)}>
+                                    <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
+                                </View>
+                                {
+                                    !notNull(selected) && selected === idx
+                                        ? <View className="selected" onClick={() => onSelect(idx)}><Text className="tit">应用中</Text></View>
+                                        : null
+                                }
+                            </View>
+                        })
+                    }
+                </View>
+            </ScrollView>
+            <View className='optBar'>
+                <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48} /></View>
+                <Text className='txt'>换图</Text>
+                <View className='icon' onClick={onOk}><IconFont name='24_gouxuan' size={48} /></View>
+            </View>
+        </View>
+        <View className="mask" />
     </View>
 }
 
@@ -555,6 +628,9 @@ export default class Shell extends Component<{}, {
   }
 
   onSelected = (item?: { id: any, type: "img" | "text" | "container" }) => {
+    if (this.store.isEdit) {
+        return;
+    }
     if (!item) {
       this.store.tool = 0;
       return;
@@ -600,6 +676,21 @@ export default class Shell extends Component<{}, {
     const { tool } = this.store;
 
 
+    const changeImage = () => {
+        this.store.tool = 4;
+        this.store.isEdit = true;
+    }
+
+    const onOk = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false
+    }
+
+    const cancelEdit = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false;
+    }
+
 
     return <View className='editor-page'>
       <View
@@ -613,7 +704,7 @@ export default class Shell extends Component<{}, {
       </View>
       <View className="editor" style={size ? { height: size.height } : undefined}>
         {/* eslint-disable-next-line react/forbid-elements */}
-        <iframe className="editor_frame" src={`http://192.168.0.100:8080/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=999}`}></iframe>
+        <iframe className="editor_frame" src={`http://192.168.0.100:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=999}`}></iframe>
         {loadingTemplate ? <View className='loading'><AtActivityIndicator size={64} mode='center' /></View> : null}
       </View>
 
@@ -624,7 +715,7 @@ export default class Shell extends Component<{}, {
 
           case 1:
             return <View key={s} className='tools'>
-              <View className='btn' onClick={() => this.store.tool = 4}>
+              <View className='btn' onClick={changeImage}>
                 <IconFont name='24_bianjiqi_chongyin' size={48} />
                 <Text className='txt'>换图</Text>
               </View>
@@ -651,7 +742,10 @@ export default class Shell extends Component<{}, {
             </View>
 
             case 4: // 换图
-                return <ChangeImage/>
+                return <ChangeImage
+                    onClose={cancelEdit}
+                    onOK={onOk}
+                />
         }
       }))[0]}
     </View>

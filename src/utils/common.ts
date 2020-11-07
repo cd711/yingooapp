@@ -13,3 +13,7 @@ export function ossUrl(url:string,type:number) {
     }
     return u;
 }
+
+export function notNull(val) {
+    return val === null || val === ""
+}
