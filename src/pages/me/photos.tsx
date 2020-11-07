@@ -102,6 +102,10 @@ export default class Photos extends Component<any,{
             this.setState({loadStatus: "noMore"})
             return
         }
+        if (len < 15) {
+            this.setState({loadStatus: "noMore"});
+            return;
+        }
         this.setState({loadStatus: "loading"});
         this.getList({start: len, loadMore: true});
     }
@@ -185,6 +189,7 @@ export default class Photos extends Component<any,{
                                     <Image src={require('../../source/empty/nophoto.png')} className='img' />
                                     <Text className='txt'>暂无素材</Text>
                                     <UploadFile extraType={navSwitchActive === 0 ? 3 : 4}
+                                                uploadType={navSwitchActive === 0 ? "image" : "video"}
                                                 type="button"
                                                 onChange={this.uploadFile}>
                                         <Button className='btn'>上传素材</Button>
@@ -197,13 +202,17 @@ export default class Photos extends Component<any,{
                                     </View>
                                     <View className="list_main">
                                         <View className="list_item">
-                                            <UploadFile extraType={navSwitchActive} type="card" onChange={this.uploadFile}/>
+                                            <UploadFile
+                                                extraType={navSwitchActive}
+                                                type="card"
+                                                uploadType={navSwitchActive === 0 ? "image" : "video"}
+                                                onChange={this.uploadFile}/>
                                         </View>
                                         {
                                             list.map((item, idx) => {
                                                 return <View className="list_item" key={idx}>
                                                     <View className="img_item" key={idx} onClick={() => this.imageSelect(item.id)}>
-                                                        <Image src={ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
+                                                        <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
                                                     </View>
                                                     {
                                                         isEdit

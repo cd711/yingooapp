@@ -9,6 +9,8 @@ import IconFont from '../../components/iconfont';
 import { observable } from 'mobx';
 import { observer } from '@tarojs/mobx';
 import Fragment from '../../components/Fragment';
+import UploadFile from "../../components/Upload/Upload";
+import {notNull, ossUrl} from "../../utils/common";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -50,7 +52,10 @@ class Store {
   @observable
   tool = 0;
 
-  model: any
+  model: any;
+
+  @observable
+  isEdit = false;
 }
 
 interface BrandType {
@@ -94,7 +99,7 @@ const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
       <View className='brand'>
         <ScrollView className='brand cate_list' scrollX>
           <View className='warp'>
-            
+
           </View>
         </ScrollView>
       </View>
@@ -108,6 +113,168 @@ const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
 </View>;
 };
 
+interface ChangeImageProps {
+    onClose: () => void,
+    onOK?: () => void,
+}
+const ChangeImage: React.FC<ChangeImageProps> = (props) => {
+
+    const {onClose, onOk} = props;
+
+    const bars = ["素材库", "贴纸", "动效", "形状"];
+    const [active, setActive] = useState(0);
+    const [selected, setSelected] = useState(null);
+    const [list, setList] = useState([]);
+    const defaultDoc = Taro.useRef(null);
+    let total = 0;
+
+    async function getList(data) {
+        const opt = {
+            start: data.start || 0,
+            size: data.size || 15,
+            type: data.type || 0,
+            loadMore: data.loadMore || false
+        };
+        try{
+            const res = await api("app.profile/imgs", {start: opt.start, size: opt.size, type: opt.type === 0 ? "image" : "video"});
+            total = Number(res.total);
+            console.log(res);
+            let tempArr = [];
+            if (opt.loadMore) {
+                tempArr = [...list, ...res.list]
+            } else {
+                tempArr = [...res.list]
+            }
+            setList([...tempArr]);
+        }catch (e) {
+            console.log("获取图库出错：", e)
+        };
+    }
+
+    useEffect(() => {
+        getList({start: 0});
+        getDefaultDoc();
+    }, [])
+
+    const uploadFile = async files => {
+        console.log(files)
+        getList({start: 0})
+    }
+
+    async function getDefaultDoc() {
+        try{
+            const doc = await callEditor("getDoc");
+            console.log("doc", doc)
+            defaultDoc.current = doc;
+        }catch (e) {
+
+        }
+    }
+
+    const loadMore = () => {
+        console.log("下拉加载")
+        if (total === list.length || list.length < 15) {
+            return
+        }
+        getList({start: list.length, loadMore: true})
+    }
+
+    const onSelect = idx => {
+        console.log(idx)
+        const src = list[idx];
+        if (notNull(selected)) {
+            setSelected(idx);
+            if (src) {
+                changeEditImg(src.url)
+            }
+        } else {
+            if (idx !== selected) {
+                setSelected(idx);
+                if (src) {
+                    changeEditImg(src.url)
+                }
+            } else {
+                console.log(idx, selected, idx === selected)
+                setSelected(null);
+                if (src) {
+                    changeEditImg(null)
+                }
+            }
+        }
+    }
+
+    const changeEditImg = async (src?: string) => {
+        try{
+            if (!src) {
+                resetImage()
+            } else {
+                const doc = await callEditor("changeImage", src);
+                console.log(doc)
+            }
+        }catch (e) {
+
+        }
+    }
+
+    async function resetImage() {
+        try{
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        }catch (e) {
+            console.log("重置出错：", e)
+        }
+    }
+
+    const onCancel = () => {
+        resetImage();
+        onClose && onClose()
+    }
+
+    return <View className="change_image_container">
+        <View className="change_main">
+            <View className="filter_bar">
+                {bars.map((value, index) => (
+                    <View className="filter_bar_item" key={index} onClick={() => setActive(index)}>
+                        <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>
+                        {active === index ? <Image src={require("../../source/switchBottom.png")} className="filter_bar_img"/> : null}
+                    </View>
+                ))}
+            </View>
+            <ScrollView className="list_container" scrollY={true} style={{height: 280}} onScrollToLower={loadMore}>
+                <View className="list_main">
+                    <View className="list_item">
+                        <UploadFile
+                            extraType={0}
+                            type="card"
+                            uploadType="image"
+                            onChange={uploadFile}/>
+                    </View>
+                    {
+                        list.map((item, idx) => {
+                            return <View className="list_item" key={idx}>
+                                <View className="img_item" key={idx} onClick={() => onSelect(idx)}>
+                                    <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
+                                </View>
+                                {
+                                    !notNull(selected) && selected === idx
+                                        ? <View className="selected" onClick={() => onSelect(idx)}><Text className="tit">应用中</Text></View>
+                                        : null
+                                }
+                            </View>
+                        })
+                    }
+                </View>
+            </ScrollView>
+            <View className='optBar'>
+                <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48} /></View>
+                <Text className='txt'>换图</Text>
+                <View className='icon' onClick={onOk}><IconFont name='24_gouxuan' size={48} /></View>
+            </View>
+        </View>
+        <View className="mask" />
+    </View>
+}
 
 const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = ({ parent, model, brand }) => {
   const [type, setType] = useState(0);
@@ -116,13 +283,13 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
   const [series, setSeries] = useState<BrandType[]>([]);
 
   const [currentModel, setCurrentModel] = useState<BrandType>(model);
-    
+
   const [tempCurrentModel, setTempCurrentModel] = useState<BrandType>(currentModel);
 
 
 
   useEffect((async () => {
-    
+
     switch (type) {
       case 1:
         let list = null;
@@ -165,12 +332,12 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
         if (model && model.phoneshell) {
           sendMessage("phoneshell", { id: model.id, mask: model.phoneshell.image });
         }
-      
+
         Taro.setStorage({key: "phone_brand", data: {
           time: Date.now(),
           list: list
         }});
-        
+
 
     }
   }) as any, [type])
@@ -341,7 +508,7 @@ export default class Shell extends Component<{}, {
     this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
     editorProxy = this.editorProxy;
     window.addEventListener("message", this.onMsg);
-    
+
 
     // Taro.hideLoading();
   }
@@ -397,9 +564,9 @@ export default class Shell extends Component<{}, {
     }
     if (data.from == "editor") {
       switch (data.type) {
-        case "_req": 
+        case "_req":
           const {id, fun, args} = data.data;
-          
+
           if (this[`rpc_${fun}`]) {
             try {
               const res = await this[`rpc_${fun}`](...args)
@@ -420,7 +587,7 @@ export default class Shell extends Component<{}, {
               });
           }
           return;
-        
+
           case "_res":
             this._res(data);
             return;
@@ -430,7 +597,7 @@ export default class Shell extends Component<{}, {
             try {
               const {tplId, doc} = Taro.getStorageSync("doc_draft");
               await callEditor("setDoc", doc);
-              // this.tplId = tplId;  
+              // this.tplId = tplId;
             } catch(e) {
               alert(e);
             }
@@ -461,6 +628,9 @@ export default class Shell extends Component<{}, {
   }
 
   onSelected = (item?: { id: any, type: "img" | "text" | "container" }) => {
+    if (this.store.isEdit) {
+        return;
+    }
     if (!item) {
       this.store.tool = 0;
       return;
@@ -483,7 +653,7 @@ export default class Shell extends Component<{}, {
       }
     }
   }
-  
+
   next = async ()=> {
     Taro.showLoading({
       title: "请稍候"
@@ -505,7 +675,22 @@ export default class Shell extends Component<{}, {
     const { loadingTemplate, size, currentModel, currentBrand } = this.state;
     const { tool } = this.store;
 
-   
+
+    const changeImage = () => {
+        this.store.tool = 4;
+        this.store.isEdit = true;
+    }
+
+    const onOk = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false
+    }
+
+    const cancelEdit = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false;
+    }
+
 
     return <View className='editor-page'>
       <View
@@ -530,7 +715,7 @@ export default class Shell extends Component<{}, {
 
           case 1:
             return <View key={s} className='tools'>
-              <View className='btn'>
+              <View className='btn' onClick={changeImage}>
                 <IconFont name='24_bianjiqi_chongyin' size={48} />
                 <Text className='txt'>换图</Text>
               </View>
@@ -539,18 +724,32 @@ export default class Shell extends Component<{}, {
                 <Text className='txt'>水平</Text>
               </View>
               <View className='btn'>
-                <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48} />
+                <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48} />
                 <Text className='txt'>垂直</Text>
               </View>
               <View className='btn'>
                 <View className='icon'>
-                  <IconFont name='24_bianjiqi_chongyin' size={48} />
+                  <Image className="icon_img" src={require("../../source/trans.png")}/>
                 </View>
-                <Text className='txt'>换图</Text>
+                <Text className='txt'>透明度</Text>
               </View>
+                <View className='btn'>
+                    <View className='icon'>
+                        <IconFont name='24_bianjiqi_shanchu' size={48} />
+                    </View>
+                 <Text className='txt'>删除</Text>
+                </View>
             </View>
+
+            case 4: // 换图
+                return <ChangeImage
+                    onClose={cancelEdit}
+                    onOK={onOk}
+                />
         }
       }))[0]}
     </View>
   }
 }
+
+

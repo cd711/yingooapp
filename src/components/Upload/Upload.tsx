@@ -6,8 +6,10 @@ import {getToken, options} from "../../utils/net";
 
 interface UploadFileProps{
     type: "button" | "card",
+    uploadType: "image" | "video",
     extraType: number,
     onChange?: (data: {id: string, cdnUrl: string, url: string}) => void,
+    onProgress?: (progress: number, currentTotal: number, total: number) => void
 }
 interface UploadFileState {
     files: Array<any>;
@@ -26,44 +28,60 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
 
     _upload = () => {
         const that = this;
+        const {uploadType} = this.props;
+
+        if (uploadType === "image") {
+            Taro.chooseImage({
+                count: 1,
+                sourceType: ['album', 'camera'],
+                success: function (res) {
+                    const tempFilePaths = res.tempFilePaths
+                    that.uploadFileFn(tempFilePaths[0])
+                }
+            })
+        } else {
+            Taro.chooseVideo({
+                camera: "back",
+                sourceType: ["album", "camera"],
+                success: res => {
+                    console.log("选择视频：", res)
+                    const tempFilePaths = res.tempFilePaths
+                    that.uploadFileFn(tempFilePaths[0])
+                }
+            })
+        }
+    }
+
+    uploadFileFn(path: string) {
+        const {extraType, onChange, onProgress} = this.props;
         let url = options.apiUrl + "common/upload";
         if (getToken()) {
             url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
         }
-        Taro.chooseImage({
-            count: 1,
-            sourceType: ['album', 'camera'],
-            success: function (res) {
-                const {onChange, extraType} = that.props;
-                // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
-                const tempFiles = res.tempFiles;
-                const tempFilePaths = res.tempFilePaths
-                Taro.uploadFile({
-                    url,
-                    filePath: tempFilePaths[0],
-                    name: 'file',
-                    header: {
-                      "Access-Control-Allow-Origin": "*"
-                    },
-                    formData: {
-                        'type': extraType
-                    },
-                    success: res => {
-                        const jsonRes = JSON.parse(res.data)
-                        if (jsonRes.code === 1) {
-                            that.setState({
-                                files: tempFiles
-                            });
-                            onChange && onChange(jsonRes.data)
-                        }
-                    },
-                    fail: err => {
-                        console.log("UploadFile文件上传出错：", err)
-                    }
-                })
-
-
+        const upload = Taro.uploadFile({
+            url,
+            filePath: path,
+            name: 'file',
+            header: {
+                "Access-Control-Allow-Origin": "*"
+            },
+            formData: {
+                'type': extraType
+            },
+            success: res => {
+                const jsonRes = JSON.parse(res.data)
+                if (jsonRes.code === 1) {
+                    onChange && onChange(jsonRes.data)
+                }
+            },
+            fail: err => {
+                console.log("UploadFile文件上传出错：", err)
             }
+        });
+
+        upload.progress(res => {
+            // 上传进度、 已上传的数据长度、 文件总长度
+            onProgress && onProgress(res.progress, res.totalBytesSent, res.totalBytesExpectedToSend)
         })
     }
 
