@@ -20,9 +20,11 @@ export class UserStore {
     public gender:number = 0;
     @observable
     public bio:string = "";
+    @observable
+    public address:any = null;
 
     public get sex() {
-        let s = sexList[this.gender||0];
+        const s = sexList[this.gender||0];
         return s || '保密';
     }
     @action
@@ -35,6 +37,7 @@ export class UserStore {
         this.nickname = info.nickname;
         this.gender = info.gender;
         this.bio = info.bio;
+        this.address = info.address;
     }
 
     @action

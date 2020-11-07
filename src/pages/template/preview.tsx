@@ -55,6 +55,9 @@ export default class Preview extends Component<{}, {
     placeOrderShow: boolean;
     saveId:number;
     productInfo:any;
+    buyTotal:number;
+    sku:any;
+    modalId:number
 }> {
 
     config: Config = {
@@ -66,7 +69,10 @@ export default class Preview extends Component<{}, {
         this.state = {
             placeOrderShow: false,
             saveId: 0,
-            productInfo: {}
+            productInfo: {},
+            buyTotal:0,
+            sku:{},
+            modalId:0
         }
     }
     componentDidMount() {
@@ -78,8 +84,6 @@ export default class Preview extends Component<{}, {
         }
         editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         window.addEventListener("message", this.onMsg);
-
-
     }
 
 
@@ -132,11 +136,12 @@ export default class Preview extends Component<{}, {
                     return;
 
                 case "onLoadEmpty":
-                    const { doc,docId } = Taro.getStorageSync("doc_draft");
+                    const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
                     if (docId) {
                         window.history.pushState(null,null,`/pages/template/preview?doc_id=${docId}`);
                         this.setState({
-                            saveId:docId
+                            saveId:docId,
+                            modalId:modelId
                         });
                     }
                     callEditor("setDoc", doc);
@@ -198,8 +203,7 @@ export default class Preview extends Component<{}, {
         api('app.product/info',{
             id:30
         }).then((res)=>{
-            console.log(res);
-            
+            // console.log(res);
             this.setState({
                 productInfo:res,
                 placeOrderShow: true
@@ -210,9 +214,8 @@ export default class Preview extends Component<{}, {
         const { saveId } = this.state;
         window.location.replace(`/editor/shell?id=${saveId}`);
     }
-     render() {
+    render() {
         const { placeOrderShow,saveId,productInfo } = this.state;
-
         return (
             <View className='preview'>
                 <View className='nav-bar'>
@@ -257,12 +260,30 @@ export default class Preview extends Component<{}, {
                         }
                     }}>立即下单</Button>
                 </View>
-                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} images={productInfo.image} onButtonClose={this.onPlaceOrderClose} onBuyNumberChange={(n) => {
-                    console.log(n);
+                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose} 
+                onBuyNumberChange={(n) => {
+                    this.setState({
+                        buyTotal:n
+                    })
                 }} onAddCart={()=>{
 
                 }} onNowBuy={()=>{
-
+                    const {buyTotal,sku,saveId,modalId} = this.state;
+                    if (sku) {
+                        Taro.navigateTo({
+                            url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${saveId}&model=${modalId}`
+                        })
+                    } else {
+                        Taro.showToast({
+                            title:"请选择规格!",
+                            icon:"none",
+                            duration:2000
+                        });
+                    }
+                }} onSkuChange={(sku)=>{
+                    this.setState({
+                        sku:sku
+                    })
                 }} />
             </View>
         )
