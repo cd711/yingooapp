@@ -121,7 +121,7 @@ export default class Confirm extends Component<any,{
     }
     //计数器更改
     onCounterChange = (num,product) => {
-        
+        // console.log(num)
         if ( parseInt(product.quantity) != num ) {
             console.log(num,product);
         }

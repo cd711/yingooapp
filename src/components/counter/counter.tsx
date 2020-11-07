@@ -6,11 +6,10 @@ import './counter.less'
 const Counter: React.FC<any> = ({num,onCounterChange}) => {
     const [number,setNumber] = useState(1);
     useEffect(()=>{
-        console.log(number,num,number != num)
-        if (number != num && onCounterChange) {
+        if (onCounterChange) {
             onCounterChange(number);
         }
-    },[number, onCounterChange]);
+    },[number]);
     useEffect(()=>{
         if (num) {
             setNumber(num);
