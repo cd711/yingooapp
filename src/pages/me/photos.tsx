@@ -180,8 +180,8 @@ export default class Photos extends Component<any,{
                 <View className='container'>
                     <ScrollView className='list_scrollview'
                                 style={{height: window.screen.height - 52 + 16}}
-                                scrollY={true}
-                                scrollWithAnimation={true}
+                                scrollY
+                                scrollWithAnimation
                                 onScrollToLower={this.loadMore}>
                         {
                             list.length === 0

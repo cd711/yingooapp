@@ -115,7 +115,7 @@ const Template: React.FC<{ parent: Shell; close: ()=> void}> = ({close})=> {
 
 interface ChangeImageProps {
     onClose: () => void,
-    onOK?: () => void,
+    onOk?: () => void,
 }
 const ChangeImage: React.FC<ChangeImageProps> = (props) => {
 
@@ -148,17 +148,7 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
             setList([...tempArr]);
         }catch (e) {
             console.log("获取图库出错：", e)
-        };
-    }
-
-    useEffect(() => {
-        getList({start: 0});
-        getDefaultDoc();
-    }, [])
-
-    const uploadFile = async files => {
-        console.log(files)
-        getList({start: 0})
+        }
     }
 
     async function getDefaultDoc() {
@@ -169,6 +159,39 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
         }catch (e) {
 
         }
+    }
+
+    async function resetImage() {
+        try{
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        }catch (e) {
+            console.log("重置出错：", e)
+        }
+    }
+
+    const changeEditImg = async (src?: string) => {
+        try{
+            if (!src) {
+                resetImage()
+            } else {
+                const doc = await callEditor("changeImage", src);
+                console.log(doc)
+            }
+        }catch (e) {
+
+        }
+    }
+
+    useEffect(() => {
+        getList({start: 0});
+        getDefaultDoc();
+    }, [])
+
+    const uploadFile = async files => {
+        console.log(files)
+        getList({start: 0})
     }
 
     const loadMore = () => {
@@ -203,29 +226,6 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
         }
     }
 
-    const changeEditImg = async (src?: string) => {
-        try{
-            if (!src) {
-                resetImage()
-            } else {
-                const doc = await callEditor("changeImage", src);
-                console.log(doc)
-            }
-        }catch (e) {
-
-        }
-    }
-
-    async function resetImage() {
-        try{
-            if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
-            }
-        }catch (e) {
-            console.log("重置出错：", e)
-        }
-    }
-
     const onCancel = () => {
         resetImage();
         onClose && onClose()
@@ -241,7 +241,7 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
                     </View>
                 ))}
             </View>
-            <ScrollView className="list_container" scrollY={true} style={{height: 280}} onScrollToLower={loadMore}>
+            <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
                 <View className="list_main">
                     <View className="list_item">
                         <UploadFile
@@ -557,7 +557,7 @@ export default class Shell extends Component<{}, {
     }
   }
 
-  onMsg: { (e: MessageEvent<any>): void } = async ({ data }) => {
+  onMsg: { (e: MessageEvent): void } = async ({ data }) => {
     console.log("msg", data);
     if (!data) {
       return;
@@ -595,7 +595,7 @@ export default class Shell extends Component<{}, {
         case "onLoadEmpty":
           if (!this.tplId && !this.docId) {
             try {
-              const {tplId, doc} = Taro.getStorageSync("doc_draft");
+              const {doc} = Taro.getStorageSync("doc_draft");
               await callEditor("setDoc", doc);
               // this.tplId = tplId;
             } catch(e) {
@@ -691,6 +691,26 @@ export default class Shell extends Component<{}, {
         this.store.isEdit = false;
     }
 
+    // 水平翻转
+    const onFilpY = async () => {
+        console.log(1111)
+        try{
+            const res = await callEditor("filpH");
+            console.log("水平点击：", res)
+        }catch (e) {
+
+        }
+    }
+
+    // 垂直翻转
+    const onFilpX = async () => {
+        try{
+            await callEditor("filpV")
+        }catch (e) {
+
+        }
+    }
+
 
     return <View className='editor-page'>
       <View
@@ -719,11 +739,11 @@ export default class Shell extends Component<{}, {
                 <IconFont name='24_bianjiqi_chongyin' size={48} />
                 <Text className='txt'>换图</Text>
               </View>
-              <View className='btn'>
+              <View className='btn' onClick={onFilpY}>
                 <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48} />
                 <Text className='txt'>水平</Text>
               </View>
-              <View className='btn'>
+              <View className='btn' onClick={onFilpX}>
                 <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48} />
                 <Text className='txt'>垂直</Text>
               </View>
@@ -744,7 +764,7 @@ export default class Shell extends Component<{}, {
             case 4: // 换图
                 return <ChangeImage
                     onClose={cancelEdit}
-                    onOK={onOk}
+                    onOk={onOk}
                 />
         }
       }))[0]}
