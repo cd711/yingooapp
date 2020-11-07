@@ -11,24 +11,45 @@ import Fragment from '../../components/Fragment'
 export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonClose,onBuyNumberChange,onAddCart,onNowBuy}) => {
     const [itemActive,setItemActive] = useState([])
     const [tags,setTags] = useState([]);
-    const [hasSkus,setHasSkus] = useState("")
+    const [currentSku,setCurrentSku] = useState({});
     const onItemSelect = (idx,itemId,tagId) => {
         const items = itemActive;
-        items[idx] = `${itemId},${tagId}`
+        items[idx] = tagId
         setItemActive(items);
         let temp = "";
-        const skus = data.skus;
-        for (const iterator of skus) {
-            if (iterator.value.indexOf(tagId) != -1) {
-                if (iterator.stock>0) {
-                    temp += `${iterator.value},`
-                }
+        const skus = data.skus.filter(item=>item.value.indexOf(tagId) != -1);
+        let sku = "";
+        let overskus = '';
+        for (let index = 0; index < skus.length; index++) {
+            const iterator = skus[index];
+            if (iterator.stock>0) {
+                temp += temp.length>0?`${iterator.value}`:`,${iterator.value}`
+            } else {
+                overskus += overskus.length>0?`${iterator.value}`:`,${iterator.value}`
             }
         }
-        setHasSkus(temp);
-        
-
-        console.log(itemId,tagId,temp)
+        const t = [];
+        for (let index = 0; index < data.attrGroup.length; index++) {
+            sku += sku.length==0?`${items[index]}`:`,${items[index]}`
+            if (index != idx) {
+                tags[index]=tags[index].map((item)=>{
+                    item["over"]=false;
+                    if (overskus.indexOf(item.id)!=-1) {
+                        item["over"] = true;
+                    }
+                    return item;
+                })
+                const tt = tags[index].filter(item=>overskus.indexOf(item.id)!=-1||temp.indexOf(item.id)!=-1)
+                t.push(tt)
+            } else {
+                t.push(tags[index])
+            }
+        }
+        if (sku.split(',').length==data.attrGroup.length) {
+            const a = data.skus.filter(item=>item.value == sku)[0];
+            setCurrentSku(a);
+        }
+        setTags(t);
     }
     useEffect(()=>{
         if (data && data.attrItems) {
@@ -66,7 +87,7 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                         </View>
                         <Text className='actual'>￥{data.market_price}</Text>
                     </View>
-                </View>
+                </View>                
                 <ScrollView scrollY className='scroll'>
                     <View className='param-part'>
                         {
@@ -80,11 +101,13 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,images,onButtonCl
                                     {
                                         tags && tags[index] && tags[index].map((tag)=>(
                                             <Fragment key={tag.id}>
-                                                    <View className={itemActive[index]==`${item.id},${tag.id}`?'item active':'item'} onClick={()=>{
-                                                        onItemSelect(index,item.id,tag.id)
+                                                    <View className={itemActive[index]==tag.id?'item active':tag.over?'item over':'item'} onClick={()=>{
+                                                        if (!tag.over) {
+                                                            onItemSelect(index,item.id,tag.id)
+                                                        }
                                                     }}>
                                                         <Text className='txt'>{tag.name}</Text>
-                                                    </View>
+                                                    </View>                                                    
                                             </Fragment>
  
                                         ))
