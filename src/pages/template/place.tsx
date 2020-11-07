@@ -83,19 +83,22 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onB
         <AtFloatLayout isOpened={isShow} onClose={onClose}>
             <View className='float-container'>
                 <View className='swiper-images-warp'>
-                    <Swiper
-                        indicatorColor='#000000'
-                        indicatorActiveColor='#FF4966'
-                        circular
-                        indicatorDots>
-                            {
-                                imgs && imgs.map((item,index)=>(
-                                    <SwiperItem className='swiper-item' key={index}>
-                                        <Image src={item} mode='aspectFill' className='pre-image' />
-                                    </SwiperItem>
-                                ))
-                            }
-                    </Swiper>
+                    {
+                        imgs && imgs.length>0?<Swiper
+                            indicatorColor='#000000'
+                            indicatorActiveColor='#FF4966'
+                            circular
+                            indicatorDots>
+                                {
+                                    imgs && imgs.map((item,index)=>(
+                                        <SwiperItem className='swiper-item' key={index}>
+                                            <Image src={item} mode='aspectFill' className='pre-image' />
+                                        </SwiperItem>
+                                    ))
+                                }
+                        </Swiper>:null
+                    }
+                    
                     <View className='close' onClick={onButtonClose}>
                         <IconFont name='32_guanbi' size={64} color='#333' />
                     </View>
