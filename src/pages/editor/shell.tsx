@@ -692,13 +692,23 @@ export default class Shell extends Component<{}, {
     }
 
     // 水平翻转
-    const onFilpY = () => {
+    const onFilpY = async () => {
+        console.log(1111)
+        try{
+            const res = await callEditor("filpH");
+            console.log("水平点击：", res)
+        }catch (e) {
 
+        }
     }
 
     // 垂直翻转
-    const onFilpX = () => {
+    const onFilpX = async () => {
+        try{
+            await callEditor("filpV")
+        }catch (e) {
 
+        }
     }
 
 
