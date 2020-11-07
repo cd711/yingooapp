@@ -132,14 +132,14 @@ export default class Preview extends Component<{}, {
                     return;
 
                 case "onLoadEmpty":
-                    const { doc,docId } = Taro.getStorageSync("doc_draft");
+                    const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
                     if (docId) {
                         window.history.pushState(null,null,`/pages/template/preview?doc_id=${docId}`);
                         this.setState({
                             saveId:docId
                         });
                     }
-                    console.log(doc)
+                    console.log(doc,modelId)
                     callEditor("setDoc", doc);
 
                     // callEditor("loadDraft")
