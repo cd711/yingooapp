@@ -557,7 +557,7 @@ export default class Shell extends Component<{}, {
     }
   }
 
-  onMsg: { (e: MessageEvent<any>): void } = async ({ data }) => {
+  onMsg: { (e: MessageEvent): void } = async ({ data }) => {
     console.log("msg", data);
     if (!data) {
       return;
@@ -595,7 +595,7 @@ export default class Shell extends Component<{}, {
         case "onLoadEmpty":
           if (!this.tplId && !this.docId) {
             try {
-              const {tplId, doc} = Taro.getStorageSync("doc_draft");
+              const {doc} = Taro.getStorageSync("doc_draft");
               await callEditor("setDoc", doc);
               // this.tplId = tplId;
             } catch(e) {
@@ -691,6 +691,16 @@ export default class Shell extends Component<{}, {
         this.store.isEdit = false;
     }
 
+    // 水平翻转
+    const onFilpY = () => {
+
+    }
+
+    // 垂直翻转
+    const onFilpX = () => {
+
+    }
+
 
     return <View className='editor-page'>
       <View
@@ -719,11 +729,11 @@ export default class Shell extends Component<{}, {
                 <IconFont name='24_bianjiqi_chongyin' size={48} />
                 <Text className='txt'>换图</Text>
               </View>
-              <View className='btn'>
+              <View className='btn' onClick={onFilpY}>
                 <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48} />
                 <Text className='txt'>水平</Text>
               </View>
-              <View className='btn'>
+              <View className='btn' onClick={onFilpX}>
                 <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48} />
                 <Text className='txt'>垂直</Text>
               </View>
