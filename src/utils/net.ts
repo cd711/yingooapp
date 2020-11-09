@@ -1,5 +1,6 @@
 import Taro from '@tarojs/taro';
 import { Base64 } from 'js-base64';
+import {userStore} from "../store/user";
 
 export const options: {
     apiUrl: string;
@@ -83,22 +84,22 @@ export function api(name: string, params?: any): Promise<any> {
         }).then(function (res: any) {
             console.log(res);
             if(res.data.code == 401){
-                // userStore.auth().then(res=>{
-                //     // setToken(res.access_token,res.expired_at);
-                //     api(name,params).then(()=>{
-                //         Taro.showLoading({title:"加载中"});
-                //         resolve(res.data.data);
-                //     }).catch((e)=>{
-                //         Taro.hideLoading();
-                //         reject(e.errMsg || e.message || e);
-                //     })
-                // }).catch(()=>{
-                //     Taro.showToast({
-                //         title:"登录失败!",
-                //         icon:'none',
-                //         duration:2000
-                //     })
-                // })
+                userStore.auth().then(res=>{
+                    // setToken(res.access_token,res.expired_at);
+                    api(name,params).then(()=>{
+                        Taro.showLoading({title:"加载中"});
+                        resolve(res.data.data);
+                    }).catch((e)=>{
+                        Taro.hideLoading();
+                        reject(e.errMsg || e.message || e);
+                    })
+                }).catch(()=>{
+                    Taro.showToast({
+                        title:"登录失败!",
+                        icon:'none',
+                        duration:2000
+                    })
+                })
                 Taro.redirectTo({
                     url:"/pages/login/index"
                 });

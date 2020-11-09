@@ -964,12 +964,8 @@ export default class Shell extends Component<{}, {
             this.store.isEdit = true;
         }
 
-
         return <View className='editor-page'>
-            <View
-                className='header'
-
-            >
+            <View className='header'>
                 <View onClick={this.back}>
                     <IconFont name='24_shangyiye' color='#000' size={48}/>
                 </View>

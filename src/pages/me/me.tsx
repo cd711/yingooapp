@@ -7,6 +7,7 @@ import IconFont from '../../components/iconfont';
 // / npx iconfont-taro
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
+import Popover from "../../components/popover";
 
 const switchBottom = require("../../source/switchBottom.png");
 
@@ -28,7 +29,7 @@ export default class Me extends Component<any,{
     onTabItem=(item)=>{
         console.log(item)
     }
-    
+
     render() {
         const {switchActive} = this.state;
         const {id,nickname,avatar} = userStore;
@@ -121,7 +122,14 @@ export default class Me extends Component<any,{
                                 ))
                             }
                         </View>
-                        <Text className='total'>共18个</Text>
+                        {/*<Text className='total'>共18个</Text>*/}
+                        <Popover popRender={<View className="temp_pop">
+                            <Text className="txt">456465</Text>
+                            <Text className="txt">789465</Text>
+                            <Text className="txt">132456</Text>
+                        </View>}>
+                            <Text className='total'>共18个</Text>
+                        </Popover>
                     </View>
                     <View className='content'>
                         <View className='item'>
@@ -144,7 +152,7 @@ export default class Me extends Component<any,{
                                         <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
                                     {/* </TaroPopover> */}
                                 </View>
-                                
+
                             </View>
                             <View className='box'>
                                 <View className='cns'>
@@ -153,10 +161,10 @@ export default class Me extends Component<any,{
                                         <Text className='nook'>已打印</Text>
                                         <Image src='' className='pic' />
                                     </View>
-                                    
+
                                 </View>
                             </View>
-                        </View> 
+                        </View>
 
                         <View className='item'>
                             <View className='dates'>
@@ -178,34 +186,34 @@ export default class Me extends Component<any,{
                                     <Image src='' className='pic' />
                                 </View>
                             </View>
-                        </View> 
+                        </View>
 
                         <View className='years'>
                             <Text className='text'>2019</Text>
                         </View>
 
-                        
+
                     </View>
 
                 </View>
 
-                <View className='sub-menu'>
-                    <View className='list'>
-                        <View className='triangle'></View>
-                        <View className='item'>
-                            <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
-                            <Text className='item-text'>保存到相册</Text>
-                        </View>
-                        <View className='item'>
-                            <IconFont name='24_fenxiang' size={40} color='#121314' />
-                            <Text className='item-text'>分享</Text>
-                        </View>
-                        <View className='item'>
-                            <IconFont name='24_shanchu' size={40} color='#FF4966' />
-                            <Text className='item-text'>删除</Text>
-                        </View>
-                    </View>
-                </View>
+                {/*<View className='sub-menu'>*/}
+                {/*    <View className='list'>*/}
+                {/*        <View className='triangle'></View>*/}
+                {/*        <View className='item'>*/}
+                {/*            <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />*/}
+                {/*            <Text className='item-text'>保存到相册</Text>*/}
+                {/*        </View>*/}
+                {/*        <View className='item'>*/}
+                {/*            <IconFont name='24_fenxiang' size={40} color='#121314' />*/}
+                {/*            <Text className='item-text'>分享</Text>*/}
+                {/*        </View>*/}
+                {/*        <View className='item'>*/}
+                {/*            <IconFont name='24_shanchu' size={40} color='#FF4966' />*/}
+                {/*            <Text className='item-text'>删除</Text>*/}
+                {/*        </View>*/}
+                {/*    </View>*/}
+                {/*</View>*/}
 
             </View>
         )
