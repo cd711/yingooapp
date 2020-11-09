@@ -16,7 +16,7 @@ import FloatModal from '../../components/floatModal/FloatModal';
 import Ticket from '../../components/ticket/Ticket';
 import Checkbox from '../../components/checkbox/checkbox';
 import Fragment from '../../components/Fragment';
-import { ossUrl } from '../../utils/common';
+import {notNull, ossUrl} from '../../utils/common';
 
 
 
@@ -39,23 +39,29 @@ export default class Confirm extends Component<any,{
     showTickedModal:boolean;
     showPayWayModal:boolean;
     payWayArray:Array<any>;
-    data:any
+    data:any;
+    tickets: [],
+    ticketId: number | string | null,
+    usedTicket: boolean
 }> {
 
     config: Config = {
         navigationBarTitleText: '确认订单'
     }
-    
+
     constructor(props){
         super(props);
         this.state = {
             showTickedModal: false,
             showPayWayModal: false,
             payWayArray: payway,
-            data:{}
+            data: {},
+            tickets: [],
+            ticketId: null,
+            usedTicket: false
         }
     }
-    componentDidMount() { 
+    componentDidMount() {
         // console.log(this.$router.params)
         // skuid=375&total=1&tplid=55&model=0
         const {skuid,total,tplid,model,orderid} = this.$router.params;
@@ -77,7 +83,7 @@ export default class Confirm extends Component<any,{
                 Taro.hideLoading();
                 window.history.pushState(null,null,`/pages/template/confirm?orderid=${res.prepay_id}`);
                 this.setState({
-                    data:res
+                    data: res
                 });
             })
         }
@@ -109,8 +115,15 @@ export default class Confirm extends Component<any,{
             this.setState({
                 data:res
             })
+        }).catch(e => {
+            Taro.hideLoading();
+            Taro.showToast({
+                title: e,
+                icon: "none",
+            })
         })
     }
+
     onSubmitOrder = () => {
         // this.setState({
         //     showPayWayModal:true
@@ -119,6 +132,18 @@ export default class Confirm extends Component<any,{
         this.checkOrder(data.prepay_id);
 
     }
+
+    // 选择优惠券
+    onSelectTicket = (ticket, tId) => {
+
+        const {ticketId} = this.state;
+        if (!notNull(ticketId) && Number(tId) === Number(ticketId)) {
+            this.setState({ticketId: null, usedTicket: false});
+            return
+        }
+        this.setState({ticketId: Number(tId), usedTicket: true})
+    }
+
     //计数器更改
     onCounterChange = (num,product) => {
         // console.log(num)
@@ -127,7 +152,7 @@ export default class Confirm extends Component<any,{
         }
     }
      render() {
-        const { showTickedModal,showPayWayModal,payWayArray,data } = this.state;
+        const { showTickedModal,showPayWayModal,payWayArray,data, tickets, ticketId, usedTicket} = this.state;
         const { address } = templateStore;
         return (
             <View className='confirm'>
@@ -172,7 +197,7 @@ export default class Confirm extends Component<any,{
                 }
 
                 {
-                    data && data.orders && data.orders.map((item,index)=>(
+                    data.orders && data.orders.map((item,index)=>(
                         <Fragment key={item.pre_order_id}>
                             <View className='goods-info'>
                                 <View className='title'>
@@ -216,22 +241,34 @@ export default class Confirm extends Component<any,{
                                     return;
                                 }
                                 this.setState({
-                                    showTickedModal:true
+                                    showTickedModal:true,
+                                    tickets: item.usable_discounts
                                 })
                             }}>
                                 <Text className='title'>优惠券</Text>
                                 {
-                                    item.usable_discounts.length==0?<View className='right'>
-                                        <Text className='txt'>无优惠券可用</Text>
-                                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
-                                    </View>:<View className='right'>
-                                        <View className='tt'>
-                                            <Text className='has'>有</Text>
-                                            <Text className='n'>{item.usable_discounts.length}</Text>
-                                            <Text>张优惠券可用</Text>
+                                    !usedTicket
+                                        ? item.usable_discounts.length==0
+                                            ? <View className='right'>
+                                                <Text className='txt'>无优惠券可用</Text>
+                                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
+                                            </View>
+                                            :<View className='right'>
+                                                <View className='tt'>
+                                                    <Text className='has'>有</Text>
+                                                    <Text className='n'>{item.usable_discounts.length}</Text>
+                                                    <Text>张优惠券可用</Text>
+                                                </View>
+                                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
+                                            </View>
+                                        : <View className='right'>
+                                            <View className='tt'>
+                                                <Text className='n'>
+                                                    - ￥{tickets.filter(val => Number(val.id) === ticketId)[0].coupon.money}
+                                                </Text>
+                                            </View>
+                                            <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                                         </View>
-                                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
-                                    </View>
                                 }
                             </View>
                             {/* <View className='goods-item'>
@@ -275,7 +312,7 @@ export default class Confirm extends Component<any,{
                             })
                         }}>提交订单</Button>
                     }
-                    
+
                 </View>
                 <FloatModal title='优惠卷' isShow={showTickedModal} onClose={()=>{
                     this.setState({
@@ -284,14 +321,18 @@ export default class Confirm extends Component<any,{
                 }}>
                     <ScrollView scrollY>
                         <View className='yhlist'>
-                            <Ticket isNew />
-                            <Ticket />
-                            <Ticket />
-                            <Ticket />
+                            {
+                                tickets.map((value: any, index) => (
+                                    <Ticket key={index}
+                                            isSelected={Number(ticketId) === Number(value.id)}
+                                            ticket={value.coupon}
+                                            onChange={t => this.onSelectTicket(t, value.id)} />
+                                ))
+                            }
                         </View>
                     </ScrollView>
                     <View className='yh_ops'>
-                        <Button className='use-btn'>使用</Button>
+                        <Button className='use-btn' onClick={() => this.setState({showTickedModal: false})}>使用</Button>
                     </View>
                 </FloatModal>
                 <View className='paywaymodal'>
