@@ -77,7 +77,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
     async function getListOfCategory(params: {tagId?: number | string, page?: number, size?: number, loadMore?: boolean} = {}) {
         const {cid} = parent.$router.params;
         const opt = {
-            cid,
+            cid: 41,
             tagId: params.tagId || "",
             page: params.page || 0,
             size: params.size || 15,
@@ -129,18 +129,16 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
         api("app.product/cate").then(res => {
             prodList.current = res;
             const {cid} = parent.$router.params;
-            if (cid) {
-                // 获取标签分类
-                let arr = [];
-                for (const item of res) {
-                    if (Number(item.tpl_category_id) === Number(cid)) {
-                        arr = item.tags;
-                        break;
-                    }
+            // 获取标签分类
+            let arr = [];
+            for (const item of res) {
+                if (Number(item.tpl_category_id) === Number("41")) {
+                    arr = item.tags;
+                    break;
                 }
-                getListOfCategory({tagId: arr[0].id, page: 0})
-                setTypeList([...arr])
             }
+            getListOfCategory({tagId: arr[0].id, page: 0})
+            setTypeList([...arr])
         }).catch(e => {
             console.log("获取商品分类出错：", e)
         })
@@ -964,12 +962,8 @@ export default class Shell extends Component<{}, {
             this.store.isEdit = true;
         }
 
-
         return <View className='editor-page'>
-            <View
-                className='header'
-
-            >
+            <View className='header'>
                 <View onClick={this.back}>
                     <IconFont name='24_shangyiye' color='#000' size={48}/>
                 </View>

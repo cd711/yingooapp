@@ -12,6 +12,8 @@ import { observer, inject } from '@tarojs/mobx';
 // import {ossUrl} from '../../utils/common'
 import { PlaceOrder } from './place';
 import { takeWhile } from 'lodash';
+import {userStore} from "../../store/user";
+import {AtModal} from "taro-ui";
 
 
 const pics = [
@@ -57,7 +59,8 @@ export default class Preview extends Component<{}, {
     productInfo:any;
     buyTotal:number;
     sku:any;
-    modalId:number
+    modalId:number;
+    isOpened: boolean
 }> {
 
     config: Config = {
@@ -71,7 +74,8 @@ export default class Preview extends Component<{}, {
             saveId: 0,
             productInfo: {},
             buyTotal:0,
-            sku:{},
+            sku:{},,
+            isOpened: false,
             modalId:0
         }
     }
@@ -186,7 +190,7 @@ export default class Preview extends Component<{}, {
                 icon:"success",
                 duration:2000
             })
-            
+
             callback && callback();
             // console.log("api-----",res);
         }).catch((e)=>{
@@ -214,10 +218,36 @@ export default class Preview extends Component<{}, {
         const { saveId } = this.state;
         window.location.replace(`/editor/shell?id=${saveId}`);
     }
+
+    onOrderIng = () => {
+        const {saveId} = this.state;
+        const {id} = userStore;
+        if (!id) {
+            this.setState({isOpened: true})
+            return
+        }
+        if (saveId) {
+            this.getShellInfo()
+        } else {
+            this.onSave(null,()=>{
+                this.getShellInfo()
+
+            });
+        }
+    }
+
     render() {
-        const { placeOrderShow,saveId,productInfo } = this.state;
+        const { placeOrderShow,saveId,productInfo, isOpened} = this.state;
         return (
             <View className='preview'>
+                <AtModal
+                    isOpened={isOpened}
+                    cancelText='取消'
+                    confirmText='前往登录'
+                    onCancel={() => this.setState({isOpened: false})}
+                    onConfirm={() => window.location.replace(`pages/login/index`)}
+                    content='检测到您还未登录，请登录后操作!'
+                />
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
                         if (saveId) {
@@ -249,18 +279,9 @@ export default class Preview extends Component<{}, {
                             <Text className='txt'>保存</Text>
                         </View>
                     }
-                    <Button className='noworder' onClick={() => {
-                        if (saveId) {
-                            this.getShellInfo()
-                        } else {
-                            this.onSave(null,()=>{
-                                this.getShellInfo()
-
-                            });
-                        }
-                    }}>立即下单</Button>
+                    <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
-                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose} 
+                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
                 onBuyNumberChange={(n) => {
                     this.setState({
                         buyTotal:n
