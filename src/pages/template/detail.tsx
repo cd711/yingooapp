@@ -38,7 +38,7 @@ export default class Detail extends Component<any,{
     }
     private lastBottomTime = 0;
 
-    componentDidMount() { 
+    componentDidMount() {
         // const {selectItem} = templateStore;
         const { id,cid } = this.$router.params
         if (!id || !cid) {
@@ -88,7 +88,7 @@ export default class Detail extends Component<any,{
             })
         })
     }
-    
+
     onPageScroll(){
         const query = Taro.createSelectorQuery;
         query().select(".taro-tabbar__panel").fields({
@@ -104,9 +104,9 @@ export default class Detail extends Component<any,{
                 this.lastBottomTime = nowUnixTime;
                 console.log("触及底线了...");
             }
-          }).exec();        
+          }).exec();
     }
-    
+
 
     render() {
         const { isLike,likeList,currentItem } = this.state;
@@ -157,8 +157,9 @@ export default class Detail extends Component<any,{
                         <Text className='txt'>收藏</Text>
                     </View>
                     <View className='now-editor' onClick={()=>{
+                        console.log(currentItem)
                         Taro.navigateTo({
-                            url:`/pages/editor/index?tpl_id=${currentItem.id}`
+                            url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
                         });
                     }}>
                         <Text className='txt'>立即编辑</Text>
