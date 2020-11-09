@@ -178,7 +178,7 @@ export default class Preview extends Component<{}, {
         const { doc } = Taro.getStorageSync("doc_draft");
         Taro.showLoading({title:"保存中"});
         api("editor.user_tpl/add",{
-            doc:JSON.stringify(doc)
+            doc: JSON.stringify(doc)
         }).then((res)=>{
             this.setState({
                 saveId: res.id
@@ -240,14 +240,19 @@ export default class Preview extends Component<{}, {
         const { placeOrderShow,saveId,productInfo, isOpened} = this.state;
         return (
             <View className='preview'>
-                <AtModal
-                    isOpened={isOpened}
-                    cancelText='取消'
-                    confirmText='前往登录'
-                    onCancel={() => this.setState({isOpened: false})}
-                    onConfirm={() => window.location.replace(`pages/login/index`)}
-                    content='检测到您还未登录，请登录后操作!'
-                />
+                {
+                    isOpened
+                        ? <AtModal
+                            className="modal_confirm_container"
+                            isOpened={isOpened}
+                            cancelText='取消'
+                            confirmText='前往登录'
+                            onCancel={() => this.setState({isOpened: false})}
+                            onConfirm={() => window.location.replace(`/pages/login/index`)}
+                            content='检测到您还未登录，请登录后操作!'
+                        />
+                        : null
+                }
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
                         if (saveId) {
