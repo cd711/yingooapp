@@ -8,14 +8,15 @@ interface PopoverProps {
 const Popover: React.FC<PopoverProps> = (props) => {
 
     const {popRender, children} = props;
+    const _childRef = Taro.createRef();
 
-    useEffect(() => {
-        console.log(children)
-    }, [])
+    const onChange = () => {
+        console.log(_childRef.current)
+    }
 
     return (
         <View className="popover_container">
-            <View className="children_view">
+            <View className="children_view" ref={_childRef} onClick={onChange}>
                 {children}
             </View>
             <View className="popover_content">
