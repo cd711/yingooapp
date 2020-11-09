@@ -63,7 +63,7 @@ interface BrandType {
     brandIndex?: number;
 }
 
-const Template: React.FC<{ parent: Shell; onClose: () => void }> = ({onClose, parent}) => {
+const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}> = ({onClose, parent, onOk}) => {
 
     const prodList = Taro.useRef([]);
     const [typeList, setTypeList] = useState([]);
@@ -189,10 +189,6 @@ const Template: React.FC<{ parent: Shell; onClose: () => void }> = ({onClose, pa
         }
     }
 
-    const applyTemplate = () => {
-
-    }
-
     const onCancel = () => {
         resetTemplate();
         onClose && onClose()
@@ -234,7 +230,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void }> = ({onClose, pa
         <View className='optBar'>
             <View onClick={onCancel} className="icon"><IconFont name='24_guanbi' size={48}/></View>
             <Text className='txt'>模板</Text>
-            <View onClick={applyTemplate} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
+            <View onClick={onOk} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
         </View>
     </View>;
 };
@@ -723,7 +719,7 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
 
             //模板
             case 2:
-                return <Template parent={parent} onClose={() => setType(0)}/>;
+                return <Template parent={parent} onClose={() => setType(0)} onOk={() => setType(0)} />;
         }
     }))[0] as any;
 }
