@@ -55,14 +55,15 @@ const Popover: React.FC<PopoverProps> = (props) => {
 
     const _onChange = async () => {
         try {
+            const win = Taro.getSystemInfoSync();
             const {top, left, right, height} = await getPopoverContentRect();
             const {
                 width: cWidth,
                 height: cHeight
             } = await getPopoverBodyRect();
 
-            const screenW = window.screen.availWidth;
-            const screenH = window.screen.availHeight;
+            const screenW = win.windowWidth;
+            const screenH = win.windowHeight;
             const halfW = screenW / 2;
 
             let temp: any = {top: 0};
