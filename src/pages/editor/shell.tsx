@@ -63,7 +63,7 @@ interface BrandType {
     brandIndex?: number;
 }
 
-const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}> = ({onClose, parent, onOk}) => {
+const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
     const prodList = Taro.useRef([]);
     const [typeList, setTypeList] = useState([]);
@@ -75,7 +75,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
 
     // 获取列表
     async function getListOfCategory(params: {tagId?: number | string, page?: number, size?: number, loadMore?: boolean} = {}) {
-        const {cid} = parent.$router.params;
+
         const opt = {
             cid: 41,
             tagId: params.tagId || "",
@@ -128,7 +128,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
     useEffect(() => {
         api("app.product/cate").then(res => {
             prodList.current = res;
-            const {cid} = parent.$router.params;
+
             // 获取标签分类
             let arr = [];
             for (const item of res) {
@@ -160,6 +160,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
             resetTemplate()
             return
         }
+        console.log("选择的docid：", item.id)
         setSelected(Number(item.id));
 
         // 获取模板详情并向DOC更新
@@ -190,6 +191,10 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
     const onCancel = () => {
         resetTemplate();
         onClose && onClose()
+    }
+
+    const _onOk = () => {
+        onOk && onOk(selected)
     }
 
     return <View className='switch-template'>
@@ -228,7 +233,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: () => void}
         <View className='optBar'>
             <View onClick={onCancel} className="icon"><IconFont name='24_guanbi' size={48}/></View>
             <Text className='txt'>模板</Text>
-            <View onClick={onOk} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
+            <View onClick={_onOk} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
         </View>
     </View>;
 };
@@ -1002,12 +1007,12 @@ export default class Shell extends Component<{}, {
                                 </View>
                                 <Text className='txt'>透明度</Text>
                             </View>
-                            <View className='btn'>
-                                <View className='icon'>
-                                    <IconFont name='24_bianjiqi_shanchu' size={48}/>
-                                </View>
-                                <Text className='txt'>删除</Text>
-                            </View>
+                            {/*<View className='btn'>*/}
+                            {/*    <View className='icon'>*/}
+                            {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
+                            {/*    </View>*/}
+                            {/*    <Text className='txt'>删除</Text>*/}
+                            {/*</View>*/}
                         </View>
 
                     case 4: // 换图

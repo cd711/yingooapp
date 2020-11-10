@@ -8,7 +8,7 @@ import {templateStore} from '../../store/template';
 import {userStore} from '../../store/user';
 import { observer, inject } from '@tarojs/mobx';
 // import { AtLoadMore } from 'taro-ui';
-// import lodash from 'lodash';
+import lodash from 'lodash';
 // import moment from 'moment';
 // import {ossUrl} from '../../utils/common'
 import Counter from '../../components/counter/counter';
@@ -80,7 +80,7 @@ export default class Confirm extends Component<any,{
                 user_tpl_id:tplid,
                 phone_model_id:336
             };
-            if (userStore.address) {
+            if (!lodash.isEmpty(userStore.address)) {
                 templateStore.address = userStore.address;
                 data["address_id"] = userStore.address.id;
             }
@@ -137,7 +137,7 @@ export default class Confirm extends Component<any,{
                     Taro.switchTab({
                         url:'/pages/index/index'
                     })
-                }, 2000);               
+                }, 2000);
             }
             Taro.showToast({
                 title: e,
@@ -275,6 +275,7 @@ export default class Confirm extends Component<any,{
      render() {
         const { showTickedModal,showPayWayModal,payWayArray,data, tickets,usedTickets} = this.state;
         const { address } = templateStore;
+        console.log(address)
         return (
             <View className='confirm'>
                 <View className='nav-bar'>
@@ -290,7 +291,7 @@ export default class Confirm extends Component<any,{
                     </View>
                 </View>
                 {
-                    address && (address)?<View className='address-part-has' onClick={()=>{
+                    address?<View className='address-part-has' onClick={()=>{
                         Taro.navigateTo({
                             url:`/pages/me/address/index?t=select&id=${address.id}`
                         })
@@ -400,7 +401,7 @@ export default class Confirm extends Component<any,{
                                             <Text>张优惠券可用</Text>
                                         </View>
                                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
-                                    </View>)     
+                                    </View>)
                                 }
                             </View>
                             {/* <View className='goods-item'>
