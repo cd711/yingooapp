@@ -178,7 +178,8 @@ export default class Preview extends Component<{}, {
         const { doc } = Taro.getStorageSync("doc_draft");
         Taro.showLoading({title:"保存中"});
         api("editor.user_tpl/add",{
-            doc: JSON.stringify(doc)
+            doc: JSON.stringify(doc),
+            
         }).then((res)=>{
             this.setState({
                 saveId: res.id
