@@ -30,6 +30,13 @@ export default class Me extends Component<any,{
         console.log(item)
     }
 
+    private popItems = [
+        {title: "时间由远到近", value: 1},
+        {title: "时间从近到远排序", value: 3},
+        {title: "从大到小降序", value: 2},
+        {title: "自定义item", value: 4, customRender: <View className="cus_item"><IconFont name="16_re" size={40} /><Text className="txt">自定义列表</Text></View> },
+    ]
+
     render() {
         const {switchActive} = this.state;
         const {id,nickname,avatar} = userStore;
@@ -122,14 +129,8 @@ export default class Me extends Component<any,{
                                 ))
                             }
                         </View>
-                        {/*<Text className='total'>共18个</Text>*/}
-                        <Popover popRender={<View className="temp_pop">
-                            <Text className="txt">456465</Text>
-                            <Text className="txt">789465</Text>
-                            <Text className="txt">132456</Text>
-                        </View>}>
-                            <Text className='total'>共18个</Text>
-                        </Popover>
+                        <Text className='total'>共18个</Text>
+
                     </View>
                     <View className='content'>
                         <View className='item'>
@@ -140,19 +141,22 @@ export default class Me extends Component<any,{
                                     </View>
                                 </View>
                                 <Text className='date'>9月23日</Text>
-                                <View className='more' onClick={(e)=>{
-                                    // @ts-ignore
-                                    console.log(e.y,e.currentTarget.clientWidth)
-                                    Taro.createSelectorQuery().select(".taro-tabbar__panel").scrollOffset((_view: any) => {
+                                {/*<View className='more' onClick={(e)=>{*/}
+                                {/*    // @ts-ignore*/}
+                                {/*    console.log(e.y,e.currentTarget.clientWidth)*/}
+                                {/*    Taro.createSelectorQuery().select(".taro-tabbar__panel").scrollOffset((_view: any) => {*/}
 
-                                        console.log(_view.scrollTop)
-                                    }).exec();
-                                }}>
-                                    {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
-                                    {/* </TaroPopover> */}
-                                </View>
+                                {/*        console.log(_view.scrollTop)*/}
+                                {/*    }).exec();*/}
+                                {/*}}>*/}
+                                {/*    /!* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> *!/*/}
+                                {/*        <IconFont name='24_gengduo' size={48} color='#9C9DA6' />*/}
+                                {/*    /!* </TaroPopover> *!/*/}
+                                {/*</View>*/}
 
+                                <Popover className="more" popoverItem={this.popItems} offsetBottom={30} onChange={v => console.log(v)}>
+                                    <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
+                                </Popover>
                             </View>
                             <View className='box'>
                                 <View className='cns'>
@@ -174,11 +178,9 @@ export default class Me extends Component<any,{
                                     </View>
                                 </View>
                                 <Text className='date'>9月23日</Text>
-                                <View className='more'>
-                                    {/* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> */}
-                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
-                                    {/* </TaroPopover> */}
-                                </View>
+                                <Popover className="more" popoverItem={this.popItems} offsetBottom={30}>
+                                    <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
+                                </Popover>
                             </View>
                             <View className='box'>
                                 <View className='cns'>
