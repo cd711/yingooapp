@@ -15,7 +15,7 @@ interface PopoverItemProps {
 interface PopoverProps {
     popoverItem: Array<PopoverItemProps>;
     className?: string;
-    offsetBottom?: number;
+    offsetBottom?: number;  // 如果偶尔存在底部还差一点没有显示就使用此字段增加偏移量
     onChange?: (isOpened: boolean) => void;
 }
 const Popover: React.FC<PopoverProps> = (props) => {
