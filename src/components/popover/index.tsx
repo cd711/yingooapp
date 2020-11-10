@@ -53,6 +53,16 @@ const Popover: React.FC<PopoverProps> = (props) => {
         onChange && onChange(visible)
     }, [visible])
 
+    function changeOverflow(show: boolean) {
+        if (Taro.getEnv() === Taro.ENV_TYPE.WEB) {
+            const scr = window.document.getElementsByClassName("taro-tabbar__panel");
+            if (scr[0]) {
+                // @ts-ignore
+                scr[0].style.overflow = show ? "hidden" : "auto"
+            }
+        }
+    }
+
     const _onChange = async () => {
         try {
             const win = Taro.getSystemInfoSync();
@@ -98,6 +108,8 @@ const Popover: React.FC<PopoverProps> = (props) => {
             setOffset({...temp})
             setVisible(!visible);
 
+            changeOverflow(!visible)
+
         }catch (e) {
             console.log("获取坐标出错：", e)
         }
@@ -106,7 +118,8 @@ const Popover: React.FC<PopoverProps> = (props) => {
     const _onClose = () => {
         setVisible(false);
         setOnluBottom(false);
-        setOffset({})
+        setOffset({});
+        changeOverflow(false)
     }
 
     const onItemClick = (item: PopoverItemProps) => {
