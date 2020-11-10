@@ -211,10 +211,10 @@ export default class Me extends Component<any, MeProps> {
                                     <View className='dates'>
                                         <View className='day'>
                                             <View className='circle'>
-                                                <Text className='text'>{moment(value.create_time).date()}</Text>
+                                                <Text className='text'>{moment.unix(value.create_time).date()}</Text>
                                             </View>
                                         </View>
-                                        <Text className='date'>{moment(value.create_time).format("MM月DD日")}</Text>
+                                        <Text className='date'>{moment.unix(value.create_time).format("MM月DD日")}</Text>
 
                                         <Popover className="more" popoverItem={this.popItems} offsetBottom={30}
                                                  onChange={v => console.log(v)}>
@@ -226,7 +226,7 @@ export default class Me extends Component<any, MeProps> {
                                             <Text className='neir'>{value.name}</Text>
                                             <View className='docker'>
                                                 {value.order_sn ? <Text className='nook'>已打印</Text> : null}
-                                                <Image src={ossUrl(value.thumbnail, 1)} className='pic'/>
+                                                <Image src={ossUrl(value.thumbnail, 1)} className='pic' />
                                             </View>
                                         </View>
                                     </View>
