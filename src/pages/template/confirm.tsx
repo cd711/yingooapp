@@ -479,7 +479,7 @@ export default class Confirm extends Component<any,{
                                 <Text className="txt">您需要支付</Text>
                                 <View className='price'>
                                     <Text className='left'>¥</Text>
-                                    <Text className='right'>32.00</Text>
+                                    <Text className='right'>{parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"00.00"}</Text>
                                 </View>
                             </View>
                             <View className='way-list'>

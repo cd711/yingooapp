@@ -74,7 +74,7 @@ export default class Preview extends Component<{}, {
             saveId: 0,
             productInfo: {},
             buyTotal:0,
-            sku:{},,
+            sku:{},
             isOpened: false,
             modalId:0
         }
@@ -292,6 +292,17 @@ export default class Preview extends Component<{}, {
                         buyTotal:n
                     })
                 }} onAddCart={()=>{
+                    const {buyTotal,sku,saveId,modalId} = this.state;
+                    api("app.cart/add",{
+                        sku_id:sku.id,
+                        user_tpl_id:saveId,
+                        phone_model_id:modalId,
+                        quantity:buyTotal
+                    }).then((res)=>{
+                        console.log(res);
+                    }).catch((e)=>{
+                        console.log(e);
+                    })
 
                 }} onNowBuy={()=>{
                     const {buyTotal,sku,saveId,modalId} = this.state;
