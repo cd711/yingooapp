@@ -48,7 +48,11 @@ export default class Me extends Component<any,{
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                         <View className='ops'>
-                            <View className='cart'><IconFont name='24_gouwuche' size={48} color='#121314' /></View>
+                            <View className='cart' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/cart/index'
+                                })
+                            }}><IconFont name='24_gouwuche' size={48} color='#121314' /></View>
                             <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314' /></View>
                             <View className='set' onClick={()=>{
                                 Taro.navigateTo({
