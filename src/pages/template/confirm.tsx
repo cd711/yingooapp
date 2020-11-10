@@ -267,6 +267,7 @@ export default class Confirm extends Component<any,{
             pay_method:"wap"
         }).then((res)=>{
             console.log(res);
+            window.location.href = res;
         }).catch((e)=>{
             console.log(e);
         })

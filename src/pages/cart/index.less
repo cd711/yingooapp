@@ -39,6 +39,51 @@
         }
     }
     .list{
-        
+        .item{
+            display: flex;
+            align-items: center;
+            padding: 32px;
+            .left{
+
+            }
+            .right{
+                display: flex;
+                flex: 1;
+                .pre-image{
+                    position: relative;
+                    width: 160px;
+                    height: 160px;
+                    margin-right: 24px;
+                    .img{
+                        width: 160px;
+                        height: 160px;
+                        border-radius: 16px;
+                        background: red;
+                    }
+                    .big{
+                        width: 40px;
+                        height: 40px;
+                        position: absolute;
+                        right: 8px;
+                        bottom: 8px;
+                    }
+                }
+                .party{
+                    flex: 1;
+                    .name{
+                        .txt{
+                            font-size: 28px;
+                            font-weight: 400;
+                            color: #121314;
+                        }
+                    }
+                    .np{
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    }
+                }
+            }
+        }
     }
 }
