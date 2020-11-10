@@ -1,115 +1,182 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image } from '@tarojs/components'
+import Taro, {Component, Config} from '@tarojs/taro'
+import {Image, Text, View} from '@tarojs/components'
 import './me.less'
 import IconFont from '../../components/iconfont';
-
-// import { AtModal } from 'taro-ui';
-// / npx iconfont-taro
 import {userStore} from "../../store/user";
-import { observer, inject } from '@tarojs/mobx'
+import {inject, observer} from '@tarojs/mobx'
 import Popover from "../../components/popover";
+import {api} from "../../utils/net";
+import moment from "moment";
+import {ossUrl} from "../../utils/common";
 
 const switchBottom = require("../../source/switchBottom.png");
 
+interface MeProps {
+    switchActive: number;
+    works: Array<{id: number, name: string, thumbnail: string, create_time: number, order_sn?: any}>
+}
+
 @inject("userStore")
 @observer
-export default class Me extends Component<any,{
-    switchActive:number;
-}> {
+export default class Me extends Component<any, MeProps> {
+
     config: Config = {
         navigationBarTitleText: '我的'
-      }
-    constructor(props){
+    }
+
+    constructor(props) {
         super(props);
         this.state = {
-            switchActive:0
+            switchActive: 0,
+            works: []
         }
     }
 
-    onTabItem=(item)=>{
+    private total: number = 0;
+    async getWorksList(data:{start?: number, size?: number, loadMore?: boolean}) {
+        const opt = {
+            start: data.start || 0,
+            size: data.size || 15,
+            loadMore: data.size || false
+        }
+        try {
+            const res = await api("editor.user_tpl/index", {
+                page: opt.start,
+                size: opt.size,
+            });
+            this.total = Number(res.total);
+            let works: any[] = [];
+            if (opt.loadMore) {
+                works = [...res.list, this.state.works]
+            } else {
+                works = [...res.list]
+            }
+
+            this.setState({works})
+        }catch (e) {
+            console.log("获取作品出错：", e)
+        }
+    }
+
+    componentDidMount() {
+        this.getWorksList({start: 0})
+    }
+
+    onTabItem = (item) => {
         console.log(item)
     }
 
     private popItems = [
-        {title: "时间由远到近", value: 1},
-        {title: "时间从近到远排序", value: 3},
-        {title: "从大到小降序", value: 2},
-        {title: "自定义item", value: 4, customRender: <View className="cus_item"><IconFont name="16_re" size={40} /><Text className="txt">自定义列表</Text></View> },
+        {
+            title: "保存到相册",
+            value: 1,
+            customRender: <View className='sub-menu'>
+                <View className='list'>
+                    <View className='item'>
+                        <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
+                        <Text className='item-text'>保存到相册</Text>
+                    </View>
+                </View>
+            </View>
+        },
+        {
+            title: "分享",
+            value: 2,
+            customRender: <View className='sub-menu'>
+                <View className='list'>
+                    <View className='item'>
+                        <IconFont name='24_fenxiang' size={40} color='#121314' />
+                        <Text className='item-text'>分享</Text>
+                    </View>
+                </View>
+            </View>
+        },
+        {
+            title: "删除",
+            value: 3,
+            customRender: <View className='sub-menu'>
+                <View className='list'>
+                    <View className='item'>
+                        <IconFont name='24_shanchu' size={40} color='#FF4966' />
+                        <Text className='item-text'>删除</Text>
+                    </View>
+                </View>
+            </View>
+        },
     ]
 
     render() {
-        const {switchActive} = this.state;
-        const {id,nickname,avatar} = userStore;
+        const {switchActive, works} = this.state;
+        const {id, nickname, avatar} = userStore;
         return (
             <View className='me'>
-                <View className='topBox' ref={() =>{
-                    // console.log(node)
-                }}>
+                <View className='topBox'>
                     <View className='top'>
                         {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                         <View className='ops'>
-                            <View className='cart'><IconFont name='24_gouwuche' size={48} color='#121314' /></View>
-                            <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314' /></View>
-                            <View className='set' onClick={()=>{
+                            <View className='cart'><IconFont name='24_gouwuche' size={48} color='#121314'/></View>
+                            <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314'/></View>
+                            <View className='set' onClick={() => {
                                 Taro.navigateTo({
-                                    url:'/pages/me/setting'
+                                    url: '/pages/me/setting'
                                 })
-                            }}><IconFont name='24_shezhi' size={48} color='#121314' /></View>
+                            }}><IconFont name='24_shezhi' size={48} color='#121314'/></View>
                         </View>
                     </View>
-                    <View className='baseInfo' onClick={()=>{
-                        if (id>0) {
+                    <View className='baseInfo' onClick={() => {
+                        if (id > 0) {
                             return;
                         }
                         Taro.redirectTo({
-                            url:'/pages/login/index'
+                            url: '/pages/login/index'
                         })
                     }}>
                         <View className='avator'>
-                            <Image src={avatar.length>0?avatar:require('../../source/defaultAvatar.png')} className='avatarImg' />
+                            <Image src={avatar.length > 0 ? avatar : require('../../source/defaultAvatar.png')}
+                                   className='avatarImg'/>
                         </View>
                         {/* todo: 昵称6个字 */}
-                        <Text className='nickname'>{nickname.length>0?`Hi，${nickname}`:"Hi，未登录"}</Text>
+                        <Text className='nickname'>{nickname.length > 0 ? `Hi，${nickname}` : "Hi，未登录"}</Text>
                     </View>
                     <View className='orderWarp'>
                         <View className='myorall'>
                             <Text className='myorder'>我的订单</Text>
-                            <View className='allorder' onClick={()=>{
+                            <View className='allorder' onClick={() => {
                                 Taro.navigateTo({
-                                    url:'/pages/me/order'
+                                    url: '/pages/me/order'
                                 })
                             }}>
                                 <Text>全部订单</Text>
-                                <IconFont name='16_xiayiye' size={36} color='#9C9DA6' />
+                                <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                             </View>
                         </View>
                         <View className='orderstate'>
-                            <View className='oitem' onClick={()=>{
+                            <View className='oitem' onClick={() => {
                                 Taro.navigateTo({
-                                    url:'/pages/me/order?switch=1'
+                                    url: '/pages/me/order?switch=1'
                                 })
                             }}>
-                                <IconFont name='24_daifukuan' size={48} color='#121314' />
+                                <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                 <Text className='orderText'>待付款</Text>
                             </View>
-                            <View className='oitem' onClick={()=>{
+                            <View className='oitem' onClick={() => {
                                 Taro.navigateTo({
-                                    url:'/pages/me/order?switch=2'
+                                    url: '/pages/me/order?switch=2'
                                 })
                             }}>
-                                <IconFont name='24_daifahuo' size={48} color='#121314' />
+                                <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                 <Text className='orderText'>待发货</Text>
                             </View>
-                            <View className='oitem' onClick={()=>{
+                            <View className='oitem' onClick={() => {
                                 Taro.navigateTo({
-                                    url:'/pages/me/order?switch=3'
+                                    url: '/pages/me/order?switch=3'
                                 })
                             }}>
-                                <IconFont name='24_daishouhuo' size={48} color='#121314' />
+                                <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                 <Text className='orderText'>待收货</Text>
                             </View>
                             <View className='oitem'>
-                                <IconFont name='24_shouhou' size={48} color='#121314' />
+                                <IconFont name='24_shouhou' size={48} color='#121314'/>
                                 <Text className='orderText'>售后</Text>
                             </View>
                         </View>
@@ -119,12 +186,13 @@ export default class Me extends Component<any,{
                     <View className='switchBox'>
                         <View className='switchBar'>
                             {
-                                ["作品","喜欢","收藏"].map((item,index)=>(
-                                    <View className={index==switchActive?'item active':'item'} key={index+""} onClick={()=>{
-                                        this.setState({switchActive:index})
-                                    }}>
+                                ["作品", "喜欢", "收藏"].map((item, index) => (
+                                    <View className={index == switchActive ? 'item active' : 'item'} key={index + ""}
+                                          onClick={() => {
+                                              this.setState({switchActive: index})
+                                          }}>
                                         <Text className='text'>{item}</Text>
-                                        {index==switchActive?<Image className='icon' src={switchBottom} />:null}
+                                        {index == switchActive ? <Image className='icon' src={switchBottom}/> : null}
                                     </View>
                                 ))
                             }
@@ -133,90 +201,40 @@ export default class Me extends Component<any,{
 
                     </View>
                     <View className='content'>
-                        <View className='item'>
-                            <View className='dates'>
-                                <View className='day'>
-                                    <View className='circle'>
-                                        <Text className='text'>23</Text>
+                        {
+                            works.map((value, index) => (
+                                <View className='item' key={index}>
+                                    <View className='dates'>
+                                        <View className='day'>
+                                            <View className='circle'>
+                                                <Text className='text'>{moment(value.create_time).date()}</Text>
+                                            </View>
+                                        </View>
+                                        <Text className='date'>{moment(value.create_time).format("MM月DD日")}</Text>
+
+                                        <Popover className="more" popoverItem={this.popItems} offsetBottom={30}
+                                                 onChange={v => console.log(v)}>
+                                            <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
+                                        </Popover>
+                                    </View>
+                                    <View className='box'>
+                                        <View className='cns'>
+                                            <Text className='neir'>{value.name}</Text>
+                                            <View className='docker'>
+                                                {value.order_sn ? <Text className='nook'>已打印</Text> : null}
+                                                <Image src={ossUrl(value.thumbnail, 1)} className='pic'/>
+                                            </View>
+                                        </View>
                                     </View>
                                 </View>
-                                <Text className='date'>9月23日</Text>
-                                {/*<View className='more' onClick={(e)=>{*/}
-                                {/*    // @ts-ignore*/}
-                                {/*    console.log(e.y,e.currentTarget.clientWidth)*/}
-                                {/*    Taro.createSelectorQuery().select(".taro-tabbar__panel").scrollOffset((_view: any) => {*/}
+                            ))
+                        }
 
-                                {/*        console.log(_view.scrollTop)*/}
-                                {/*    }).exec();*/}
-                                {/*}}>*/}
-                                {/*    /!* <TaroPopover list={list} label='label' onTabItem={this.onTabItem}> *!/*/}
-                                {/*        <IconFont name='24_gengduo' size={48} color='#9C9DA6' />*/}
-                                {/*    /!* </TaroPopover> *!/*/}
-                                {/*</View>*/}
-
-                                <Popover className="more" popoverItem={this.popItems} offsetBottom={30} onChange={v => console.log(v)}>
-                                    <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
-                                </Popover>
-                            </View>
-                            <View className='box'>
-                                <View className='cns'>
-                                    <Text className='neir'>发布作品《映果果饮品日记》</Text>
-                                    <View className='docker'>
-                                        <Text className='nook'>已打印</Text>
-                                        <Image src='' className='pic' />
-                                    </View>
-
-                                </View>
-                            </View>
-                        </View>
-
-                        <View className='item'>
-                            <View className='dates'>
-                                <View className='day'>
-                                    <View className='circle'>
-                                        <Text className='text'>23</Text>
-                                    </View>
-                                </View>
-                                <Text className='date'>9月23日</Text>
-                                <Popover className="more" popoverItem={this.popItems} offsetBottom={30}>
-                                    <IconFont name='24_gengduo' size={48} color='#9C9DA6' />
-                                </Popover>
-                            </View>
-                            <View className='box'>
-                                <View className='cns'>
-                                    <Text className='neir'>发布作品《映果果饮品日记》</Text>
-                                    <Image src='' className='pic' />
-                                </View>
-                            </View>
-                        </View>
-
-                        <View className='years'>
-                            <Text className='text'>2019</Text>
-                        </View>
-
-
+                        {/*<View className='years'>*/}
+                        {/*    <Text className='text'>2019</Text>*/}
+                        {/*</View>*/}
                     </View>
-
                 </View>
-
-                {/*<View className='sub-menu'>*/}
-                {/*    <View className='list'>*/}
-                {/*        <View className='triangle'></View>*/}
-                {/*        <View className='item'>*/}
-                {/*            <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />*/}
-                {/*            <Text className='item-text'>保存到相册</Text>*/}
-                {/*        </View>*/}
-                {/*        <View className='item'>*/}
-                {/*            <IconFont name='24_fenxiang' size={40} color='#121314' />*/}
-                {/*            <Text className='item-text'>分享</Text>*/}
-                {/*        </View>*/}
-                {/*        <View className='item'>*/}
-                {/*            <IconFont name='24_shanchu' size={40} color='#FF4966' />*/}
-                {/*            <Text className='item-text'>删除</Text>*/}
-                {/*        </View>*/}
-                {/*    </View>*/}
-                {/*</View>*/}
-
             </View>
         )
     }
