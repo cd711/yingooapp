@@ -87,7 +87,7 @@ export default class Confirm extends Component<any,{
             Taro.showLoading({title:"加载中"});
             api("app.order_temp/add",data).then((res)=>{
                 Taro.hideLoading();
-                window.history.pushState(null,null,`/pages/template/confirm?orderid=${res.prepay_id}`);
+                window.history.replaceState(null,null,`/pages/template/confirm?orderid=${res.prepay_id}`);
                 this.filterUsedTicket(res.orders);
                 this.setState({
                     data: res
@@ -97,20 +97,23 @@ export default class Confirm extends Component<any,{
     }
     componentDidShow(){
         const {data:{address}} = this.state;
-        if (address && templateStore.address) {
-            if (address.id != templateStore.address.id) {
-                Taro.showLoading({title:"加载中"});
-                api("app.order_temp/address",{
-                    prepay_id: this.state.data.prepay_id,
-                    address_id:templateStore.address.id
-                }).then((res)=>{
-                    Taro.hideLoading();
-                    this.filterUsedTicket(res.orders)
-                    this.setState({
-                        data:res
-                    })
-                })
+        if (!lodash.isEmpty(address) && !lodash.isEmpty(templateStore.address)) {
+            if (address.id == templateStore.address.id) {
+                return;
             }
+        }
+        if (!lodash.isEmpty(templateStore.address) && this.state.data && this.state.data.prepay_id) {
+            Taro.showLoading({title:"加载中"});
+            api("app.order_temp/address",{
+                prepay_id: this.state.data.prepay_id,
+                address_id:templateStore.address.id
+            }).then((res)=>{
+                Taro.hideLoading();
+                this.filterUsedTicket(res.orders)
+                this.setState({
+                    data:res
+                })
+            })
         }
     }
 
@@ -132,6 +135,7 @@ export default class Confirm extends Component<any,{
             });
         }).catch(e => {
             Taro.hideLoading();
+            console.log(isInfo)
             if (!isInfo) {
                 setTimeout(() => {
                     Taro.switchTab({
@@ -275,7 +279,6 @@ export default class Confirm extends Component<any,{
      render() {
         const { showTickedModal,showPayWayModal,payWayArray,data, tickets,usedTickets} = this.state;
         const { address } = templateStore;
-        console.log(address)
         return (
             <View className='confirm'>
                 <View className='nav-bar'>

@@ -35,21 +35,10 @@ function callEditor(name, ...args) {
 }
 
 
-const defaultBrank = 1201;
-const defaultModel = {
-    id: 1586,
-    name: "华为 V30 Pro",
-    phoneshell: {
-        id: 37,
-        image: "http://palybox-app.oss-cn-chengdu.aliyuncs.com/uploads/phoneshell/20200911/0e768b37d0f96869abfcca08303dce70.png"
-    }
-};
-
 class Store {
     @observable
     tool = 0;
 
-    model: any;
 
     @observable
     isEdit = false;
@@ -103,7 +92,17 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => 
         }
     }
 
-    // 获取初始化的DOC
+  
+    // 重置DOC
+    async function resetTemplate() {
+        try {
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        } catch (e) {
+            console.log("重置出错：", e)
+        }
+    }  // 获取初始化的DOC
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
@@ -114,16 +113,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => 
         }
     }
 
-    // 重置DOC
-    async function resetTemplate() {
-        try {
-            if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
-            }
-        } catch (e) {
-            console.log("重置出错：", e)
-        }
-    }
+    
 
     useEffect(() => {
         api("app.product/cate").then(res => {
@@ -144,7 +134,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => 
         })
 
         getDefaultDoc()
-    }, [])
+    }, []);
 
     const changeType = idx => {
         setActive(idx);
@@ -523,19 +513,20 @@ const ChangeAlpha: React.FC<ChangeImageProps> = (props) => {
     </View>
 }
 
-const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = ({parent, model, brand}) => {
+const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
     const [type, setType] = useState(0);
     const [brandList, setBrandList] = useState<BrandType[]>([]);
-    const [brandIndex, setBrand] = useState<number>(-1);
+    const [brandIndex, setBrand] = useState<number>(0);
     const [series, setSeries] = useState<BrandType[]>([]);
 
-    const [currentModel, setCurrentModel] = useState<BrandType>(model);
 
-    const [tempCurrentModel, setTempCurrentModel] = useState<BrandType>(currentModel);
-
+    const [tempCurrentModel, setTempCurrentModel] = useState<any>(parent.defaultModel as any);
 
     useEffect((async () => {
-
+        if (!parent.defaultModel) {
+            return;
+        }
+        setTempCurrentModel(parent.defaultModel);
         switch (type) {
             case 1:
                 let list = null;
@@ -560,24 +551,14 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
                 }
 
                 setBrandList(list);
-                let bi = -1;
-                for (const i in list) {
-                    if (brandIndex == -1) {
-                        if (list[i].id == brand) {
-                            bi = i as any
-                            setBrand(i as any);
-                            break;
-                        }
+                
+                for (let i = 0; i < list.length; i ++) {
+                    if (list[i].id == tempCurrentModel.brand.id) {
+                        setBrand(i);
+                        break;
                     }
                 }
-                if (bi == -1 && brandIndex == -1) {
-                    setBrand(0);
-                } else if (bi != -1) {
-                    setBrand(bi);
-                }
-                if (model && model.phoneshell) {
-                    sendMessage("phoneshell", {id: model.id, mask: model.phoneshell.image});
-                }
+                
 
                 Taro.setStorage({
                     key: "phone_brand", data: {
@@ -588,7 +569,7 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
 
 
         }
-    }) as any, [type])
+    }) as any, [type, parent.defaultModel])
 
     //系列
     useEffect((async () => {
@@ -597,13 +578,10 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
         }
         setSeries(null);
         let list = null;
-        let idx = brandIndex
-        if (tempCurrentModel && currentModel && tempCurrentModel.id != currentModel.id) {
-            idx = currentModel.brandIndex || idx;
-        }
+        
         try {
             //@ts-ignore
-            const res = brandList[idx] ? Taro.getStorageSync("phone_series_" + brandList[idx].id) : null;
+            const res = brandList[brandIndex] ? Taro.getStorageSync("phone_series_" + brandList[brandIndex].id) : null;
             if (res && res.time + 3 * 86400000 > Date.now()) {
                 list = res.list;
             }
@@ -625,11 +603,7 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
             return;
         }
         setSeries(list);
-        if (!tempCurrentModel) {
-            setTempCurrentModel(list[0].models[0]);
-            setCurrentModel(list[0].models[0]);
-            parent.store.model = list[0].models[0].id;
-        }
+        
         Taro.setStorage({
             key: "phone_series_" + brandList[brandIndex].id, data: {
                 time: Date.now(),
@@ -641,18 +615,23 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
 
     const selectPhone = () => {
         setType(0);
-        if (currentModel.id == tempCurrentModel.id) {
-            return;
+        
+        const mod = {
+            id: tempCurrentModel.id,
+            name: tempCurrentModel.name,
+            mask: tempCurrentModel.phoneshell ? tempCurrentModel.phoneshell.image : "",
+            brank: {
+                name: brandList[brandIndex].name,
+                id: brandList[brandIndex].id,
+            },
+            series: tempCurrentModel.series
+        };
+       
+        if (mod.mask) {
+            sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
         }
-        const mod = tempCurrentModel;
-        mod.brandIndex = brandIndex;
-        setCurrentModel(mod);
-
-        parent.store.model = mod.id;
-        if (mod.phoneshell) {
-            sendMessage("phoneshell", {id: mod.id, mask: mod.phoneshell.image});
-        }
-        Taro.setStorage({key: "myphone", data: [brandList[brandIndex].id, mod]});
+        parent.defaultModel = mod;
+        Taro.setStorage({key: "phone_mode", data: mod});
     };
 
     const cancelMode = () => {
@@ -702,7 +681,7 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
                                         <Text className='head'>{ses.name}系列</Text>
                                         <View className='phone'>
                                             {ses.models.map((mod) => {
-                                                return <View onClick={() => setTempCurrentModel(mod)} key={`mod-${mod.id}`}
+                                                return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}
                                                              className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>
                                                     <Text>{mod.name}</Text>
                                                 </View>
@@ -730,10 +709,9 @@ const ToolBar0: React.FC<{ parent: Shell, brand: number, model?: BrandType }> = 
 @observer
 export default class Shell extends Component<{}, {
     size?: { width: string | number; height: string | number };
-    currentBrand?: number;
+    
     data?: number;
     loadingTemplate?: boolean;
-    currentModel?: BrandType;
 }> {
 
     public store = new Store();
@@ -748,13 +726,12 @@ export default class Shell extends Component<{}, {
         this.docId = this.$router.params['id'] || 0;
 
         this.state = {
-            currentBrand: -1,
             loadingTemplate: true
         };
     }
 
     public editorProxy: WindowProxy | null | undefined;
-
+    public defaultModel: any;
     async componentDidMount() {
         // Taro.showLoading({title: "请稍候"});
         // @ts-ignore
@@ -762,9 +739,25 @@ export default class Shell extends Component<{}, {
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
 
+        try {
+            const mod = Taro.getStorageSync("phone_model");
+            this.defaultModel = mod;
+        } catch(e) {
 
+        }
+        if (!this.defaultModel) {
+            Taro.showLoading({title: "请稍候"});
+            this.defaultModel = await api("editor.phone_shell/default");
+            Taro.setStorageSync("phone_mode", this.defaultModel);
+            Taro.hideLoading();
+            
+        }
+
+
+        // console.log(this.defaultModel);
         // Taro.hideLoading();
     }
+    
 
     componentWillUnmount() {
         editorProxy = null;
@@ -772,26 +765,9 @@ export default class Shell extends Component<{}, {
     }
 
     onLoad = async (type?: number) => {
-        try {
-            const res = Taro.getStorageSync("myphone");
-            if (res && res.length == 2) {
-                this.setState({
-                    currentBrand: res[0],
-                    currentModel: res[1],
-                });
-                console.log(res)
-                res[1].phoneshell && sendMessage("phoneshell", {id: res[1].id, mask: res[1].phoneshell.image});
-                // defaultModel
-            } else {
-                this.setState({
-                    currentBrand: defaultBrank,
-                    currentModel: defaultModel,
-                });
-                sendMessage("phoneshell", {id: defaultModel.id, mask: defaultModel.phoneshell.image});
-            }
-            // !type && await callEditor("saveDraft");
-        } catch (e) {
-            console.error(e);
+        if (this.defaultModel) {
+            const mod = this.defaultModel;
+            sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
         }
 
     }
@@ -916,7 +892,7 @@ export default class Shell extends Component<{}, {
         Taro.setStorageSync("doc_draft", {
             tplId: this.tplId,
             docId: this.docId,
-            modelId: this.store.model,
+            modelId: this.defaultModel.id,
             doc: doc
         });
         Taro.hideLoading();
@@ -925,7 +901,7 @@ export default class Shell extends Component<{}, {
 
 
     render() {
-        const {loadingTemplate, size, currentModel, currentBrand} = this.state;
+        const {loadingTemplate, size } = this.state;
         const {tool} = this.store;
 
 
@@ -976,8 +952,7 @@ export default class Shell extends Component<{}, {
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame"
-                        src={`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=999}`}></iframe>
+                <iframe className="editor_frame" src={`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`}></iframe>
                 {loadingTemplate ?
                     <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
             </View>
@@ -985,7 +960,7 @@ export default class Shell extends Component<{}, {
             {([tool].map((s) => {
                 switch (s) {
                     case 0:
-                        return <ToolBar0 parent={this} brand={currentBrand} model={currentModel}/>;
+                        return <ToolBar0 parent={this} />;
 
                     case 1:
                         return <View key={s} className='tools'>

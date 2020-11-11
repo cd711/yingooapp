@@ -54,7 +54,7 @@ export default class Detail extends Component<any,{
     getCurrentItem(id){
         api('app.product_tpl/info',{id}).then((res)=>{
             if (this.$router.params.id != res.id) {
-                window.history.pushState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
+                window.history.replaceState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
             console.log("info",res)
             this.setState({

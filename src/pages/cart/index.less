@@ -2,6 +2,12 @@
     background: #F5F6F9;
 }
 .cart{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+    height: 100%;
     .nav-bar{
         display: flex;
         align-items: center;
@@ -38,13 +44,20 @@
             }
         }
     }
+    .center{
+        flex: 1;
+    }
     .list{
+        padding-top: 16px;
+        flex: 1;
         .item{
             display: flex;
             align-items: center;
             padding: 32px;
+            background: #FFF;
+            margin-bottom: 16px;
             .left{
-
+                margin-right: 32px;
             }
             .right{
                 display: flex;
@@ -58,7 +71,6 @@
                         width: 160px;
                         height: 160px;
                         border-radius: 16px;
-                        background: red;
                     }
                     .big{
                         width: 40px;
@@ -70,18 +82,112 @@
                 }
                 .party{
                     flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
                     .name{
+                        line-height: 32px;
+                        width: 320px;
                         .txt{
                             font-size: 28px;
                             font-weight: 400;
                             color: #121314;
                         }
                     }
+                    .gg{
+                        font-size: 24px;
+                        font-weight: 400;
+                        color: #9C9DA6;
+                    }
                     .np{
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
+                        line-height: 32px;
+                        .price{
+                            font-weight: 500;
+                            color: #FF4966;
+                            .l{
+                                font-size: 24px;
+                                padding: 0 4px;
+                            }
+                            .n{
+                                font-size: 32px;
+                            }
+                        }
                     }
+                }
+            }
+        }
+    }
+    .bottom{
+        height: 120px;
+        background: #FFFFFF;
+        display: flex;
+        justify-content: space-around;
+        box-sizing: border-box;
+
+        .all{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .txt{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+                line-height: 40px;
+            }
+        }
+        .ops{
+            display: flex;
+            align-items: center;
+            .left{
+                position: relative;
+                .total{
+                    display: flex;
+                    align-items: baseline;
+                    position: absolute;
+                    left: 32px;
+                    top: 50%;
+                    height: 88px;
+                    transform: translate(0,-50%);
+                    .name{
+                        font-size: 28px;
+                        font-weight: 500;
+                        color: #FF4966;
+                    }
+                    .price{
+                        display: flex;
+                        align-items: baseline;
+                        color: #FF4966;
+                        
+                        .syn{
+                            font-size: 28px;
+                            padding-right: 4px;
+                        }
+                        .num{
+                            font-weight: 600;
+                            font-size: 42px;
+                        }
+                    }
+                }
+            }
+            .right{
+                margin-left: -20px;
+                position: relative;
+                .txt{
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    // transform: translate(-50%,-50%);
+                    font-size: 32px;
+                    font-weight: 500;
+                    color: #FFFFFF;
+                    display: flex;
+                    height: 88px;
+                    width: 220px;
+                    justify-content: center;
+                    align-items: center;
                 }
             }
         }

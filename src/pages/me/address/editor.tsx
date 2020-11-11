@@ -6,13 +6,16 @@ import { api } from '../../../utils/net';
 import { AtTextarea,AtSwitch } from 'taro-ui';
 // import region from '../../../utils/region';
 import TipModal from '../../../components/tipmodal/TipModal'
+import { observer, inject } from '@tarojs/mobx';
+import { userStore } from '../../../store/user';
 
 interface CityModal {
     province:any,
     city:Array<any>
     area:Array<any>
 }
-
+@inject("userStore")
+@observer
 export default class Editor extends Component<any,{
     pickerRange:Array<any>;
     pickerValue:Array<number>;
@@ -45,7 +48,6 @@ export default class Editor extends Component<any,{
     }
 
     componentDidMount() {
-
         this.getRegion()
         
     }
@@ -293,6 +295,7 @@ export default class Editor extends Component<any,{
                 icon:"success",
                 duration:1500
             });
+            userStore.getUserInfo();
             setTimeout(() => {
                 Taro.navigateBack();
             }, 1500);
@@ -317,6 +320,7 @@ export default class Editor extends Component<any,{
             Taro.showLoading({title:"正在删除..."});
             api('app.address/del',{id}).then(()=>{
                 Taro.hideLoading();
+                userStore.getUserInfo();
                 setTimeout(() => {
                     Taro.navigateBack();
                 }, 1500);
