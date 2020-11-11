@@ -5,10 +5,10 @@ import IconFont from '../../components/iconfont';
 import Checkbox from '../../components/checkbox/checkbox';
 import Counter from '../../components/counter/counter';
 import {ossUrl} from '../../utils/common';
-// import { api } from '../../utils/net'
+import { api } from '../../utils/net'
 
 export default class Cart extends Component<{},{
-
+    source:any
 }> {
 
     config: Config = {
@@ -18,13 +18,42 @@ export default class Cart extends Component<{},{
     constructor(props){
         super(props);
         this.state = {
-
+            source:null
         }
     }
-
+    componentDidMount(){
+        Taro.showLoading({title:'加载中'}); 
+        api("app.cart/list",{
+            size:20,
+            start:0
+        }).then((res)=>{
+            Taro.hideLoading();
+            console.log(res);
+            if (res) {
+                res.list = res.list.map((item)=>{
+                    item["checked"] = false;
+                    return item;
+                })
+                this.setState({
+                    source:res
+                })
+            }
+        }).catch((e)=>{
+            console.log(e);
+        })
+    }
+    onItemClick = (list,index) => {
+        list[index]["checked"] = !list[index]["checked"];
+        const {source} = this.state;
+        source.list = list; 
+        this.setState({
+            source
+        })
+    }
 
     render() {
-        const {  } = this.state;
+        const { source } = this.state;
+        const list = source && source.list && source.list.length>0?source.list:[];
         return (
             <View className='cart'>
                 <View className='nav-bar'>
@@ -41,28 +70,33 @@ export default class Cart extends Component<{},{
                     </View>
                 </View>
                 <View className='list'>
-                    <View className='item'>
-                        <Checkbox isChecked={false} className='left'/>
-                        <View className='right'>
-                            <View className='pre-image'>
-                                <Image src={ossUrl("",0)} className='img' mode='aspectFill'/>
-                                <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
-                            </View>
-                            <View className='party'>
-                                <View className='name'>
-                                    <Text className='txt'>嘻哈纯棉圆领运动短袖</Text>
-                                </View>
-                                <View className='np'>
-                                    <View className='price'>
-                                        <Text className='l'>¥</Text>
-                                        <Text className='n'>99.00</Text>
+                    {
+                        list.map((item,index)=>(
+                            <View className='item' key={item.id} onClick={this.onItemClick.bind(this,list,index)}>
+                                <Checkbox isChecked={item.checked} className='left' disabled/>
+                                <View className='right'>
+                                    <View className='pre-image'>
+                                        <Image src={ossUrl(item.tpl.thumb_image,0)} className='img' mode='aspectFill'/>
+                                        <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                                     </View>
-                                    <Counter />
+                                    <View className='party'>
+                                        <View className='name'>
+                                            <Text className='txt'>{item.product.title}</Text>
+                                        </View>
+                                        <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
+                                        <View className='np'>
+                                            <View className='price'>
+                                                <Text className='l'>¥</Text>
+                                                <Text className='n'>{(parseFloat(item.sku.price)*parseFloat(item.quantity)).toFixed(2)}</Text>
+                                            </View>
+                                            <Counter num={item.quantity}/>
+                                        </View>
+                                    </View>
                                 </View>
                             </View>
+                        ))
+                    }
 
-                        </View>
-                    </View>
                 </View>
             </View>
         )
