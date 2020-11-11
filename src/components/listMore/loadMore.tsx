@@ -3,7 +3,21 @@ import {View, Text} from "@tarojs/components";
 import { AtActivityIndicator } from 'taro-ui';
 import "./listMore.less";
 
-class LoadMore extends Component<{ status: 'more' | 'loading' | 'noMore' }, any> {
+export interface LoadMoreProps {
+    status: 'more' | 'loading' | 'noMore'
+}
+
+export enum LoadMoreEnum {
+    more = "more",
+    loading = "loading",
+    noMore = "noMore"
+}
+
+class LoadMore extends Component<LoadMoreProps, any> {
+
+    static defaultProps = {
+        status: "more"
+    }
 
     getContent() {
         const {status} = this.props;
@@ -19,7 +33,7 @@ class LoadMore extends Component<{ status: 'more' | 'loading' | 'noMore' }, any>
         return (
             <View className="load_more_view">
                 {status === "loading" ? <AtActivityIndicator /> : null}
-                <Text>{this.getContent()}</Text>
+                <Text className="txt">{this.getContent()}</Text>
             </View>
         );
     }

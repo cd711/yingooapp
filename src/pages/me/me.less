@@ -1,19 +1,22 @@
-.me{
+.me {
     background-color: #F5F6F9;
     min-height: 90vh;
 
 }
-.cus_item{
+
+.cus_item {
     display: flex;
     align-items: center;
     font-size: 24px;
     color: #ff4e58;
 }
-.topBox{
+
+.topBox {
     position: relative;
     padding: 0 32px;
     height: 574px;
     background: linear-gradient(180deg, rgba(244, 175, 175, 0.55) 0%, #F5F6F950 100%);
+
     .baseInfo {
         display: flex;
         flex-direction: row;
@@ -21,41 +24,48 @@
         margin-top: 52px;
         margin-bottom: 48px;
         z-index: 1;
-        .avator{
+
+        .avator {
             width: 140px;
             height: 140px;
             border-radius: 50%;
             overflow: hidden;
-            .avatarImg{
+
+            .avatarImg {
                 width: 140px;
                 height: 140px;
                 border-radius: 50%;
             }
         }
-        .nickname{
+
+        .nickname {
             font-size: 48px;
             padding-left: 44px;
             color: #121314;
         }
     }
-    .orderWarp{
+
+    .orderWarp {
         width: 686px;
         border-radius: 30px;
         background: #FFFFFF;
         padding-top: 24px;
         padding-bottom: 28px;
-        .myorall{
+
+        .myorall {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding-left: 32px;
             padding-right: 44px;
             margin-bottom: 28px;
-            .myorder{
+
+            .myorder {
                 color: #121314;
                 font-size: 32px;
             }
-            .allorder{
+
+            .allorder {
                 display: flex;
                 align-items: center;
                 color: #9C9DA6;
@@ -63,17 +73,20 @@
             }
 
         }
-        .orderstate{
+
+        .orderstate {
             display: flex;
             align-items: center;
             justify-content: space-around;
-            .oitem{
+
+            .oitem {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
             }
-            .orderText{
+
+            .orderText {
                 color: #121314;
                 font-size: 24px;
                 padding-top: 14px;
@@ -82,77 +95,57 @@
     }
 }
 
-.topBox .top{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 56px 0 0;
-    .ops{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        .coupon{
-            margin-left: 40px;
-        }
-        .set{
-            margin-left: 40px;
+.topBox {
+    .fix_top {
+        height: 88px;
+        display: block;
+        padding-top: 28px;
+        .top {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+            height: 88px;
+            z-index: 1000;
+            .ops {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+
+                .coupon {
+                    margin-left: 40px;
+                }
+
+                .set {
+                    margin-left: 40px;
+                }
+            }
         }
     }
 }
-.me{
-    .container{
+
+.me {
+    .container {
         width: 750px;
         min-height: 200vh;
         background: #FFFFFF;
         border-radius: 48px 48px 0px 0px;
         margin-top: 32px;
         padding-bottom: 40px;
-        .switchBox{
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 32px 40px 18px;
-            border-bottom: 1px solid #EDEDEF;
-            margin-bottom: 32px;
-            .switchBar{
-                display: flex;
-                align-items: flex-start;
-                &>.item{
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    .text{
-                        color: #707177;
-                        font-size: 32px;
-                        margin-right: 48px;
-                    }
-                }
-                .active{
 
-                    .text{
-                        color: #121314;
-                    }
-                    .icon{
-                        width: 64px;
-                        height: 16px;
-                    }
-                }
-            }
-            .total{
-                color:#9C9DA6;
-                font-size: 24px;
-            }
-        }
-        .content{
+
+        .content {
             padding: 0 32px;
-            &>.item{
+
+            & > .item {
                 margin-bottom: 8px;
-                .dates{
+
+                .dates {
                     display: flex;
                     align-items: center;
                     margin-bottom: 6px;
-                    .day{
+
+                    .day {
                         width: 72px;
                         height: 72px;
                         background: rgba(255, 73, 102, 0.1);
@@ -160,7 +153,8 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        .circle{
+
+                        .circle {
                             width: 48px;
                             height: 48px;
                             background: rgba(255, 73, 102, 1);
@@ -168,24 +162,28 @@
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            .text{
+
+                            .text {
                                 color: rgba(255, 255, 255, 1);
                                 font-size: 28px;
                             }
                         }
 
                     }
-                    .date{
+
+                    .date {
                         font-size: 28px;
                         color: #121314;
                         padding-left: 24px;
                     }
-                    .more{
+
+                    .more {
                         margin-left: auto;
                         margin-right: 0;
                     }
                 }
-                .box{
+
+                .box {
                     margin-left: 36px;
                     border-left: 1px solid #EDEDEF;
                     padding-top: 1px;
@@ -193,41 +191,42 @@
                     line-height: 0;
                     padding-bottom: 40px;
 
-                    .cns{
+                    .cns {
                         margin-top: -16px;
                         padding-left: 58px;
 
 
-                        .neir{
+                        .neir {
                             color: #9C9DA6;
                             font-size: 28px;
                             display: block;
                             line-height: 32px;
                             margin-bottom: 24px;
                         }
-                        .pic{
-                            width: 400px;
+
+                        .pic {
+
                             border-radius: 16px;
                             z-index: 1;
                         }
-                        .docker{
+
+                        .docker {
                             position: relative;
                             overflow: hidden;
-                            width: 500px;
-                            height: 360px;
+
                             .nook {
                                 display: block;
-                                width:200px;
-                                height:44px;
+                                width: 200px;
+                                height: 44px;
                                 background: #FF4966;
-                                transform:rotate(-45deg);
-                                position:absolute;
-                                left:-52px;
-                                top:26px;
-                                color:#fff;
+                                transform: rotate(-45deg);
+                                position: absolute;
+                                left: -52px;
+                                top: 26px;
+                                color: #fff;
                                 line-height: 42px;
-                                font-size:28px;
-                                text-align:center;
+                                font-size: 28px;
+                                text-align: center;
                                 z-index: 99;
                             }
                         }
@@ -236,9 +235,11 @@
                 }
 
             }
-            .years{
+
+            .years {
                 margin-bottom: 24px;
-                &>text{
+
+                & > text {
                     font-size: 48px;
                     color: #121314;
                     font-weight: bold;
@@ -247,23 +248,92 @@
         }
     }
 }
-.sub-menu{
-    .list{
+
+.sub-menu {
+    .list {
         width: 280px;
-        .item{
+
+        .item {
             display: flex;
             align-items: center;
-            .item-text{
+
+            .item-text {
                 font-size: 28px;
                 color: #121314;
                 padding-left: 20px;
             }
         }
-        .item:last-child{
+
+        .item:last-child {
             padding: 26px 0 26px 24px;
-            .item-text{
-                color: #FF4966;
-            }
         }
     }
+}
+
+.fixed_switch_bar{
+    height: 106px;
+    display: block;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #EDEDEF;
+    .switchBox {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        height: 106px;
+        z-index: 1000;
+        .switchBar {
+            display: flex;
+            align-items: flex-start;
+
+            & > .item {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+
+                .text {
+                    color: #707177;
+                    font-size: 32px;
+                    margin-right: 48px;
+                }
+            }
+
+            .active {
+
+                .text {
+                    color: #121314;
+                }
+
+                .icon {
+                    width: 64px;
+                    height: 16px;
+                }
+            }
+        }
+
+        .total {
+            color: #9C9DA6;
+            font-size: 24px;
+        }
+    }
+}
+.content_scroll {
+
+}
+
+.fiex_set{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 0 40px;
+}
+.fiex_switch{
+    position: fixed;
+    top: 86px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-bottom: 2px solid #EDEDEF;
 }

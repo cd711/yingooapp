@@ -5,22 +5,27 @@ import BoundingClientRectCallbackResult = Taro.NodesRef.BoundingClientRectCallba
 
 
 // 此组件未兼容react-native
-
-interface PopoverItemProps {
+export interface PopoverItemClickProps {
+    title: string | number,
+    value?: string | number,
+    corrValue?: any
+}
+export interface PopoverItemProps {
     title: string | null,
     value?: string | number,
     customRender?: JSX.Element,
-    onClick?: (data: { title: string | number, value?: string | number}) => void
+    onClick?: (data: PopoverItemClickProps) => void
 }
 interface PopoverProps {
     popoverItem: Array<PopoverItemProps>;
     className?: string;
     offsetBottom?: number;  // 如果偶尔存在底部还差一点没有显示就使用此字段增加偏移量
     onChange?: (isOpened: boolean) => void;
+    value?: any;  // 关联值，作为列表渲染时可把要关联的值填入
 }
 const Popover: React.FC<PopoverProps> = (props) => {
 
-    const {popoverItem = [], className, offsetBottom = 0, children, onChange} = props;
+    const {popoverItem = [], className, offsetBottom = 0, children, onChange, value} = props;
     const _childRef = Taro.createRef();
     const _bodyRef = Taro.createRef();
     const [offset, setOffset] = useState({});
@@ -123,7 +128,7 @@ const Popover: React.FC<PopoverProps> = (props) => {
     }
 
     const onItemClick = (item: PopoverItemProps) => {
-        item.onClick && item.onClick({title: item.title, value: item.value})
+        item.onClick && item.onClick({title: item.title, value: item.value, corrValue: value})
         _onClose();
     }
 
