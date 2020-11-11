@@ -127,7 +127,6 @@
 .me {
     .container {
         width: 750px;
-        min-height: 200vh;
         background: #FFFFFF;
         border-radius: 48px 48px 0px 0px;
         margin-top: 32px;
@@ -336,4 +335,23 @@
     right: 0;
     background: #fff;
     border-bottom: 2px solid #EDEDEF;
+}
+.collection_container{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    .collection_item{
+        flex: 1;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .collection_pic{
+            //width: 328px;
+            //height: 328px;
+            overflow: hidden;
+            display: block;
+            border-radius: 10px;
+        }
+    }
 }

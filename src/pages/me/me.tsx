@@ -22,12 +22,25 @@ interface WorksProps {
     order_sn?: any,
     attr: {width: number, height: number}
 }
+interface CollectiongProps {
+    id: number,
+    name: string,
+    subtitle?: string,
+    thumb_image: string,
+    model: string,
+    relation_id: number,
+    user_id: number,
+    admin_id: number,
+    topid: number,
+    favorite_time: number,
+}
 interface MeProps {
     switchActive: number;
     works: Array<WorksProps>;
     fixed: boolean;
     loadStatus: LoadMoreEnum;
-    isOpened: boolean
+    isOpened: boolean,
+    collectionList: Array<CollectiongProps>
 }
 
 @inject("userStore")
@@ -45,12 +58,14 @@ export default class Me extends Component<any, MeProps> {
             works: [],
             fixed: false,
             loadStatus: LoadMoreEnum.more,
-            isOpened: false
+            isOpened: false,
+            collectionList: []
         }
     }
 
     private total: number = 0;
     private isLoading: number = 0;
+    // 获取作品列表
     async getWorksList(data:{start?: number, size?: number, loadMore?: boolean}) {
         if (this.isLoading > 1) {
             return
@@ -95,12 +110,42 @@ export default class Me extends Component<any, MeProps> {
         }
     }
 
-    componentDidMount() {
-        this.getWorksList({start: 0})
+    // 获取收藏列表
+    async getCollectionList(data:{start?: number, size?: number, loadMore?: boolean}) {
+        if (this.isLoading > 1) {
+            return
+        }
+        this.isLoading ++;
+        const opt = {
+            start: data.start || 0,
+            size: data.size || 15,
+            loadMore: data.loadMore || false
+        }
+        try {
+            const res = await api("app.profile/favoriteList", {
+                model: "tpl_product",
+                start: opt.start,
+                size: opt.size,
+            });
+            this.total = Number(res.total);
+            let collectionList: any[] = [];
+            if (opt.loadMore) {
+                collectionList = this.state.collectionList.concat(res.list)
+            } else {
+                collectionList = res.list
+            }
+
+            this.setState({collectionList}, () => {
+                this.isLoading = 0
+            })
+        }catch (e) {
+            console.log("获取作品出错：", e)
+            this.isLoading = 0
+        }
     }
 
-    onTabItem = (item) => {
-        console.log(item)
+    componentDidMount() {
+        this.getWorksList({start: 0})
     }
 
     onScroll = (e) => {
@@ -119,17 +164,31 @@ export default class Me extends Component<any, MeProps> {
     }
 
     lodeMore = () => {
-        const { works } = this.state;
+        const { works, switchActive, collectionList } = this.state;
         console.log("加载更多", this.isLoading, this.total, works.length)
 
-        if (this.total === works.length || this.total < works.length || this.total < 15) {
+        if (switchActive === 0) {
+            if (this.total === works.length || this.total < works.length || this.total < 15) {
+                this.setState({loadStatus: LoadMoreEnum.noMore})
+                return
+            }
+            if (this.total > works.length) {
+                this.setState({loadStatus: LoadMoreEnum.loading})
+                this.getWorksList({
+                    start: works.length,
+                    loadMore: true
+                })
+            }
+            return;
+        }
+        if (this.total === collectionList.length || this.total < collectionList.length || this.total < 15) {
             this.setState({loadStatus: LoadMoreEnum.noMore})
             return
         }
-        if (this.total > works.length) {
+        if (this.total > collectionList.length) {
             this.setState({loadStatus: LoadMoreEnum.loading})
-            this.getWorksList({
-                start: works.length,
+            this.getCollectionList({
+                start: collectionList.length,
                 loadMore: true
             })
         }
@@ -176,6 +235,24 @@ export default class Me extends Component<any, MeProps> {
                 },
                 fail: _ => {
                     Taro.showToast({title: "保存失败"})
+                }
+            })
+        }
+    }
+
+    // 切换菜单
+    changeActive = idx => {
+        const {switchActive} = this.state;
+        if (switchActive !== idx) {
+            this.setState({switchActive: idx}, () => {
+                if (idx === 0) {
+                    this.getWorksList({
+                        start: 0
+                    })
+                } else {
+                    this.getCollectionList({
+                        start: 0
+                    })
                 }
             })
         }
@@ -231,7 +308,7 @@ export default class Me extends Component<any, MeProps> {
     }
 
     render() {
-        const {switchActive, works, fixed, loadStatus, isOpened} = this.state;
+        const {switchActive, works, fixed, loadStatus, isOpened, collectionList} = this.state;
         const {id, nickname, avatar} = userStore;
         return (
             <View className='me'>
@@ -334,9 +411,7 @@ export default class Me extends Component<any, MeProps> {
                                     {
                                         ["作品", "收藏"].map((item, index) => (
                                             <View className={index == switchActive ? 'item active' : 'item'} key={index + ""}
-                                                  onClick={() => {
-                                                      this.setState({switchActive: index})
-                                                  }}>
+                                                  onClick={() => this.changeActive(index)}>
                                                 <Text className='text'>{item}</Text>
                                                 {index == switchActive ? <Image className='icon' src={switchBottom}/> : null}
                                             </View>
@@ -346,45 +421,64 @@ export default class Me extends Component<any, MeProps> {
                                 <Text className='total'>共{this.total}个</Text>
                             </View>
                         </View>
-                        <View className='content'>
-                            {
-                                works.map((value, index) => (
-                                    <View className='item' key={index}>
-                                        <View className='dates'>
-                                            <View className='day'>
-                                                <View className='circle'>
-                                                    <Text className='text'>{moment.unix(value.create_time).date()}</Text>
+                        {
+                            switchActive === 0
+                                ? <View className='content'>
+                                    {
+                                        works.map((value, index) => (
+                                            <View className='item' key={index}>
+                                                <View className='dates'>
+                                                    <View className='day'>
+                                                        <View className='circle'>
+                                                            <Text className='text'>{moment.unix(value.create_time).date()}</Text>
+                                                        </View>
+                                                    </View>
+                                                    <Text className='date'>{this.getDateString(value)}</Text>
+                                                    <Popover className="more" popoverItem={this.popItems} offsetBottom={30} value={value}>
+                                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
+                                                    </Popover>
+                                                </View>
+                                                <View className='box'>
+                                                    <View className='cns'>
+                                                        <Text className='neir'>{value.name}</Text>
+                                                        <View className='docker'>
+                                                            {value.order_sn ? <Text className='nook'>已打印</Text> : null}
+                                                            <Image src={ossUrl(value.thumbnail, 1)} className='pic'
+                                                                   mode="widthFix"
+                                                                   style={{width: value.attr.width}} />
+                                                        </View>
+                                                    </View>
                                                 </View>
                                             </View>
-                                            <Text className='date'>{this.getDateString(value)}</Text>
-                                            <Popover className="more" popoverItem={this.popItems} offsetBottom={30} value={value}>
-                                                <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
-                                            </Popover>
-                                        </View>
-                                        <View className='box'>
-                                            <View className='cns'>
-                                                <Text className='neir'>{value.name}</Text>
-                                                <View className='docker'>
-                                                    {value.order_sn ? <Text className='nook'>已打印</Text> : null}
-                                                    <Image src={ossUrl(value.thumbnail, 1)} className='pic'
-                                                           mode="widthFix"
-                                                           style={{width: value.attr.width}} />
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                ))
-                            }
-                            {
-                                works.length === 0
-                                    ? <Empty/>
-                                    : null
-                            }
+                                        ))
+                                    }
+                                    {
+                                        works.length === 0
+                                            ? <Empty/>
+                                            : null
+                                    }
 
-                            {/*<View className='years'>*/}
-                            {/*    <Text className='text'>2019</Text>*/}
-                            {/*</View>*/}
-                        </View>
+                                    {/*<View className='years'>*/}
+                                    {/*    <Text className='text'>2019</Text>*/}
+                                    {/*</View>*/}
+                                </View>
+                                : <View className="collection_container">
+                                    {
+                                        collectionList.map((value: CollectiongProps, index) => (
+                                            <View className="collection_item" key={index}>
+                                                <View className="collection_pic"
+                                                    style={{
+                                                        width: window.screen.width / 2 - 15,
+                                                        height: window.screen.width / 2 - 15,
+                                                    }}
+                                                >
+                                                    <Image src={ossUrl(value.thumb_image, 1)} mode="aspectFill"/>
+                                                </View>
+                                            </View>
+                                        ))
+                                    }
+                                </View>
+                        }
                     </View>
                     <LoadMore status={loadStatus} />
                 </ScrollView>
