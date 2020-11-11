@@ -307,6 +307,13 @@ export default class Me extends Component<any, MeProps> {
         return moment.unix(item.create_time).format("YYYY年MM月DD日")
     }
 
+    // 跳转预览页
+    previewOrder = (item: WorksProps) => {
+        Taro.navigateTo({
+            url: `/pages/template/preview?workID=${item.id}&isWork=1`
+        })
+    }
+
     render() {
         const {switchActive, works, fixed, loadStatus, isOpened, collectionList} = this.state;
         const {id, nickname, avatar} = userStore;
@@ -438,7 +445,7 @@ export default class Me extends Component<any, MeProps> {
                                                         <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
                                                     </Popover>
                                                 </View>
-                                                <View className='box'>
+                                                <View className='box' onClick={() => this.previewOrder(value)}>
                                                     <View className='cns'>
                                                         <Text className='neir'>{value.name}</Text>
                                                         <View className='docker'>
