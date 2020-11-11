@@ -58,7 +58,8 @@ export default class Detail extends Component<any,{
             }
             console.log("info",res)
             this.setState({
-                currentItem:res
+                currentItem: res,
+                isLike: res.favorite !== 0
             })
         }).catch((e)=>{
             Taro.hideLoading();
@@ -122,6 +123,23 @@ export default class Detail extends Component<any,{
         });
     }
 
+    collectedProd = async () => {
+        const {isLike, currentItem} = this.state;
+        try{
+            await api("app.profile/favorite", {
+                id: currentItem.id,
+                model: "tpl_product",
+                status: isLike ? 0 : 1
+            })
+            Taro.showToast({
+                title: `${isLike ? "取消收藏成功" : "收藏成功"}`
+            })
+            this.setState({isLike: !isLike})
+        }catch (e) {
+            console.log(`${isLike ? "取消收藏失败" : "收藏失败"}：`, e)
+        }
+    }
+
     render() {
         const { isLike,likeList,currentItem, isOpened } = this.state;
         return (
@@ -175,11 +193,7 @@ export default class Detail extends Component<any,{
                     </View>
                 </View>
                 <View className='bottom_bar'>
-                    <View className='favorite' onClick={()=>{
-                        this.setState({
-                            isLike:!isLike
-                        })
-                    }}>
+                    <View className='favorite' onClick={this.collectedProd}>
                         <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color='#707177' />
                         <Text className='txt'>收藏</Text>
                     </View>
