@@ -104,6 +104,7 @@
                         align-items: center;
                         justify-content: space-between;
                         line-height: 32px;
+                        height: 44px;
                         .price{
                             font-weight: 500;
                             color: #FF4966;
@@ -115,6 +116,11 @@
                                 font-size: 32px;
                             }
                         }
+                        .total{
+                            font-size: 28px;
+                            font-weight: 400;
+                            color: #9C9DA6;
+                        }
                     }
                 }
             }
@@ -124,9 +130,10 @@
         height: 120px;
         background: #FFFFFF;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         box-sizing: border-box;
-
+        align-items: center;
+        padding: 0 32px;
         .all{
             display: flex;
             flex-direction: column;
@@ -143,14 +150,17 @@
             align-items: center;
             .left{
                 position: relative;
+                display: flex;
                 .total{
                     display: flex;
                     align-items: baseline;
                     position: absolute;
                     left: 32px;
-                    top: 50%;
+                    top: 0;
                     height: 88px;
-                    transform: translate(0,-50%);
+                    // transform: translate(0,-50%);
+                    line-height: 88px;
+                    text-align: center;
                     .name{
                         font-size: 28px;
                         font-weight: 500;
@@ -175,6 +185,8 @@
             .right{
                 margin-left: -20px;
                 position: relative;
+                display: flex;
+                align-items: center;
                 .txt{
                     position: absolute;
                     left: 0;
@@ -190,6 +202,18 @@
                     align-items: center;
                 }
             }
+        }
+        .remove-cart-btn{
+            width: 256px;
+            height: 88px;
+            background: #FF4966;
+            border-radius: 48px;
+            font-size: 32px;
+            font-weight: 500;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 }

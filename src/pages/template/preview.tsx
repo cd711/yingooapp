@@ -80,7 +80,7 @@ export default class Preview extends Component<{}, {
     }
     componentDidMount() {
         const {doc_id} = this.$router.params;
-        if (doc_id) {
+        if (parseInt(doc_id)>=0) {
             this.setState({
                 saveId:parseInt(doc_id)
             })
@@ -140,13 +140,11 @@ export default class Preview extends Component<{}, {
 
                 case "onLoadEmpty":
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
-                    if (docId) {
-                        window.history.replaceState(null,null,`/pages/template/preview?doc_id=${docId}`);
-                        this.setState({
-                            saveId:docId,
-                            modalId:modelId
-                        });
-                    }
+                    window.history.replaceState(null,null,`/pages/template/preview?doc_id=${docId}`);
+                    this.setState({
+                        saveId:docId,
+                        modalId:modelId
+                    });
                     callEditor("setDoc", doc);
 
                     // callEditor("loadDraft")

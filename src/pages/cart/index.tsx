@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image,ScrollView } from '@tarojs/components'
+import { View, Text,Input,Image,ScrollView, Button } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
 import Checkbox from '../../components/checkbox/checkbox';
@@ -13,7 +13,8 @@ export default class Cart extends Component<{},{
     source:any;
     allSelected:boolean;
     total:number;
-    isManage:boolean
+    isManage:boolean;
+    selectIds:Array<any>;
 }> {
 
     config: Config = {
@@ -26,7 +27,8 @@ export default class Cart extends Component<{},{
             source:null,
             allSelected:false,
             total:0,
-            isManage:false
+            isManage:false,
+            selectIds:[]
         }
     }
 
@@ -82,20 +84,23 @@ export default class Cart extends Component<{},{
     calcTotal = (list:Array<any>) =>{
         let tt = 0;
         let n = 0;
+        const tempIds = [];
         for (const iterator of list) {
             if(iterator["checked"]){
                 tt += (parseFloat(iterator.sku.price)*parseFloat(iterator.quantity));
                 n ++;
+                tempIds.push(iterator.id);
             }
         }
         this.setState({
             total:tt,
-            allSelected:n==list.length?true:false
+            allSelected:n==list.length?true:false,
+            selectIds:tempIds
         });
     }
 
     render() {
-        const { source,allSelected,total } = this.state;
+        const { source,allSelected,total,isManage,selectIds } = this.state;
         const list = source && source.list && source.list.length>0?source.list:[];
         return (
             <View className='cart'>
@@ -109,12 +114,17 @@ export default class Cart extends Component<{},{
                         <Text className='title'>购物车</Text>
                     </View>
                     <View className='right' onClick={()=>{
+                        let url = "/pages/cart/index"
+                        if (!isManage) {
+                            url = "/pages/cart/index?manage=1"
+                        } 
+                        window.history.replaceState(null,null,url)
                         this.setState({
-                            isManage:true
+                            isManage:!isManage
                         })
-                        window.history.replaceState(null,null,`/pages/cart/index?manage=1`)
+                        
                     }}>
-                        <Text className='txt'>管理</Text>
+                        <Text className='txt'>{isManage?'完成':'管理'}</Text>
                     </View>
                 </View>
                 <ScrollView scrollY className='center'>
@@ -138,15 +148,17 @@ export default class Cart extends Component<{},{
                                                     <Text className='l'>¥</Text>
                                                     <Text className='n'>{(parseFloat(item.sku.price)*parseFloat(item.quantity)).toFixed(2)}</Text>
                                                 </View>
-                                                <Counter num={item.quantity} onButtonClick={(num)=>{
-                                                    list[index]["quantity"] = num;
-                                                    const {source} = this.state;
-                                                    source.list = list; 
-                                                    this.calcTotal(list);
-                                                    this.setState({
-                                                        source
-                                                    })
-                                                }}/>
+                                                {
+                                                    isManage?<Text className='total'>x{item.quantity}</Text>:<Counter num={item.quantity} onButtonClick={(num)=>{
+                                                        list[index]["quantity"] = num;
+                                                        const {source} = this.state;
+                                                        source.list = list; 
+                                                        this.calcTotal(list);
+                                                        this.setState({
+                                                            source
+                                                        })
+                                                    }}/>
+                                                }
                                             </View>
                                         </View>
                                     </View>
@@ -160,22 +172,41 @@ export default class Cart extends Component<{},{
                         <Checkbox isChecked={allSelected} disabled/>
                         <Text className='txt'>全选</Text>
                     </View>
-                    <View className='ops'>
-                        <View className='left'>
-                            <CartLeftIcon width={366} height={88}/>
-                            <View className='total'>
-                                <Text className='name'>合计：</Text>
-                                <View className='price'>
-                                    <Text className='syn'>¥</Text>
-                                    <Text className='num'>{total.toFixed(2)}</Text>
+                    {
+                        isManage?<Button className='remove-cart-btn' onClick={()=>{
+                            if (selectIds.length>0) {
+                                api("app.cart/delete",{
+                                    ids:selectIds.join(',')
+                                }).then(()=>{
+                                    source.list = list.filter(obj=>!selectIds.some(obj1=>obj1==obj.id));
+                                    this.setState({
+                                        source,
+                                        selectIds:[]
+                                    })
+                                })
+                            }
+                        }}>移除购物车</Button>:<View className='ops'>
+                            <View className='left'>
+                                <CartLeftIcon width={366} height={88}/>
+                                <View className='total'>
+                                    <Text className='name'>合计：</Text>
+                                    <View className='price'>
+                                        <Text className='syn'>¥</Text>
+                                        <Text className='num'>{total.toFixed(2)}</Text>
+                                    </View>
                                 </View>
                             </View>
+                            <View className='right' onClick={()=>{
+                                if (total>0) {
+                                    
+                                }
+                            }}>
+                                <CartRightIcon width={220} height={88} linght={total>0}/>
+                                <Text className='txt'>结算</Text>
+                            </View>
                         </View>
-                        <View className='right'>
-                            <CartRightIcon width={220} height={88} linght={total>0}/>
-                            <Text className='txt'>结算</Text>
-                        </View>
-                    </View>
+                    }
+                    
                 </View>
             </View>
         )
