@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { setUserInfo } from '../utils/net'
+import { setUserInfo,api } from '../utils/net'
 
 const sexList = {
     0: '保密',
@@ -38,6 +38,20 @@ export class UserStore {
         this.gender = info.gender;
         this.bio = info.bio;
         this.address = info.address;
+    }
+
+    @action
+    public getUserInfo(){
+        api("user/info").then((info)=>{
+            setUserInfo(info);
+            this.id = info.id;
+            this.mobile = info.mobile;
+            this.avatar = info.avatar;
+            this.nickname = info.nickname;
+            this.gender = info.gender;
+            this.bio = info.bio;
+            this.address = info.address;
+        })
     }
 
     @action
