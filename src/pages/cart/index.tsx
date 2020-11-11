@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Image } from '@tarojs/components'
+import { View, Text,Input,Image,ScrollView } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
 import Checkbox from '../../components/checkbox/checkbox';
@@ -69,33 +69,44 @@ export default class Cart extends Component<{},{
                         <Text className='txt'>管理</Text>
                     </View>
                 </View>
-                <View className='list'>
-                    {
-                        list.map((item,index)=>(
-                            <View className='item' key={item.id} onClick={this.onItemClick.bind(this,list,index)}>
-                                <Checkbox isChecked={item.checked} className='left' disabled/>
-                                <View className='right'>
-                                    <View className='pre-image'>
-                                        <Image src={ossUrl(item.tpl.thumb_image,0)} className='img' mode='aspectFill'/>
-                                        <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
-                                    </View>
-                                    <View className='party'>
-                                        <View className='name'>
-                                            <Text className='txt'>{item.product.title}</Text>
+                <ScrollView scrollY className='center'>
+                    <View className='list'>
+                        {
+                            list.map((item,index)=>(
+                                <View className='item' key={item.id} onClick={this.onItemClick.bind(this,list,index)}>
+                                    <Checkbox isChecked={item.checked} className='left' disabled/>
+                                    <View className='right'>
+                                        <View className='pre-image'>
+                                            <Image src={ossUrl(item.tpl.thumb_image,0)} className='img' mode='aspectFill'/>
+                                            <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                                         </View>
-                                        <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
-                                        <View className='np'>
-                                            <View className='price'>
-                                                <Text className='l'>¥</Text>
-                                                <Text className='n'>{(parseFloat(item.sku.price)*parseFloat(item.quantity)).toFixed(2)}</Text>
+                                        <View className='party'>
+                                            <View className='name'>
+                                                <Text className='txt'>{item.product.title}</Text>
                                             </View>
-                                            <Counter num={item.quantity}/>
+                                            <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
+                                            <View className='np'>
+                                                <View className='price'>
+                                                    <Text className='l'>¥</Text>
+                                                    <Text className='n'>{(parseFloat(item.sku.price)*parseFloat(item.quantity)).toFixed(2)}</Text>
+                                                </View>
+                                                <Counter num={item.quantity} onButtonClick={(num)=>{
+                                                    list[index]["quantity"] = num;
+                                                    const {source} = this.state;
+                                                    source.list = list; 
+                                                    this.setState({
+                                                        source
+                                                    })
+                                                }}/>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
-                            </View>
-                        ))
-                    }
+                            ))
+                        }
+                    </View>
+                </ScrollView>
+                <View className='bottom'>
 
                 </View>
             </View>
