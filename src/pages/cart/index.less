@@ -1,0 +1,89 @@
+.taro_page{
+    background: #F5F6F9;
+}
+.cart{
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 88px;
+        // position: fixed;
+        // z-index: 10;
+        width: 100%;
+        box-sizing: border-box;
+        background: #FFF;
+        position: relative;
+        .left{
+            padding-left: 32px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
+            .title{
+                font-size: 36px;
+                font-weight: 500;
+                color: #121314;
+            }
+        }
+        .right{
+            padding-right: 32px;
+            .txt{
+                font-size: 32px;
+                font-weight: 400;
+                color: #121314;
+            }
+        }
+    }
+    .list{
+        .item{
+            display: flex;
+            align-items: center;
+            padding: 32px;
+            .left{
+
+            }
+            .right{
+                display: flex;
+                flex: 1;
+                .pre-image{
+                    position: relative;
+                    width: 160px;
+                    height: 160px;
+                    margin-right: 24px;
+                    .img{
+                        width: 160px;
+                        height: 160px;
+                        border-radius: 16px;
+                        background: red;
+                    }
+                    .big{
+                        width: 40px;
+                        height: 40px;
+                        position: absolute;
+                        right: 8px;
+                        bottom: 8px;
+                    }
+                }
+                .party{
+                    flex: 1;
+                    .name{
+                        .txt{
+                            font-size: 28px;
+                            font-weight: 400;
+                            color: #121314;
+                        }
+                    }
+                    .np{
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -7,11 +7,10 @@ import { api, getToken } from '../../utils/net'
 // import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 // import { AtLoadMore } from 'taro-ui';
-// import lodash from 'lodash';
+import lodash from 'lodash';
 // import moment from 'moment';
 // import {ossUrl} from '../../utils/common'
 import { PlaceOrder } from './place';
-import { takeWhile } from 'lodash';
 import {userStore} from "../../store/user";
 import {AtModal} from "taro-ui";
 
@@ -74,7 +73,7 @@ export default class Preview extends Component<{}, {
             saveId: 0,
             productInfo: {},
             buyTotal:0,
-            sku:{},,
+            sku:{},
             isOpened: false,
             modalId:0
         }
@@ -178,7 +177,8 @@ export default class Preview extends Component<{}, {
         const { doc } = Taro.getStorageSync("doc_draft");
         Taro.showLoading({title:"保存中"});
         api("editor.user_tpl/add",{
-            doc:JSON.stringify(doc)
+            doc: JSON.stringify(doc),
+
         }).then((res)=>{
             this.setState({
                 saveId: res.id
@@ -240,14 +240,19 @@ export default class Preview extends Component<{}, {
         const { placeOrderShow,saveId,productInfo, isOpened} = this.state;
         return (
             <View className='preview'>
-                <AtModal
-                    isOpened={isOpened}
-                    cancelText='取消'
-                    confirmText='前往登录'
-                    onCancel={() => this.setState({isOpened: false})}
-                    onConfirm={() => window.location.replace(`pages/login/index`)}
-                    content='检测到您还未登录，请登录后操作!'
-                />
+                {
+                    isOpened
+                        ? <AtModal
+                            className="modal_confirm_container"
+                            isOpened={isOpened}
+                            cancelText='取消'
+                            confirmText='前往登录'
+                            onCancel={() => this.setState({isOpened: false})}
+                            onConfirm={() => window.location.replace(`/pages/login/index`)}
+                            content='检测到您还未登录，请登录后操作!'
+                        />
+                        : null
+                }
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
                         if (saveId) {
@@ -287,10 +292,39 @@ export default class Preview extends Component<{}, {
                         buyTotal:n
                     })
                 }} onAddCart={()=>{
-
+                    const {buyTotal,sku,saveId,modalId} = this.state;
+                    if (!lodash.isEmpty(sku) && Number(sku.id)>0) {
+                        Taro.showLoading({title:"加载中"})
+                        api("app.cart/add",{
+                            sku_id:sku.id,
+                            user_tpl_id:saveId,
+                            phone_model_id:modalId,
+                            quantity:buyTotal
+                        }).then(()=>{
+                            Taro.hideLoading();
+                            Taro.showToast({
+                                title:"已成功添加到购物车!",
+                                icon:"success",
+                                duration:2000
+                            })
+                        }).catch((e)=>{
+                            Taro.hideLoading();
+                            Taro.showToast({
+                                title:e,
+                                icon:"none",
+                                duration:2000
+                            })
+                        })
+                    } else {
+                        Taro.showToast({
+                            title:"请选择规格!",
+                            icon:"none",
+                            duration:2000
+                        });
+                    }
                 }} onNowBuy={()=>{
                     const {buyTotal,sku,saveId,modalId} = this.state;
-                    if (sku) {
+                    if (!lodash.isEmpty(sku) && Number(sku.id)>0) {
                         Taro.navigateTo({
                             url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${saveId}&model=${modalId}`
                         })

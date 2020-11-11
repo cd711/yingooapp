@@ -11,21 +11,24 @@ const Checkbox: React.FC<{
     isChecked:boolean;
     onChange?:Function
 }> = ({className,disabled=false,isChecked,onChange}) => {
-    const [checked,setChecked] = useState(false);
+
+    const [checked,setChecked] = useState(isChecked);
+
+    // useEffect(()=>{
+    //     if (onChange && checked != isChecked) {
+    //         onChange(checked)
+    //     }
+    // },[checked,onChange])
+    //
     useEffect(()=>{
-        if (onChange && checked != isChecked) {
-            onChange(checked)
-        }
-    },[checked,onChange])
-    useEffect(()=>{
-        if (isChecked != checked) {
-            setChecked(isChecked)
-        }
+        setChecked(isChecked)
     },[isChecked])
+
     // 22_yixuanzhong
     return  <View className={`xy-checkbox ${className}`} onClick={()=>{
                 if (!disabled) {
                     setChecked(!checked);
+                    onChange && onChange(!checked)
                 }
             }}>
             <IconFont name={checked?'22_yixuanzhong':'22_touming-weixuanzhong'} size={44} />

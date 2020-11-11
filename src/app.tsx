@@ -54,6 +54,7 @@ class App extends Component {
             'pages/template/preview',
             'pages/template/confirm',
             'pages/template/success',
+            'pages/cart/index'
         ],
         window: {
             backgroundTextStyle: 'light',

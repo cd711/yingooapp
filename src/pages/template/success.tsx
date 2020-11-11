@@ -1,15 +1,9 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image, Button } from '@tarojs/components'
+import { View, Text, Button } from '@tarojs/components'
 import './success.less';
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net'
-import { AtNavBar} from 'taro-ui'
-// import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-// import { AtLoadMore } from 'taro-ui';
-// import lodash from 'lodash';
-import moment from 'moment';
-import {ossUrl} from '../../utils/common'
+
 import SuccessIcon from '../../components/icon/SuccessIcon';
 import WarmIcon from '../../components/icon/WarmIcon';
 // interface LikeData{
@@ -35,11 +29,11 @@ export default class Success extends Component<any,{
         }
     }
 
-    componentDidMount() { 
+    componentDidMount() {
         console.log();
     }
 
-    
+
 
     render() {
         const {  } = this.state;

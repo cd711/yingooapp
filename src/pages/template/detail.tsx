@@ -3,13 +3,14 @@ import { View, Text,Image } from '@tarojs/components'
 import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
-import { AtNavBar} from 'taro-ui'
+import {AtModal, AtNavBar} from 'taro-ui'
 // import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 // import { AtLoadMore } from 'taro-ui';
 // import lodash from 'lodash';
 import moment from 'moment';
-import {ossUrl} from '../../utils/common'
+import {notNull, ossUrl} from '../../utils/common'
+import {userStore} from "../../store/user";
 // interface LikeData{
 //     list:Array<any>,
 //     size:number,
@@ -23,6 +24,7 @@ export default class Detail extends Component<any,{
     isLike:boolean;
     likeList:Array<any>;
     currentItem:any;
+    isOpened: boolean
 }> {
 
     config: Config = {
@@ -33,7 +35,8 @@ export default class Detail extends Component<any,{
         this.state = {
             isLike:false,
             likeList:[],
-            currentItem:{}
+            currentItem:{},
+            isOpened: false
         }
     }
     private lastBottomTime = 0;
@@ -107,9 +110,20 @@ export default class Detail extends Component<any,{
           }).exec();
     }
 
+    onEditor = () => {
+        const {currentItem} = this.state;
+        const {id} = userStore;
+        if (notNull(id)) {
+            this.setState({isOpened: true})
+            return
+        }
+        Taro.navigateTo({
+            url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
+        });
+    }
 
     render() {
-        const { isLike,likeList,currentItem } = this.state;
+        const { isLike,likeList,currentItem, isOpened } = this.state;
         return (
             <View className='detail'>
                 <AtNavBar
@@ -126,6 +140,19 @@ export default class Detail extends Component<any,{
                         size:24
                     }}
                 />
+                {
+                    isOpened
+                        ? <AtModal
+                            className="modal_confirm_container"
+                            isOpened={isOpened}
+                            cancelText='取消'
+                            confirmText='前往登录'
+                            onCancel={() => this.setState({isOpened: false})}
+                            onConfirm={() => window.location.replace(`/pages/login/index`)}
+                            content='检测到您还未登录，请登录后操作!'
+                        />
+                        : null
+                }
                 {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
                 <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' />
                 <View className='doyoulike'>
@@ -156,12 +183,7 @@ export default class Detail extends Component<any,{
                         <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color='#707177' />
                         <Text className='txt'>收藏</Text>
                     </View>
-                    <View className='now-editor' onClick={()=>{
-                        console.log(currentItem)
-                        Taro.navigateTo({
-                            url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
-                        });
-                    }}>
+                    <View className='now-editor' onClick={this.onEditor}>
                         <Text className='txt'>立即编辑</Text>
                     </View>
                 </View>
