@@ -7,6 +7,7 @@ import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
 import {ossUrl} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
+import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 
 export default class Photos extends Component<any,{
     navSwitchActive:number;
@@ -16,7 +17,8 @@ export default class Photos extends Component<any,{
     selects: number[];
     loadStatus: 'more' | 'loading' | 'noMore';
     isEdit: boolean;
-    isOpened: boolean
+    isOpened: boolean;
+    sortActive: number
 }> {
 
     config: Config = {
@@ -32,7 +34,8 @@ export default class Photos extends Component<any,{
             selects: [],
             loadStatus: "noMore",
             isEdit: false,
-            isOpened: false
+            isOpened: false,
+            sortActive: 0
         }
     }
 
@@ -48,8 +51,17 @@ export default class Photos extends Component<any,{
             type: data.type || this.state.navSwitchActive,
             loadMore: data.loadMore || false
         };
+        const temp = {
+            start: opt.start, size: opt.size, type: opt.type === 0 ? "image" : "video"
+        }
+        if (data.sort) {
+            Object.assign(temp, {sort: data.sort})
+        }
+        if (data.order) {
+            Object.assign(temp, {order: data.order})
+        }
         try{
-            const res = await api("app.profile/imgs", {start: opt.start, size: opt.size, type: opt.type === 0 ? "image" : "video"});
+            const res = await api("app.profile/imgs", temp);
             this.total = Number(res.total);
             console.log(res);
             this.setState({loading: false});
@@ -64,7 +76,7 @@ export default class Photos extends Component<any,{
         }catch (e) {
             console.log("获取图库出错：", e)
             this.setState({loadStatus: "noMore"})
-        };
+        }
         this.setState({loading: false})
     }
 
@@ -145,6 +157,47 @@ export default class Photos extends Component<any,{
         this.setState({isOpened: false})
     }
 
+    changeSort = (data: PopoverItemClickProps) => {
+        console.log(data.value)
+        if (data.value) {
+            let sort = {};
+            if (typeof data.value === "string") {
+                sort = JSON.parse(data.value);
+            }
+            this.getList({
+                start: 0,
+                ...sort
+            })
+        }
+    }
+
+    private popoverItem: PopoverItemProps[] = [
+        {
+            title: " 时间从远到近排序",
+            value: JSON.stringify({sort: "createtime", order: "asc"}),
+            onClick: this.changeSort,
+            customRender: <View className="sort_item"><Text className="txt">时间从远到近排序</Text></View>
+        },
+        {
+            title: "时间从近到远排序",
+            value: JSON.stringify({sort: "createtime", order: "desc"}),
+            onClick: this.changeSort,
+            customRender: <View className="sort_item"><Text className="txt">时间从近到远排序</Text></View>
+        },
+        {
+            title: "从大到小降序",
+            value: JSON.stringify({sort: "filesize", order: "desc"}),
+            onClick: this.changeSort,
+            customRender: <View className="sort_item"><Text className="txt">从大到小降序</Text></View>
+        },
+        {
+            title: "从小到大升序",
+            value: JSON.stringify({sort: "filesize", order: "asc"}),
+            onClick: this.changeSort,
+            customRender: <View className="sort_item"><Text className="txt">从小到大升序</Text></View>
+        }
+    ]
+
 
     render() {
         const { navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened} = this.state;
@@ -179,7 +232,7 @@ export default class Photos extends Component<any,{
                 </View>
                 <View className='container'>
                     <ScrollView className='list_scrollview'
-                                style={{height: window.screen.height - 52 + 16}}
+                                style={{height: window.screen.height - 52 + 7}}
                                 scrollY
                                 scrollWithAnimation
                                 onScrollToLower={this.loadMore}>
@@ -198,7 +251,9 @@ export default class Photos extends Component<any,{
                                 : <View className="list_container">
                                     <View className="list_filter">
                                         <Text className="tit">排序</Text>
-                                        <View><IconFont size={48} name="24_tupianpaixu"/></View>
+                                        <Popover popoverItem={this.popoverItem}>
+                                            <View><IconFont size={48} name="24_tupianpaixu"/></View>
+                                        </Popover>
                                     </View>
                                     <View className="list_main">
                                         <View className="list_item">
@@ -247,15 +302,19 @@ export default class Photos extends Component<any,{
                             : null
                     }
                 </View>
-                <AtModal
-                    className="modal_confirm_container"
-                    isOpened={isOpened}
-                    cancelText='取消'
-                    confirmText='确认'
-                    onCancel={() => this.setState({isOpened: false})}
-                    onConfirm={this.handleConfirm}
-                    content={`是否删除这${selects.length}${navSwitchActive === 0 ? "张照片" : "个视频"}?`}
-                />
+                {
+                    isOpened
+                        ? <AtModal
+                            className="modal_confirm_container"
+                            isOpened={isOpened}
+                            cancelText='取消'
+                            confirmText='确认'
+                            onCancel={() => this.setState({isOpened: false})}
+                            onConfirm={this.handleConfirm}
+                            content={`是否删除这${selects.length}${navSwitchActive === 0 ? "张照片" : "个视频"}?`}
+                        />
+                        : null
+                }
             </View>
         )
     }
