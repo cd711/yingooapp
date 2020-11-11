@@ -141,7 +141,7 @@ export default class Preview extends Component<{}, {
                 case "onLoadEmpty":
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
                     if (docId) {
-                        window.history.pushState(null,null,`/pages/template/preview?doc_id=${docId}`);
+                        window.history.replaceState(null,null,`/pages/template/preview?doc_id=${docId}`);
                         this.setState({
                             saveId:docId,
                             modalId:modelId
@@ -184,7 +184,7 @@ export default class Preview extends Component<{}, {
                 saveId: res.id
             })
             Taro.hideLoading();
-            window.history.pushState(null,null,`/pages/template/preview?doc_id=${res.id}`)
+            window.history.replaceState(null,null,`/pages/template/preview?doc_id=${res.id}`)
             Taro.showToast({
                 title:"保存成功",
                 icon:"success",

@@ -123,5 +123,73 @@
     .bottom{
         height: 120px;
         background: #FFFFFF;
+        display: flex;
+        justify-content: space-around;
+        box-sizing: border-box;
+
+        .all{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            .txt{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+                line-height: 40px;
+            }
+        }
+        .ops{
+            display: flex;
+            align-items: center;
+            .left{
+                position: relative;
+                .total{
+                    display: flex;
+                    align-items: baseline;
+                    position: absolute;
+                    left: 32px;
+                    top: 50%;
+                    height: 88px;
+                    transform: translate(0,-50%);
+                    .name{
+                        font-size: 28px;
+                        font-weight: 500;
+                        color: #FF4966;
+                    }
+                    .price{
+                        display: flex;
+                        align-items: baseline;
+                        color: #FF4966;
+                        
+                        .syn{
+                            font-size: 28px;
+                            padding-right: 4px;
+                        }
+                        .num{
+                            font-weight: 600;
+                            font-size: 42px;
+                        }
+                    }
+                }
+            }
+            .right{
+                margin-left: -20px;
+                position: relative;
+                .txt{
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    // transform: translate(-50%,-50%);
+                    font-size: 32px;
+                    font-weight: 500;
+                    color: #FFFFFF;
+                    display: flex;
+                    height: 88px;
+                    width: 220px;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+        }
     }
 }

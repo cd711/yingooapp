@@ -87,7 +87,7 @@ export default class Confirm extends Component<any,{
             Taro.showLoading({title:"加载中"});
             api("app.order_temp/add",data).then((res)=>{
                 Taro.hideLoading();
-                window.history.pushState(null,null,`/pages/template/confirm?orderid=${res.prepay_id}`);
+                window.history.replaceState(null,null,`/pages/template/confirm?orderid=${res.prepay_id}`);
                 this.filterUsedTicket(res.orders);
                 this.setState({
                     data: res

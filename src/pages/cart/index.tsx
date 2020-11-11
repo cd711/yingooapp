@@ -5,10 +5,15 @@ import IconFont from '../../components/iconfont';
 import Checkbox from '../../components/checkbox/checkbox';
 import Counter from '../../components/counter/counter';
 import {ossUrl} from '../../utils/common';
-import { api } from '../../utils/net'
+import { api } from '../../utils/net';
+import CartLeftIcon from '../../components/icon/CartLeftIcon';
+import CartRightIcon from '../../components/icon/CartRightIcon';
 
 export default class Cart extends Component<{},{
-    source:any
+    source:any;
+    allSelected:boolean;
+    total:number;
+    isManage:boolean
 }> {
 
     config: Config = {
@@ -18,11 +23,22 @@ export default class Cart extends Component<{},{
     constructor(props){
         super(props);
         this.state = {
-            source:null
+            source:null,
+            allSelected:false,
+            total:0,
+            isManage:false
         }
     }
+
     componentDidMount(){
-        Taro.showLoading({title:'加载中'}); 
+
+        const {manage} = this.$router.params;
+        if(manage){
+            this.setState({
+                isManage:true
+            })
+        }
+        Taro.showLoading({title:'加载中'});
         api("app.cart/list",{
             size:20,
             start:0
@@ -46,13 +62,40 @@ export default class Cart extends Component<{},{
         list[index]["checked"] = !list[index]["checked"];
         const {source} = this.state;
         source.list = list; 
+        this.calcTotal(list);
         this.setState({
             source
         })
     }
+    onAllSelect = (list,allSelected) => {
+        const {source} = this.state;
+        source.list = list.map((item)=>{
+            item["checked"] = !allSelected;
+            return item;
+        });
+        this.calcTotal(source.list);
+        this.setState({
+            allSelected:!allSelected,
+            source
+        })
+    }
+    calcTotal = (list:Array<any>) =>{
+        let tt = 0;
+        let n = 0;
+        for (const iterator of list) {
+            if(iterator["checked"]){
+                tt += (parseFloat(iterator.sku.price)*parseFloat(iterator.quantity));
+                n ++;
+            }
+        }
+        this.setState({
+            total:tt,
+            allSelected:n==list.length?true:false
+        });
+    }
 
     render() {
-        const { source } = this.state;
+        const { source,allSelected,total } = this.state;
         const list = source && source.list && source.list.length>0?source.list:[];
         return (
             <View className='cart'>
@@ -65,7 +108,12 @@ export default class Cart extends Component<{},{
                     <View className='center'>
                         <Text className='title'>购物车</Text>
                     </View>
-                    <View className='right'>
+                    <View className='right' onClick={()=>{
+                        this.setState({
+                            isManage:true
+                        })
+                        window.history.replaceState(null,null,`/pages/cart/index?manage=1`)
+                    }}>
                         <Text className='txt'>管理</Text>
                     </View>
                 </View>
@@ -94,6 +142,7 @@ export default class Cart extends Component<{},{
                                                     list[index]["quantity"] = num;
                                                     const {source} = this.state;
                                                     source.list = list; 
+                                                    this.calcTotal(list);
                                                     this.setState({
                                                         source
                                                     })
@@ -107,7 +156,26 @@ export default class Cart extends Component<{},{
                     </View>
                 </ScrollView>
                 <View className='bottom'>
-
+                    <View className="all" onClick={this.onAllSelect.bind(this,list,allSelected)}>
+                        <Checkbox isChecked={allSelected} disabled/>
+                        <Text className='txt'>全选</Text>
+                    </View>
+                    <View className='ops'>
+                        <View className='left'>
+                            <CartLeftIcon width={366} height={88}/>
+                            <View className='total'>
+                                <Text className='name'>合计：</Text>
+                                <View className='price'>
+                                    <Text className='syn'>¥</Text>
+                                    <Text className='num'>{total.toFixed(2)}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View className='right'>
+                            <CartRightIcon width={220} height={88} linght={total>0}/>
+                            <Text className='txt'>结算</Text>
+                        </View>
+                    </View>
                 </View>
             </View>
         )
