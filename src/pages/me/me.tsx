@@ -8,12 +8,13 @@ import Popover from "../../components/popover";
 import {api} from "../../utils/net";
 import moment from "moment";
 import {ossUrl} from "../../utils/common";
+import Empty from "../../components/empty";
 
 const switchBottom = require("../../source/switchBottom.png");
 
 interface MeProps {
     switchActive: number;
-    works: Array<{id: number, name: string, thumbnail: string, create_time: number, order_sn?: any}>
+    works: Array<{id: number, name: string, thumbnail: string, create_time: number, order_sn?: any, attr: {width: number, height: number}}>
 }
 
 @inject("userStore")
@@ -190,7 +191,7 @@ export default class Me extends Component<any, MeProps> {
                     <View className='switchBox'>
                         <View className='switchBar'>
                             {
-                                ["作品", "喜欢", "收藏"].map((item, index) => (
+                                ["作品", "收藏"].map((item, index) => (
                                     <View className={index == switchActive ? 'item active' : 'item'} key={index + ""}
                                           onClick={() => {
                                               this.setState({switchActive: index})
@@ -201,7 +202,7 @@ export default class Me extends Component<any, MeProps> {
                                 ))
                             }
                         </View>
-                        <Text className='total'>共18个</Text>
+                        <Text className='total'>共{this.total}个</Text>
 
                     </View>
                     <View className='content'>
@@ -232,6 +233,11 @@ export default class Me extends Component<any, MeProps> {
                                     </View>
                                 </View>
                             ))
+                        }
+                        {
+                            works.length === 0
+                                ? <Empty/>
+                                : null
                         }
 
                         {/*<View className='years'>*/}
