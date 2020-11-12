@@ -107,7 +107,7 @@ export default class Setting extends Component<any,{
                         <Text className='name'>隐私政策</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item'>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/aboutus`})}>
                         <Text className='name'>关于我们</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
