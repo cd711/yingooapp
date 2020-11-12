@@ -6,14 +6,15 @@ import { AtFloatLayout } from "taro-ui"
 import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
 import Fragment from '../../components/Fragment'
-
+import lodash from 'lodash';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onBuyNumberChange,onSkuChange,onAddCart,onNowBuy}) => {
     const [itemActive,setItemActive] = useState([])
     const [tags,setTags] = useState([]);
-    const [price,setPrice] = useState(0);
-    const [marketPrice,setMarketPrice] = useState(0);
+    const [price,setPrice] = useState("0");
+    const [marketPrice,setMarketPrice] = useState("0");
+    const [marketPriceShow,setMarketPriceShow] = useState(true);
     const [selectSku,setSelectSku] = useState({});
     const [imgs,setImgs] = useState([]);
     const onItemSelect = (idx,itemId,tagId) => {
@@ -59,6 +60,7 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onB
             // console.log(imgs.image);
             if (a) {
                 setPrice(a.price);
+                setMarketPriceShow(true);
                 setMarketPrice(a.market_price);
                 setSelectSku(a);
             }
@@ -66,9 +68,15 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onB
         setTags(t);
     }
     useEffect(()=>{
-        if (data) {
+    
+        if (!lodash.isEmpty(data)) {
             data.attrItems && setTags(data.attrItems);
-            data.price && setPrice(data.price);
+            const prices = data.skus.map((item)=>{
+                return item.price;
+            })
+            prices.sort(function(a, b){return parseFloat(a+"") - parseFloat(b+"")}); 
+            data.price && setPrice(prices[0]==prices[prices.length-1]?prices[0]:`${prices[0]}-${prices[prices.length-1]}`);
+            setMarketPriceShow(false);
             data.market_price && setMarketPrice(data.market_price);
             data.image && setImgs(data.image);
         }
@@ -78,9 +86,16 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onB
             onSkuChange(selectSku);
         }
     },[selectSku])
-
+    useEffect(()=>{
+        if (!isShow) {
+            setSelectSku({});
+            setTags([]);
+            setItemActive([]);
+            onClose && onClose();
+        }
+    },[isShow])
     return <View className='placeOrder'>
-        <AtFloatLayout isOpened={isShow} onClose={onClose}>
+        <AtFloatLayout isOpened={isShow}>
             <View className='float-container'>
                 <View className='swiper-images-warp'>
                     {
@@ -110,7 +125,10 @@ export const PlaceOrder: React.FC<any> = ({data,isShow,onClose,onButtonClose,onB
                             <Text className='sym'>¥</Text>
                             <Text className='n'>{price}</Text>
                         </View>
-                        <Text className='actual'>￥{marketPrice}</Text>
+                        {
+                            marketPriceShow?<Text className='actual'>￥{marketPrice}</Text>:null
+                        }
+                        
                     </View>
                 </View>                
                 <ScrollView scrollY className='scroll'>

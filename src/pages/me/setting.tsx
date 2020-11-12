@@ -123,10 +123,10 @@ export default class Setting extends Component<any,{
                         tipModalShow:false
                     })
                     console.log(e)
-                }} onOK={(e)=>{
-                    console.log(e);
+                }} onOK={()=>{
                     Taro.removeStorage({key:"TaroInfoKey"});
                     Taro.removeStorage({key:"token"});
+                    userStore.clear();
                     Taro.switchTab({url:"/pages/index/index"});
                 }} cancelText='不退出' okText='退出' />
             </View>

@@ -53,7 +53,16 @@ export class UserStore {
             this.address = info.address;
         })
     }
-
+    @action
+    public clear() {
+        this.id = null;
+        this.mobile = "";
+        this.avatar = "";
+        this.nickname = "";
+        this.gender = 0;
+        this.bio = "";
+        this.address = null;
+    }
     @action
     public auth(){
         return new Promise<any>(async (resolve, reject)=> {

@@ -16,9 +16,9 @@ import FloatModal from '../../components/floatModal/FloatModal';
 import Ticket from '../../components/ticket/Ticket';
 import Checkbox from '../../components/checkbox/checkbox';
 import Fragment from '../../components/Fragment';
-import {notNull, ossUrl} from '../../utils/common';
+import {notNull, ossUrl,is_weixin,jsApiList} from '../../utils/common';
 import { Base64 } from 'js-base64';
-
+import wx from 'weixin-js-sdk'
 
 const payway = [
     {
@@ -83,7 +83,6 @@ export default class Confirm extends Component<any,{
                 phone_model_id:model?model:336
             };
             if(cartIds){
-                console.log(Base64.decode(cartIds));
                 data = {
                     cart_ids:Base64.decode(cartIds)
                 }
@@ -100,6 +99,12 @@ export default class Confirm extends Component<any,{
                 this.setState({
                     data: res
                 });
+            }).catch((e)=>{
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:e,
+                    duration:2000
+                })
             })
         }
     }
@@ -271,17 +276,70 @@ export default class Confirm extends Component<any,{
             currentOrderTicketId:0
         })
     }
+    setWXpayConfig = (callback:()=>void) =>{
+        api("wechat/jssdkconfig",{
+            url:window.location.href
+        }).then((res)=>{
+            alert(JSON.stringify(res))
+            wx.config({
+                debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                appId: res.appId, // 必填，公众号的唯一标识
+                timestamp: res.timestamp, // 必填，生成签名的时间戳
+                nonceStr: res.nonceStr, // 必填，生成签名的随机串
+                signature: res.signature,// 必填，签名
+                jsApiList: jsApiList // 必填，需要使用的JS接口列表
+            });
+            wx.ready(()=>{
+                if (callback) callback()
+            })
+        }).catch((e)=>{
+            alert(JSON.stringify(e));
+        })
+    }
+    // 确认支付，返回url
     onSurePay = () => {
         const {data} = this.state;
-        api("app.pay/add",{
+        const d = {
             prepay_id:data.prepay_id,
             pay_type:"wechat",
             pay_method:"wap"
-        }).then((res)=>{
+        }
+        alert(is_weixin())
+        if (is_weixin()) {
+            
+            d["pay_method"] = 'mp';
+            this.setWXpayConfig(()=>{
+                this.submitOrder(d,(res)=>{
+                    alert(JSON.stringify(res))
+                    wx.chooseWXPay({
+                        timestamp: res.payinfo.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                        nonceStr: res.payinfo.nonceStr, // 支付签名随机串，不长于 32 位
+                        package: res.payinfo.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                        signType: res.payinfo.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                        paySign: res.payinfo.paySign, // 支付签名
+                        success: function (result) {
+                          // 支付成功后的回调函数
+                          alert(JSON.stringify(result));
+                        },
+                        error:(e)=>{
+                            alert(JSON.stringify(e));
+                        }
+                    });
+                });
+            })
+        }
+        // window.location.href = res;
+    }
+    submitOrder = (d:any,callback:(res: any)=>void) =>{
+        Taro.showLoading({title:"加载中"})
+        api("app.pay/add",d).then((res)=>{
             console.log(res);
-            window.location.href = res;
+            Taro.hideLoading();
+            callback && callback(res);
         }).catch((e)=>{
             console.log(e);
+            Taro.hideLoading();
+
         })
     }
      render() {
@@ -371,10 +429,10 @@ export default class Confirm extends Component<any,{
                                 </View>
                             </View>
                             <View className='goods-item' onClick={()=>{
-                                if (item.usable_discounts.length==0) {
+                                let discounts = item.usable_discounts.filter(obj=>!usedTickets.some(obj1=>obj1.ticketId==obj.id && obj1.orderId != item.pre_order_id));
+                                if (discounts==0) {
                                     return;
                                 }
-                                let discounts = item.usable_discounts.filter(obj=>!usedTickets.some(obj1=>obj1.ticketId==obj.id && obj1.orderId != item.pre_order_id));
                                 const ticketId = item.use_coupon?item.use_coupon.id:0
                                 discounts = discounts.map((item)=>{
                                     item["checked"] = false;
@@ -401,7 +459,7 @@ export default class Confirm extends Component<any,{
                                             </Text>
                                         </View>
                                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
-                                    </View> : (item.usable_discounts.length==0
+                                    </View> : (item.usable_discounts.filter(obj=>!usedTickets.some(obj1=>obj1.ticketId==obj.id && obj1.orderId != item.pre_order_id)).length==0
                                     ? <View className='right'>
                                         <Text className='txt'>无优惠券可用</Text>
                                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />

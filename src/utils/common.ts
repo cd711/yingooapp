@@ -30,3 +30,61 @@ export function getImageSize(containerW: number, imgW: number, imgH: number) {
     }
     return {width: imgW, height: imgH}
 }
+
+export function is_weixin()  { //判断是否是微信
+    const ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf('micromessenger') != -1;
+}
+
+export const jsApiList = [
+    'checkJsApi',
+    'onMenuShareTimeline',
+    'onMenuShareAppMessage',
+    'onMenuShareQQ',
+    'onMenuShareWeibo',
+    'hideMenuItems',
+    'showMenuItems',
+    'hideAllNonBaseMenuItem',
+    'showAllNonBaseMenuItem',
+    'translateVoice',
+    'startRecord',
+    'stopRecord',
+    'onRecordEnd',
+    'playVoice',
+    'pauseVoice',
+    'stopVoice',
+    'uploadVoice',
+    'downloadVoice',
+    'chooseImage',
+    'previewImage',
+    'uploadImage',
+    'downloadImage',
+    'getNetworkType',
+    'openLocation',
+    'getLocation',
+    'hideOptionMenu',
+    'showOptionMenu',
+    'closeWindow',
+    'scanQRCode',
+    'chooseWXPay',
+    'openProductSpecificView',
+    'addCard',
+    'chooseCard',
+    'openCard',
+    'openWXDeviceLib',
+    'closeWXDeviceLib',
+    'configWXDeviceWiFi',
+    'getWXDeviceInfos',
+    'sendDataToWXDevice',
+    'startScanWXDevice',
+    'stopScanWXDevice',
+    'connectWXDevice',
+    'disconnectWXDevice',
+    'getWXDeviceTicket',
+    'WeixinJSBridgeReady',
+    'onWXDeviceBindStateChange',
+    'onWXDeviceStateChange',
+    'onScanWXDeviceResult',
+    'onReceiveDataFromWXDevice',
+    'onWXDeviceBluetoothStateChange'
+];

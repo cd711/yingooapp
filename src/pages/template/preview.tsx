@@ -80,7 +80,7 @@ export default class Preview extends Component<{}, {
     }
     componentDidMount() {
         const {doc_id} = this.$router.params;
-        if (parseInt(doc_id)>=0) {
+        if (parseInt(doc_id)>0) {
             this.setState({
                 saveId:parseInt(doc_id)
             })
@@ -140,9 +140,11 @@ export default class Preview extends Component<{}, {
 
                 case "onLoadEmpty":
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
-                    window.history.replaceState(null,null,`/pages/template/preview?doc_id=${docId}`);
+                    const {doc_id} = this.$router.params;
+                    window.history.replaceState(null,null,`/pages/template/preview?doc_id=${parseInt(doc_id+"")>0?doc_id:docId}`);
+                    
                     this.setState({
-                        saveId:docId,
+                        saveId:parseInt(doc_id+"")>=0?doc_id:docId,
                         modalId:modelId
                     });
                     callEditor("setDoc", doc);
@@ -274,7 +276,7 @@ export default class Preview extends Component<{}, {
                 </View>
                 <View className='bottom'>
                     {
-                        parseInt(saveId+"")>=0?<View className='editor' onClick={this.onEditor}>
+                        parseInt(saveId+"")>0?<View className='editor' onClick={this.onEditor}>
                             <IconFont name='24_qubianji' size={48} color='#707177' />
                             <Text className='txt'>编辑</Text>
                         </View>:<View className='editor' onClick={this.onSave}>

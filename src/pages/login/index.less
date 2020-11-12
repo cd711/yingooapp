@@ -1,134 +1,136 @@
 .taro_page{
     background: #FFF;
 }
-.tops{
-    padding: 88px 48px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 120px;
-    .acount-login{
+.login{
+    .tops{
+        padding: 88px 48px 0;
         display: flex;
         align-items: center;
-        .text{
-            color: #121314;
-            font-size: 28px;
+        justify-content: space-between;
+        margin-bottom: 120px;
+        .acount-login{
+            display: flex;
+            align-items: center;
+            .text{
+                color: #121314;
+                font-size: 28px;
+            }
         }
     }
-}
-.container{
-    height: 62vh;
-    min-height: 400px;
-    .title{
+    .container{
+        height: 62vh;
+        min-height: 400px;
+        .title{
+            display: flex;
+            flex-direction: column;
+            padding-left: 64px;
+            margin-bottom: 96px;
+            .ttext{
+                color: #121314;
+                font-size: 24PX;
+    
+            }
+        }
+        .acount{
+            padding: 0 64px;
+            margin-bottom: 108px;
+            position: relative;
+            .acount-input{
+                font-size: 28px;
+                padding-bottom: 28px;
+                border-bottom: 1PX solid #EDEDEF;
+                text-align: left;
+            }
+            .acount-input-active{
+                border-bottom-color: #FF4966;
+                font-size: 36px;
+            }
+            .clearIcon{
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                right: 64px;
+                top: 0;
+            }
+        }
+        .getcode{
+            background: #FFC4C8;
+            height: 90px;
+            border-radius: 90/2px;
+            margin: 0 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .gtext{
+                color: #FFFFFF;
+                font-size: 32px;
+            }
+        }
+        .codeActive{
+            background: #FF4966;
+            box-shadow: 0px 20px 48px -14px rgba(255, 73, 102, 0.5);
+        }
+    }
+    .footer{
+        // position: fixed;
+        // left: 0;
+        // bottom: 54px;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        padding-left: 64px;
-        margin-bottom: 96px;
-        .ttext{
-            color: #121314;
-            font-size: 24PX;
-
+        .otherlogin{
+            width: 548px;
+            margin: 0 auto 48px;
+            display: flex;
+            justify-content: center;
+            .line{
+                width: 166px;
+                height: 1px;
+                background: #EDEDEF;
+            }
+            .othertext{
+                padding: 0 32px;
+                font-size: 24px;
+                line-height: 0;
+                color: #9C9DA6;
+            }
         }
-    }
-    .acount{
-        padding: 0 64px;
-        margin-bottom: 108px;
-        position: relative;
-        .acount-input{
-            font-size: 28px;
-            padding-bottom: 28px;
-            border-bottom: 1PX solid #EDEDEF;
-            text-align: left;
+        .qw{
+            display: flex;
+            width: 288px;
+            margin: 0 auto 32px;
+            justify-content: space-between;
+            align-items: center;
+            .qq,.wechat{
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .wechat{
+                background: #0AD78A;
+            }
+            .qq{
+                background: #50AFFE;
+            }
         }
-        .acount-input-active{
-            border-bottom-color: #FF4966;
-            font-size: 36px;
-        }
-        .clearIcon{
-            width: 48px;
-            height: 48px;
+        .xieyi{
             display: flex;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            right: 64px;
-            top: 0;
-        }
-    }
-    .getcode{
-        background: #FFC4C8;
-        height: 90px;
-        border-radius: 90/2px;
-        margin: 0 64px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        .gtext{
-            color: #FFFFFF;
-            font-size: 32px;
-        }
-    }
-    .codeActive{
-        background: #FF4966;
-        box-shadow: 0px 20px 48px -14px rgba(255, 73, 102, 0.5);
-    }
-}
-.footer{
-    // position: fixed;
-    // left: 0;
-    // bottom: 54px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    .otherlogin{
-        width: 548px;
-        margin: 0 auto 48px;
-        display: flex;
-        justify-content: center;
-        .line{
-            width: 166px;
-            height: 1px;
-            background: #EDEDEF;
-        }
-        .othertext{
-            padding: 0 32px;
-            font-size: 24px;
-            line-height: 0;
-            color: #9C9DA6;
-        }
-    }
-    .qw{
-        display: flex;
-        width: 288px;
-        margin: 0 auto 32px;
-        justify-content: space-between;
-        align-items: center;
-        .qq,.wechat{
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .wechat{
-            background: #0AD78A;
-        }
-        .qq{
-            background: #50AFFE;
-        }
-    }
-    .xieyi{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        .enter{
-            color: #9C9DA6;
-            font-size: 24px;
-        }
-        .xy{
-            color: #0CB6FF;
-            font-size: 24px;
+            .enter{
+                color: #9C9DA6;
+                font-size: 24px;
+            }
+            .xy{
+                color: #0CB6FF;
+                font-size: 24px;
+            }
         }
     }
 }
