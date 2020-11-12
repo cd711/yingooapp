@@ -60,6 +60,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
         if (getToken()) {
             url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
         }
+        Taro.showLoading({title: "上传中..."})
         const upload = Taro.uploadFile({
             url,
             filePath: path,
@@ -75,9 +76,13 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                 if (jsonRes.code === 1) {
                     onChange && onChange(jsonRes.data)
                 }
+                Taro.hideLoading();
+                Taro.showToast({title: "上传成功", icon: "none"})
             },
             fail: err => {
                 console.log("UploadFile文件上传出错：", err)
+                Taro.hideLoading();
+                Taro.showToast({title: "上传失败", icon: "none"})
             }
         });
 
