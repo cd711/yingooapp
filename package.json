@@ -56,7 +56,8 @@
     "nervjs": "^1.5.5",
     "regenerator-runtime": "0.11.1",
     "rgbaster": "^2.1.1",
-    "taro-ui": "^2.3.4"
+    "taro-ui": "^2.3.4",
+    "weixin-js-sdk": "^1.6.0"
   },
   "devDependencies": {
     "@tarojs/mini-runner": "2.2.15",

@@ -63,11 +63,9 @@ export default class Template extends Component<any,{
                 cates:res,
             },()=>{
                 Taro.hideLoading();
-
-                this.getTagContext(res[0].tags[0])
+                this.getTagContext(res[0].tags[0]);
+                this.calcDeviceRota();
             })
-            this.calcDeviceRota();
-
         }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
@@ -84,7 +82,8 @@ export default class Template extends Component<any,{
     calcDeviceRota = () => {
         const query = Taro.createSelectorQuery;
         query().selectViewport().boundingClientRect((vres)=>{
-            query().select(".tops").boundingClientRect((res)=>{
+            query().select(".t_tops").boundingClientRect((res)=>{
+                console.log("topsHeight",res.height)
                 this.setState({
                     topsHeight:res.height,
                     otherHeight:vres.height-res.height-50
@@ -139,7 +138,7 @@ export default class Template extends Component<any,{
         </View>
         return (
             <View className='template'>
-                <View className='tops'>
+                <View className='t_tops'>
                     {
                         showAllCates?<View className='all-category-warp'>
                             {searchBox}

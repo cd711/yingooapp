@@ -52,17 +52,17 @@ class Index extends Component<any,{
 
     }
     test = () => {
-        const colors = pics.map(async(item)=>{
-            const result = await analyze(item);
-            return result[0].color;
-        });
-        Promise.all(colors).then((results)=>{
-            console.log(results);  // [1, 2, 3]
-            this.setState({
-                tempColors:results,
-                colorWarp:results[0]
-            })
-        });
+        // const colors = pics.map(async(item)=>{
+        //     const result = await analyze(item);
+        //     return result[0].color;
+        // });
+        // Promise.all(colors).then((results)=>{
+        //     console.log(results);  // [1, 2, 3]
+        //     this.setState({
+        //         tempColors:results,
+        //         colorWarp:results[0]
+        //     })
+        // });
 
     }
 
