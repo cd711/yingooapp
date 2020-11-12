@@ -175,13 +175,22 @@ export default class Cart extends Component<{},{
                     {
                         isManage?<Button className='remove-cart-btn' onClick={()=>{
                             if (selectIds.length>0) {
+                                Taro.showLoading({title:"删除中"})
                                 api("app.cart/delete",{
                                     ids:selectIds.join(',')
                                 }).then(()=>{
+                                    Taro.hideLoading();
                                     source.list = list.filter(obj=>!selectIds.some(obj1=>obj1==obj.id));
                                     this.setState({
                                         source,
                                         selectIds:[]
+                                    })
+                                }).catch(()=>{
+                                    Taro.hideLoading();
+                                    Taro.showToast({
+                                        title:"删除失败，请稍后再试",
+                                        icon:'none',
+                                        duration:2000
                                     })
                                 })
                             }
