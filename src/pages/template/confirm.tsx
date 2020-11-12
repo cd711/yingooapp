@@ -278,9 +278,9 @@ export default class Confirm extends Component<any,{
     }
     setWXpayConfig = (callback:()=>void) =>{
         api("wechat/jssdkconfig",{
-            url:window.location.href
+            url:window.location.href.split('#')[0]
         }).then((res)=>{
-            alert(JSON.stringify(res))
+            alert(`${JSON.stringify(res)} aaa`);
             wx.config({
                 debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
                 appId: res.appId, // 必填，公众号的唯一标识
@@ -310,7 +310,7 @@ export default class Confirm extends Component<any,{
             d["pay_method"] = 'mp';
             this.setWXpayConfig(()=>{
                 this.submitOrder(d,(res)=>{
-                    alert(JSON.stringify(res))
+                    alert(`${JSON.stringify(res)} bbb`)
                     wx.chooseWXPay({
                         timestamp: res.payinfo.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
                         nonceStr: res.payinfo.nonceStr, // 支付签名随机串，不长于 32 位
