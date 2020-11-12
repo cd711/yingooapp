@@ -82,7 +82,8 @@ const config = {
         // '/pages/editor/photos': '/editor/photos',
         // '/pages/editor/pillow': '/editor/pillow',
         // '/pages/editor/mousepad': '/editor/mousepad',
-        '/pages/me/me':'/me'
+        '/pages/me/me':'/me',
+        '/pages/search/index': "/search"
       }
     },
     publicPath: '/',

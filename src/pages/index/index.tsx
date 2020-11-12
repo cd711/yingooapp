@@ -46,7 +46,7 @@ class Index extends Component<any,{
     componentWillReact() {
         console.log('componentWillReact',Taro.getSystemInfoSync().SDKVersion)
     }
-    
+
     componentDidMount() {
         this.test();
 
@@ -61,9 +61,9 @@ class Index extends Component<any,{
             this.setState({
                 tempColors:results,
                 colorWarp:results[0]
-            })  
+            })
         });
-      
+
     }
 
 
@@ -75,7 +75,7 @@ class Index extends Component<any,{
         return (
             <View className='index'>
                 <View className='top-search'>
-                    <View className='search-box'>
+                    <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                         <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
                         <Text className='placeholders'>搜索海量模板</Text>
                     </View>

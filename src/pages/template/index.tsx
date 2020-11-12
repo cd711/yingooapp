@@ -63,11 +63,11 @@ export default class Template extends Component<any,{
                 cates:res,
             },()=>{
                 Taro.hideLoading();
-                
+
                 this.getTagContext(res[0].tags[0])
             })
             this.calcDeviceRota();
-            
+
         }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
@@ -122,7 +122,7 @@ export default class Template extends Component<any,{
                     showTemplateLoading:false
                 });
                 Taro.hideLoading();
-            })           
+            })
         }
 
     }
@@ -132,7 +132,7 @@ export default class Template extends Component<any,{
         console.log(tags)
         const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
         const searchBox = <View className='top-search'>
-            <View className='search-box'>
+            <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                 <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
                 <Text className='placeholders'>搜索海量模板</Text>
             </View>
@@ -162,7 +162,7 @@ export default class Template extends Component<any,{
                                                     tagData:{},
                                                     showAllCates:false
                                                 },()=>{
-                                                    
+
                                                     const tagsa = cates && cates[index]?cates[index].tags:[];
                                                     if (tagsa.length>0) {
                                                         this.getTagContext(tagsa[0]);
@@ -185,14 +185,14 @@ export default class Template extends Component<any,{
                                 {
                                     cates.length>0 && cates.map((item,index)=>(
                                         <View className={index==switchActive?'item active':'item'} key={item.id} onClick={()=>{
-                                            
+
                                             this.setState({
                                                 switchActive:index,
                                                 switchTagActive:0,
                                                 tagData:{}
                                             },()=>{
                                                 const tagsa = cates && cates[index]?cates[index].tags:[];
-                                                
+
                                                 if (tagsa.length>0) {
                                                     this.getTagContext(tagsa[0]);
                                                 }
@@ -253,7 +253,7 @@ export default class Template extends Component<any,{
                                     </View>
                                 </View>:<AtActivityIndicator isOpened={showTemplateLoading} mode='center'></AtActivityIndicator>
                             }
-                            
+
                             {
                                 tagList.map((item)=>(
 
@@ -268,7 +268,7 @@ export default class Template extends Component<any,{
                                                 <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='aspectFill' />
                                                 <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='aspectFill' />
                                             </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`} />
-                                        }                                        
+                                        }
                                     </View>
                                 ))
                             }
