@@ -295,3 +295,48 @@
         }
     }
 }
+
+.color_selector_main{
+    flex: 1;
+    width: 100%;
+    background: #F5F6F9;
+    padding: 15px 0;
+    .color_selector_item{
+        margin-bottom: 15px;
+        display: block;
+        .tit{
+            color: #9C9DA6;
+            font-size: 24px;
+            padding: 16px 32px;
+        }
+        .colors_items{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 0 20px;
+            .color_wrap{
+                //flex: 6;
+                width: 16.666%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .color_item{
+                    width: 100px;
+                    height: 100px;
+                    padding: 6px;
+                    border: 1px solid transparent;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .color{
+                        width: 88px;
+                        height: 88px;
+                        display: block;
+                        border-radius: 8px;
+                    }
+                }
+            }
+        }
+    }
+}

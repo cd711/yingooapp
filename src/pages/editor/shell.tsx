@@ -11,6 +11,7 @@ import {observer} from '@tarojs/mobx';
 import Fragment from '../../components/Fragment';
 import UploadFile from "../../components/Upload/Upload";
 import {notNull, ossUrl} from "../../utils/common";
+import {userStore} from "../../store/user";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -92,7 +93,7 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => 
         }
     }
 
-  
+
     // 重置DOC
     async function resetTemplate() {
         try {
@@ -113,9 +114,8 @@ const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => 
         }
     }
 
-    
-
     useEffect(() => {
+
         api("app.product/cate").then(res => {
             prodList.current = res;
 
@@ -237,13 +237,56 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
 
     const {onClose, onOk} = props;
 
-    const bars = ["素材库", "贴纸"];
+    const bars = ["素材库", "贴纸", "颜色"];
     const [active, setActive] = useState(0);
     const [selected, setSelected] = useState(null);
     const [list, setList] = useState([]);
     const defaultDoc = Taro.useRef(null);
     let total = 0;
-    const stickersTotal = Taro.useRef(0)
+    const stickersTotal = Taro.useRef(0);
+    const [historyColor, setHistoryColor] = useState([]);
+    const [colorActive, setColorActive] = useState(null);
+
+    const colors = [
+        {key: 1, color: "#5B8FF9"},
+        {key: 2, color: "#5AD8A6"},
+        {key: 3, color: "#5D7092"},
+        {key: 4, color: "#F6BD16"},
+        {key: 5, color: "#E8684A"},
+        {key: 6, color: "#6DC8EC"},
+        {key: 7, color: "#9270CA"},
+        {key: 8, color: "#FF9D4D"},
+        {key: 9, color: "#269A99"},
+        {key: 10, color: "#FF99C3"},
+        {key: 11, color: "#FFFFFF"},
+        {key: 12, color: "#000000"},
+    ]
+
+    async function setHistoryColors(item) {
+        const {id} = userStore;
+        Taro.getStorage({
+            key: `historyColor_${id}`,
+            success: res => {
+                console.log(res)
+                if (res.data) {
+                    const hc = JSON.parse(res.data) || [];
+                    const arr = [...hc, item];
+                    Taro.setStorage({
+                        key: `historyColor_${id}`,
+                        data: JSON.stringify(arr),
+                    })
+                }
+            },
+            fail: err => {
+                console.log("在存储颜色时获取颜色失败：", err)
+                const arr = [item];
+                Taro.setStorage({
+                    key: `historyColor_${id}`,
+                    data: JSON.stringify(arr),
+                })
+            }
+        })
+    }
 
     async function getList(data) {
         Taro.showLoading({title: "加载中"})
@@ -337,6 +380,22 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
     useEffect(() => {
         getList({start: 0});
         getDefaultDoc();
+
+        const {id} = userStore;
+        // 获取历史使用颜色
+        Taro.getStorage({
+            key: `historyColor_${id}`,
+            success: res => {
+                if (res.data) {
+                    const c = JSON.parse(res.data) || [];
+                    setHistoryColor([...c])
+                }
+            },
+            fail: err => {
+                console.log("获取历史颜色出错：", err)
+            }
+        })
+
     }, [])
 
     const uploadFile = async files => {
@@ -360,6 +419,9 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
     }
 
     const loadMore = () => {
+        if (active === 2) {
+            return;
+        }
         if (active === 0) {
             if (total === list.length || list.length < 15) {
                 return
@@ -402,9 +464,28 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
 
     }
 
+    const onSelectColor = key => {
+        if (!notNull(colorActive) && key === colorActive) {
+            setColorActive(null);
+
+            return
+        }
+        setColorActive(key)
+    }
+
     const onCancel = () => {
         resetImage();
         onClose && onClose()
+    }
+
+    const _onOk = () => {
+        if (!notNull(colorActive)) {
+            const idx = colors.findIndex(v => Number(v.key) === Number(colorActive));
+            if (idx > -1) {
+                setHistoryColors(colors[idx])
+            }
+        }
+        onOk && onOk()
     }
 
     return <View className="change_image_container">
@@ -430,7 +511,7 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
                         </View>
                         : null}
                     {
-                        list.map((item, idx) => {
+                        active !== 2 && list.map((item, idx) => {
                             return <View className="list_item" key={idx}>
                                 <View className="img_item" key={idx} onClick={() => onSelect(item, idx)}>
                                     <Image src={getSrc(item)} mode="aspectFill" className="img"/>
@@ -444,12 +525,54 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
                             </View>
                         })
                     }
+                    {
+                        active === 2
+                            ? <View className="color_selector_main">
+                                {
+                                    historyColor.length > 0
+                                        ? <View className="color_selector_item">
+                                            <Text className="tit">使用过的</Text>
+                                            <View className="colors_items">
+                                                {
+                                                    historyColor.map((value, index) => (
+                                                        <View className="color_wrap" key={index}>
+                                                            <View className="color_item"
+                                                                  style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
+                                                                  onClick={() => onSelectColor(value.key)}>
+                                                                <View className="color" style={{background: value.color}} />
+                                                            </View>
+                                                        </View>
+                                                    ))
+                                                }
+                                            </View>
+                                        </View>
+                                        : null
+                                }
+                                <View className="color_selector_item">
+                                    <Text className="tit">默认颜色</Text>
+                                    <View className="colors_items">
+                                        {
+                                            colors.map((value, index) => (
+                                                    <View className="color_wrap" key={index}>
+                                                        <View className="color_item"
+                                                              style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
+                                                              onClick={() => onSelectColor(value.key)}>
+                                                            <View className="color" style={{background: value.color}} />
+                                                        </View>
+                                                    </View>
+                                            ))
+                                        }
+                                    </View>
+                                </View>
+                            </View>
+                            : null
+                    }
                 </View>
             </ScrollView>
             <View className='optBar'>
                 <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48}/></View>
                 <Text className='txt'>换图</Text>
-                <View className='icon' onClick={onOk}><IconFont name='24_gouxuan' size={48}/></View>
+                <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
             </View>
         </View>
         <View className="mask"/>
@@ -551,14 +674,14 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
                 }
 
                 setBrandList(list);
-                
+
                 for (let i = 0; i < list.length; i ++) {
                     if (list[i].id == tempCurrentModel.brand.id) {
                         setBrand(i);
                         break;
                     }
                 }
-                
+
 
                 Taro.setStorage({
                     key: "phone_brand", data: {
@@ -578,7 +701,7 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
         }
         setSeries(null);
         let list = null;
-        
+
         try {
             //@ts-ignore
             const res = brandList[brandIndex] ? Taro.getStorageSync("phone_series_" + brandList[brandIndex].id) : null;
@@ -603,7 +726,7 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
             return;
         }
         setSeries(list);
-        
+
         Taro.setStorage({
             key: "phone_series_" + brandList[brandIndex].id, data: {
                 time: Date.now(),
@@ -615,7 +738,7 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
 
     const selectPhone = () => {
         setType(0);
-        
+
         const mod = {
             id: tempCurrentModel.id,
             name: tempCurrentModel.name,
@@ -626,7 +749,7 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
             },
             series: tempCurrentModel.series
         };
-       
+
         if (mod.mask) {
             sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
         }
@@ -709,7 +832,7 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
 @observer
 export default class Shell extends Component<{}, {
     size?: { width: string | number; height: string | number };
-    
+
     data?: number;
     loadingTemplate?: boolean;
 }> {
@@ -750,14 +873,14 @@ export default class Shell extends Component<{}, {
             this.defaultModel = await api("editor.phone_shell/default");
             Taro.setStorageSync("phone_mode", this.defaultModel);
             Taro.hideLoading();
-            
+
         }
 
 
         // console.log(this.defaultModel);
         // Taro.hideLoading();
     }
-    
+
 
     componentWillUnmount() {
         editorProxy = null;
