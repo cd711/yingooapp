@@ -17,7 +17,7 @@ import Ticket from '../../components/ticket/Ticket';
 import Checkbox from '../../components/checkbox/checkbox';
 import Fragment from '../../components/Fragment';
 import {notNull, ossUrl} from '../../utils/common';
-
+import { Base64 } from 'js-base64';
 
 
 const payway = [
@@ -70,16 +70,24 @@ export default class Confirm extends Component<any,{
     componentDidMount() {
         // console.log(this.$router.params)
         // skuid=375&total=1&tplid=55&model=0
-        const {skuid,total,tplid,model,orderid} = this.$router.params;
+        const {skuid,total,tplid,model,orderid,cartIds} = this.$router.params;
+        // /pages/template/confirm?skuid=379&total=1&tplid=166&model=343
         if (orderid) {
             this.checkOrder(orderid,true);
         } else {
-            const data = {
+
+            let data:any = {
                 sku_id:skuid,
                 quantity:total,
                 user_tpl_id:tplid,
-                phone_model_id:336
+                phone_model_id:model?model:336
             };
+            if(cartIds){
+                console.log(Base64.decode(cartIds));
+                data = {
+                    cart_ids:Base64.decode(cartIds)
+                }
+            }
             if (!lodash.isEmpty(userStore.address)) {
                 templateStore.address = userStore.address;
                 data["address_id"] = userStore.address.id;
@@ -293,6 +301,7 @@ export default class Confirm extends Component<any,{
                         <Text className='title'>确认订单</Text>
                     </View>
                 </View>
+                <ScrollView scrollY style={{paddingBottom:40,flex:1}}>
                 {
                     address?<View className='address-part-has' onClick={()=>{
                         Taro.navigateTo({
@@ -400,7 +409,7 @@ export default class Confirm extends Component<any,{
                                     :<View className='right'>
                                         <View className='tt'>
                                             <Text className='has'>有</Text>
-                                            <Text className='n'>{item.usable_discounts.length}</Text>
+                                            <Text className='n'>{item.usable_discounts.filter(obj=>!usedTickets.some(obj1=>obj1.ticketId==obj.id && obj1.orderId != item.pre_order_id)).length}</Text>
                                             <Text>张优惠券可用</Text>
                                         </View>
                                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
@@ -430,7 +439,7 @@ export default class Confirm extends Component<any,{
                         </Fragment>
                     ))
                 }
-
+                </ScrollView>
                 <View className='bottom'>
                     <View className='left'>
                         <Text className='title'>合计：</Text>
@@ -505,8 +514,6 @@ export default class Confirm extends Component<any,{
                         </View>
                     </FloatModal>
                 </View>
-
-                <View className='opsbar'></View>
             </View>
         )
     }

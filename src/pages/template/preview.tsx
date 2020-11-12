@@ -274,7 +274,7 @@ export default class Preview extends Component<{}, {
                 </View>
                 <View className='bottom'>
                     {
-                        saveId?<View className='editor' onClick={this.onEditor}>
+                        parseInt(saveId+"")>=0?<View className='editor' onClick={this.onEditor}>
                             <IconFont name='24_qubianji' size={48} color='#707177' />
                             <Text className='txt'>编辑</Text>
                         </View>:<View className='editor' onClick={this.onSave}>

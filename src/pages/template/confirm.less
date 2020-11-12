@@ -2,16 +2,21 @@
     background: #F5F6F9;
 }
 .confirm{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+    height: 100%;
     .nav-bar{
         display: flex;
         align-items: center;
         justify-content: space-between;
         height: 88px;
-        // position: fixed;
-        z-index: 10;
         width: 100%;
         box-sizing: border-box;
         background: #FFF;
+        position: relative;
         .left{
             padding-left: 32px;
         }
@@ -35,7 +40,6 @@
     .address-part-has{
         position: relative;
         height: 164px;
-        margin-bottom: 16px;
         .backimg{
             position: absolute;
             top: 0;
@@ -85,7 +89,7 @@
         }
     }
     .address-part{
-        margin: 16px 0;
+        margin: 16px 0 0;
         padding: 32px;
         background: #FFF;
         display: flex;
@@ -101,6 +105,7 @@
     .goods-info{
         padding: 32px;
         background: #FFF;
+        margin-top: 16px;
         .title{
             display: flex;
             align-items: center;
@@ -225,15 +230,18 @@
         }
     }
     .bottom{
-        position: fixed;
-        bottom: 0;
-        width: 100vw;
-        padding: 12px 32px;
+        // position: fixed;
+        // bottom: 0;
+        width: 100%;
+        padding: 0 32px;
+        height: 120px;
         box-sizing: border-box;
         background: #FFF;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
         .left{
             display: flex;
             align-items: baseline;
@@ -372,9 +380,5 @@
     .xy_pay_way_item_active{
         background: #F5F6F9;
     }
-    .opsbar{
-        background: #FFF;
-        padding-bottom: constant(safe-area-inset-bottom);
-        padding-bottom: env(safe-area-inset-bottom);
-    }
+
 }
