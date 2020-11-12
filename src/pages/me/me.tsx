@@ -145,7 +145,7 @@ export default class Me extends Component<any, MeProps> {
     }
 
     componentDidMount() {
-        // this.getWorksList({start: 0})
+        this.getWorksList({start: 0})
     }
 
     onScroll = (e) => {
