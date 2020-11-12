@@ -22,6 +22,8 @@ export class UserStore {
     public bio:string = "";
     @observable
     public address:any = null;
+    @observable
+    public birthday: string = ""
 
     public get sex() {
         const s = sexList[this.gender||0];
@@ -38,6 +40,7 @@ export class UserStore {
         this.gender = info.gender;
         this.bio = info.bio;
         this.address = info.address;
+        this.birthday = info.birthday;
     }
 
     @action
@@ -51,8 +54,10 @@ export class UserStore {
             this.gender = info.gender;
             this.bio = info.bio;
             this.address = info.address;
+            this.birthday = info.birthday;
         })
     }
+
     @action
     public clear() {
         this.id = null;
@@ -63,6 +68,7 @@ export class UserStore {
         this.bio = "";
         this.address = null;
     }
+
     @action
     public auth(){
         return new Promise<any>(async (resolve, reject)=> {

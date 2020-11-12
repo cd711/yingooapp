@@ -29,16 +29,16 @@ export default class Setting extends Component<any,{
 
 
 
-    componentDidMount() { 
+    componentDidMount() {
         // alert(Taro.getSystemInfoSync().statusBarHeight);
         console.log(Taro.getSystemInfoSync(),userStore.nickname)
-        
+
     }
 
     render() {
         const {tipModalShow} = this.state;
         // const {id,nickname} = userStore;
-        
+
         return (
             <View className='setting'>
                 <AtNavBar
@@ -95,19 +95,19 @@ export default class Setting extends Component<any,{
                 </View>
                 <View className='slist'>
                     <Text className='title'>关于反馈</Text>
-                    <View className='item'>
+                    <View className='item' onClick={() => Taro.navigateTo({url: "/pages/me/feedback"})}>
                         <Text className='name'>问题反馈</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item'>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/privacy?pageType=user_agreement`})}>
                         <Text className='name'>用户协议</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item'>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/privacy?pageType=privacy`})}>
                         <Text className='name'>隐私政策</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item'>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/aboutus`})}>
                         <Text className='name'>关于我们</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>

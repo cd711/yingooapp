@@ -7,6 +7,8 @@ import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import { AtNavBar,AtFloatLayout} from 'taro-ui'
 import { api,updateLocalUserInfo } from '../../utils/net';
+import moment from "moment";
+import UploadFile from "../../components/Upload/Upload";
 
 const sexList = [
     '保密',
@@ -40,13 +42,30 @@ export default class Profile extends Component<any,{
     }
 
 
-    componentDidMount() { 
+    componentDidMount() {
         // alert(Taro.getSystemInfoSync().statusBarHeight);
         console.log(Taro.getSystemInfoSync())
-        
+
     }
 
+    updateInfo = (data) => {
+        return new Promise<any>(async (resolve, reject)=> {
+            Taro.showLoading({title:"加载中..."})
+            api("user/profile",data).then(()=>{
+                Taro.hideLoading();
+                resolve();
+            }).catch((e)=>{
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:e,
+                    icon:"none",
+                    duration:2000
+                })
+                reject(e);
+            })
+        })
 
+    }
 
     onOkFixNickName = () => {
         const {inputNickName} = this.state;
@@ -101,29 +120,35 @@ export default class Profile extends Component<any,{
         });
     }
 
-    updateInfo = (data) => {
-        return new Promise<any>(async (resolve, reject)=> {
-            Taro.showLoading({title:"加载中..."})
-            api("user/profile",data).then(()=>{
-                Taro.hideLoading();
-                resolve();
-            }).catch((e)=>{
-                Taro.hideLoading();
-                Taro.showToast({
-                    title:e,
-                    icon:"none",
-                    duration:2000
-                })
-                reject(e);
-            })
+    onDateChange = e => {
+        console.log(e.detail.value)
+        const birthday = e.detail.value;
+        this.updateInfo({birthday}).then(() => {
+            userStore.birthday = birthday;
+            Taro.showToast({
+                title: "更新成功",
+                icon: "none"
+            });
+            updateLocalUserInfo("birthday", birthday)
         })
-
     }
 
-    // @ts-ignore
+    uploadAvatar = data => {
+        const avatar = data.cdnUrl;
+        this.updateInfo({avatar}).then(() =>{
+            userStore.avatar = avatar;
+            Taro.showToast({
+                title: "更新成功",
+                icon: "none"
+            });
+            updateLocalUserInfo("avatar", avatar)
+        })
+    }
+
+
     render() {
         const {showNickName,inputNickName,showBio,inputBio} = this.state;
-        const {nickname,avatar,bio,gender} = userStore;
+        const {nickname,avatar,bio,gender, birthday} = userStore;
         const sex = userStore.sex
         return (
             <View className='profile'>
@@ -141,19 +166,16 @@ export default class Profile extends Component<any,{
                     }}
                 />
                 <View className='base-info'>
-                    <View className='item'>
-                        {/* @ts-ignore */}
-                        <Input type='file' accept='image/*;' className='upload' onChange={(e)=>{
-                            console.log(e.detail.value)
-                        }} />
-                        <Text className='title'>头像</Text>
-                        <View className='right'>
-                            
-                            <Image className='img' src={avatar.length>0?avatar:require('../../source/defaultAvatar.png')} />
-                            <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
+                    <UploadFile uploadType="image" extraType={1} onChange={this.uploadAvatar}>
+                        <View className='item'>
+                            <Text className='title'>头像</Text>
+                            <View className='right'>
+                                <Image className='img' mode="aspectFill" src={avatar.length>0?avatar:require('../../source/defaultAvatar.png')} />
+                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
+                            </View>
                         </View>
-                    </View>
-                    
+                    </UploadFile>
+
                     <View className='item' onClick={()=>{
                         this.setState({
                             showNickName:true,
@@ -179,13 +201,11 @@ export default class Profile extends Component<any,{
                         </Picker>
                     </View>
                     <View className='picker-item'>
-                        <Picker mode='date' onChange={(e)=>{
-                            console.log(e)
-                        }} start='1950-01-01' end='2020-01-01' value='2020-01-01'>
+                        <Picker mode='date' onChange={this.onDateChange} start='1950-01-01' end={moment().format("YYYY-MM-DD")} value={birthday}>
                             <View className='item'>
                                 <Text className='title'>生日</Text>
                                 <View className='right'>
-                                    <Text className='txt'>1998/3/12</Text>
+                                    <Text className='txt'>{birthday}</Text>
                                     <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                                 </View>
                             </View>

@@ -46,6 +46,9 @@ class App extends Component {
             'pages/me/profile',
             'pages/me/acount',
             'pages/me/order',
+            'pages/me/privacy',
+            'pages/me/aboutus',
+            'pages/me/feedback',
             'pages/me/orderdetail',
             'pages/me/refund',
             'pages/me/address/index',
@@ -54,7 +57,8 @@ class App extends Component {
             'pages/template/preview',
             'pages/template/confirm',
             'pages/template/success',
-            'pages/cart/index'
+            'pages/cart/index',
+            'pages/search/index'
         ],
         window: {
             backgroundTextStyle: 'light',
