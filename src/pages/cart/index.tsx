@@ -8,6 +8,7 @@ import {ossUrl} from '../../utils/common';
 import { api } from '../../utils/net';
 import CartLeftIcon from '../../components/icon/CartLeftIcon';
 import CartRightIcon from '../../components/icon/CartRightIcon';
+import { Base64 } from 'js-base64';
 
 export default class Cart extends Component<{},{
     source:any;
@@ -175,13 +176,22 @@ export default class Cart extends Component<{},{
                     {
                         isManage?<Button className='remove-cart-btn' onClick={()=>{
                             if (selectIds.length>0) {
+                                Taro.showLoading({title:"删除中"})
                                 api("app.cart/delete",{
                                     ids:selectIds.join(',')
                                 }).then(()=>{
+                                    Taro.hideLoading();
                                     source.list = list.filter(obj=>!selectIds.some(obj1=>obj1==obj.id));
                                     this.setState({
                                         source,
                                         selectIds:[]
+                                    })
+                                }).catch(()=>{
+                                    Taro.hideLoading();
+                                    Taro.showToast({
+                                        title:"删除失败，请稍后再试",
+                                        icon:'none',
+                                        duration:2000
                                     })
                                 })
                             }
@@ -198,7 +208,11 @@ export default class Cart extends Component<{},{
                             </View>
                             <View className='right' onClick={()=>{
                                 if (total>0) {
-                                    
+                                    // /pages/template/confirm?skuid=379&total=1&tplid=166&model=343
+                                    const cartIds = selectIds.join(',');
+                                    Taro.navigateTo({
+                                        url:`/pages/template/confirm?cartIds=${Base64.encode(cartIds,true)}`
+                                    })
                                 }
                             }}>
                                 <CartRightIcon width={220} height={88} linght={total>0}/>

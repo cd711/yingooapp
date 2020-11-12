@@ -338,7 +338,7 @@ export default class Me extends Component<any, MeProps> {
                             <View className={`top ${fixed ? "fiex_set" : ""}`}>
                                 {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                                 <View className='ops'>
-                                    <View className='cart'  onClick={()=>{
+                                    <View className='carts'  onClick={()=>{
                                         Taro.navigateTo({
                                             url:'/pages/cart/index'
                                         })
