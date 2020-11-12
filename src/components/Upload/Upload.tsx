@@ -7,7 +7,7 @@ import {getToken, options} from "../../utils/net";
 interface UploadFileProps{
     type: "button" | "card",
     uploadType: "image" | "video",
-    extraType: number,
+    extraType: number,  // 1=普通上传，2=作品,3=照片
     onChange?: (data: {id: string, cdnUrl: string, url: string}) => void,
     onProgress?: (progress: number, currentTotal: number, total: number) => void
 }
@@ -44,7 +44,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                 camera: "back",
                 sourceType: ["album", "camera"],
                 success: res => {
-                    console.log("选择视频：", res)
+                    // @ts-ignore
                     const tempFilePaths = res.tempFilePaths
                     that.uploadFileFn(tempFilePaths[0])
                 }

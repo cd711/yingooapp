@@ -145,7 +145,7 @@ export default class Me extends Component<any, MeProps> {
     }
 
     componentDidMount() {
-        this.getWorksList({start: 0})
+        // this.getWorksList({start: 0})
     }
 
     onScroll = (e) => {
@@ -336,7 +336,6 @@ export default class Me extends Component<any, MeProps> {
                     <View className='topBox'>
                         <View className="fix_top">
                             <View className={`top ${fixed ? "fiex_set" : ""}`}>
-                                {/* <IconFont name={"iconsaoyisao"} size={48} color="#121314"/> */}
                                 <View className='ops'>
                                     <View className='carts'  onClick={()=>{
                                         Taro.navigateTo({
@@ -362,7 +361,7 @@ export default class Me extends Component<any, MeProps> {
                         }}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../source/defaultAvatar.png')}
-                                       className='avatarImg'/>
+                                       className='avatarImg' mode="aspectFill"/>
                             </View>
                             {/* todo: 昵称6个字 */}
                             <Text className='nickname'>{nickname.length > 0 ? `Hi，${nickname}` : "Hi，未登录"}</Text>
@@ -461,8 +460,12 @@ export default class Me extends Component<any, MeProps> {
                                     }
                                     {
                                         works.length === 0
-                                            ? <Empty/>
-                                            : null
+                                            ? <Empty button="我要创作" onClick={() => {
+                                                Taro.navigateTo({
+                                                    url: "pages/template/index"
+                                                })
+                                            }}/>
+                                            : <LoadMore status={loadStatus} />
                                     }
 
                                     {/*<View className='years'>*/}
@@ -484,10 +487,14 @@ export default class Me extends Component<any, MeProps> {
                                             </View>
                                         ))
                                     }
+                                    {
+                                        works.length === 0
+                                            ? <Empty content="暂无收藏"/>
+                                            : <LoadMore status={loadStatus} />
+                                    }
                                 </View>
                         }
                     </View>
-                    <LoadMore status={loadStatus} />
                 </ScrollView>
             </View>
         )
