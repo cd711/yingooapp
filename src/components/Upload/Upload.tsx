@@ -9,7 +9,9 @@ interface UploadFileProps{
     uploadType: "image" | "video",
     extraType: number,  // 1=普通上传，2=作品,3=照片
     onChange?: (data: {id: string, cdnUrl: string, url: string}) => void,
-    onProgress?: (progress: number, currentTotal: number, total: number) => void
+    onProgress?: (progress: number, currentTotal: number, total: number) => void,
+    className?: string
+    style?: any
 }
 interface UploadFileState {
     files: Array<any>;
@@ -86,9 +88,9 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
     }
 
     render(): React.ReactNode {
-        const {type} = this.props;
+        const {type, className, style} = this.props;
         return (
-            <View className="upload_container" onClick={this._upload}>
+            <View className={`upload_container ${className}`} onClick={this._upload} style={style}>
                 {
                     type === "button"
                         ? this.props.children

@@ -95,7 +95,7 @@ export default class Setting extends Component<any,{
                 </View>
                 <View className='slist'>
                     <Text className='title'>关于反馈</Text>
-                    <View className='item'>
+                    <View className='item' onClick={() => Taro.navigateTo({url: "/pages/me/feedback"})}>
                         <Text className='name'>问题反馈</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
