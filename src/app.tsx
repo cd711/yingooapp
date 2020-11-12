@@ -46,6 +46,7 @@ class App extends Component {
             'pages/me/profile',
             'pages/me/acount',
             'pages/me/order',
+            'pages/me/privacy',
             'pages/me/orderdetail',
             'pages/me/refund',
             'pages/me/address/index',

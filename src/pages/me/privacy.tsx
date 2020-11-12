@@ -1,0 +1,57 @@
+import {RichText, View} from "@tarojs/components";
+import Taro, {Component, Config} from "@tarojs/taro";
+import {AtNavBar} from "taro-ui";
+import {api} from "../../utils/net";
+import "./privacy.less";
+
+
+export default class Privacy extends Component {
+    config: Config = {
+        navigationBarTitleText: `${this.$router.params.pageType === "privacy" ? "隐私政策" : "用户协议"}`,
+        // backgroundColor:'#F5F6F9'
+    }
+
+    constructor() {
+        super();
+        this.state = {
+            privacyTxt: ""
+        }
+    }
+
+    componentDidMount() {
+        const {params} = this.$router;
+        if (params.pageType) {
+            api("app.about/info", {name: params.pageType}).then(privacyTxt => {
+                this.setState({privacyTxt})
+            }).catch(e => {
+                console.log("获取内容出错：", e)
+            })
+        }
+    }
+
+    render(): React.ReactNode {
+        const {privacyTxt} = this.state;
+        return (
+            <View className="privacy_container">
+                <AtNavBar
+                    onClickLeftIcon={()=>{
+                        Taro.navigateBack();
+                    }}
+                    color='#121314'
+                    title={`${this.$router.params.pageType === "privacy" ? "隐私政策" : "用户协议"}`}
+                    border
+                    fixed
+                    leftIconType={{
+                        value:'chevron-left',
+                        color:'#121314',
+                        size:24
+                    }}
+                />
+                <View className="txt">
+                    <RichText nodes={privacyTxt} />
+                </View>
+            </View>
+        )
+    }
+}
+
