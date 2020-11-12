@@ -887,7 +887,7 @@ export default class Shell extends Component<{}, {
         window.removeEventListener("message", this.onMsg);
     }
 
-    onLoad = async (type?: number) => {
+    onLoad = async (_?: number) => {
         if (this.defaultModel) {
             const mod = this.defaultModel;
             sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
