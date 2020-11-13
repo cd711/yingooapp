@@ -482,14 +482,21 @@ export default class Me extends Component<any, MeProps> {
                                                         height: window.screen.width / 2 - 15,
                                                     }}
                                                 >
-                                                    <Image src={ossUrl(value.thumb_image, 1)} mode="aspectFill"/>
+                                                    <Image src={ossUrl(value.thumb_image, 1)} mode="aspectFill"
+                                                           style={{
+                                                               width: window.screen.width / 2 - 15,
+                                                               height: window.screen.width / 2 - 15,
+                                                           }}
+                                                    />
                                                 </View>
                                             </View>
                                         ))
                                     }
                                     {
-                                        works.length === 0
-                                            ? <Empty content="暂无收藏"/>
+                                        collectionList.length === 0
+                                            ? <View className="more_View">
+                                                <Empty content="暂无收藏"/>
+                                            </View>
                                             : <LoadMore status={loadStatus} />
                                     }
                                 </View>

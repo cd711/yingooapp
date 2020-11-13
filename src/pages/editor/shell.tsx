@@ -59,6 +59,7 @@ interface BrandType {
     brandIndex?: number;
 }
 
+// 换模板
 const Template: React.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
     const prodList = Taro.useRef([]);
@@ -239,6 +240,7 @@ interface ChangeImageProps {
     onOk?: () => void,
 }
 
+// 换图、换颜色
 const ChangeImage: React.FC<ChangeImageProps> = (props) => {
 
     const {onClose, onOk} = props;
@@ -585,7 +587,6 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
     </View>
 }
 
-
 // 编辑文字
 const ChangeText:React.FC<BaseProps> = props => {
 
@@ -753,7 +754,7 @@ const SelectFont: React.FC<BaseProps> = props => {
         setFontSelected(Number(font.id));
 
         try{
-            await callEditor("changeTextFont", font.font)
+            await callEditor("changeTextFont", font["font-family"], font.font)
         }catch (e) {
             console.log("更换字体出错：", e)
         }
@@ -777,7 +778,10 @@ const SelectFont: React.FC<BaseProps> = props => {
                                    </View>
                                    <View className="right">
                                         <View className="dowload">
-                                            <IconFont name="20_congyunduanxiazai" size={40} color="#999"/>
+                                            <IconFont name={fontSelected === Number(value.id) ? "22_yixuanzhong" : "20_congyunduanxiazai"}
+                                                      size={40}
+                                                      // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
+                                            />
                                         </View>
                                    </View>
                                </View>
@@ -788,6 +792,226 @@ const SelectFont: React.FC<BaseProps> = props => {
                 <View className='optBar'>
                     <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>
                     <Text className='txt'>字体</Text>
+                    <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
+                </View>
+            </View>
+            <View className="mask"/>
+        </View>
+    )
+}
+
+// 设置样式
+const ChangeFontStyle: React.FC<BaseProps> = props => {
+
+    const {onClose, onOk} = props;
+    const colors = [
+        {key: 1, color: "#F6BD16"},
+        {key: 2, color: "#5AD8A6"},
+        {key: 3, color: "#5D7092"},
+        {key: 4, color: "#F6BD16"},
+        {key: 5, color: "#E8684A"},
+        {key: 6, color: "#6DC8EC"},
+        // {key: 7, color: "#9270CA"},
+        // {key: 8, color: "#FF9D4D"},
+        // {key: 9, color: "#269A99"},
+        // {key: 10, color: "#FF99C3"},
+        // {key: 11, color: "#FFFFFF"},
+        // {key: 12, color: "#000000"},
+    ]
+
+    const fontAttribute = {
+        style: [
+            {
+                key: 1,
+                attr: "color",
+                icon: "24_bianjiqi_yangshi1",
+                colors: colors.map(v => ({...v, checked: false}))
+            },
+            {
+                key: 2,
+                attr: "strokeColor",
+                icon: "24_bianjiqi_yangshi2",
+                colors: colors.map(v => ({...v, checked: false}))
+            },
+            {
+                key: 3,
+                attr: "bgColor",
+                icon: "24_bianjiqi_yangshi3",
+                colors: colors.map(v => ({...v, checked: false}))
+            },
+            {
+                key: 4,
+                attr: "bgOpacity",
+                icon: "24_bianjiqi_yangshi4",
+                colors: colors.map(v => ({...v, checked: false}))
+            },
+        ],
+        align: [
+            {key: "left", icon: "24_bianjiqi_zuoduiqi"},
+            {key: "center", icon: "24_bianjiqi_juzhongduiqi"},
+            {key: "right", icon: "24_bianjiqi_youduiqi"},
+        ]
+    }
+
+    const defaultDoc = Taro.useRef(null);
+    const activeStyle = Taro.useRef(0);
+    const alignActive = Taro.useRef(0);
+    const activeColor = Taro.useRef(null);
+    const _fontAttribute = Taro.useRef(fontAttribute); // 备份数据，以提供数据的操作还原
+    const [styleSelect, setStyleSelect] = useState(fontAttribute.style[activeStyle.current]);
+    const [styleAlign, setStyleAlign] = useState(fontAttribute.align[alignActive.current].key);
+
+    async function getDefaultDoc() {
+        try {
+            const doc = await callEditor("getDoc");
+            console.log("doc", doc)
+            defaultDoc.current = doc;
+        } catch (e) {
+
+        }
+    }
+
+    async function resetImage() {
+        try {
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        } catch (e) {
+            console.log("重置出错：", e)
+        }
+    }
+
+    async function updateDocFont(value: string | object) {
+        let temp = {};
+        switch (styleSelect.attr) {
+            case "color": temp = {color: notNull(value) ? "#000" : value}; break;
+            case "strokeColor": temp = {strokeColor: notNull(value) ? "#000" : value}; break;
+            case "bgColor": temp = {bgColor: value}; break;
+            case "bgOpacity": temp = {bgColor: value}; break;
+        }
+        try{
+            await callEditor("changeTextAttr", typeof value === "string" ? temp : value )
+        }catch (e) {
+            console.log("修改文字样式出错：", e)
+        }
+    }
+
+    useEffect(() => {
+        getDefaultDoc()
+
+        updateDocFont({align: "left"})
+    }, [])
+
+    const _onClose = () => {
+        resetImage()
+        onClose && onClose()
+    }
+
+    const _onOk = () => {
+        onOk && onOk()
+    }
+
+    const onSelectColor = (value) => {
+        let _colors = [...styleSelect.colors];
+        console.log(value, activeColor.current)
+        if (!notNull(activeColor.current) && value.key === activeColor.current) {
+            const idx = _colors.findIndex(v => v.key === activeColor.current);
+
+            if (idx > -1) {
+                _colors[idx].checked = false;
+            }
+            activeColor.current = null;
+            updateDocFont("")
+        } else {
+            const idx = _colors.findIndex(v => v.key === value.key);
+            if (idx > -1) {
+                // 先取消，再选中
+                _colors = _colors.map(v => {
+                    return {
+                        ...v,
+                        checked: false
+                    }
+                });
+                _colors[idx].checked = !_colors[idx].checked
+                activeColor.current = Number(value.key);
+                if (styleSelect.attr === "bgOpacity") {
+                    updateDocFont(`${_colors[idx].color}50`)
+                } else {
+                    updateDocFont(_colors[idx].color)
+                }
+            }
+        }
+        console.log("变更过的值：", _colors)
+        setStyleSelect(prev => ({...prev, colors: [..._colors]}));
+        _fontAttribute.current.style[activeStyle.current].colors = [..._colors];
+
+    }
+
+    const onStyleClick = () => {
+        let num = activeStyle.current;
+        if (num === 3) {
+            num = 0
+        } else {
+            num += 1;
+        }
+        activeStyle.current = num;
+        setStyleSelect({..._fontAttribute.current.style[num]});
+        console.log("当前下标：",num, "当前样式：",_fontAttribute.current.style[num] )
+    }
+
+    const onAlignClick = () => {
+        let num = alignActive.current;
+        if (num === 2) {
+            num = 0
+        } else {
+            num += 1;
+        }
+        alignActive.current = num;
+        setStyleAlign(fontAttribute.align[num].key);
+        updateDocFont({align: styleAlign})
+    }
+
+    return (
+        <View className="change_image_container">
+            <View className="change_main">
+                <ScrollView className="list_container" scrollY style={{height: 280}}>
+                    <View className="font_change_style_container">
+                        <View className="change_item">
+                            <Text className="tit">样式和对齐</Text>
+                            <View className="change_item_ctx">
+                                <View className="style_item" onClick={onStyleClick}>
+                                    <IconFont name={styleSelect.icon} size={48} />
+                                </View>
+                                <View className="border"/>
+                                <View className="style_item" onClick={onAlignClick}>
+                                    <IconFont name={fontAttribute.align[alignActive.current].icon} size={48} />
+                                </View>
+                            </View>
+                        </View>
+                        <View className="change_item">
+                            <Text className="tit">颜色</Text>
+                            <View className="colors_items">
+                                {
+                                    styleSelect.colors.map((value, index) => (
+                                        <View className="color_wrap" key={index}>
+                                            <View className="color_item"
+                                                  onClick={() => onSelectColor(value)}
+                                                  style={{
+                                                      borderColor: value.checked ? "#FF4966" : "transparent"
+                                                  }}
+                                            >
+                                                <View className="color" style={{background: value.color}} />
+                                            </View>
+                                        </View>
+                                    ))
+                                }
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
+                <View className='optBar'>
+                    <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>
+                    <Text className='txt'>样式</Text>
                     <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
                 </View>
             </View>
@@ -1274,6 +1498,11 @@ export default class Shell extends Component<{}, {
             this.store.isEdit = true;
         }
 
+        const changeFontStyle = () => {
+            this.store.tool = 8;
+            this.store.isEdit = true;
+        }
+
         // 水平翻转
         const onFilpY = async () => {
             try {
@@ -1354,16 +1583,16 @@ export default class Shell extends Component<{}, {
                                 <IconFont name='24_bianjiqi_ziti' size={48}/>
                                 <Text className='txt'>字体</Text>
                             </View>
-                            <View className='btn'>
+                            <View className='btn' onClick={changeFontStyle}>
                                 <IconFont name='24_bianjiqi_yangshi' size={48}/>
                                 <Text className='txt'>样式</Text>
                             </View>
-                            <View className='btn'>
-                                <View className='icon'>
-                                    <IconFont name='24_bianjiqi_shanchu' size={48}/>
-                                </View>
-                                <Text className='txt'>删除</Text>
-                            </View>
+                            {/*<View className='btn'>*/}
+                            {/*    <View className='icon'>*/}
+                            {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
+                            {/*    </View>*/}
+                            {/*    <Text className='txt'>删除</Text>*/}
+                            {/*</View>*/}
                         </View>
 
                     case 4: // 换图
@@ -1380,6 +1609,9 @@ export default class Shell extends Component<{}, {
 
                     case 7: // 选择字体
                         return <SelectFont onClose={cancelEdit} onOk={onOk} />
+
+                    case 8: // 修改字体样式
+                        return <ChangeFontStyle onClose={cancelEdit} onOk={onOk} />
 
                 }
             }))[0]}

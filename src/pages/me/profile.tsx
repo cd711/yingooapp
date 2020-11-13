@@ -226,13 +226,13 @@ export default class Profile extends Component<any,{
                     </View>
 
                 </View>
-                <View className='er-item'>
-                    <Text className='title'>我的二维码</Text>
-                    <View className='right'>
-                        <IconFont name='24_erweima' size={48} color='#9C9DA6' />
-                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
-                    </View>
-                </View>
+                {/*<View className='er-item'>*/}
+                {/*    <Text className='title'>我的二维码</Text>*/}
+                {/*    <View className='right'>*/}
+                {/*        <IconFont name='24_erweima' size={48} color='#9C9DA6' />*/}
+                {/*        <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />*/}
+                {/*    </View>*/}
+                {/*</View>*/}
                 {/* 昵称 */}
                 <View className='float-layout'>
                     <AtFloatLayout isOpened={showNickName} onClose={()=>{this.setState({showNickName:false})}}>

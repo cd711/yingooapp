@@ -18,7 +18,8 @@ export default class Photos extends Component<any,{
     loadStatus: 'more' | 'loading' | 'noMore';
     isEdit: boolean;
     isOpened: boolean;
-    sortActive: number
+    sortActive: object;
+
 }> {
 
     config: Config = {
@@ -35,7 +36,7 @@ export default class Photos extends Component<any,{
             loadStatus: "noMore",
             isEdit: false,
             isOpened: false,
-            sortActive: 0
+            sortActive: {}
         }
     }
 
@@ -108,7 +109,7 @@ export default class Photos extends Component<any,{
     }
 
     loadMore = () => {
-        const {navSwitchActive, imageList, videoList} = this.state;
+        const {navSwitchActive, imageList, videoList, sortActive} = this.state;
         const len = navSwitchActive === 0 ? imageList.length : videoList.length;
         if (this.total === len) {
             this.setState({loadStatus: "noMore"})
@@ -119,7 +120,11 @@ export default class Photos extends Component<any,{
             return;
         }
         this.setState({loadStatus: "loading"});
-        this.getList({start: len, loadMore: true});
+        const temp = {start: len, loadMore: true};
+        if (Object.keys(sortActive).length > 0) {
+            Object.assign(temp, sortActive)
+        }
+        this.getList(temp);
     }
 
     onEdit = (isEdit) => {
@@ -164,6 +169,7 @@ export default class Photos extends Component<any,{
             if (typeof data.value === "string") {
                 sort = JSON.parse(data.value);
             }
+            this.setState({sortActive: sort})
             this.getList({
                 start: 0,
                 ...sort

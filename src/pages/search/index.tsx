@@ -1,16 +1,48 @@
 import "./index.less";
-import Taro, {useState} from "@tarojs/taro";
+import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image, ScrollView} from "@tarojs/components";
 import IconFont from "../../components/iconfont";
 import {AtInput} from "taro-ui";
 import Empty from "../../components/empty";
+import {debounce, notNull} from "../../utils/common";
+import {api} from "../../utils/net";
+import searchStore from "../../store/search";
 
 const Search:React.FC<any> = () => {
 
-    const [touched, setTouched] = useState(false)
+    const [touched, setTouched] = useState(false);
+    const [searchList, setSearchList] = useState([]);
+
+    async function getSearchList(keywords) {
+        setTouched(true)
+        try{
+            const res = await api("app.product_tpl/search", {keywords});
+            setSearchList([...res]);
+            searchStore.searchList = [...res];
+        }catch (e) {
+            console.log("获取搜索数据出错：", e)
+        }
+    }
+
+    useEffect(() => {
+        if (searchList.length === 0 && searchStore.searchList.length > 0) {
+            setSearchList([...searchStore.searchList])
+        }
+    }, [])
+
+    const debounceFn = debounce(getSearchList, 1000)
 
     const onSearch = (val, _) => {
         console.log(val)
+        if (!notNull(val)) {
+            // @ts-ignore
+            debounceFn(val)
+        }
+    }
+
+    const onCancel = () => {
+        Taro.navigateBack();
+        searchStore.searchList = []
     }
 
     return (
@@ -22,50 +54,38 @@ const Search:React.FC<any> = () => {
                     </View>
                     <AtInput autoFocus focus name="value" placeholder="搜索" onChange={onSearch} className="search_input_act" />
                 </View>
-                <Text className="cancel_search" onClick={() => Taro.navigateBack()}>取消</Text>
+                <Text className="cancel_search" onClick={onCancel}>取消</Text>
             </View>
             <ScrollView scrollY style={{height: window.screen.height - 70}}>
                 <View className="search_scroll_container">
-                    <View className="search_type_item">
-                        <View className="more">
-                            <Text className="tit">冲印</Text>
-                            <Text className="more_txt">更多 <IconFont name="24_xiayiye" size={32} color="#9C9DA6" /></Text>
-                        </View>
-                        <ScrollView className="x_scroll_search_item" scrollX style={{width: window.screen.width}}>
-                            <View className="scroll_view_x">
-                                {
-                                    [1,2,3,4,5].map((value, index) => (
-                                        <View className="search_item_wrap" key={index}>
-                                            <View className="search_item">
-                                                <Image src="http://palybox-app.oss-cn-chengdu.aliyuncs.com/uploads/file/20201112/f9ae28a4490a1177ac3c48fa7394eef2.file" className="search_item_img" mode="aspectFill" />
-                                            </View>
-                                        </View>
-                                    ))
-                                }
-                            </View>
-                        </ScrollView>
-                    </View>
-                    <View className="search_type_item">
-                        <View className="more">
-                            <Text className="tit">手机壳</Text>
-                            <Text className="more_txt">更多 <IconFont name="24_xiayiye" size={32} color="#9C9DA6" /></Text>
-                        </View>
-                        <ScrollView className="x_scroll_search_item" scrollX style={{width: window.screen.width}}>
-                            <View className="scroll_view_x">
-                                {
-                                    [1,2,3,4,5].map((value, index) => (
-                                        <View className="search_item_wrap" key={index}>
-                                            <View className="search_item circle">
-                                                <Image src="http://palybox-app.oss-cn-chengdu.aliyuncs.com/uploads/file/20201112/f9ae28a4490a1177ac3c48fa7394eef2.file" className="search_item_img" mode="aspectFill" />
-                                            </View>
-                                        </View>
-                                    ))
-                                }
-                            </View>
-                        </ScrollView>
-                    </View>
                     {
-                        touched ? <Empty icon={require("../../source/empty/searchnull.png")} content="什么都没有，换个词试试呢" /> : null
+                        searchList.map((value, index) => (
+                            <View className="search_type_item" key={index}>
+                                <View className="more">
+                                    <Text className="tit">{value.name}</Text>
+                                    <Text className="more_txt"
+                                          onClick={() => Taro.navigateTo({url: `/pages/search/result?tpl_category_id=${value.tpl_category_id}&title=${value.name}`})}>
+                                        更多 <IconFont name="24_xiayiye" size={32} color="#9C9DA6" />
+                                    </Text>
+                                </View>
+                                <ScrollView className="x_scroll_search_item" scrollX style={{width: window.screen.width}}>
+                                    <View className="scroll_view_x">
+                                        {
+                                            value.list.map((item, childIdx) => (
+                                                <View className="search_item_wrap" key={childIdx}>
+                                                    <View className="search_item circle">
+                                                        <Image src={item.thumb_image} className="search_item_img" mode="aspectFill" />
+                                                    </View>
+                                                </View>
+                                            ))
+                                        }
+                                    </View>
+                                </ScrollView>
+                            </View>
+                        ))
+                    }
+                    {
+                        touched && searchList.length === 0 ? <Empty icon={require("../../source/empty/searchnull.png")} content="什么都没有，换个词试试呢" /> : null
                     }
                 </View>
             </ScrollView>
