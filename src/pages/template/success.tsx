@@ -37,6 +37,7 @@ export default class Success extends Component<any,{
 
     render() {
         const {  } = this.state;
+        const {way,price} = this.$router.params;
         return (
             <View className='success'>
                 <View className='nav-bar'>
@@ -55,7 +56,11 @@ export default class Success extends Component<any,{
                         <Text className='txt'>支付成功</Text>
                     </View>
                     <View className="ops">
-                        <Button className='look-order-btn'>查看订单</Button>
+                        <Button className='look-order-btn' onClick={()=>{
+                            Taro.navigateTo({
+                                url:'/pages/me/order?tab=1'
+                            })
+                        }}>查看订单</Button>
                         <Button className='back-home-btn' onClick={()=>{
                             Taro.switchTab({
                                 url:'/pages/index/index'
@@ -65,13 +70,13 @@ export default class Success extends Component<any,{
                 </View>
                 <View className='line'>
                     <Text className='left'>支付方式</Text>
-                    <Text className='way'>支付宝</Text>
+                    <Text className='way'>{way=="alipay"?'支付宝':'微信'}</Text>
                 </View>
                 <View className='line'>
                     <Text className='left'>支付金额</Text>
                     <View className='right'>
                         <Text className='sym'>¥</Text>
-                        <Text className='num'>49.00</Text>
+                        <Text className='num'>{price}</Text>
                     </View>
                 </View>
                 <View className='warm'>

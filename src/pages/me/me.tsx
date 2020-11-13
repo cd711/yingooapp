@@ -381,7 +381,7 @@ export default class Me extends Component<any, MeProps> {
                             <View className='orderstate'>
                                 <View className='oitem' onClick={() => {
                                     Taro.navigateTo({
-                                        url: '/pages/me/order?switch=1'
+                                        url: '/pages/me/order?tab=1'
                                     })
                                 }}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
@@ -389,7 +389,7 @@ export default class Me extends Component<any, MeProps> {
                                 </View>
                                 <View className='oitem' onClick={() => {
                                     Taro.navigateTo({
-                                        url: '/pages/me/order?switch=2'
+                                        url: '/pages/me/order?tab=2'
                                     })
                                 }}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
@@ -397,7 +397,7 @@ export default class Me extends Component<any, MeProps> {
                                 </View>
                                 <View className='oitem' onClick={() => {
                                     Taro.navigateTo({
-                                        url: '/pages/me/order?switch=3'
+                                        url: '/pages/me/order?tab=3'
                                     })
                                 }}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>

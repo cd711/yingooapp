@@ -36,6 +36,13 @@ export function is_weixin()  { //判断是否是微信
     return ua.indexOf('micromessenger') != -1;
 }
 
+export interface ListModel{
+    list:Array<any>,
+    size:number,
+    start:number,
+    total:number
+}
+
 export const jsApiList = [
     'checkJsApi',
     'onMenuShareTimeline',

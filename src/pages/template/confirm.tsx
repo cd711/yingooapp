@@ -277,6 +277,7 @@ export default class Confirm extends Component<any,{
         })
     }
     setWXpayConfig = (callback:()=>void) =>{
+        alert(window.location.href.split('#')[0]);
         api("wechat/jssdkconfig",{
             url:window.location.href.split('#')[0]
         }).then((res)=>{
@@ -319,27 +320,33 @@ export default class Confirm extends Component<any,{
                         paySign: res.payinfo.paySign, // 支付签名
                         success: function (result) {
                           // 支付成功后的回调函数
-                          alert(JSON.stringify(result));
+                          alert(`${JSON.stringify(result)} ccc`);
                         },
                         error:(e)=>{
-                            alert(JSON.stringify(e));
+                            alert(`${JSON.stringify(e)} ddd`);
                         }
                     });
                 });
             })
+        } else {
+            this.submitOrder(d,(res)=>{
+                window.location.href = res.payinfo;
+            })
         }
-        // window.location.href = res;
+        // ;
     }
     submitOrder = (d:any,callback:(res: any)=>void) =>{
         Taro.showLoading({title:"加载中"})
         api("app.pay/add",d).then((res)=>{
-            console.log(res);
             Taro.hideLoading();
             callback && callback(res);
         }).catch((e)=>{
-            console.log(e);
             Taro.hideLoading();
-
+            Taro.showToast({
+                title:e,
+                icon:'none',
+                duration:2000
+            });
         })
     }
      render() {
