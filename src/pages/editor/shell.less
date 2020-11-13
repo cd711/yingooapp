@@ -340,3 +340,72 @@
         }
     }
 }
+
+.template_change_text_container{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #00000090;
+    padding-top: 88px;
+    box-sizing: border-box;
+    .act_bar{
+        width: 100%;
+        display: flex;
+        height: 96px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        box-sizing: border-box;
+    }
+    .input{
+        display: block;
+        margin-top: 62px;
+        padding: 0 32px;
+        .input_act{
+            margin: 0;
+            background: transparent;
+            color: #fff;
+            text-align: center;
+            font-size: 48px;
+            &:after{
+                border-color: #fff;
+            }
+            input{
+                color: #fff;
+                text-align: center;
+                font-size: 48px;
+            }
+        }
+    }
+}
+
+.font_change_list_main{
+    box-sizing: border-box;
+    width: 100%;
+    .font_change_item{
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        height: 90px;
+        .left{
+            width: 80%;
+            display: flex;
+            align-items: center;
+            .font_img{
+                height: 50px;
+            }
+        }
+
+        .right{
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 20%;
+        }
+    }
+}

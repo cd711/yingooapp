@@ -36,6 +36,58 @@ export function is_weixin()  { //判断是否是微信
     return ua.indexOf('micromessenger') != -1;
 }
 
+export function debounce(fn,delay) {
+    let timeout = null;
+    return function () {
+        if(timeout){
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(() => {
+            fn.apply(this, arguments);
+        },delay);
+    }
+}
+
+export function pageTotal(rowCount: number, pageSize: number) {
+    if (notNull(rowCount) || notNull(pageSize)) {
+        return 0;
+    } else {
+        if (pageSize != 0 && rowCount % pageSize == 0) {
+            return parseInt((rowCount / pageSize).toString())
+        }
+        if (pageSize != 0 && rowCount % pageSize != 0) {
+            return parseInt((rowCount / pageSize).toString()) + 1;
+        }
+    }
+}
+
+/**
+ * 是否允许继续分页，返回下一页页码和是否允许分页
+ * @param currentPage
+ * @param pageTotal
+ * @return {page: number, more: boolean}
+ */
+export function getNextPage(currentPage: number, pageTotal: number) {
+    if (notNull(currentPage) || notNull(pageTotal) || (!notNull(pageTotal) && pageTotal === 0)) {
+        return {
+            page: 0,
+            more: false
+        }
+    } else {
+        if (currentPage === pageTotal) {
+            return {
+                page: pageTotal,
+                more: false
+            }
+        } else {
+            return {
+                page: currentPage + 1,
+                more: true
+            }
+        }
+    }
+}
+
 export const jsApiList = [
     'checkJsApi',
     'onMenuShareTimeline',

@@ -1,6 +1,6 @@
 import Taro, {Component, useEffect, useState} from '@tarojs/taro';
 import {Image, ScrollView, Text, View} from '@tarojs/components';
-import {AtActivityIndicator, AtSlider} from "taro-ui";
+import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
 import './editor.less';
 import './shell.less';
 
@@ -10,7 +10,7 @@ import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import Fragment from '../../components/Fragment';
 import UploadFile from "../../components/Upload/Upload";
-import {notNull, ossUrl} from "../../utils/common";
+import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
 import {userStore} from "../../store/user";
 
 let editorProxy: WindowProxy | null | undefined;
@@ -43,6 +43,12 @@ class Store {
 
     @observable
     isEdit = false;
+}
+
+
+interface BaseProps {
+    onClose: () => void,
+    onOk?: () => void,
 }
 
 interface BrandType {
@@ -579,6 +585,217 @@ const ChangeImage: React.FC<ChangeImageProps> = (props) => {
     </View>
 }
 
+
+// 编辑文字
+const ChangeText:React.FC<BaseProps> = props => {
+
+    const {onClose, onOk} = props;
+
+    const defaultDoc = Taro.useRef(null);
+
+    async function getDefaultDoc() {
+        try {
+            const doc = await callEditor("getDoc");
+            console.log("doc", doc)
+            defaultDoc.current = doc;
+        } catch (e) {
+
+        }
+    }
+
+    async function resetImage() {
+        try {
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        } catch (e) {
+            console.log("重置出错：", e)
+        }
+    }
+
+    async function updateTxt(txt) {
+        try{
+            await callEditor("changeText", txt)
+        }catch (e) {
+            console.log("修改文字失败：", e)
+        }
+    }
+
+    useEffect(() => {
+        getDefaultDoc()
+    }, [])
+
+    const debounceFn = debounce(updateTxt, 1000)
+
+    const onTextChange = (val, _) => {
+        console.log(val)
+        if (!notNull(val)) {
+            // @ts-ignore
+            debounceFn(val)
+        }
+    }
+
+    const _onClose = () => {
+        resetImage()
+        onClose && onClose()
+    }
+
+    const _onOk = () => {
+        onOk && onOk()
+    }
+
+    return (
+        <View className="template_change_text_container">
+            <View className="act_bar">
+                <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={48} color="#fff"/></View>
+                <View className="submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
+            </View>
+            <View className="input">
+                <AtInput name="txt" className="input_act" onChange={onTextChange} autoFocus focus />
+            </View>
+        </View>
+    )
+}
+
+// 选择字体
+const SelectFont: React.FC<BaseProps> = props => {
+
+    const {onClose, onOk} = props;
+
+    const defaultDoc = Taro.useRef(null);
+    const [fontList, setFontList] = useState([]);
+    const [fontSelected, setFontSelected] = useState(null);
+    const [page, setPage] = useState(0);
+    const _total = Taro.useRef(0)
+
+    async function getFontList(data) {
+        const opt = {
+            page: data.start || 0,
+            size: data.size || 15,
+            loadMore: data.loadMore || false
+        };
+
+        try {
+            const res = await api("admin.font/index", {
+                page: opt.page,
+                size: opt.size
+            });
+            console.log(res.total)
+            _total.current = Number(res.total) || 0;
+            let arr = [];
+            if (opt.loadMore) {
+                arr = [...fontList, ...res.list]
+            } else {
+                arr = res.list || []
+            }
+            setFontList([...arr])
+        }catch (e) {
+            console.log("获取字体列表出错：", e)
+        }
+    }
+
+    async function getDefaultDoc() {
+        try {
+            const doc = await callEditor("getDoc");
+            console.log("doc", doc)
+            defaultDoc.current = doc;
+        } catch (e) {
+
+        }
+    }
+
+    async function resetImage() {
+        try {
+            if (defaultDoc.current) {
+                await callEditor("setDoc", defaultDoc.current);
+            }
+        } catch (e) {
+            console.log("重置出错：", e)
+        }
+    }
+
+    useEffect(() => {
+        getFontList({start: 0})
+        getDefaultDoc()
+    }, [])
+
+    const _onClose = () => {
+        resetImage()
+        onClose && onClose()
+    }
+
+    const _onOk = () => {
+        onOk && onOk()
+    }
+
+    const loadMore = () => {
+        console.log("加载更多", _total.current)
+        const pagtion = getNextPage(page, pageTotal(_total.current, 15));
+        console.log("分页参数：", pagtion)
+
+        if (_total.current === fontList.length || _total.current < 15 || !pagtion.more) {
+            return
+        }
+        setPage(pagtion.page)
+        getFontList({
+            start: pagtion.page,
+            loadMore: true
+        })
+    }
+
+    const onSelectFont = async (font: {id: number, name: string, thumbnail: string, font: string}) => {
+        if (!notNull(fontSelected) && fontSelected === Number(font.id)) {
+            setFontSelected(null);
+            resetImage();
+            return
+        }
+
+        setFontSelected(Number(font.id));
+
+        try{
+            await callEditor("changeTextFont", font.font)
+        }catch (e) {
+            console.log("更换字体出错：", e)
+        }
+    }
+
+    return(
+        <View className="change_image_container">
+            <View className="change_main">
+                <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
+                    <View className="font_change_list_main">
+                        {
+                           fontList.map((value, index) => (
+                               <View className="font_change_item" key={index} onClick={() => onSelectFont(value)}>
+                                   <View className="left">
+                                        <Image src={value.thumbnail} className="font_img"
+                                               mode="aspectFit"
+                                               style={{
+                                                   width: window.screen.availWidth * 0.75 - 32
+                                               }}
+                                        />
+                                   </View>
+                                   <View className="right">
+                                        <View className="dowload">
+                                            <IconFont name="20_congyunduanxiazai" size={40} color="#999"/>
+                                        </View>
+                                   </View>
+                               </View>
+                           ))
+                        }
+                    </View>
+                </ScrollView>
+                <View className='optBar'>
+                    <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>
+                    <Text className='txt'>字体</Text>
+                    <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
+                </View>
+            </View>
+            <View className="mask"/>
+        </View>
+    )
+}
+
 // 透明度
 const ChangeAlpha: React.FC<ChangeImageProps> = (props) => {
 
@@ -990,6 +1207,10 @@ export default class Shell extends Component<{}, {
         switch (item.type) {
             case "img":
                 this.store.tool = 1;
+                break;
+            case "text":
+                this.store.tool = 2;
+                break;
         }
     }
 
@@ -1041,6 +1262,16 @@ export default class Shell extends Component<{}, {
         const cancelEdit = () => {
             this.store.tool = 0;
             this.store.isEdit = false;
+        }
+
+        const changeTxt = () => {
+            this.store.tool = 6;
+            this.store.isEdit = true;
+        }
+
+        const selectFont = () => {
+            this.store.tool = 7;
+            this.store.isEdit = true;
         }
 
         // 水平翻转
@@ -1113,6 +1344,28 @@ export default class Shell extends Component<{}, {
                             {/*</View>*/}
                         </View>
 
+                    case 2: // 文字编辑
+                        return <View key={s} className='tools'>
+                            <View className='btn' onClick={changeTxt}>
+                                <IconFont name='24_bianjiqi_huantu' size={48}/>
+                                <Text className='txt'>编辑</Text>
+                            </View>
+                            <View className='btn' onClick={selectFont}>
+                                <IconFont name='24_bianjiqi_ziti' size={48}/>
+                                <Text className='txt'>字体</Text>
+                            </View>
+                            <View className='btn'>
+                                <IconFont name='24_bianjiqi_yangshi' size={48}/>
+                                <Text className='txt'>样式</Text>
+                            </View>
+                            <View className='btn'>
+                                <View className='icon'>
+                                    <IconFont name='24_bianjiqi_shanchu' size={48}/>
+                                </View>
+                                <Text className='txt'>删除</Text>
+                            </View>
+                        </View>
+
                     case 4: // 换图
                         return <ChangeImage
                             onClose={cancelEdit}
@@ -1121,10 +1374,15 @@ export default class Shell extends Component<{}, {
 
                     case 5: // 透明度
                         return <ChangeAlpha onClose={cancelEdit} onOk={onOk}/>
+
+                    case 6: // 编辑文字
+                        return <ChangeText onClose={cancelEdit} onOk={onOk} />
+
+                    case 7: // 选择字体
+                        return <SelectFont onClose={cancelEdit} onOk={onOk} />
+
                 }
             }))[0]}
         </View>
     }
 }
-
-
