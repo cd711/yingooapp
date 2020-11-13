@@ -753,7 +753,7 @@ const SelectFont: React.FC<BaseProps> = props => {
         setFontSelected(Number(font.id));
 
         try{
-            await callEditor("changeTextFont", font.font)
+            await callEditor("changeTextFont", font["font-family"], font.font)
         }catch (e) {
             console.log("更换字体出错：", e)
         }
@@ -777,7 +777,10 @@ const SelectFont: React.FC<BaseProps> = props => {
                                    </View>
                                    <View className="right">
                                         <View className="dowload">
-                                            <IconFont name="20_congyunduanxiazai" size={40} color="#999"/>
+                                            <IconFont name={fontSelected === Number(value.id) ? "22_yixuanzhong" : "20_congyunduanxiazai"}
+                                                      size={40}
+                                                      // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
+                                            />
                                         </View>
                                    </View>
                                </View>
