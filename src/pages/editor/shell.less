@@ -409,3 +409,63 @@
         }
     }
 }
+
+.font_change_style_container{
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    .change_item{
+        box-sizing: border-box;
+        width: 100%;
+        display: block;
+        padding: 0 32px;
+        margin-bottom: 15px;
+        .tit{
+            color: #9C9DA6;
+            font-size: 24px;
+            display: block;
+            padding: 24px 0;
+        }
+        .change_item_ctx{
+            display: flex;
+            align-items: center;
+            .style_item{
+                width: 88px;
+                height: 88px;
+                border: 1px solid #EDEDEF;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .border{
+                width: 2px;
+                height: 64px;
+                background: #DFDFE0;
+                margin: 0 40px;
+            }
+        }
+        .colors_items{
+            display: flex;
+            align-items: center;
+            .color_wrap{
+                flex: 1;
+                .color_item{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 96px;
+                    height: 96px;
+                    border: 1px solid transparent;
+                    border-radius: 14px;
+                    .color{
+                        display: block;
+                        width: 88px;
+                        height: 88px;
+                        border-radius: 14px;
+                    }
+                }
+            }
+        }
+    }
+}
