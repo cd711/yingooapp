@@ -42,7 +42,9 @@ export default class Success extends Component<any,{
             <View className='success'>
                 <View className='nav-bar'>
                     <View className='left' onClick={()=>{
-                        Taro.navigateBack();
+                        Taro.navigateTo({
+                            url:'/pages/me/order?tab=1'
+                        })
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
