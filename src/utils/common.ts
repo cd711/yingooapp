@@ -148,3 +148,5 @@ export const jsApiList = [
     'onReceiveDataFromWXDevice',
     'onWXDeviceBluetoothStateChange'
 ];
+
+

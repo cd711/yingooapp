@@ -305,7 +305,7 @@ export default class Confirm extends Component<any,{
             pay_type:"wechat",
             pay_method:"wap"
         }
-        alert(is_weixin())
+        // alert(is_weixin())
         if (is_weixin()) {
             
             d["pay_method"] = 'mp';

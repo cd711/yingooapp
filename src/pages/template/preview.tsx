@@ -226,12 +226,11 @@ export default class Preview extends Component<{}, {
             this.setState({isOpened: true})
             return
         }
-        if (saveId) {
+        if (parseInt(saveId+'')>0) {
             this.getShellInfo()
         } else {
             this.onSave(null,()=>{
                 this.getShellInfo()
-
             });
         }
     }
