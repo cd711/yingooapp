@@ -1587,12 +1587,12 @@ export default class Shell extends Component<{}, {
                                 <IconFont name='24_bianjiqi_yangshi' size={48}/>
                                 <Text className='txt'>样式</Text>
                             </View>
-                            <View className='btn'>
-                                <View className='icon'>
-                                    <IconFont name='24_bianjiqi_shanchu' size={48}/>
-                                </View>
-                                <Text className='txt'>删除</Text>
-                            </View>
+                            {/*<View className='btn'>*/}
+                            {/*    <View className='icon'>*/}
+                            {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
+                            {/*    </View>*/}
+                            {/*    <Text className='txt'>删除</Text>*/}
+                            {/*</View>*/}
                         </View>
 
                     case 4: // 换图

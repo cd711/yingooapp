@@ -58,7 +58,8 @@ class App extends Component {
             'pages/template/confirm',
             'pages/template/success',
             'pages/cart/index',
-            'pages/search/index'
+            'pages/search/index',
+            'pages/search/result',
         ],
         window: {
             backgroundTextStyle: 'light',
