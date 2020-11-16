@@ -1,22 +1,27 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image, Button } from '@tarojs/components'
+import { View, Text,Image, Button,ScrollView } from '@tarojs/components'
 import './order.less'
 import IconFont from '../../components/iconfont';
 // / npx iconfont-taro
 import {userStore} from "../../store/user";
+import {templateStore} from "../../store/template";
 import { observer, inject } from '@tarojs/mobx'
 import { AtNavBar} from 'taro-ui'
 import { api } from '../../utils/net';
 import { ListModel, ossUrl } from '../../utils/common';
-import lodash from 'lodash';
+
+import PayWayModal from '../../components/payway/PayWayModal';
 
 const tabs = ["全部","待付款","待发货","待收货","已完成"];
 
-@inject("userStore")
+@inject("userStore","templateStore")
 @observer
 export default class Order extends Component<any,{
     switchTabActive:number;
-    data:ListModel
+    data:ListModel;
+    showPayWayModal:boolean;
+    order_price:string;
+    order_sn:string
 }> {
 
     config: Config = {
@@ -33,14 +38,17 @@ export default class Order extends Component<any,{
                 start:0,
                 size:0,
                 total:0
-            }
+            },
+            showPayWayModal:false,
+            order_price:"0.00",
+            order_sn:""
         }
     }
     componentDidMount(){
         console.log(userStore.nickname);
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
-
+        templateStore.address = null;
         if(parseInt(tab)>=0){
             if (switchTabActive != parseInt(tab)) {
                 this.setState({
@@ -127,14 +135,27 @@ export default class Order extends Component<any,{
             });
         })
     }
+    onResult = (res) => {
+        if (res.code == 1) {
+            
+        } else {
+            Taro.showToast({
+                title:res.data,
+                icon:'none',
+                duration:2000
+            });
+        }
+    }
     render() {
-        const {switchTabActive,data} = this.state;
+        const {switchTabActive,data,showPayWayModal,order_price,order_sn} = this.state;
         const list = data && data.list && data.list.length>0 ? data.list:[];
         return (
             <View className='order'>
                 <AtNavBar
                     onClickLeftIcon={()=>{
-                        Taro.navigateBack();
+                        Taro.reLaunch({
+                            url:'/pages/me/me'
+                        });
                     }}
                     color='#121314'
                     title='我的订单'
@@ -161,6 +182,7 @@ export default class Order extends Component<any,{
                         ))
                     }
                 </View>
+                <ScrollView scrollY>
                 <View className='container'>
                     {
                         list.length == 0 ? <View className='empty'>
@@ -225,7 +247,14 @@ export default class Order extends Component<any,{
                                                 url:`/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
-                                        <Button className='red-full-btn'>去支付</Button>
+                                        <Button className='red-full-btn' onClick={()=>{
+                                            console.log(item.order_sn)
+                                            this.setState({
+                                                order_price:item.order_price,
+                                                order_sn:item.order_sn,
+                                                showPayWayModal:true
+                                            })
+                                        }}>去支付</Button>
                                     </View>:item.status == 2 ? <View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
@@ -253,6 +282,17 @@ export default class Order extends Component<any,{
                     }
                     
                 </View>
+                </ScrollView>
+                <PayWayModal 
+                    isShow={showPayWayModal} 
+                    totalPrice={parseFloat(order_price+"")>0?parseFloat(order_price+"").toFixed(2):"0.00"} 
+                    order_sn={order_sn}
+                    onResult={this.onResult}
+                    onClose={()=>{
+                        this.setState({
+                            showPayWayModal:false
+                        })
+                    }}/>
             </View>
         )
     }

@@ -6,12 +6,19 @@ import { api } from '../../utils/net'
 import lodash from 'lodash';
 import { ossUrl } from '../../utils/common';
 import moment from "moment";
+import PayWayModal from '../../components/payway/PayWayModal';
+import { templateStore } from '../../store/template';
+import { observer, inject } from '@tarojs/mobx';
 
+
+@inject("templateStore")
+@observer
 export default class OrderDetail extends Component<any,{
     data:any,
     hours:string,
     minutes:string,
-    seconds:string
+    seconds:string,
+    showPayWayModal:boolean
 }> {
 
     config: Config = {
@@ -24,10 +31,12 @@ export default class OrderDetail extends Component<any,{
             data:{},
             hours:"00",
             minutes:"00",
-            seconds:"00"
+            seconds:"00",
+            showPayWayModal:false
         }
     }
     componentDidMount(){
+        templateStore.address = null;
         const {id} = this.$router.params;
         if (id) {
             api("app.order/info",{
@@ -43,7 +52,43 @@ export default class OrderDetail extends Component<any,{
                 if (res.status == 1) {
                     this.calcTime(res.create_time);
                 }
+            }).catch((e)=>{
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:e||"服务器开小差了，稍后再试",
+                    icon:"none",
+                    duration:2000
+                })
+            })
+        }
 
+    }
+    componentDidShow(){
+        if(templateStore.address !=  null){
+            Taro.showLoading({title:"加载中..."});
+            const {data} = this.state;
+            api("app.order/editAddress",{
+                id:data.id,
+                address_id:templateStore.address.id
+            }).then((res)=>{
+                Taro.hideLoading();
+                this.setState({
+                    data:res,
+                    hours:"00",
+                    minutes:"00",
+                    seconds:"00"
+                });
+                if (res.status == 1) {
+                    this.calcTime(res.create_time);
+                }
+            }).catch((e)=>{
+                console.log(e)
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:e||"服务器开小差了，稍后再试",
+                    icon:"none",
+                    duration:2000
+                })
             })
         }
 
@@ -113,8 +158,19 @@ export default class OrderDetail extends Component<any,{
             });
         })
     }
+    onResult = (res) => {
+        if (res.code == 1) {
+            
+        } else {
+            Taro.showToast({
+                title:res.data,
+                icon:'none',
+                duration:2000
+            });
+        }
+    }
     render() {
-        const { data,hours,minutes,seconds } = this.state;
+        const { data,hours,minutes,seconds,showPayWayModal } = this.state;
         const status = data.state_tip?data.state_tip:"";
         const plist = lodash.isEmpty(data.products)?[]:data.products;
         return (
@@ -178,7 +234,6 @@ export default class OrderDetail extends Component<any,{
                         </View>
                         ))
                     }
-
                 </View>
                 <View className='price-list'>
                     <View className='box'>
@@ -216,21 +271,38 @@ export default class OrderDetail extends Component<any,{
                 {
                     data.status == 1?<View className='ops'>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
-                        <Button className='red-border-btn'>修改地址</Button>
+                        <Button className='red-border-btn' onClick={()=>{
+                            Taro.navigateTo({
+                                url:`/pages/me/address/index?t=select&id=${0}`
+                            })
+                        }}>修改地址</Button>
                         {/* <Button className='gray-border-btn' onClick={()=>{
                             Taro.navigateTo({
                                 url:'/pages/me/refund'
                             })
                         }}>申请退款</Button> */}
-                        <Button className='red-full-btn'>去支付</Button>
+                        <Button className='red-full-btn' onClick={()=>{
+                            this.setState({
+                                showPayWayModal:true
+                            })
+                        }}>去支付</Button>
                     </View>:data.status == 2?<View className='ops'>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
-                        <Button className='red-border-btn'>修改地址</Button>
+
                     </View>:data.status == 4?<View className='ops'>
                         <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
                     </View>:null
                 }
-                
+                <PayWayModal 
+                    isShow={showPayWayModal} 
+                    totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"} 
+                    order_sn={data.order_sn}
+                    onResult={this.onResult}
+                    onClose={()=>{
+                        this.setState({
+                            showPayWayModal:false
+                        })
+                    }}/>
             </View>
         )
     }

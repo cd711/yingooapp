@@ -14,31 +14,20 @@ import lodash from 'lodash';
 import Counter from '../../components/counter/counter';
 import FloatModal from '../../components/floatModal/FloatModal';
 import Ticket from '../../components/ticket/Ticket';
-import Checkbox from '../../components/checkbox/checkbox';
 import Fragment from '../../components/Fragment';
-import {notNull, ossUrl,is_weixin,jsApiList} from '../../utils/common';
+import {notNull, ossUrl,jsApiList} from '../../utils/common';
 import { Base64 } from 'js-base64';
 import wx from 'weixin-js-sdk'
+import PayWayModal from '../../components/payway/PayWayModal';
 
-const payway = [
-    {
-        icon:'32_weixinzhifu',
-        name:'微信',
-        checked:true
-    },
-    {
-        icon:'32_zhifubaozhifu',
-        name:'支付宝',
-        checked:false
-    }
-]
+
 
 @inject("templateStore","userStore")
 @observer
 export default class Confirm extends Component<any,{
     showTickedModal:boolean;
     showPayWayModal:boolean;
-    payWayArray:Array<any>;
+
     data:any;
     tickets: [],
     ticketId: number | string | null,
@@ -46,6 +35,7 @@ export default class Confirm extends Component<any,{
     currentTicketOrderId:string,
     currentOrderTicketId:number,
     usedTickets:Array<any>
+    order_sn:string
 }> {
 
     config: Config = {
@@ -57,7 +47,7 @@ export default class Confirm extends Component<any,{
         this.state = {
             showTickedModal: false,
             showPayWayModal: false,
-            payWayArray: payway,
+            order_sn:"",
             data: {},
             tickets: [],
             ticketId: null,
@@ -73,7 +63,7 @@ export default class Confirm extends Component<any,{
         const {skuid,total,tplid,model,orderid,cartIds} = this.$router.params;
         // /pages/template/confirm?skuid=379&total=1&tplid=166&model=343
         if (orderid) {
-            this.checkOrder(orderid,true);
+            this.checkOrder(orderid);
         } else {
 
             let data:any = {
@@ -130,12 +120,12 @@ export default class Confirm extends Component<any,{
         }
     }
 
-    checkOrder = (id,isInfo) => {
+    checkOrder = (id) => {
         Taro.showLoading({title:"加载中"});
-        let url = "app.order_temp/check";
-        if (isInfo) {
-            url = "app.order_temp/info";
-        }
+        const url = "app.order_temp/info";
+        // if (isInfo) {
+        //     url = "app.order_temp/info";
+        // }
         api(url,{
             prepay_id:id
         }).then((res)=>{
@@ -144,18 +134,10 @@ export default class Confirm extends Component<any,{
             templateStore.address = res.address;
             this.setState({
                 data:res,
-                showPayWayModal:isInfo?false:true
+                // showPayWayModal:isInfo?false:true
             });
         }).catch(e => {
             Taro.hideLoading();
-            console.log(isInfo)
-            if (!isInfo) {
-                setTimeout(() => {
-                    Taro.switchTab({
-                        url:'/pages/index/index'
-                    })
-                }, 2000);
-            }
             Taro.showToast({
                 title: e,
                 icon: "none",
@@ -185,7 +167,17 @@ export default class Confirm extends Component<any,{
         //     showPayWayModal:true
         // })
         const { data } = this.state;
-        this.checkOrder(data.prepay_id,false);
+        // this.checkOrder(data.prepay_id,false);
+        api('app.order/add',{
+            prepay_id:data.prepay_id,
+            remarks:""
+        }).then((res)=>{
+            // console.log(res);
+            this.setState({
+                order_sn:res.order_sn,
+                showPayWayModal:true
+            })
+        })
 
     }
 
@@ -276,88 +268,24 @@ export default class Confirm extends Component<any,{
             currentOrderTicketId:0
         })
     }
-    setWXpayConfig = (callback:()=>void) =>{
-        alert(window.location.href.split('#')[0]);
-        api("wechat/jssdkconfig",{
-            url:window.location.href.split('#')[0]
-        }).then((res)=>{
-            alert(`${JSON.stringify(res)} aaa`);
-            wx.config({
-                debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-                appId: res.appId, // 必填，公众号的唯一标识
-                timestamp: res.timestamp, // 必填，生成签名的时间戳
-                nonceStr: res.nonceStr, // 必填，生成签名的随机串
-                signature: res.signature,// 必填，签名
-                jsApiList: jsApiList // 必填，需要使用的JS接口列表
-            });
-            wx.ready(()=>{
-                if (callback) callback()
-            })
-        }).catch((e)=>{
-            alert(JSON.stringify(e));
-        })
-    }
-    // 确认支付，返回url
-    onSurePay = () => {
-        const {data} = this.state;
-        const d = {
-            prepay_id:data.prepay_id,
-            pay_type:"wechat",
-            pay_method:"wap"
-        }
-        // alert(is_weixin())
-        if (is_weixin()) {
+    onResult = (res) => {
+        if (res.code == 1) {
             
-            d["pay_method"] = 'mp';
-            this.setWXpayConfig(()=>{
-                this.submitOrder(d,(res)=>{
-                    alert(`${JSON.stringify(res)} bbb`)
-                    wx.chooseWXPay({
-                        timestamp: res.payinfo.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                        nonceStr: res.payinfo.nonceStr, // 支付签名随机串，不长于 32 位
-                        package: res.payinfo.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                        signType: res.payinfo.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                        paySign: res.payinfo.paySign, // 支付签名
-                        success: function (result) {
-                          // 支付成功后的回调函数
-                          alert(`${JSON.stringify(result)} ccc`);
-                        },
-                        error:(e)=>{
-                            alert(`${JSON.stringify(e)} ddd`);
-                        }
-                    });
-                });
-            })
         } else {
-            this.submitOrder(d,(res)=>{
-                window.location.href = res.payinfo;
-            })
-        }
-        // ;
-    }
-    submitOrder = (d:any,callback:(res: any)=>void) =>{
-        Taro.showLoading({title:"加载中"})
-        api("app.pay/add",d).then((res)=>{
-            Taro.hideLoading();
-            callback && callback(res);
-        }).catch((e)=>{
-            Taro.hideLoading();
             Taro.showToast({
-                title:e,
+                title:res.data,
                 icon:'none',
                 duration:2000
             });
-        })
+        }
     }
-     render() {
-        const { showTickedModal,showPayWayModal,payWayArray,data, tickets,usedTickets} = this.state;
+    render() {
+        const { showTickedModal,showPayWayModal,data, tickets,usedTickets,order_sn} = this.state;
         const { address } = templateStore;
         return (
             <View className='confirm'>
                 <View className='nav-bar'>
                     <View className='left' onClick={()=>{
-
-                        // console.log(Taro.getCurrentPages().length)
                         Taro.navigateBack();
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
@@ -547,58 +475,19 @@ export default class Confirm extends Component<any,{
                         }}>使用</Button>
                     </View>
                 </FloatModal>
-                <View className='paywaymodal'>
-                    <FloatModal isShow={showPayWayModal} onClose={()=>{
+                <PayWayModal 
+                    isShow={showPayWayModal} 
+                    totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"} 
+                    order_sn={order_sn}
+                    onResult={this.onResult}
+                    onClose={()=>{
                         this.setState({
                             showPayWayModal:false
-                        });
-                    }}>
-                        <View className='pay-way-modal-content'>
-                            <View className='price-item'>
-                                <Text className="txt">您需要支付</Text>
-                                <View className='price'>
-                                    <Text className='left'>¥</Text>
-                                    <Text className='right'>{parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"00.00"}</Text>
-                                </View>
-                            </View>
-                            <View className='way-list'>
-                                {
-                                    payWayArray.map((item,index)=>(
-                                        <PayWay isCheck={item.checked} icon={item.icon} name={item.name} onPress={()=>{
-                                            this.setState({
-                                                payWayArray:payWayArray.map((it,idx)=>{
-                                                    it.checked = idx == index?true:false;
-                                                    return it;
-                                                })
-                                            })
-                                        }} key={index} />
-                                    ))
-                                }
-                            </View>
-                            <Button className='pay-btn' onClick={this.onSurePay}>确定支付</Button>
-                        </View>
-                    </FloatModal>
-                </View>
+                        })
+                    }}/>
             </View>
         )
     }
 }
-const PayWay: React.FC<any> = ({isCheck,icon,name,onPress}) => {
-    const [isSelect,setIsSelect] = useState(false);
-    useEffect(()=>{
-        if (isCheck != isSelect) {
-            setIsSelect(isCheck);
-        }
-    },[isCheck])
-    return  <View className={isSelect?'xy_pay_way_item xy_pay_way_item_active':'xy_pay_way_item'} onClick={()=>{
-                setIsSelect(true);
-                onPress && onPress()
-            }}>
-            <View className='name'>
-                <IconFont name={icon} size={64} />
-                <Text className='txt'>{name}</Text>
-            </View>
-            <Checkbox isChecked={isSelect} disabled />
-        </View>
-}
+
 
