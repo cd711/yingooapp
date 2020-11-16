@@ -4,7 +4,7 @@ import {View, Text, Image, ScrollView} from "@tarojs/components";
 import IconFont from "../../components/iconfont";
 import {AtInput} from "taro-ui";
 import Empty from "../../components/empty";
-import {debounce, notNull} from "../../utils/common";
+import {debounce, deviceInfo, notNull} from "../../utils/common";
 import {api} from "../../utils/net";
 import searchStore from "../../store/search";
 
@@ -56,7 +56,7 @@ const Search:React.FC<any> = () => {
                 </View>
                 <Text className="cancel_search" onClick={onCancel}>取消</Text>
             </View>
-            <ScrollView scrollY style={{height: window.screen.height - 70}}>
+            <ScrollView scrollY style={{height: deviceInfo.windowHeight - 70}}>
                 <View className="search_scroll_container">
                     {
                         searchList.map((value, index) => (

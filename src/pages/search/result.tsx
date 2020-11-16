@@ -10,8 +10,9 @@ const SearchResult:React.FC<any> = () => {
 
     const [list, setList] = useState([]);
     const total = Taro.useRef(0);
-    const [status, setStatus] = useState("more");
+    const [status, setStatus] = useState<"more" | "noMore" | "loading">("more");
     const router = useRouter();
+    const screen = Taro.getSystemInfoSync();
 
     async function getList(data) {
         const opt = {
@@ -76,7 +77,7 @@ const SearchResult:React.FC<any> = () => {
                     size:24
                 }}
             />
-            <ScrollView scrollY style={{height: window.screen.availHeight - 50}} onScrollToLower={loadMore} >
+            <ScrollView scrollY style={{height: screen.windowHeight - 50}} onScrollToLower={loadMore} >
                 <View className="search_item_container">
                     {
                         list.map((value, index) => (

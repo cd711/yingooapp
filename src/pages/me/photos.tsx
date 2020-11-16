@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {ossUrl} from "../../utils/common";
+import {ossUrl, deviceInfo} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 
@@ -25,6 +25,7 @@ export default class Photos extends Component<any,{
     config: Config = {
         navigationBarTitleText: '首页'
     }
+
     constructor(props){
         super(props);
         this.state = {
@@ -238,7 +239,7 @@ export default class Photos extends Component<any,{
                 </View>
                 <View className='container'>
                     <ScrollView className='list_scrollview'
-                                style={{height: window.screen.height - 52 + 7}}
+                                style={{height: deviceInfo.windowHeight - 52 + 7}}
                                 scrollY
                                 scrollWithAnimation
                                 onScrollToLower={this.loadMore}>

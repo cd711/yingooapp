@@ -4,6 +4,7 @@ import Taro, {useState} from "@tarojs/taro";
 import IconFont from "../../components/iconfont";
 import UploadFile from "../../components/Upload/Upload";
 import "./feedback.less";
+import {deviceInfo} from "../../utils/common";
 
 const Feedback: React.FC<any> = (_) => {
 
@@ -59,7 +60,7 @@ const Feedback: React.FC<any> = (_) => {
                           leftIconType={{value:'chevron-left', color:'#121314', size:24}}
                 />
             </View>
-            <ScrollView scrollY style={{height: window.screen.height - 50}}>
+            <ScrollView scrollY style={{height: deviceInfo.windowHeight - 50}}>
                 <View className="feedback_selector">
                     {
                         feedBackArr.map((value, index) => (

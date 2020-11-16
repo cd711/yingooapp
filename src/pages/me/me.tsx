@@ -7,7 +7,7 @@ import {inject, observer} from '@tarojs/mobx'
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {api} from "../../utils/net";
 import moment from "moment";
-import {getImageSize, ossUrl} from "../../utils/common";
+import {deviceInfo, getImageSize, ossUrl} from "../../utils/common";
 import Empty from "../../components/empty";
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import {AtModal} from "taro-ui";
@@ -146,6 +146,7 @@ export default class Me extends Component<any, MeProps> {
 
     componentDidMount() {
         this.getWorksList({start: 0})
+        console.log(deviceInfo)
     }
 
     onScroll = (e) => {
@@ -332,7 +333,7 @@ export default class Me extends Component<any, MeProps> {
                         />
                         : null
                 }
-                <ScrollView scrollY className="content_scroll" style={{height: window.screen.height - 50}} onScrollToLower={this.lodeMore} onScroll={this.onScroll}>
+                <ScrollView scrollY className="content_scroll" style={{height: deviceInfo.windowHeight - 50}} onScrollToLower={this.lodeMore} onScroll={this.onScroll}>
                     <View className='topBox'>
                         <View className="fix_top">
                             <View className={`top ${fixed ? "fiex_set" : ""}`}>
