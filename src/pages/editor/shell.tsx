@@ -1304,7 +1304,7 @@ export default class Shell extends Component<{}, {
         window.addEventListener("message", this.onMsg);
 
         try {
-            const mod = Taro.getStorageSync("phone_model");
+            const mod = Taro.getStorageSync("phone_mode");
             this.defaultModel = mod;
         } catch(e) {
 
