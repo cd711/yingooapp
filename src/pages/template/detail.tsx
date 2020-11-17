@@ -4,19 +4,14 @@ import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import {AtModal, AtNavBar} from 'taro-ui'
-// import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-// import { AtLoadMore } from 'taro-ui';
-// import lodash from 'lodash';
 import moment from 'moment';
 import {notNull, ossUrl} from '../../utils/common'
 import {userStore} from "../../store/user";
-// interface LikeData{
-//     list:Array<any>,
-//     size:number,
-//     start:number,
-//     total:number
-// }
+import Modal from "../../components/UITopProvider/modal";
+import Login from "../../components/login/login";
+import UITopProvider, {UITop} from "../../components/UITopProvider";
+
 
 @inject("templateStore")
 @observer
@@ -115,7 +110,13 @@ export default class Detail extends Component<any,{
         const {currentItem} = this.state;
         const {id} = userStore;
         if (notNull(id)) {
-            this.setState({isOpened: true})
+            const key = Modal.show(
+                <Login onClose={() => UITop.remove(key)}
+                       onOk={() => {
+                           UITop.remove(key);
+                           window.location.replace(`/pages/login/index`);
+                       }} />
+                )
             return
         }
         Taro.navigateTo({
@@ -144,6 +145,7 @@ export default class Detail extends Component<any,{
         const { isLike,likeList,currentItem, isOpened } = this.state;
         return (
             <View className='detail'>
+                <UITopProvider/>
                 <AtNavBar
                     onClickLeftIcon={()=>{
                         Taro.navigateBack();

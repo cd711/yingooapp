@@ -27,12 +27,23 @@ export default class Setting extends Component<any,{
         }
     }
 
+    loginOut = () => {
+        try{
+            Taro.removeStorageSync("TaroInfoKey");
+            Taro.removeStorageSync("token");
+            userStore.clear();
+            this.setState({tipModalShow: false})
+            Taro.showLoading({title: "请稍后..."});
 
-
-    componentDidMount() {
-        // alert(Taro.getSystemInfoSync().statusBarHeight);
-        console.log(Taro.getSystemInfoSync(),userStore.nickname)
-
+            setTimeout(() => {
+                Taro.hideLoading()
+            }, 1500)
+            setTimeout(() => {
+                Taro.reLaunch({url: "/pages/index/index"});
+            }, 1501)
+        }catch (e) {
+            console.log(e)
+        }
     }
 
     render() {
@@ -118,17 +129,11 @@ export default class Setting extends Component<any,{
                     })
                 }}>退出登录</Button>
                 <View style={{paddingTop:54}}></View>
-                <TipModal isShow={tipModalShow} tip='是否退出当前账号？' onCancel={(e)=>{
+                <TipModal isShow={tipModalShow} tip='是否退出当前账号？' onCancel={()=>{
                     this.setState({
                         tipModalShow:false
                     })
-                    console.log(e)
-                }} onOK={()=>{
-                    Taro.removeStorage({key:"TaroInfoKey"});
-                    Taro.removeStorage({key:"token"});
-                    userStore.clear();
-                    Taro.switchTab({url:"/pages/index/index"});
-                }} cancelText='不退出' okText='退出' />
+                }} onOK={this.loginOut} cancelText='不退出' okText='退出' />
             </View>
         )
     }

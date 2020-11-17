@@ -4,7 +4,6 @@ import './index.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import { LoginFooter } from './footer'
-// import { api } from '../../utils/net'
 
 export default class Login extends Component<any,{
     codeBtnActive:boolean;
@@ -40,7 +39,7 @@ export default class Login extends Component<any,{
         } else {
             this.setState({
                 showMobileClear:false
-            }) 
+            })
         }
         if (pattern.test(value)) {
             this.setState({

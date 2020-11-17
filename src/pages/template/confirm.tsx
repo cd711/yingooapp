@@ -151,7 +151,7 @@ export default class Confirm extends Component<any,{
             console.log(isInfo)
             if (!isInfo) {
                 setTimeout(() => {
-                    Taro.switchTab({
+                    Taro.reLaunch({
                         url:'/pages/index/index'
                     })
                 }, 2000);
@@ -223,7 +223,7 @@ export default class Confirm extends Component<any,{
             }).catch((e)=>{
                 Taro.hideLoading();
                 setTimeout(() => {
-                    Taro.switchTab({
+                    Taro.reLaunch({
                         url:'/pages/index/index'
                     })
                 }, 2000);
@@ -252,7 +252,7 @@ export default class Confirm extends Component<any,{
             }).catch((e)=>{
                 Taro.hideLoading();
                 setTimeout(() => {
-                    Taro.switchTab({
+                    Taro.reLaunch({
                         url:'/pages/index/index'
                     })
                 }, 2000);
@@ -307,7 +307,7 @@ export default class Confirm extends Component<any,{
         }
         alert(is_weixin())
         if (is_weixin()) {
-            
+
             d["pay_method"] = 'mp';
             this.setWXpayConfig(()=>{
                 this.submitOrder(d,(res)=>{

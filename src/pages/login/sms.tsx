@@ -26,7 +26,7 @@ export default class SMS extends Component<any,{
         }
     }
     componentDidMount(){
-        
+
         this.input.inputRef.focus();
         this.sendCode();
     }
@@ -72,7 +72,7 @@ export default class SMS extends Component<any,{
         }).then((res)=>{
             userStore.setInfo(res);
             Taro.hideLoading();
-            Taro.switchTab({
+            Taro.reLaunch({
                 url:"/pages/index/index"
             })
         }).catch((e)=>{

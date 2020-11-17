@@ -4,7 +4,6 @@ import './index.less'
 import IconFont from '../../components/iconfont'
 import { api } from '../../utils/net'
 import {AtActivityIndicator} from 'taro-ui'
-// import { templateStore } from '../../store/template'
 import { observer, inject } from '@tarojs/mobx'
 import {ossUrl} from '../../utils/common'
 
@@ -73,7 +72,7 @@ export default class Template extends Component<any,{
                 icon:"none",
                 duration:2000
             }).then(()=>{
-                Taro.switchTab({
+                Taro.reLaunch({
                     url:'/pages/index/index'
                 })
             });
