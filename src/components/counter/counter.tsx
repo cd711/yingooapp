@@ -7,8 +7,9 @@ interface CounterProps {
     num?: number;
     onCounterChange?: (count: number) => void;
     onButtonClick?: (count: number) => void;
+    max?: number
 }
-const Counter: React.FC<CounterProps> = ({num, onCounterChange, onButtonClick}) => {
+const Counter: React.FC<CounterProps> = ({num, onCounterChange, onButtonClick, max}) => {
     const [number, setNumber] = useState<number>(1);
     useEffect(() => {
         if (onCounterChange) {
@@ -32,6 +33,9 @@ const Counter: React.FC<CounterProps> = ({num, onCounterChange, onButtonClick}) 
         </View>
         <Text className='num'>{number}</Text>
         <View className='add' onClick={(e) => {
+            if (!notNull(max) && num >= max) {
+                return
+            }
             e.stopPropagation();
             if (onButtonClick) {
                 onButtonClick(number + 1);

@@ -185,7 +185,7 @@ export function getURLParamsStr(paramsStr: string) {
 }
 
 /**
- * 序列化地址栏参数, 需从Taro.useRouter()取值
+ * 序列化地址栏参数, 需从Taro.useRouter() / this.$router取值
  *
  * @return {object}  JSON对象
  */
@@ -233,5 +233,51 @@ export function urlDeCode(params) {
     } catch (e) {
         console.log("解析URL为Object出错：", e)
         return {}
+    }
+}
+
+/**
+ * 二分法，求区间
+ * @param arr {array}  原数组
+ * @param findVal  {any}  要找的值
+ * @param key  {string}  要对比的字段
+ * @param leftIndex {number} 当前下标
+ * @param rightIndex  {number}  下一个
+ */
+export function binarySearch(arr, key, findVal, leftIndex, rightIndex) {
+    if (leftIndex > rightIndex) {
+        const find = leftIndex - 1
+
+        return find;
+
+    }
+
+    const midIndex = Math.floor((leftIndex + rightIndex) / 2);
+
+    const midVal = arr[midIndex][key];
+
+    if (midVal > findVal) {
+        return binarySearch(arr, key, findVal, leftIndex, midIndex - 1);
+
+    } else if (midVal < findVal) {
+        return binarySearch(arr, key, findVal, midIndex + 1, rightIndex);
+
+    } else {
+        const find = midIndex + 1;
+
+        return find;
+
+    }
+
+}
+
+export function clearStorge(key: string) {
+    if (!key) {
+        return
+    }
+    try {
+        Taro.removeStorage({key})
+    }catch (e) {
+
     }
 }
