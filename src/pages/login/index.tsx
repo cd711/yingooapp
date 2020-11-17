@@ -3,7 +3,7 @@ import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
-import { LoginFooter } from './footer'
+import LoginFooter from './footer'
 // import { api } from '../../utils/net'
 
 export default class Login extends Component<any,{

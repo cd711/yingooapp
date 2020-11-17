@@ -3,7 +3,7 @@ import { View, Text,Input, Button } from '@tarojs/components'
 import './index.less'
 import './acount.less'
 import HeaderTop from './header'
-import { LoginFooter } from './footer'
+import LoginFooter from './footer'
 
 export default class Login extends Component {
     config: Config = {

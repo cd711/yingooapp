@@ -109,7 +109,7 @@ export function api(name: string, params?: any): Promise<any> {
                 if (res.data.code == 1) {
                     resolve(res.data.data);
                 } else {
-                    reject(res.data.msg);
+                    reject(res.data.msg || res.msg);
                 }
             }
         }).catch(function (e) {

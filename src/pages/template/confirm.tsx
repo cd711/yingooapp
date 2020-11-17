@@ -138,11 +138,18 @@ export default class Confirm extends Component<any,{
             });
         }).catch(e => {
             Taro.hideLoading();
+            setTimeout(() => {
+                console.log('aaaaaaa')
+                window.history.replaceState(null,null,'/pages/me/me');
+                Taro.navigateTo({
+                    url:'/pages/me/order?tab=1'
+                })
+            }, 2000);
             Taro.showToast({
-                title: e,
-                icon: "none",
-                duration:2000
-            })
+                title:e,
+                duration:2000,
+                icon:"none"
+            });
         })
     }
 
@@ -168,15 +175,31 @@ export default class Confirm extends Component<any,{
         // })
         const { data } = this.state;
         // this.checkOrder(data.prepay_id,false);
+        Taro.showLoading({title:'加载中...'})
         api('app.order/add',{
             prepay_id:data.prepay_id,
             remarks:""
         }).then((res)=>{
             // console.log(res);
+            Taro.hideLoading();
             this.setState({
                 order_sn:res.order_sn,
                 showPayWayModal:true
             })
+        }).catch((e)=>{
+            Taro.hideLoading();
+            setTimeout(() => {
+                window.history.replaceState(null,null,'/pages/me/me');
+                Taro.navigateTo({
+                    url:'/pages/me/order?tab=1'
+                })
+            }, 2000);
+            Taro.showToast({
+                title:e,
+                duration:2000,
+                icon:"none"
+            });
+
         })
 
     }
@@ -483,6 +506,10 @@ export default class Confirm extends Component<any,{
                     onClose={()=>{
                         this.setState({
                             showPayWayModal:false
+                        });
+                        window.history.replaceState(null,null,'/pages/me/me');
+                        Taro.navigateTo({
+                            url:'/pages/me/order?tab=1'
                         })
                     }}/>
             </View>

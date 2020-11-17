@@ -3,8 +3,18 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
+import { is_weixin } from '../../utils/common';
 
-export const LoginFooter: React.FC<any> = () => {
+const LoginFooter: React.FC<any> = () => {
+    
+    const wxLogin = () => {
+        // @ts-ignore
+        // eslint-disable-next-line no-undef
+        // const appid = common_config.wxappid;
+        // @ts-ignore
+        // eslint-disable-next-line no-undef
+        // const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${}&response_type=code&scope=snsapi_base&state=123#wechat_redirect`
+    }
     return <View className='footer'>
         <View className='otherlogin'>
             <View className='line'></View>
@@ -12,12 +22,16 @@ export const LoginFooter: React.FC<any> = () => {
             <View className='line'></View>
         </View>
         <View className='qw'>
-            <View className='wechat'>
-                <IconFont name='24_weixin' size={48} color='#FFF'/>
-            </View>
-            <View className='qq'>
-                <IconFont name='24_QQ' size={48} color='#FFF'/>
-            </View>
+            {
+                is_weixin()?<View className='wechat' onClick={wxLogin}>
+                    <IconFont name='24_weixin' size={48} color='#FFF'/>
+                </View>:null
+            }
+            {
+                is_weixin()?null:<View className='qq'>
+                    <IconFont name='24_QQ' size={48} color='#FFF'/>
+                </View>
+            }
         </View>
         <View className='xieyi'>
             <Text className='enter'>进入即同意</Text>
@@ -26,3 +40,4 @@ export const LoginFooter: React.FC<any> = () => {
         </View>
     </View>
 }
+export default LoginFooter;
