@@ -64,7 +64,7 @@ export default class Success extends Component<any,{
                             })
                         }}>查看订单</Button>
                         <Button className='back-home-btn' onClick={()=>{
-                            Taro.switchTab({
+                            Taro.reLaunch({
                                 url:'/pages/index/index'
                             })
                         }}>返回首页</Button>

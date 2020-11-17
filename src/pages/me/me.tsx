@@ -7,10 +7,13 @@ import {inject, observer} from '@tarojs/mobx'
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {api} from "../../utils/net";
 import moment from "moment";
-import {getImageSize, ossUrl} from "../../utils/common";
+import {deviceInfo, getImageSize, notNull, ossUrl} from "../../utils/common";
 import Empty from "../../components/empty";
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import {AtModal} from "taro-ui";
+import UITopProvider, {UITop} from "../../components/UITopProvider";
+import Modal from "../../components/UITopProvider/modal";
+import Login from "../../components/login/login";
 
 const switchBottom = require("../../source/switchBottom.png");
 
@@ -61,6 +64,20 @@ export default class Me extends Component<any, MeProps> {
             isOpened: false,
             collectionList: []
         }
+    }
+
+    checkLogin() {
+        if (notNull(userStore.id)) {
+            const key = Modal.show(
+                <Login onClose={() => UITop.remove(key)}
+                       onOk={() => {
+                           UITop.remove(key);
+                           window.location.replace(`/pages/login/index`);
+                       }} />
+            )
+            return true
+        }
+        return false
     }
 
     private total: number = 0;
@@ -145,7 +162,9 @@ export default class Me extends Component<any, MeProps> {
     }
 
     componentDidMount() {
-        this.getWorksList({start: 0})
+        if (userStore.id) {
+            this.getWorksList({start: 0})
+        }
     }
 
     onScroll = (e) => {
@@ -245,6 +264,9 @@ export default class Me extends Component<any, MeProps> {
         const {switchActive} = this.state;
         if (switchActive !== idx) {
             this.setState({switchActive: idx}, () => {
+                if (notNull(userStore.id)) {
+                    return
+                }
                 if (idx === 0) {
                     this.getWorksList({
                         start: 0
@@ -314,11 +336,19 @@ export default class Me extends Component<any, MeProps> {
         })
     }
 
+    jumpTo = (path: string) => {
+        if (this.checkLogin()) {
+            return
+        }
+        Taro.navigateTo({url: path})
+    }
+
     render() {
         const {switchActive, works, fixed, loadStatus, isOpened, collectionList} = this.state;
-        const {id, nickname, avatar} = userStore;
+        const {nickname, avatar} = userStore;
         return (
             <View className='me'>
+                <UITopProvider />
                 {
                     isOpened
                         ? <AtModal
@@ -332,33 +362,22 @@ export default class Me extends Component<any, MeProps> {
                         />
                         : null
                 }
-                <ScrollView scrollY className="content_scroll" style={{height: window.screen.height - 50}} onScrollToLower={this.lodeMore} onScroll={this.onScroll}>
+                <ScrollView scrollY className="content_scroll" style={{height: deviceInfo.windowHeight - 50}} onScrollToLower={this.lodeMore} onScroll={this.onScroll}>
                     <View className='topBox'>
                         <View className="fix_top">
                             <View className={`top ${fixed ? "fiex_set" : ""}`}>
                                 <View className='ops'>
-                                    <View className='carts'  onClick={()=>{
-                                        Taro.navigateTo({
-                                            url:'/pages/cart/index'
-                                        })
-                                    }}><IconFont name='24_gouwuche' size={48} color='#121314'/></View>
+                                    <View className='carts'  onClick={() => this.jumpTo('/pages/cart/index')}>
+                                        <IconFont name='24_gouwuche' size={48} color='#121314'/>
+                                    </View>
                                     <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314'/></View>
-                                    <View className='set' onClick={() => {
-                                        Taro.navigateTo({
-                                            url: '/pages/me/setting'
-                                        })
-                                    }}><IconFont name='24_shezhi' size={48} color='#121314'/></View>
+                                    <View className='set' onClick={() => this.jumpTo('/pages/me/setting')}>
+                                        <IconFont name='24_shezhi' size={48} color='#121314'/>
+                                    </View>
                                 </View>
                             </View>
                         </View>
-                        <View className='baseInfo' onClick={() => {
-                            if (id > 0) {
-                                return;
-                            }
-                            Taro.redirectTo({
-                                url: '/pages/login/index'
-                            })
-                        }}>
+                        <View className='baseInfo' onClick={() => Taro.navigateTo({url: '/pages/login/index'})}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../source/defaultAvatar.png')}
                                        className='avatarImg' mode="aspectFill"/>
@@ -369,37 +388,21 @@ export default class Me extends Component<any, MeProps> {
                         <View className='orderWarp'>
                             <View className='myorall'>
                                 <Text className='myorder'>我的订单</Text>
-                                <View className='allorder' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order'
-                                    })
-                                }}>
+                                <View className='allorder' onClick={() => this.jumpTo('/pages/me/order')}>
                                     <Text>全部订单</Text>
                                     <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                                 </View>
                             </View>
                             <View className='orderstate'>
-                                <View className='oitem' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order?tab=1'
-                                    })
-                                }}>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=1')}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
-                                <View className='oitem' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order?tab=2'
-                                    })
-                                }}>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=2')}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order?tab=3'
-                                    })
-                                }}>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=3')}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>

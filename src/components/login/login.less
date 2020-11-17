@@ -1,0 +1,73 @@
+.un_login_model{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0, .5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    flex-direction: column;
+    z-index: 3000;
+    .model_main{
+        width: 590px;
+        height: 728px;
+        box-sizing: border-box;
+        position: relative;
+        .login_bg{
+            width: 590px;
+            height: 728px;
+        }
+        .model_info_main{
+            width: 590px;
+            height: 728px;
+            box-sizing: border-box;
+            //background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 3000;
+            .h2{
+                font-size: 36px;
+                color: #121314;
+                margin-bottom: 24px;
+                display: block;
+                font-family: "PingFangSC-Medium", "PingFang SC", "Microsoft Sans Serif";
+            }
+            .txt {
+                color: #9C9DA6;
+                font-size: 28px;
+                display: block;
+            }
+            .btn{
+                margin-top: 96px;
+                margin-bottom: 76px;
+                width: 462px;
+                height: 98px;
+                background: #FF4966;
+                border-radius: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .lo_txt{
+                    color: #fff;
+                    font-size: 32px;
+                }
+            }
+        }
+    }
+    .close{
+        width: 72px;
+        height: 72px;
+        text-align: center;
+        margin-top: 32px;
+    }
+}

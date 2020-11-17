@@ -40,7 +40,7 @@ export default class Login extends Component<any,{
         } else {
             this.setState({
                 showMobileClear:false
-            }) 
+            })
         }
         if (pattern.test(value)) {
             this.setState({

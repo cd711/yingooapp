@@ -1,3 +1,5 @@
+import Taro from "@tarojs/taro";
+
 export function ossUrl(url:string,type:number) {
     let u = '';
     switch (type) {
@@ -149,4 +151,4 @@ export const jsApiList = [
     'onWXDeviceBluetoothStateChange'
 ];
 
-
+export const deviceInfo = Taro.getSystemInfoSync();

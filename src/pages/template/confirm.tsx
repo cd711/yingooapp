@@ -238,7 +238,7 @@ export default class Confirm extends Component<any,{
             }).catch((e)=>{
                 Taro.hideLoading();
                 setTimeout(() => {
-                    Taro.switchTab({
+                    Taro.reLaunch({
                         url:'/pages/index/index'
                     })
                 }, 2000);
@@ -267,7 +267,7 @@ export default class Confirm extends Component<any,{
             }).catch((e)=>{
                 Taro.hideLoading();
                 setTimeout(() => {
-                    Taro.switchTab({
+                    Taro.reLaunch({
                         url:'/pages/index/index'
                     })
                 }, 2000);
@@ -293,7 +293,7 @@ export default class Confirm extends Component<any,{
     }
     onResult = (res) => {
         if (res.code == 1) {
-            
+
         } else {
             Taro.showToast({
                 title:res.data,
@@ -498,9 +498,9 @@ export default class Confirm extends Component<any,{
                         }}>使用</Button>
                     </View>
                 </FloatModal>
-                <PayWayModal 
-                    isShow={showPayWayModal} 
-                    totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"} 
+                <PayWayModal
+                    isShow={showPayWayModal}
+                    totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"}
                     order_sn={order_sn}
                     onResult={this.onResult}
                     onClose={()=>{

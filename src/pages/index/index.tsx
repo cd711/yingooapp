@@ -2,10 +2,8 @@ import { ComponentType } from 'react'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Swiper, SwiperItem, Text,Image, Button } from '@tarojs/components'
 import { observer, inject } from '@tarojs/mobx'
-import analyze from 'rgbaster'
 import './index.less'
 import IconFont from '../../components/iconfont'
-import { userStore } from "../../store/user";
 
 const pics = [
     "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
@@ -70,7 +68,6 @@ class Index extends Component<any,{
 
 
     render() {
-        const { } = userStore;
         const {colorWarp,swiperCurrent} = this.state;
         return (
             <View className='index'>

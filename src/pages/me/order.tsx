@@ -63,7 +63,7 @@ export default class Order extends Component<any,{
             this.getList();
         }
     }
-    componentWillUpdate(nextProps, nextState) {
+    componentWillUpdate(_, nextState) {
         const {switchTabActive} = this.state;
         if (switchTabActive != nextState.switchTabActive) {
             this.getList(nextState.switchTabActive);
@@ -280,7 +280,7 @@ export default class Order extends Component<any,{
                             </View>
                             ))
                     }
-                    
+
                 </View>
                 </ScrollView>
                 <PayWayModal 

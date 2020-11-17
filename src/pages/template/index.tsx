@@ -4,7 +4,6 @@ import './index.less'
 import IconFont from '../../components/iconfont'
 import { api } from '../../utils/net'
 import {AtActivityIndicator} from 'taro-ui'
-// import { templateStore } from '../../store/template'
 import { observer, inject } from '@tarojs/mobx'
 import {ossUrl} from '../../utils/common'
 
@@ -73,7 +72,7 @@ export default class Template extends Component<any,{
                 icon:"none",
                 duration:2000
             }).then(()=>{
-                Taro.switchTab({
+                Taro.reLaunch({
                     url:'/pages/index/index'
                 })
             });
@@ -239,9 +238,9 @@ export default class Template extends Component<any,{
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
                             {
                                 !showTemplateLoading && switchActive == 0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
-                                    // Taro.navigateTo({
-                                    //     url:`/pages/editor/index`
-                                    // })
+                                    Taro.navigateTo({
+                                        url:`pages/printing/index?id=32`
+                                    })
                                 }}>
                                     <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>
                                         <Image src={require("../../source/editor-print.png")} className='print' />
