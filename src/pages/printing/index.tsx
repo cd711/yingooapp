@@ -3,10 +3,11 @@ import {View, Image, Text, ScrollView} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
+import UploadFile, {UploadFileChangeProps} from "../../components/Upload/Upload";
 
-const Index: Taro.FC<any> = props => {
+const Index: Taro.FC<any> = () => {
 
     const [checked, setChecked] = useState(0);
     const router = Taro.useRouter();
@@ -18,7 +19,15 @@ const Index: Taro.FC<any> = props => {
             api("app.product/info", {id}).then(res => {
                 let arr = [];
                 arr = [...res.attrItems[0]];
-                setSizeItem([...arr])
+                setSizeItem([...arr]);
+                setChecked(Number(arr[0].id))
+
+                // 向本地存储attrItems
+                Taro.setStorage({
+                    key: "print_attrItems",
+                    data: JSON.stringify(res.attrItems)
+                })
+
             }).catch(e => {
                 console.log("获取--app.product/info出错：", e)
             })
@@ -27,6 +36,21 @@ const Index: Taro.FC<any> = props => {
 
     const selectSize = id => {
         setChecked(Number(id))
+    }
+
+    const onUpload = (files: Array<UploadFileChangeProps> | UploadFileChangeProps) => {
+        console.log("上传返回的结果：", files)
+        let path = [];
+        if (files instanceof Array) {
+            path = files.map(val => ({id: val.id, url: val.cdnUrl}));
+            const urlStr = getURLParamsStr(urlEncode({path, sku: checked}))
+            console.log(urlStr)
+            setTimeout(() => {
+                Taro.navigateTo({
+                    url: `/pages/printing/change?${urlStr}`
+                })
+            }, 1500)
+        }
     }
 
     return(
@@ -59,7 +83,9 @@ const Index: Taro.FC<any> = props => {
             </ScrollView>
             <View className="print_foot">
                 <View className="submit">
-                    <Text className="txt">添加照片</Text>
+                    <UploadFile uploadType="image" extraType={1} sourceType={["album"]} count={3} onChange={onUpload}>
+                        <Text className="txt">添加照片</Text>
+                    </UploadFile>
                 </View>
             </View>
         </View>

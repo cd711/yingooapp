@@ -57,6 +57,7 @@
     "regenerator-runtime": "0.11.1",
     "rgbaster": "^2.1.1",
     "taro-ui": "^2.3.4",
+    "url-polyfill": "^1.1.12",
     "weixin-js-sdk": "^1.6.0"
   },
   "devDependencies": {
