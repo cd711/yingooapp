@@ -1,28 +1,13 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Image, Button } from '@tarojs/components'
+import { View, Text, Button } from '@tarojs/components'
 import './preview.less';
 import IconFont from '../../components/iconfont';
 import { api, getToken } from '../../utils/net'
-
-// import {templateStore} from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-// import { AtLoadMore } from 'taro-ui';
 import lodash from 'lodash';
-// import moment from 'moment';
-// import {ossUrl} from '../../utils/common'
 import { PlaceOrder } from './place';
 import {userStore} from "../../store/user";
 import {AtModal} from "taro-ui";
-
-
-const pics = [
-    "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
-    "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
-    "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
-    "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
-    "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
-    "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
-]
 
 
 
@@ -104,7 +89,7 @@ export default class Preview extends Component<{}, {
         }
     }
 
-    onMsg: { (e: MessageEvent<any>): void } = async ({ data }) => {
+    onMsg: { (e: MessageEvent): void } = async ({ data }) => {
         console.log("msg", data);
         if (!data) {
             return;
@@ -143,7 +128,7 @@ export default class Preview extends Component<{}, {
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
                     const {doc_id} = this.$router.params;
                     window.history.replaceState(null,null,`/pages/template/preview?doc_id=${parseInt(doc_id+"")>0?doc_id:docId}`);
-                    
+
                     this.setState({
                         saveId:parseInt(doc_id+"")>=0?doc_id:docId,
                         modalId:modelId

@@ -238,9 +238,9 @@ export default class Template extends Component<any,{
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
                             {
                                 !showTemplateLoading && switchActive == 0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
-                                    // Taro.navigateTo({
-                                    //     url:`/pages/editor/index`
-                                    // })
+                                    Taro.navigateTo({
+                                        url:`pages/printing/index?id=32`
+                                    })
                                 }}>
                                     <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>
                                         <Image src={require("../../source/editor-print.png")} className='print' />

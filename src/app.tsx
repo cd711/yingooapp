@@ -54,6 +54,7 @@ class App extends Component {
             'pages/me/address/index',
             'pages/me/address/editor',
             'pages/me/photos',
+            'pages/printing/index',
             'pages/template/preview',
             'pages/template/confirm',
             'pages/template/success',
