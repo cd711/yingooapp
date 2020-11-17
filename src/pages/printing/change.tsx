@@ -5,12 +5,12 @@ import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
 import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlDeCode, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
-import UploadFile, {UploadFileChangeProps} from "../../components/Upload/Upload";
 import Counter from "../../components/counter/counter";
 import OrderModal from "./orederModal";
 import {userStore} from "../../store/user";
 import moment from "moment";
 import {templateStore} from "../../store/template";
+import Photos from "../me/photos";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -22,6 +22,7 @@ const PrintChange: Taro.FC<any> = () => {
     const goodsInfo = Taro.useRef({});
     const [skus, setSkus] = useState([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
+    const [photoVisible, setPhotoPickerVisible] = useState(true);
 
     useEffect(() => {
         // 解析地址栏参数
@@ -60,14 +61,6 @@ const PrintChange: Taro.FC<any> = () => {
         const arr = [...photos];
         arr.splice(idx, 1);
         setPhotos([...arr])
-    }
-
-    const onUpload = (files: Array<UploadFileChangeProps> | UploadFileChangeProps) => {
-        if (files instanceof Array) {
-            const arr = [...photos];
-            const temp = files.map(val => ({id: val.id, url: val.cdnUrl, count: 1}));
-            setPhotos([...arr, ...temp])
-        }
     }
 
     function setCount(id) {
@@ -194,10 +187,8 @@ const PrintChange: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot" style={{justifyContent: "space-around"}}>
-                <View className="btn default">
-                    <UploadFile uploadType="image" extraType={1} sourceType={["album"]} count={4} onChange={onUpload}>
-                        <Text className="txt">添加图片</Text>
-                    </UploadFile>
+                <View className="btn default" onClick={() => setPhotoPickerVisible(true)}>
+                    <Text className="txt">添加图片</Text>
                 </View>
                 <View className="btn" onClick={onCreateOrder}>
                     <Text className="txt">立即下单</Text>
@@ -212,6 +203,13 @@ const PrintChange: Taro.FC<any> = () => {
                                   onSkuChange={orderSkuChange}
                                   onNowBuy={onSubmitOrder}
                     />
+                    : null
+            }
+            {
+                photoVisible
+                    ? <View className="photo_picker_container">
+                        <Photos editSelect />
+                    </View>
                     : null
             }
         </View>

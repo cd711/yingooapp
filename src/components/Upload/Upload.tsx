@@ -23,6 +23,7 @@ interface UploadFileProps{
     onProgress?: (progress: number, currentTotal: number, total: number, index: number) => void,
     className?: string
     style?: any
+    title?: string
 }
 interface UploadFileState {
     files: Array<any>;
@@ -177,7 +178,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
     }
 
     render(): React.ReactNode {
-        const {type, className, style} = this.props;
+        const {type, className, style, title} = this.props;
         return (
             <View className={`upload_container ${className}`} onClick={this._upload} style={style}>
                 {
@@ -185,7 +186,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                         ? this.props.children
                         : <View className="card_view">
                             <IconFont size={96} name="24_paizhaoshangchuan" color="#fff" />
-                            <Text className="title">上传图片</Text>
+                            <Text className="title">{title || "上传图片"}</Text>
                         </View>
                 }
             </View>

@@ -9,7 +9,13 @@ import {ossUrl, deviceInfo} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 
-export default class Photos extends Component<any,{
+
+interface PhotosProps {
+    editSelect?: boolean;
+    onPhotoSelect?: () => void;
+    defaultSelect?: string[]
+}
+export default class Photos extends Component<PhotosProps,{
     navSwitchActive:number;
     loading: boolean;
     imageList: any[];
@@ -21,6 +27,10 @@ export default class Photos extends Component<any,{
     sortActive: object;
 
 }> {
+
+    static defaultProps = {
+        editSelect: false
+    }
 
     config: Config = {
         navigationBarTitleText: '首页'
@@ -207,6 +217,7 @@ export default class Photos extends Component<any,{
 
 
     render() {
+        const {editSelect} = this.props;
         const { navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片","视频"];
@@ -231,9 +242,15 @@ export default class Photos extends Component<any,{
                     </View>
                     {
                         list.length > 0
-                            ? <View className="right" onClick={() => this.onEdit(!isEdit)}>
-                                <Text>{isEdit ? "完成" : "编辑"}</Text>
-                            </View>
+                            ? editSelect
+                                ? <View className="right">
+                                    <Popover popoverItem={this.popoverItem}>
+                                        <View><IconFont size={48} name="24_tupianpaixu"/></View>
+                                    </Popover>
+                                </View>
+                                : <View className="right" onClick={() => this.onEdit(!isEdit)}>
+                                    <Text>{isEdit ? "完成" : "编辑"}</Text>
+                                </View>
                             : null
                     }
                 </View>
@@ -250,23 +267,28 @@ export default class Photos extends Component<any,{
                                     <Text className='txt'>暂无素材</Text>
                                     <UploadFile extraType={navSwitchActive === 0 ? 3 : 4}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
+                                                title={navSwitchActive === 0 ? "上传图片" : "上传视频"}
                                                 type="button"
+                                                count={9}
                                                 onChange={this.uploadFile}>
                                         <Button className='btn'>上传素材</Button>
                                     </UploadFile>
                                 </View>
                                 : <View className="list_container">
-                                    <View className="list_filter">
-                                        <Text className="tit">排序</Text>
-                                        <Popover popoverItem={this.popoverItem}>
-                                            <View><IconFont size={48} name="24_tupianpaixu"/></View>
-                                        </Popover>
-                                    </View>
+                                    {!editSelect
+                                        ? <View className="list_filter">
+                                            <Text className="tit">排序</Text>
+                                            <Popover popoverItem={this.popoverItem}>
+                                                <View><IconFont size={48} name="24_tupianpaixu"/></View>
+                                            </Popover>
+                                        </View>
+                                        : null}
                                     <View className="list_main">
                                         <View className="list_item">
                                             <UploadFile
                                                 extraType={navSwitchActive}
                                                 type="card"
+                                                count={9}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
                                                 onChange={this.uploadFile}/>
                                         </View>
