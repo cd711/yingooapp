@@ -79,7 +79,8 @@ export default class Preview extends Component<{}, {
         }
     }
     componentDidMount() {
-        const {doc_id} = this.$router.params;
+        const {doc_id,workID} = this.$router.params;
+        console.log(workID)
         if (parseInt(doc_id)>0) {
             this.setState({
                 saveId:parseInt(doc_id)
@@ -226,12 +227,11 @@ export default class Preview extends Component<{}, {
             this.setState({isOpened: true})
             return
         }
-        if (saveId) {
+        if (parseInt(saveId+'')>0) {
             this.getShellInfo()
         } else {
             this.onSave(null,()=>{
                 this.getShellInfo()
-
             });
         }
     }

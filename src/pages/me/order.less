@@ -1,3 +1,6 @@
+.taro_page{
+    background: #F5F6F9;
+}
 .order{
     .status-switch-bar{
         // height: 104px;
@@ -30,6 +33,7 @@
         }
     }
     .container{
+        padding-bottom: 50px;
         .empty{
             display: flex;
             flex-direction: column;
@@ -77,7 +81,15 @@
                 }
                 .status{
                     font-size: 28px;
+                }
+                .pay{
                     color: #FF4966;
+                }
+                .deliver{
+                    color: #36B37E;
+                }
+                .complete{
+                    color: #9C9DA6;
                 }
             }
             .order-info{
@@ -142,14 +154,15 @@
                 border-bottom: 1px solid #EDEDEF;
                 .total,.discount,.pay{
                     display: flex;
-                    align-items: center;
+                    align-items: baseline;
                     .name{
                         color: #9C9DA6;
                         font-size: 28px;
                         margin-right: 8px;
                     }
                     .num{
-                        font-size: 24px;
+                        font-weight: 500;
+                        font-size: 28px;
                         color: #121314;
                     }
                 }
@@ -187,6 +200,18 @@
                     font-size: 28px;
                     font-weight: 500;
                     color: #FFF;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .gray-border-btn{
+                    width: 170px;
+                    height: 64px;
+                    border: 1px solid #DFDFE0;
+                    border-radius: 48px;
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #9C9DA6;
                     display: flex;
                     align-items: center;
                     justify-content: center;

@@ -1195,7 +1195,7 @@ const ToolBar0: React.FC<{ parent: Shell }> = ({parent}) => {
             sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
         }
         parent.defaultModel = mod;
-        Taro.setStorage({key: "phone_mode", data: mod});
+        Taro.setStorage({key: "phone_model", data: mod});
     };
 
     const cancelMode = () => {
@@ -1312,7 +1312,7 @@ export default class Shell extends Component<{}, {
         if (!this.defaultModel) {
             Taro.showLoading({title: "请稍候"});
             this.defaultModel = await api("editor.phone_shell/default");
-            Taro.setStorageSync("phone_mode", this.defaultModel);
+            Taro.setStorageSync("phone_model", this.defaultModel);
             Taro.hideLoading();
 
         }
