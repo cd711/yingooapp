@@ -23,6 +23,7 @@ const PrintChange: Taro.FC<any> = () => {
     const [skus, setSkus] = useState([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
     const [photoVisible, setPhotoPickerVisible] = useState(false);
+    const [animating, setAnimating] = useState(false)
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -225,6 +226,20 @@ const PrintChange: Taro.FC<any> = () => {
         setPhotoPickerVisible(false)
     }
 
+    const selectPhoto = () => {
+        setPhotoPickerVisible(true);
+        setTimeout(() => {
+            setAnimating(true)
+        }, 50)
+    }
+
+    const closeSelectPhoto = () => {
+        setAnimating(false);
+        setTimeout(() => {
+            setPhotoPickerVisible(false)
+        }, 500)
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
@@ -259,7 +274,7 @@ const PrintChange: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot" style={{justifyContent: "space-around"}}>
-                <View className="btn default" onClick={() => setPhotoPickerVisible(true)}>
+                <View className="btn default" onClick={selectPhoto}>
                     <Text className="txt">添加图片</Text>
                 </View>
                 <View className="btn" onClick={onCreateOrder}>
@@ -279,10 +294,10 @@ const PrintChange: Taro.FC<any> = () => {
             }
             {
                 photoVisible
-                    ? <View className="photo_picker_container">
+                    ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
                         <Photos editSelect
-                                onClose={() => setPhotoPickerVisible(false)}
-                                // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
+                                onClose={closeSelectPhoto}
+                            // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
                         />
                     </View>

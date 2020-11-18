@@ -16,6 +16,7 @@ const Index: Taro.FC<any> = () => {
     const router = Taro.useRouter();
     const [sizeItem, setSizeItem] = useState([]);
     const [photoVisible, setPhotoPickerVisible] = useState(false);
+    const [animating, setAnimating] = useState(false)
 
     useEffect(() => {
         const id = router.params.id;
@@ -77,6 +78,20 @@ const Index: Taro.FC<any> = () => {
         })
     }
 
+    const selectPhoto = () => {
+        setPhotoPickerVisible(true);
+        setTimeout(() => {
+            setAnimating(true)
+        }, 50)
+    }
+
+    const closeSelectPhoto = () => {
+        setAnimating(false);
+        setTimeout(() => {
+            setPhotoPickerVisible(false)
+        }, 500)
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
@@ -108,15 +123,15 @@ const Index: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot">
-                <View className="submit" onClick={() => setPhotoPickerVisible(true)}>
+                <View className="submit" onClick={selectPhoto}>
                     <Text className="txt">添加照片</Text>
                 </View>
             </View>
             {
                 photoVisible
-                    ? <View className="photo_picker_container">
+                    ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
                         <Photos editSelect
-                                onClose={() => setPhotoPickerVisible(false)}
+                                onClose={closeSelectPhoto}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
                         />
