@@ -27,7 +27,8 @@
     "no-shadow":  ["off"],
     "react/forbid-elements": false,
     "taro/props-reserve-keyword": false,
-    "@typescript-eslint/no-this-alias": ["off"]
+    "@typescript-eslint/no-this-alias": ["off"],
+    "prefer-rest-params":false
   },
   "parserOptions": {
     "ecmaFeatures": {

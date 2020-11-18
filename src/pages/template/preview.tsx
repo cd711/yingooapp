@@ -8,7 +8,7 @@ import lodash from 'lodash';
 import { PlaceOrder } from './place';
 import {userStore} from "../../store/user";
 import {AtModal} from "taro-ui";
-
+import page from '../../utils/ext';
 
 
 let editorProxy: WindowProxy | null | undefined;
@@ -37,6 +37,7 @@ function callEditor(name, ...args) {
 
 @inject("templateStore")
 @observer
+@page()
 export default class Preview extends Component<{}, {
     placeOrderShow: boolean;
     saveId:number;

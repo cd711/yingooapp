@@ -1,5 +1,9 @@
 import { observable, action } from 'mobx'
 import { setUserInfo,api } from '../utils/net'
+import { is_weixin } from "../utils/common";
+import Taro from '@tarojs/taro'
+import lodash from 'lodash';
+import { Base64 } from "js-base64";
 
 const sexList = {
     0: '保密',
@@ -70,9 +74,13 @@ export class UserStore {
     }
 
     @action
-    public auth(){
+    public auth(code:string){
         return new Promise<any>(async (resolve, reject)=> {
+            if (is_weixin()) {
 
+            } else {
+                
+            }
         })
     }
 

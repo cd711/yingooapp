@@ -47,7 +47,7 @@ class Index extends Component<any,{
 
     componentDidMount() {
         this.test();
-
+        console.log(this.$router.params)
     }
     test = () => {
         // const colors = pics.map(async(item)=>{

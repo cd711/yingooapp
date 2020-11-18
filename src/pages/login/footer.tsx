@@ -10,10 +10,11 @@ const LoginFooter: React.FC<any> = () => {
     const wxLogin = () => {
         // @ts-ignore
         // eslint-disable-next-line no-undef
-        // const appid = common_config.wxappid;
+        const appid = common_config.wxappid;
         // @ts-ignore
         // eslint-disable-next-line no-undef
-        // const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${}&response_type=code&scope=snsapi_base&state=123#wechat_redirect`
+        const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent("http://m.playbox.yingoo.com/me")}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
+        window.location.href = url;   
     }
     return <View className='footer'>
         <View className='otherlogin'>

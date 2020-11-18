@@ -1,6 +1,9 @@
 import Taro from '@tarojs/taro';
 import { Base64 } from 'js-base64';
 import {userStore} from "../store/user";
+import Modal from "../components/UITopProvider/modal";
+
+
 
 export const options: {
     apiUrl: string;
@@ -81,39 +84,33 @@ export function api(name: string, params?: any): Promise<any> {
             header: {
                 'content-type': 'application/x-www-form-urlencoded'
             }
-        }).then(function (res: any) {
-            console.log(res);
+        }).then((res: any) => {
             if(res.data.code == 401){
-                userStore.auth().then(res=>{
-                    // setToken(res.access_token,res.expired_at);
-                    api(name,params).then(()=>{
-                        Taro.showLoading({title:"加载中"});
-                        resolve(res.data.data);
-                    }).catch((e)=>{
-                        Taro.hideLoading();
-                        reject(e.errMsg || e.message || e);
-                    })
-                }).catch(()=>{
-                    Taro.showToast({
-                        title:"登录失败!",
-                        icon:'none',
-                        duration:2000
-                    })
-                })
-                Taro.redirectTo({
-                    url:"/pages/login/index"
+                Taro.hideLoading();
+                Taro.hideToast();
+                Modal.showLogin(false,()=>{
+
+                },()=>{
+                    Taro.redirectTo({
+                        url:"/pages/login/index"
+                    });
                 });
-                return;
+                // console.log(modals);
+
+
+                // return;
             } else {
 
                 if (res.data.code == 1) {
                     resolve(res.data.data);
                 } else {
+                    alert(JSON.stringify(res))
                     reject(res.data.msg || res.msg);
                 }
             }
         }).catch(function (e) {
             console.log("接口报错:",name,e);
+
             reject(e.errMsg || e.message || e);
         });
     });

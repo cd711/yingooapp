@@ -11,9 +11,11 @@ import {deviceInfo, getImageSize, notNull, ossUrl} from "../../utils/common";
 import Empty from "../../components/empty";
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import {AtModal} from "taro-ui";
-import UITopProvider, {UITop} from "../../components/UITopProvider";
-import Modal from "../../components/UITopProvider/modal";
-import Login from "../../components/login/login";
+// import UITopProvider, {UITop} from "../../components/UITopProvider";
+// import Modal from "../../components/UITopProvider/modal";
+// import Login from "../../components/login/login";
+import page from '../../utils/ext';
+
 
 const switchBottom = require("../../source/switchBottom.png");
 
@@ -48,6 +50,7 @@ interface MeProps {
 
 @inject("userStore")
 @observer
+@page({wechatAutoLogin:true})
 export default class Me extends Component<any, MeProps> {
 
     config: Config = {
@@ -66,18 +69,9 @@ export default class Me extends Component<any, MeProps> {
         }
     }
 
-    checkLogin() {
-        if (notNull(userStore.id)) {
-            const key = Modal.show(
-                <Login onClose={() => UITop.remove(key)}
-                       onOk={() => {
-                           UITop.remove(key);
-                           window.location.replace(`/pages/login/index`);
-                       }} />
-            )
-            return true
-        }
-        return false
+
+    wechatLoginSuccess(res){
+        console.log(res);
     }
 
     private total: number = 0;
@@ -166,7 +160,7 @@ export default class Me extends Component<any, MeProps> {
             this.getWorksList({start: 0})
         }
     }
-
+    
     onScroll = (e) => {
         const {fixed} = this.state;
         // 260 筛选菜单固定
@@ -337,10 +331,10 @@ export default class Me extends Component<any, MeProps> {
     }
 
     jumpTo = (path: string) => {
-        if (this.checkLogin()) {
-            return
+        // @ts-ignore
+        if (this.showLoginModal()) {
+            Taro.navigateTo({url: path})
         }
-        Taro.navigateTo({url: path})
     }
 
     render() {
@@ -348,7 +342,6 @@ export default class Me extends Component<any, MeProps> {
         const {nickname, avatar} = userStore;
         return (
             <View className='me'>
-                <UITopProvider />
                 {
                     isOpened
                         ? <AtModal
@@ -377,7 +370,12 @@ export default class Me extends Component<any, MeProps> {
                                 </View>
                             </View>
                         </View>
-                        <View className='baseInfo' onClick={() => Taro.navigateTo({url: '/pages/login/index'})}>
+                        <View className='baseInfo' onClick={() => {
+                            if (nickname.length > 0) {
+                                return;
+                            }
+                            Taro.navigateTo({url: '/pages/login/index'})
+                        }}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../source/defaultAvatar.png')}
                                        className='avatarImg' mode="aspectFill"/>

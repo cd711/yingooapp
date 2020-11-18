@@ -39,7 +39,8 @@ export default class Setting extends Component<any,{
                 Taro.hideLoading()
             }, 1500)
             setTimeout(() => {
-                Taro.reLaunch({url: "/pages/index/index"});
+                window.location.href = "/pages/index/index"
+                // Taro.reLaunch({url: "/pages/index/index"});
             }, 1501)
         }catch (e) {
             console.log(e)

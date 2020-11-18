@@ -4,6 +4,7 @@ import './index.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import LoginFooter from './footer'
+// import { api } from 'src/utils/net';
 // import { api } from '../../utils/net'
 
 export default class Login extends Component<any,{
@@ -16,8 +17,8 @@ export default class Login extends Component<any,{
     config: Config = {
         navigationBarTitleText: '首页'
     }
-    private inputRef;
-    constructor(props){
+    private inputRef: { inputRef: { focus: () => void; }; };
+    constructor(props: any){
         super(props);
         this.state = {
             codeBtnActive:false,
@@ -26,7 +27,18 @@ export default class Login extends Component<any,{
             inputActive:false
         }
     }
-
+    componentDidMount(){
+        console.log("componentDidMount")
+        // const {code} = this.$router.params;
+        // if (code && code.length>0) {
+        //     api("user/third",{
+        //         platform:"wechat",
+        //         code:code,
+        //     }).then((res)=>{
+        //         console.log(res);
+        //     })
+        // }
+    }
 
     onMobileInput = ({detail:{value}}) => {
         const pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
@@ -79,6 +91,7 @@ export default class Login extends Component<any,{
         }
     }
     render() {
+        console.log("render")
         const { codeBtnActive,showMobileClear,inputValue,inputActive } = this.state;
         return (
             <View className='login'>

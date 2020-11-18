@@ -127,7 +127,6 @@ export default class Template extends Component<any,{
     render() {
         const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,showTemplateLoading} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
-        console.log(tags)
         const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
         const searchBox = <View className='top-search'>
             <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
@@ -263,8 +262,8 @@ export default class Template extends Component<any,{
                                     }} key={item.id}>
                                         {
                                             switchActive == 1 ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>
-                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='aspectFill' />
-                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='aspectFill' />
+                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />
+                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='scaleToFill' />
                                             </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`} />
                                         }
                                     </View>
