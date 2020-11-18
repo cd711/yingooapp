@@ -258,7 +258,7 @@ export default class Preview extends Component<{}, {
                 </View>
                 <View className='container'>
                      {/* eslint-disable-next-line react/forbid-elements */}
-                    <iframe className="editor_frame" src={`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
+                    <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
                 </View>
                 <View className='bottom'>
                     {

@@ -162,7 +162,7 @@ export const PlaceOrder: React.FC<any> = ({data, isShow, onClose, onButtonClose,
                 </ScrollView>
                 <View className='buy-number'>
                     <Text className='title'>购买数量</Text>
-                    <Counter onCounterChange={onBuyNumberChange}/>
+                    <Counter num={1} onCounterChange={onBuyNumberChange}/>
                 </View>
                 <View className='ops'>
                     <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>

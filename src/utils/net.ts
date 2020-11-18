@@ -104,13 +104,15 @@ export function api(name: string, params?: any): Promise<any> {
                 if (res.data.code == 1) {
                     resolve(res.data.data);
                 } else {
-                    alert(JSON.stringify(res))
+
                     reject(res.data.msg || res.msg);
                 }
             }
         }).catch(function (e) {
             console.log("接口报错:",name,e);
-
+            if (e && e.status && (e.status == 500||e.status == 501)) {
+                e = "服务器走丢了，请稍后再试。"
+            }
             reject(e.errMsg || e.message || e);
         });
     });

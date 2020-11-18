@@ -24,7 +24,7 @@ const page =(option?: {
                 if (option.wechatAutoLogin) {
                     if (code && code.length>5) {
                         const params = this.$router.params;
-                        let exportUrl = window.location.href.split("?")[0]+"?";                          
+                        let exportUrl = window.location.href.split("?")[0]+(Object.keys(params).length>0?"?":"");                          
                         Object.keys(params).map((key)=>{
                             if (key != "code" && key != "state") {
                                 exportUrl += key + '=' + params[key] +'&';	

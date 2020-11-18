@@ -15,6 +15,7 @@ import config from './config';
 // }
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
+
 const store = {
     userStore,
     templateStore
