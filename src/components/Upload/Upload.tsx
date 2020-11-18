@@ -44,6 +44,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
 
     _upload = () => {
         if (notNull(userStore.id)) {
+            Taro.showToast({title: "请登录后重试", icon: "none"})
             return
         }
         const that = this;

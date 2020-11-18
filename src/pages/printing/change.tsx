@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlDeCode, urlEncode} from "../../utils/common";
+import {backHandlePress, deviceInfo, getURLParamsStr, notNull, ossUrl, urlDeCode, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import Counter from "../../components/counter/counter";
 import OrderModal from "./orederModal";
@@ -11,6 +11,7 @@ import {userStore} from "../../store/user";
 import moment from "moment";
 import {templateStore} from "../../store/template";
 import Photos from "../me/photos";
+import ENV_TYPE = Taro.ENV_TYPE;
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -22,7 +23,23 @@ const PrintChange: Taro.FC<any> = () => {
     const goodsInfo = Taro.useRef({});
     const [skus, setSkus] = useState([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
-    const [photoVisible, setPhotoPickerVisible] = useState(true);
+    const [photoVisible, setPhotoPickerVisible] = useState(false);
+
+    const backPressHandle = () => {
+        if (Taro.getEnv() === ENV_TYPE.WEB) {
+            if (photoVisible) {
+                setPhotoPickerVisible(false)
+            }
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener("popstate", backPressHandle);
+
+        return () => {
+            window.removeEventListener("popstate", backPressHandle)
+        }
+    }, [])
 
     useEffect(() => {
         // 解析地址栏参数
@@ -48,6 +65,8 @@ const PrintChange: Taro.FC<any> = () => {
         } catch (e) {
             console.log("读取print_attrItems出错：", e)
         }
+
+        backHandlePress()
 
     }, [])
 
@@ -153,6 +172,19 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }
 
+    const onPhotoSelect = (data: {ids: [], imgs: []}) => {
+        const arr = [...photos];
+        for (let i = 0; i < data.ids.length; i++) {
+            arr.push({
+                id: data.ids[i],
+                url: data.imgs[i],
+                count: 1
+            });
+        }
+        setPhotos([...arr]);
+        setPhotoPickerVisible(false)
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
@@ -208,7 +240,11 @@ const PrintChange: Taro.FC<any> = () => {
             {
                 photoVisible
                     ? <View className="photo_picker_container">
-                        <Photos editSelect />
+                        <Photos editSelect
+                                onClose={() => setPhotoPickerVisible(false)}
+                                // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
+                                onPhotoSelect={onPhotoSelect}
+                        />
                     </View>
                     : null
             }

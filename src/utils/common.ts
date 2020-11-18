@@ -1,4 +1,5 @@
 import Taro from "@tarojs/taro";
+import ENV_TYPE = Taro.ENV_TYPE;
 
 export function ossUrl(url: string, type: number) {
     let u = '';
@@ -279,5 +280,13 @@ export function clearStorge(key: string) {
         Taro.removeStorage({key})
     }catch (e) {
 
+    }
+}
+
+export function backHandlePress() {
+    if (Taro.getEnv() === ENV_TYPE.WEB) {
+        window.addEventListener("popstate", e => {
+            console.log("监听到返回")
+        })
     }
 }
