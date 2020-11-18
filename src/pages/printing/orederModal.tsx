@@ -14,6 +14,7 @@ const OrderModal: React.FC<any> = ({data, isShow, onClose, defaultActive, onSkuC
     const [marketPrice, setMarketPrice] = useState("0");
     const [marketPriceShow, setMarketPriceShow] = useState(true);
     const [selectSku, setSelectSku] = useState({});
+    // @ts-ignore
     const [imgs, setImgs] = useState([]);
 
     useEffect(() => {
@@ -98,6 +99,10 @@ const OrderModal: React.FC<any> = ({data, isShow, onClose, defaultActive, onSkuC
         }
     }, [selectSku])
 
+    const onSubmit = () => {
+        // const skuArr = selectSku.split(",")
+        onNowBuy && onNowBuy()
+    }
 
     return <View className='placeOrder'>
         <AtFloatLayout isOpened={isShow}>
@@ -153,7 +158,7 @@ const OrderModal: React.FC<any> = ({data, isShow, onClose, defaultActive, onSkuC
                     </View>
                 </ScrollView>
                 <View className='ops'>
-                    <View className="submit" onClick={onNowBuy}>
+                    <View className="submit" onClick={onSubmit}>
                         <Text className="txt">立即购买</Text>
                     </View>
                 </View>

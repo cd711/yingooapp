@@ -29,6 +29,9 @@ export class TemplateStore {
     @observable
     public photoParams: object = {};
 
+    @observable
+    public photoSizeParams: object = {};
+
 }
 
 
