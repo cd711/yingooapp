@@ -52,10 +52,11 @@ export default class Detail extends Component<any,{
     getCurrentItem(id){
         api('app.product_tpl/info',{id}).then((res)=>{
             if (this.$router.params.id != res.id) {
-                // window.history.replaceState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
+                window.history.replaceState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
             console.log("info",res)
             this.setState({
+                
                 currentItem: res,
                 isLike: res.favorite !== 0
             })
@@ -111,17 +112,6 @@ export default class Detail extends Component<any,{
 
     onEditor = () => {
         const {currentItem} = this.state;
-        const {id} = userStore;
-        // if (notNull(id)) {
-        //     const key = Modal.show(
-        //         <Login onClose={() => UITop.remove(key)}
-        //                onOk={() => {
-        //                    UITop.remove(key);
-        //                 //    window.location.replace(`/pages/login/index`);
-        //                }} />
-        //         )
-        //     return
-        // }
         Taro.navigateTo({
             url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
         });

@@ -67,8 +67,9 @@ const PayWayModal: React.FC<{
     },[totalPrice])
     const setWXpayConfig = (callback:()=>void,errorback:(err:any)=>void) =>{
         api("wechat/jssdkconfig",{
-            url:window.location.href.split('#')[0]
+            url:window.location.href.split('?')[0]
         }).then((res)=>{
+            console.log(res);
             wx.config({
                 debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
                 appId: res.appId, // 必填，公众号的唯一标识
@@ -81,6 +82,7 @@ const PayWayModal: React.FC<{
                 if (callback) callback()
             })
         }).catch((e)=>{
+            console.log(e)
             errorback(e)
         })
     }    
@@ -127,6 +129,7 @@ const PayWayModal: React.FC<{
                             onResult && onResult(d);
                         },
                         error:(e)=>{
+                            console.log(e)
                             Taro.hideLoading();
                             const d = {
                                 code:0,
