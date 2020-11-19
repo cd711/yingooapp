@@ -139,8 +139,11 @@ export default class Order extends Component<any,{
         if (res.code == 1) {
             
         } else {
+            this.setState({
+                showPayWayModal:false
+            })
             Taro.showToast({
-                title:res.data,
+                title:res.data || res.data.errMsg,
                 icon:'none',
                 duration:2000
             });

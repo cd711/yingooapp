@@ -65,13 +65,13 @@ const PayWayModal: React.FC<{
             setPrice(totalPrice);
         }
     },[totalPrice])
+
     const setWXpayConfig = (callback:()=>void,errorback:(err:any)=>void) =>{
         api("wechat/jssdkconfig",{
-            url:window.location.href.split('?')[0]
+            url:window.location.href
         }).then((res)=>{
-            console.log(res);
             wx.config({
-                debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
                 appId: res.appId, // 必填，公众号的唯一标识
                 timestamp: res.timestamp, // 必填，生成签名的时间戳
                 nonceStr: res.nonceStr, // 必填，生成签名的随机串
@@ -90,6 +90,7 @@ const PayWayModal: React.FC<{
         api("app.pay/index",d).then((res)=>{
             callback && callback(res);
         }).catch((e)=>{
+            console.log("app.pay/index",e);
             errorback && errorback(e);
         })
     }
@@ -114,13 +115,12 @@ const PayWayModal: React.FC<{
                 }
                 payOrder(d,(res)=>{
                     wx.chooseWXPay({
-                        timestamp: res.payInfo.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                        nonceStr: res.payInfo.nonceStr, // 支付签名随机串，不长于 32 位
-                        package: res.payInfo.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                        signType: res.payInfo.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                        paySign: res.payInfo.paySign, // 支付签名
+                        timestamp: res.payinfo.timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                        nonceStr: res.payinfo.nonceStr, // 支付签名随机串，不长于 32 位
+                        package: res.payinfo.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                        signType: res.payinfo.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                        paySign: res.payinfo.paySign, // 支付签名
                         success: function (result) {
-                        // 支付成功后的回调函数
                             Taro.hideLoading();
                             const d = {
                                 code:1,
@@ -128,15 +128,24 @@ const PayWayModal: React.FC<{
                             }
                             onResult && onResult(d);
                         },
-                        error:(e)=>{
+                        cancel:(e)=>{
                             console.log(e)
                             Taro.hideLoading();
                             const d = {
-                                code:0,
-                                data:e
+                                code:2,
+                                data:e.errMsg
+                            }
+                            onResult && onResult(d);
+                        },
+                        fail:(e) => {
+                            Taro.hideLoading();
+                            const d = {
+                                code:3,
+                                data:e.errMsg
                             }
                             onResult && onResult(d);
                         }
+
                     });
                 },(e)=>{
                     Taro.hideLoading();
