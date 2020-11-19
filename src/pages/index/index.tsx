@@ -81,9 +81,9 @@ class Index extends Component<any, IndexState> {
         //     })
         // });
 
-        analyze(pics[0]).then(res => {
-            console.log(res)
-        })
+        // analyze(pics[0]).then(res => {
+        //     console.log(res)
+        // })
 
     }
 

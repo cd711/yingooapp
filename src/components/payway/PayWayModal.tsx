@@ -95,25 +95,25 @@ const PayWayModal: React.FC<{
         })
     }
     function onSurePay(){
+        if (orderSN.length<=0) {
+            setIsOpened(false)
+            Taro.hideLoading();
+            Taro.showToast({
+                title:"订单号异常",
+                icon:'none',
+                duration:2000
+            });
+            setTimeout(() => {
+                Taro.navigateTo({
+                    url:'/pages/me/order?tab=0'
+                })
+            }, 2000);
+            return;
+        }
         Taro.showLoading({title:"支付中..."});
         if (is_weixin()) {
             // d["pay_method"] = 'mp';
             setWXpayConfig(()=>{
-                if (orderSN.length<=0) {
-                    setIsOpened(false)
-                    Taro.hideLoading();
-                    Taro.showToast({
-                        title:"订单号异常",
-                        icon:'none',
-                        duration:2000
-                    });
-                    setTimeout(() => {
-                        Taro.navigateTo({
-                            url:'/pages/me/order?tab=0'
-                        })
-                    }, 2000);
-                    return;
-                }
                 const d = {
                     order_sn:orderSN,
                     pay_type:payWay,
