@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {backHandlePress, deviceInfo, getURLParamsStr, notNull, ossUrl, urlDeCode, urlEncode} from "../../utils/common";
+import {backHandlePress, deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import Counter from "../../components/counter/counter";
 import OrderModal from "./orederModal";
@@ -15,7 +15,6 @@ import ENV_TYPE = Taro.ENV_TYPE;
 
 const PrintChange: Taro.FC<any> = () => {
 
-    const rouer = Taro.useRouter();
     const paramsObj = Taro.useRef<any>({});
     const printAttrItems = Taro.useRef<any>({});
     const [photos, setPhotos] = useState([]);
@@ -24,6 +23,7 @@ const PrintChange: Taro.FC<any> = () => {
     const [skus, setSkus] = useState([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
     const [photoVisible, setPhotoPickerVisible] = useState(false);
+    const [animating, setAnimating] = useState(false)
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -42,8 +42,28 @@ const PrintChange: Taro.FC<any> = () => {
     }, [])
 
     useEffect(() => {
-        // 解析地址栏参数
-        const params: any = urlDeCode(rouer.params);
+        // 解析参数
+        let params: any = {};
+
+        try {
+            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+            if (res) {
+                params = JSON.parse(res)
+            } else {
+                if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                    params = templateStore.photoSizeParams
+                } else {
+                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+                }
+            }
+        }catch (e) {
+            if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                params = templateStore.photoSizeParams
+            } else {
+                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+            }
+        }
+
         paramsObj.current = params || {};
         params.path = params.path.map(v => {
             return {
@@ -82,11 +102,28 @@ const PrintChange: Taro.FC<any> = () => {
         setPhotos([...arr])
     }
 
-    function setCount(id) {
+    function setCount(_, id) {
         const arr = [];
         arr.push(paramsObj.current.sku);
         arr.push(id);
-        console.log(arr)
+
+        // const tempArr = data.attrGroup.map((v, index) => {
+        //     if (notNull(v.special_show)) {
+        //         return index
+        //     } else {
+        //         return null
+        //     }
+        // }) || [];
+        // for (let i = 0; i < tempArr.length; i++) {
+        //     if (!notNull(tempArr[i])) {
+        //         const c = tempArr[i];
+        //         const item = data.attrItems[c];
+        //         if (item && item[0]) {
+        //             arr.push(item[0].id)
+        //         }
+        //     }
+        // }
+        console.log("追加的skuID：", arr)
         setSkus([...arr])
     }
 
@@ -115,11 +152,11 @@ const PrintChange: Taro.FC<any> = () => {
                     if (c <= 0) {
                         c = 0
                     }
-                    setCount(printAttrItems.current.attrItems[idx][c].id)
+                    setCount(res, printAttrItems.current.attrItems[idx][c].id)
                     break;
                 } else {
                     if (i === len - 1) {
-                        setCount(printAttrItems.current.attrItems[idx][len - 1].id)
+                        setCount(res, printAttrItems.current.attrItems[idx][len - 1].id)
                         break;
                     }
                 }
@@ -144,6 +181,10 @@ const PrintChange: Taro.FC<any> = () => {
         let count = 0;
         for (const item of photos) {
             count += parseInt(item.count)
+        }
+        if (notNull(skuInfo.id) || skuInfo.id == 0) {
+            Taro.showToast({title: "请选择规格", icon: "none"})
+            return
         }
         const data = {
             skuid: skuInfo.id,
@@ -185,6 +226,20 @@ const PrintChange: Taro.FC<any> = () => {
         setPhotoPickerVisible(false)
     }
 
+    const selectPhoto = () => {
+        setPhotoPickerVisible(true);
+        setTimeout(() => {
+            setAnimating(true)
+        }, 50)
+    }
+
+    const closeSelectPhoto = () => {
+        setAnimating(false);
+        setTimeout(() => {
+            setPhotoPickerVisible(false)
+        }, 500)
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
@@ -219,7 +274,7 @@ const PrintChange: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot" style={{justifyContent: "space-around"}}>
-                <View className="btn default" onClick={() => setPhotoPickerVisible(true)}>
+                <View className="btn default" onClick={selectPhoto}>
                     <Text className="txt">添加图片</Text>
                 </View>
                 <View className="btn" onClick={onCreateOrder}>
@@ -239,10 +294,10 @@ const PrintChange: Taro.FC<any> = () => {
             }
             {
                 photoVisible
-                    ? <View className="photo_picker_container">
+                    ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
                         <Photos editSelect
-                                onClose={() => setPhotoPickerVisible(false)}
-                                // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
+                                onClose={closeSelectPhoto}
+                            // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
                         />
                     </View>

@@ -33,6 +33,7 @@ class App extends Component {
     config: Config = {
         pages: [
             'pages/index/index',
+            'pages/index/special',
             'pages/me/me',
             'pages/template/index',
             'pages/template/detail',

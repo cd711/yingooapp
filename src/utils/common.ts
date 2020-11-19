@@ -18,7 +18,7 @@ export function ossUrl(url: string, type: number) {
 }
 
 export function notNull(val) {
-    return val === null || val === ""
+    return val === null || val === "" || val === undefined
 }
 
 /**
@@ -240,7 +240,7 @@ export function clearStorge(key: string) {
 
 export function backHandlePress() {
     if (Taro.getEnv() === ENV_TYPE.WEB) {
-        window.addEventListener("popstate", e => {
+        window.addEventListener("popstate", () => {
             console.log("监听到返回")
         })
     }

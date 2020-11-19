@@ -3,15 +3,20 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, getURLParamsStr, urlEncode} from "../../utils/common";
+import {deviceInfo} from "../../utils/common";
 import {api} from "../../utils/net";
-import UploadFile, {UploadFileChangeProps} from "../../components/Upload/Upload";
+import Photos from "../me/photos";
+import {userStore} from "../../store/user";
+import moment from "moment";
+import {templateStore} from "../../store/template";
 
 const Index: Taro.FC<any> = () => {
 
     const [checked, setChecked] = useState(0);
     const router = Taro.useRouter();
     const [sizeItem, setSizeItem] = useState([]);
+    const [photoVisible, setPhotoPickerVisible] = useState(false);
+    const [animating, setAnimating] = useState(false)
 
     useEffect(() => {
         const id = router.params.id;
@@ -48,19 +53,43 @@ const Index: Taro.FC<any> = () => {
         setChecked(Number(id))
     }
 
-    const onUpload = (files: Array<UploadFileChangeProps> | UploadFileChangeProps) => {
-        console.log("上传返回的结果：", files)
-        let path = [];
-        if (files instanceof Array) {
-            path = files.map(val => ({id: val.id, url: val.cdnUrl}));
-            const urlStr = getURLParamsStr(urlEncode({path, sku: checked, id: router.params.id}))
-            console.log(urlStr)
-            setTimeout(() => {
-                Taro.navigateTo({
-                    url: `/pages/printing/change?${urlStr}`
-                })
-            }, 1500)
+    const onPhotoSelect = (data: {ids: [], imgs: []}) => {
+        console.log("返回的结果：", data)
+
+        setPhotoPickerVisible(false)
+        const path = [];
+        for (let i = 0; i < data.ids.length; i++) {
+            path.push({
+                id: data.ids[i],
+                url: data.imgs[i]
+            })
         }
+
+        const temp = {path, sku: checked, id: router.params.id};
+        try {
+            Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp))
+        }catch (e) {
+            console.log("存储错误：", e)
+        }
+        templateStore.photoSizeParams = temp;
+
+        Taro.navigateTo({
+            url: `/pages/printing/change`
+        })
+    }
+
+    const selectPhoto = () => {
+        setPhotoPickerVisible(true);
+        setTimeout(() => {
+            setAnimating(true)
+        }, 50)
+    }
+
+    const closeSelectPhoto = () => {
+        setAnimating(false);
+        setTimeout(() => {
+            setPhotoPickerVisible(false)
+        }, 500)
     }
 
     return (
@@ -94,12 +123,21 @@ const Index: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot">
-                <View className="submit">
-                    <UploadFile uploadType="image" extraType={1} sourceType={["album"]} count={3} onChange={onUpload}>
-                        <Text className="txt">添加照片</Text>
-                    </UploadFile>
+                <View className="submit" onClick={selectPhoto}>
+                    <Text className="txt">添加照片</Text>
                 </View>
             </View>
+            {
+                photoVisible
+                    ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
+                        <Photos editSelect
+                                onClose={closeSelectPhoto}
+                            // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
+                                onPhotoSelect={onPhotoSelect}
+                        />
+                    </View>
+                    : null
+            }
         </View>
     )
 }
