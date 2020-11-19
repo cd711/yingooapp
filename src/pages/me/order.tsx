@@ -136,15 +136,36 @@ export default class Order extends Component<any,{
         })
     }
     onResult = (res) => {
-        if (res.code == 1) {
-            
-        } else {
+        this.setState({
+            showPayWayModal:false,
+        });
+        let title = '';
+        let url = '';
+        switch (res.code) {
+            case 1:
+                title = '支付成功';
+                url = '/pages/me/order?tab=2';
+                break;
+            case 2:
+                url = '/pages/me/order?tab=1';
+                break;
+            default:
+                title = res.data;
+                url = '/pages/me/order?tab=1';
+                break;
+        }
+        if (title.length>0) {
             Taro.showToast({
-                title:res.data,
-                icon:'none',
-                duration:2000
+                title,
+                icon: 'none',
+                duration: 2000
             });
         }
+        setTimeout(() => {
+            Taro.navigateTo({
+                url
+            })
+        }, 2000);
     }
     render() {
         const {switchTabActive,data,showPayWayModal,order_price,order_sn} = this.state;

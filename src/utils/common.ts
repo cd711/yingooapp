@@ -100,7 +100,6 @@ export function getNextPage(currentPage: number, pageTotal: number) {
 }
 
 export const jsApiList = [
-    'checkJsApi',
     'onMenuShareTimeline',
     'onMenuShareAppMessage',
     'onMenuShareQQ',

@@ -330,15 +330,36 @@ export default class Confirm extends Component<any, {
         })
     }
     onResult = (res) => {
-        if (res.code == 1) {
-
-        } else {
+        this.setState({
+            showPayWayModal:false,
+        });
+        let title = '';
+        let url = '';
+        switch (res.code) {
+            case 1:
+                title = '支付成功';
+                url = '/pages/me/order?tab=2';
+                break;
+            case 2:
+                url = '/pages/me/order?tab=1';
+                break;
+            default:
+                title = res.data;
+                url = '/pages/me/order?tab=1';
+                break;
+        }
+        if (title.length>0) {
             Taro.showToast({
-                title: res.data,
+                title,
                 icon: 'none',
                 duration: 2000
             });
         }
+        setTimeout(() => {
+            Taro.navigateTo({
+                url
+            })
+        }, 2000);
     }
 
     render() {
@@ -546,24 +567,20 @@ export default class Confirm extends Component<any, {
                         </FloatModal>
                         : null
                 }
-                {
-                    showPayWayModal
-                        ? <PayWayModal
-                            isShow={showPayWayModal}
-                            totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
-                            order_sn={order_sn}
-                            onResult={this.onResult}
-                            onClose={() => {
-                                this.setState({
-                                    showPayWayModal: false
-                                });
-                                window.history.replaceState(null, null, '/pages/me/me');
-                                Taro.navigateTo({
-                                    url: '/pages/me/order?tab=1'
-                                })
-                            }}/>
-                        : null
-                }
+                    <PayWayModal
+                        isShow={showPayWayModal}
+                        totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
+                        order_sn={order_sn}
+                        onResult={this.onResult}
+                        onClose={() => {
+                            this.setState({
+                                showPayWayModal: false
+                            });
+                            window.history.replaceState(null, null, '/pages/me/me');
+                            Taro.navigateTo({
+                                url: '/pages/me/order?tab=1'
+                            })
+                        }}/>
             </View>
         )
     }
