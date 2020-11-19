@@ -6,24 +6,18 @@ import './index.less'
 import IconFont from '../../components/iconfont'
 import {api} from "../../utils/net";
 import {deviceInfo, ossUrl} from "../../utils/common";
-import RGBAster from 'rgbaster';
 import Fragment from "../../components/Fragment";
+import ImageSwiper from "./ImageSwiper";
 
-const pics = [
-    "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
-    "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
-    "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
-    "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
-    "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
-    "https://i.ibb.co/n6Ky6bV/cfff57e742254d16d383aa0e580ca03baa37099fed129-PZBbzk-fw1200.jpg",
-]
 
 interface IndexState {
-    currentColor: any[];
+    currentColor: any;
     colorWarp: string;
-    swiperCurrent: number;
-    data: any[]
+    swiperCurrent: {};
+    data: any
 }
+
+let currentColors = [];
 
 @inject("userStore")
 @observer
@@ -40,12 +34,13 @@ class Index extends Component<any, IndexState> {
         navigationBarTitleText: '发现'
     }
 
+
     constructor(props) {
         super(props);
         this.state = {
-            currentColor: [],
+            currentColor: {},
             colorWarp: "",
-            swiperCurrent: 0,
+            swiperCurrent: {},
             data: []
         }
     }
@@ -83,7 +78,7 @@ class Index extends Component<any, IndexState> {
 
     renderTemplateItem = (item, index) => {
         let ele = null;
-        let currentColor = this.state.currentColor;
+        // let currentColor = this.state.currentColor;
 
         if (item.clist instanceof Array) {
             // 商品模板
@@ -108,50 +103,7 @@ class Index extends Component<any, IndexState> {
                             </View>
                         )
                     } else if (itemLen > 1 && itemLen < 6) {
-                        // let temp = {
-                        //     [`${index}`]: {}
-                        // }
-                        // for (let i = 0; i < itemLen; i++) {
-                        //     temp[`${index}`] = {current: i, color: "transparent"};
-                        //     currentColor.push(temp)
-                        // }
-                        ele = (
-                            <View className='temp-warp' style={`background: #25632130`} key={index}>
-                                <View style='background:rgba(0, 0, 0, 0.03);' className='mask'>
-                                    <View className='title'>
-                                        <Text className='txt'>{item.title}</Text>
-                                        {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
-                                    </View>
-                                    <View className='swiper-back'>
-                                        <Swiper className='temp-swiper' vertical autoplay={false} circular={false} indicatorDots={false}
-                                                onChange={({detail: {current}}) => {
-                                                    this.setState({
-                                                        colorWarp: this.state.tempColors[current],
-                                                        swiperCurrent: current
-                                                    })
-                                                }}
-                                        >
-                                            {
-                                                item.clist.map((child, cIdx) => (
-                                                    <SwiperItem key={`child_${cIdx}`}>
-                                                        <Image src={ossUrl(child.thumb_image, 1)} className='photo' mode='aspectFill'/>
-                                                    </SwiperItem>
-                                                ))
-                                            }
-                                        </Swiper>
-
-                                        <View className='indicatorDots'>
-                                            {
-                                                item.clist.map((_, index) => (
-                                                    <View className={this.state.swiperCurrent == index ? 'dot active' : 'dot'} key={index} />
-                                                ))
-                                            }
-                                        </View>
-                                    </View>
-                                    <Button className='now-design-btn'>立即设计</Button>
-                                </View>
-                            </View>
-                        )
+                        ele = <ImageSwiper key={index} item={item} />
                     } else {
                         ele = (
                             <View className='temp-warp' key={index}>
@@ -204,8 +156,6 @@ class Index extends Component<any, IndexState> {
             }
         }
 
-        console.log("初始化的色值：", currentColor)
-        // this.setState({currentColor})
         return ele
     }
 
