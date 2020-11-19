@@ -333,17 +333,28 @@ export default class Confirm extends Component<any, {
         this.setState({
             showPayWayModal:false,
         });
-        let title = '支付成功';
-        let url = '/pages/me/order?tab=2';
-        if (res.code != 1) {
-            title = res.data;
-            url = '/pages/me/order?tab=1';
+        let title = '';
+        let url = '';
+        switch (res.code) {
+            case 1:
+                title = '支付成功';
+                url = '/pages/me/order?tab=2';
+                break;
+            case 2:
+                url = '/pages/me/order?tab=1';
+                break;
+            default:
+                title = res.data;
+                url = '/pages/me/order?tab=1';
+                break;
         }
-        Taro.showToast({
-            title,
-            icon: 'none',
-            duration: 2000
-        });
+        if (title.length>0) {
+            Taro.showToast({
+                title,
+                icon: 'none',
+                duration: 2000
+            });
+        }
         setTimeout(() => {
             Taro.navigateTo({
                 url

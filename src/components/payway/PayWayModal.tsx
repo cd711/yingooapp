@@ -100,12 +100,18 @@ const PayWayModal: React.FC<{
             // d["pay_method"] = 'mp';
             setWXpayConfig(()=>{
                 if (orderSN.length<=0) {
+                    setIsOpened(false)
                     Taro.hideLoading();
                     Taro.showToast({
                         title:"订单号异常",
                         icon:'none',
                         duration:2000
                     });
+                    setTimeout(() => {
+                        Taro.navigateTo({
+                            url:'/pages/me/order?tab=0'
+                        })
+                    }, 2000);
                     return;
                 }
                 const d = {
@@ -148,20 +154,32 @@ const PayWayModal: React.FC<{
 
                     });
                 },(e)=>{
+                    setIsOpened(false)
                     Taro.hideLoading();
                     Taro.showToast({
                         title:e,
                         icon:'none',
                         duration:2000
                     });
+                    setTimeout(() => {
+                        Taro.navigateTo({
+                            url:'/pages/me/order?tab=0'
+                        })
+                    }, 2000);
                 });
             },(e)=>{
+                setIsOpened(false)
                 Taro.hideLoading();
                 Taro.showToast({
                     title:e,
                     icon:'none',
                     duration:2000
                 });
+                setTimeout(() => {
+                    Taro.navigateTo({
+                        url:'/pages/me/order?tab=0'
+                    })
+                }, 2000);
             })
         } else {
             const d = {
@@ -170,6 +188,7 @@ const PayWayModal: React.FC<{
                 pay_method:'wap'
             }
             payOrder(d,(res)=>{
+                setIsOpened(false)
                 window.history.pushState(null,null,'/pages/me/order?tab=0');
                 setTimeout(() => {
                     window.location.href = res.payinfo;
