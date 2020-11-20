@@ -15,6 +15,8 @@ import ENV_TYPE = Taro.ENV_TYPE;
 
 const PrintChange: Taro.FC<any> = () => {
 
+    const router = Taro.useRouter();
+
     const paramsObj = Taro.useRef<any>({});
     const printAttrItems = Taro.useRef<any>({});
     const [photos, setPhotos] = useState([]);
@@ -89,6 +91,14 @@ const PrintChange: Taro.FC<any> = () => {
         backHandlePress()
 
     }, [])
+
+    function checkHasRotate(img: string): boolean {
+        if (router.params.id) {
+            for (const item of printAttrItems.current) {
+
+            }
+        }
+    }
 
     const onCountChange = (num, idx) => {
         const arr = [...photos];

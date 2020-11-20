@@ -74,7 +74,7 @@ const Index: Taro.FC<any> = () => {
         templateStore.photoSizeParams = temp;
 
         Taro.navigateTo({
-            url: `/pages/printing/change`
+            url: `/pages/printing/change?id=${router.params.id}`
         })
     }
 
