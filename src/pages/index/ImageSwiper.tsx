@@ -14,6 +14,7 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
     const [current, setCurrent] = useState<number>(0);
     const [color, setColor] = useState<string>("transparent");
+    const [fontColor, setFontColor] = useState<string>("#000")
 
     const getCurrentSwiperColor = (index) => {
         setCurrent(index)
@@ -23,8 +24,23 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
             scale: 0.6
         }).then(res => {
             const cArr = res.slice(1, 10);
-            // console.log(cArr)
-            setColor(cArr[2].color)
+            const currentColor = cArr[2].color;
+
+            let colorArr = currentColor.split("(");
+            colorArr = colorArr[1].split(")");
+            colorArr = colorArr[0].split(",");
+            let num = 0;
+            colorArr.forEach(val => {
+                num += val * 1
+            });
+            if (num / 3 > 200) {
+                // 浅色
+                setFontColor("#2c2c2c")
+            } else {
+                // 深色
+                setFontColor("#fff")
+            }
+            setColor(`rgba(${colorArr.join(",")}, .5)`)
 
         }).catch(e => {
             console.log(e)
@@ -42,8 +58,8 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
         <View className='temp-warp' style={{background: color}}>
             <View style='background:rgba(0, 0, 0, 0.03);' className='mask'>
                 <View className='title'>
-                    <Text className='txt'>{item.title}</Text>
-                    {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
+                    <Text className='txt' style={{color: fontColor}}>{item.title}</Text>
+                    {item.subtitle ? <Text className='sub-title' style={{color: fontColor}}>{item.subtitle}</Text> : null}
                 </View>
                 <View className='swiper-back'>
                     <Swiper className='temp-swiper' vertical autoplay={true} circular={false} indicatorDots={false}

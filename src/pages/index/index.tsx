@@ -116,8 +116,8 @@ class Index extends Component<any, IndexState> {
                     const itemLen = item.clist.length;
                     if (itemLen === 1) {
                         ele = (
-                            <View className='temp-warp' style={`background: #ff000030`} key={index}>
-                                <View style='background:rgba(0, 0, 0, 0.03);' className='mask'>
+                            <View className='temp-warp' key={index}>
+                                <View className='mask'>
                                     <View className='title'>
                                         <Text className='txt'>{item.title}</Text>
                                         {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
