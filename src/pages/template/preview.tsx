@@ -93,6 +93,18 @@ export default class Preview extends Component<{}, {
             this.setState({
                 workInfo:res
             })
+        }).catch((e)=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                icon:'none',
+                duration:1500
+            });
+            setTimeout(() => {
+                Taro.reLaunch({
+                    url:'/pages/index/index'
+                })
+            }, 1500);
         })
     }
 
