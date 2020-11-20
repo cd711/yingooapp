@@ -1147,7 +1147,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         setType(0)
         if (info.id) {
             try {
-                const res = await callEditor("setDoc", info.id, data.imgs)
+                await callEditor("setDoc", info.id, data.imgs)
             }catch (e) {
                 console.log("选图出错：", e)
             }
@@ -1235,6 +1235,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoadEmpty = async (_?: number) => {
+        console.log([this.$router.params.img])
         try {
             const res = await api("editor.tpl/index", {cid: 63});
             await callEditor("setDoc", res.list[0].id, [this.$router.params.img])
@@ -1330,6 +1331,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
         switch (item.type) {
             case "img":
+            case "container":
                 this.store.tool = 1;
                 break;
             case "text":
