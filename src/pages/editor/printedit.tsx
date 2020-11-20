@@ -1084,7 +1084,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     const [brandList, setBrandList] = useState<BrandType[]>([]);
     const [brandIndex, setBrand] = useState<number>(0);
     const [series, setSeries] = useState<BrandType[]>([]);
-
+    const [info, setInfo] = useState<any>({});
 
     const [tempCurrentModel, setTempCurrentModel] = useState<any>(parent.defaultModel as any);
 
@@ -1178,6 +1178,14 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         });
     }) as any, [brandList, brandIndex]);
 
+    useEffect(() => {
+        api("editor.tpl/index", {cid: 63}).then(res => {
+            setInfo({...res})
+        }).catch(e => {
+            console.log("获取模板系信息出错：", e)
+        })
+    }, [])
+
     const cancelMode = () => {
         setType(0);
         // setBrand(currentModel.brandIndex);
@@ -1187,10 +1195,14 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     const onPhotoSelect = async (data: {ids: [], imgs: []}) => {
         console.log(router)
         setType(0)
-        try {
-            const res = await callEditor("setDoc", data.imgs)
-        }catch (e) {
-            console.log("选图出错：", e)
+        if (info.id) {
+            try {
+                const res = await callEditor("setDoc", info.id, data.imgs)
+            }catch (e) {
+                console.log("选图出错：", e)
+            }
+        } else {
+
         }
     }
 
