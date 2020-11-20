@@ -99,6 +99,24 @@ class Index extends Component<any, IndexState> {
         })
     }
 
+    receiveCoupon = async item => {
+        Taro.showLoading({title: "请稍后..."})
+        try {
+            await api("app.coupon/add", {id: item.id});
+            Taro.hideLoading()
+            Taro.showToast({
+                title: '领取成功',
+                icon: "none"
+            })
+        }catch (e) {
+            Taro.hideLoading()
+            Taro.showToast({
+                title: e,
+                icon: "none"
+            })
+        }
+    }
+
     renderTemplateItem = (item, index) => {
         let ele = null;
 
@@ -173,6 +191,13 @@ class Index extends Component<any, IndexState> {
                         })
                     }
                 </Fragment>
+            } else if (item.model === "coupon") {
+                ele = <View className="index_coupon_main" key={index} onClick={() => this.receiveCoupon(item)}>
+                    <Image src={ossUrl(item.image, 1)} className="coupon_img" />
+                    <View className="receive_btn">
+                        <Image src={require("../../source/lq.png")} className="receive_img" mode="widthFix" />
+                    </View>
+                </View>
             }
         }
 

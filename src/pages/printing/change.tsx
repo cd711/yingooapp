@@ -241,9 +241,9 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onEditClick = (item ,index) => {
-        Taro.navigateTo({
-            url: `/pages/editor/printedit?img=${item.url}&idx=${index}`
-        })
+        // Taro.navigateTo({
+        //     url: `/pages/editor/printedit?img=${item.url}&idx=${index}`
+        // })
     }
 
     return (
