@@ -1,6 +1,6 @@
 import {ComponentType} from 'react'
 import Taro, {Component, Config} from '@tarojs/taro'
-import {Button, Image, ScrollView, Swiper, SwiperItem, Text, View} from '@tarojs/components'
+import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import {inject, observer} from '@tarojs/mobx'
 import './index.less'
 import IconFont from '../../components/iconfont'
@@ -11,13 +11,9 @@ import ImageSwiper from "./ImageSwiper";
 
 
 interface IndexState {
-    currentColor: any;
-    colorWarp: string;
-    swiperCurrent: {};
     data: any
 }
 
-let currentColors = [];
 
 @inject("userStore")
 @observer
@@ -38,9 +34,6 @@ class Index extends Component<any, IndexState> {
     constructor(props) {
         super(props);
         this.state = {
-            currentColor: {},
-            colorWarp: "",
-            swiperCurrent: {},
             data: []
         }
     }
@@ -102,9 +95,19 @@ class Index extends Component<any, IndexState> {
         }
     }
 
+    loadMore = () => {
+        const {data} = this.state;
+        if (this.total === data.length || this.total < 15) {
+            return
+        }
+        this.getIndexList({
+            start: data.length,
+            loadMore: true
+        })
+    }
+
     renderTemplateItem = (item, index) => {
         let ele = null;
-        // let currentColor = this.state.currentColor;
 
         if (item.clist instanceof Array) {
             // 商品模板
@@ -185,7 +188,7 @@ class Index extends Component<any, IndexState> {
 
 
     render() {
-        const {colorWarp, swiperCurrent, data} = this.state;
+        const {data} = this.state;
         return (
             <View className='index'>
                 <View className='top-search'>
@@ -194,7 +197,7 @@ class Index extends Component<any, IndexState> {
                         <Text className='placeholders'>搜索海量模板</Text>
                     </View>
                 </View>
-                <ScrollView scrollY style={{height: deviceInfo.windowHeight - 102}}>
+                <ScrollView scrollY style={{height: deviceInfo.windowHeight - 102}} onScrollToLower={this.loadMore}>
                     <View className='inde_page_container'>
                         {
                             data.map((value, index) => this.renderTemplateItem(value, index))
