@@ -1,9 +1,9 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image } from '@tarojs/components'
+import { View, Text,Image,ScrollView } from '@tarojs/components'
 import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
-import {AtModal, AtNavBar} from 'taro-ui'
+
 import { observer, inject } from '@tarojs/mobx';
 import moment from 'moment';
 import {notNull, ossUrl} from '../../utils/common'
@@ -18,7 +18,8 @@ export default class Detail extends Component<any,{
     isLike:boolean;
     likeList:Array<any>;
     currentItem:any;
-    isOpened: boolean
+    isOpened: boolean;
+    scrollTop:number
 }> {
 
     config: Config = {
@@ -30,7 +31,8 @@ export default class Detail extends Component<any,{
             isLike:false,
             likeList:[],
             currentItem:{},
-            isOpened: false
+            isOpened: false,
+            scrollTop:0
         }
     }
     private lastBottomTime = 0;
@@ -135,57 +137,41 @@ export default class Detail extends Component<any,{
     }
 
     render() {
-        const { isLike,likeList,currentItem, isOpened } = this.state;
+        const { isLike,likeList,currentItem, scrollTop } = this.state;
         return (
             <View className='detail'>
-                <AtNavBar
-                    onClickLeftIcon={()=>{
+                <View className='nav-bar'>
+                    <View className='left' onClick={() => {
                         Taro.navigateBack();
-                    }}
-                    color='#121314'
-                    title={`ID:${currentItem.id}`}
-                    border={false}
-                    fixed
-                    leftIconType={{
-                        value:'chevron-left',
-                        color:'#121314',
-                        size:24
-                    }}
-                />
-                {
-                    isOpened
-                        ? <AtModal
-                            className="modal_confirm_container"
-                            isOpened={isOpened}
-                            cancelText='取消'
-                            confirmText='前往登录'
-                            onCancel={() => this.setState({isOpened: false})}
-                            onConfirm={() => {}}
-                            content='检测到您还未登录，请登录后操作!'
-                        />
-                        : null
-                }
-                {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
-                <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' />
-                <View className='doyoulike'>
-                    <View className='opsline'></View>
-                    <Text className='liketxt'>猜你喜欢</Text>
-                    <View className='like-list'>
-                        {
-                            likeList && likeList.map((item)=>(
-                                <View className='item' onClick={()=>{
-                                    this.getCurrentItem(item.id);
-                                    Taro.pageScrollTo({
-                                        scrollTop:0,
-                                        duration:100
-                                    })
-                                }} key={item.id}>
-                                    <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill' />
-                                </View>
-                            ))
-                        }
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>{`ID:${currentItem.id}`}</Text>
                     </View>
                 </View>
+                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop}>
+                    {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
+                    <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' />
+                    <View className='doyoulike'>
+                        <View className='opsline'></View>
+                        <Text className='liketxt'>猜你喜欢</Text>
+                        <View className='like-list'>
+                            {
+                                likeList && likeList.map((item)=>(
+                                    <View className='item' onClick={()=>{
+                                        this.getCurrentItem(item.id);
+                                        this.setState({
+                                            scrollTop:0
+                                        })
+                                    }} key={item.id}>
+                                        <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill' />
+                                    </View>
+                                ))
+                            }
+                        </View>
+                    </View>
+                </ScrollView>
                 <View className='bottom_bar'>
                     <View className='favorite' onClick={this.collectedProd}>
                         <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color='#707177' />

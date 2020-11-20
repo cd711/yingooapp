@@ -38,6 +38,7 @@ class App extends Component {
             'pages/template/index',
             'pages/template/detail',
             'pages/login/index',
+            'pages/login/set',
             'pages/editor/shell',
             'pages/editor/printedit',
             // 'pages/editor/photos',

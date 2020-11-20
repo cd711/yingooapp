@@ -27,7 +27,9 @@ export class UserStore {
     @observable
     public address:any = null;
     @observable
-    public birthday: string = ""
+    public birthday: string = "";
+    @observable
+    public set_pwd:boolean = false;
 
     public get sex() {
         const s = sexList[this.gender||0];
@@ -35,7 +37,6 @@ export class UserStore {
     }
     @action
     public setInfo(info){
-        console.log(info)
         setUserInfo(info);
         this.id = info.id;
         this.mobile = info.mobile;
@@ -45,6 +46,7 @@ export class UserStore {
         this.bio = info.bio;
         this.address = info.address;
         this.birthday = info.birthday;
+        this.set_pwd = info.set_pwd>0?true:false;
     }
 
     @action
@@ -59,6 +61,7 @@ export class UserStore {
             this.bio = info.bio;
             this.address = info.address;
             this.birthday = info.birthday;
+            this.set_pwd = info.set_pwd>0?true:false;
         })
     }
 

@@ -20,7 +20,7 @@ export default class Success extends Component<any,{
 }> {
 
     config: Config = {
-        navigationBarTitleText: '模板详情'
+        navigationBarTitleText: '支付结果'
     }
     constructor(props){
         super(props);

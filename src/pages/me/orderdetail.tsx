@@ -14,13 +14,13 @@ import page from '../../utils/ext';
 @inject("templateStore")
 @observer
 @page({wechatAutoLogin:true})
-export default class OrderDetail extends Component<any,{
+export default class OrderDetail extends Component<{},{
     data:any,
     hours:string,
     minutes:string,
     seconds:string,
     showPayWayModal:boolean,
-    navBarChange:boolean
+    navBarChange:boolean,
 }> {
 
     config: Config = {
@@ -174,43 +174,61 @@ export default class OrderDetail extends Component<any,{
     }
     onScroll = (e) => {
         const top = e.detail.scrollTop;
-        let navBarChange = true;
+        let navBarChange = false;
         if (top>24) {
-            navBarChange = false;
+            navBarChange = true;
         }
         this.setState({
             navBarChange
         })
     }
+    onReceviceOrder = (id) => {
+        api('app.order/receive',{
+            id
+        }).then(()=>{
+            Taro.hideLoading();
+            // this.getList(this.state.switchTabActive)
+        }).catch(()=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:'服务器开小差了，稍后再试',
+                icon:'none',
+                duration:2000
+            });
+        })
+    }
     render() {
         const { data,hours,minutes,seconds,showPayWayModal,navBarChange } = this.state;
-        const status = data.state_tip?data.state_tip.text:"";
+        const state = data.state_tip?data.state_tip.value:0;
+        const afterState = data.after_sale_status_tip?data.after_sale_status_tip.value:0;
+        let status = data.state_tip?data.state_tip.text:"";
+        status = afterState!=0?data.after_sale_status_tip.text:status;
         const plist = lodash.isEmpty(data.products)?[]:data.products;
-        const state = data.state_tip?data.state_tip.value:0
         return (
             <View className='order-detail'>
-                <View className='nav-bar' style={navBarChange?{background:"#FFF"}:{}}>
+                {/* style={`background: ${navBarChange?"#FF4966":"#FFF"}`} */}
+                <View className={navBarChange?'nav-bar':(state==-1?'nav-bar bar-gray':'nav-bar bar-active')}>
                     <View className='left' onClick={() => {
                         Taro.navigateTo({
                             url:"/pages/me/order?tab=0"
                         })
                     }}>
-                        <IconFont name='24_shangyiye' size={48} color='#FFF' />
+                        <IconFont name='24_shangyiye' size={48} color={navBarChange?'#121314':'#FFF'} />
                     </View>
                     <View className='center'>
                         <Text className='title'>我的订单</Text>
                     </View>
                     <View className='right'>
-                        <IconFont name='24_kefu' size={48} color='#FFF' />
+                        <IconFont name='24_kefu' size={48} color={navBarChange?'#121314':'#FFF'} />
                     </View>
                 </View>
                 <ScrollView scrollY className='order_content_page' onScroll={this.onScroll}>
                 <View className='container'>
-                <View className='top'>
+                <View className='top' style={`background:${state==-1?'#9C9DA6':'#FF4966'}`}>
                     <View className='status'>
                         <Text className='statustxt'>{status}</Text>
                         <View className='time-tip'>
-                        {state==1?<View className='waiting-pay'>
+                        {state==1 && afterState == 0?<View className='waiting-pay'>
                                 <Text className='waiting-pay-txt'>剩余</Text>
                                 <View className='time'>
                                     <View className='item'>
@@ -226,8 +244,16 @@ export default class OrderDetail extends Component<any,{
                                     </View>
                                 </View>
                                 <Text className='waiting-pay-txt'>秒，将自动取消订单</Text>
-                            </View>:state==2?<View className='waiting-pay'>
+                            </View>:state==2 && afterState == 0?<View className='waiting-pay'>
                                 <Text className='waiting-pay-txt'>等待卖家发货</Text>
+                            </View>:state==3 && afterState == 0?<View className='waiting-pay'>
+                                <Text className='waiting-pay-txt'>等待买家确认收货</Text>
+                            </View>:afterState != 0?<View className='waiting-pay'>
+                                <Text className='waiting-pay-txt'>{data.after_sale_status_tip.tip}</Text>
+                            </View>:state==-1?<View className='waiting-pay'>
+                                <Text className='waiting-pay-txt'>{data.state_tip.tip}</Text>
+                            </View>:state==4 && afterState == 0?<View className='waiting-pay'>
+                                <Text className='waiting-pay-txt'>{data.state_tip.tip}</Text>
                             </View>:null}
                         </View>
                     </View>
@@ -302,7 +328,7 @@ export default class OrderDetail extends Component<any,{
                 </View>
                 </ScrollView>
                 {
-                    state == 1?<View className='ops'>
+                    state == 1 && afterState == 0?<View className='ops'>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
                         <Button className='red-border-btn' onClick={()=>{
                             Taro.navigateTo({
@@ -319,11 +345,13 @@ export default class OrderDetail extends Component<any,{
                                 showPayWayModal:true
                             })
                         }}>去支付</Button>
-                    </View>:data.status == 2?<View className='ops'>
+                    </View>:state == 2 && afterState == 0?<View className='ops'>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
 
-                    </View>:data.status == 4?<View className='ops'>
+                    </View>:(state == 4 || state == -1)&& afterState == 0?<View className='ops'>
                         <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
+                    </View>:state == 3 && afterState == 0?<View className='ops'>
+                        <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,data.id)}>确认收货</Button>
                     </View>:null
                 }
                 <PayWayModal 
