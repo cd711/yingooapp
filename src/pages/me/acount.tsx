@@ -66,8 +66,12 @@ export default class Setting extends Component<any,{
                     </View>
                     <View className='item'>
                         <Text className='name'>密码</Text>
-                        <View className='right'>
-                            <Text className='rtxt'>未设置</Text>
+                        <View className='right' onClick={()=>{
+                            Taro.navigateTo({
+                                url:'/pages/login/set'
+                            })
+                        }}>
+                            <Text className='rtxt'>{'未设置'}</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
                     </View>

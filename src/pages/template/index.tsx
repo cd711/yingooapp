@@ -236,7 +236,7 @@ export default class Template extends Component<any,{
                     <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`}>
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
                             {
-                                !showTemplateLoading && switchActive == 0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
+                                !showTemplateLoading && cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo"?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
                                     Taro.navigateTo({
                                         url:`pages/printing/index?id=32`
                                     })
@@ -254,14 +254,14 @@ export default class Template extends Component<any,{
                             {
                                 tagList.map((item)=>(
 
-                                    <View className='pic-box' style={switchActive == 1 ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
+                                    <View className='pic-box' style={cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone" ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
                                         // templateStore.selectItem = item;
                                         Taro.navigateTo({
                                             url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
                                         });
                                     }} key={item.id}>
                                         {
-                                            switchActive == 1 ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>
+                                            cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone" ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>
                                                 <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />
                                                 <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='scaleToFill' />
                                             </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`} />

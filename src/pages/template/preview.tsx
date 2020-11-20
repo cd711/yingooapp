@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Button } from '@tarojs/components'
+import { View, Text, Button,Image } from '@tarojs/components'
 import './preview.less';
 import IconFont from '../../components/iconfont';
 import { api, getToken } from '../../utils/net'
@@ -45,7 +45,8 @@ export default class Preview extends Component<{}, {
     buyTotal:number;
     sku:any;
     modalId:number;
-    isOpened: boolean
+    isOpened: boolean,
+    workInfo:any
 }> {
 
     config: Config = {
@@ -61,21 +62,39 @@ export default class Preview extends Component<{}, {
             buyTotal:0,
             sku:{},
             isOpened: false,
-            modalId:0
+            modalId:0,
+            workInfo:{}
         }
     }
     componentDidMount() {
-        const {doc_id,workID} = this.$router.params;
-        console.log(workID)
+        const {doc_id,workid} = this.$router.params;
+        if (workid && parseInt(workid)>0) {
+            this.getWorkInfo(workid)
+        }
         if (parseInt(doc_id)>0) {
             this.setState({
                 saveId:parseInt(doc_id)
             })
         }
-        editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
-        window.addEventListener("message", this.onMsg);
+        if (!workid) {
+            editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
+            window.addEventListener("message", this.onMsg);
+        }
+
     }
 
+    getWorkInfo = (id) => {
+        Taro.showLoading({title:"加载中..."});
+        api("editor.user_tpl/info",{
+            id
+        }).then((res)=>{
+            Taro.hideLoading();
+            console.log(res)
+            this.setState({
+                workInfo:res
+            })
+        })
+    }
 
     _res = (data) => {
         const { id, res, err } = data.data;
@@ -202,8 +221,9 @@ export default class Preview extends Component<{}, {
         })
     }
     onEditor = () => {
-        const { saveId } = this.state;
-        window.location.replace(`/editor/shell?id=${saveId}`);
+        const { saveId,workInfo } = this.state;
+        
+        window.location.replace(`/editor/shell?id=${workInfo?workInfo.id:saveId}`);
     }
 
     onOrderIng = () => {
@@ -223,10 +243,11 @@ export default class Preview extends Component<{}, {
     }
 
     render() {
-        const { placeOrderShow,saveId,productInfo, isOpened} = this.state;
+        const { placeOrderShow,saveId,productInfo,workInfo} = this.state;
+        const workid = workInfo && workInfo.id ? workInfo.id : 0;
         return (
             <View className='preview'>
-                {
+                {/* {
                     isOpened
                         ? <AtModal
                             className="modal_confirm_container"
@@ -238,7 +259,7 @@ export default class Preview extends Component<{}, {
                             content='检测到您还未登录，请登录后操作!'
                         />
                         : null
-                }
+                } */}
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
                         if (saveId) {
@@ -258,11 +279,14 @@ export default class Preview extends Component<{}, {
                 </View>
                 <View className='container'>
                      {/* eslint-disable-next-line react/forbid-elements */}
-                    <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
+                     {
+                         workid?<Image src={workInfo.thumb_image} />:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
+                     }
+                    
                 </View>
                 <View className='bottom'>
                     {
-                        parseInt(saveId+"")>0?<View className='editor' onClick={this.onEditor}>
+                        parseInt(saveId+"")>0 || parseInt(workid+"")>0?<View className='editor' onClick={this.onEditor}>
                             <IconFont name='24_qubianji' size={48} color='#707177' />
                             <Text className='txt'>编辑</Text>
                         </View>:<View className='editor' onClick={this.onSave}>
