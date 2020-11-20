@@ -240,6 +240,12 @@ const PrintChange: Taro.FC<any> = () => {
         }, 500)
     }
 
+    const onEditClick = (item ,index) => {
+        Taro.navigateTo({
+            url: `/pages/editor/printedit?img=${item.url}&idx=${index}`
+        })
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
@@ -262,7 +268,7 @@ const PrintChange: Taro.FC<any> = () => {
                                     <View className="print_change_del" onClick={() => onDeleteImg(index)}>
                                         <IconFont name="32_guanbi" size={32}/>
                                     </View>
-                                    <Image src={ossUrl(value.url, 1)} className="img" mode="aspectFill"/>
+                                    <Image src={ossUrl(value.url, 1)} className="img" mode="aspectFill" onClick={() => onEditClick(value, index)} />
                                     <View className="print_change_count">
                                         <Counter max={100} num={value.count}
                                                  onCounterChange={c => onCountChange(c, index)}/>

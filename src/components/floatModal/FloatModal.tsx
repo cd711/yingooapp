@@ -5,7 +5,7 @@ import './FloatModal.less'
 import { AtFloatLayout } from "taro-ui"
 import IconFont from '../iconfont';
 
-const FloatModal: React.FC<any> = ({title,isShow,onClose,children}) => {
+const FloatModal: Taro.FC<any> = ({title,isShow,onClose,children}) => {
     const [isOpened,setIsOpened] = useState(false);
 
     useEffect(()=>{

@@ -6,7 +6,7 @@ import IconFont from '../iconfont';
 import Checkbox from '../checkbox/checkbox';
 import moment from "moment";
 
-const Ticket: React.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
+const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
 
     useEffect(() => {
         // console.log(ticket)
@@ -45,7 +45,7 @@ const Ticket: React.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
             {
                 right?right:<Checkbox className='checkbox' isChecked={isSelected} />
             }
-            
+
         </View>
     </View>
 }

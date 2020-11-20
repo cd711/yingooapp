@@ -8,7 +8,7 @@ interface EmptyProps {
     onClick?: () => void;
     icon?: string;
 }
-const Empty: React.FC<EmptyProps> = (props) => {
+const Empty: Taro.FC<EmptyProps> = (props) => {
 
     const {content, button, onClick, icon} = props;
 

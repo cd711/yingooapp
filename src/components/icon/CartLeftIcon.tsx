@@ -1,6 +1,6 @@
 import Taro, {  } from '@tarojs/taro'
 
-const CartLeftIcon: React.FC<{
+const CartLeftIcon: Taro.FC<{
     width:number,
     height:number
 }> = ({width,height}) => {

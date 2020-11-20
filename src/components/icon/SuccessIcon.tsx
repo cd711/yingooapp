@@ -1,6 +1,6 @@
 import Taro, {  } from '@tarojs/taro'
 
-const SuccessIcon: React.FC<{
+const SuccessIcon: Taro.FC<{
     width:number,
     height:number
 }> = ({width,height}) => {

@@ -9,7 +9,7 @@ interface CounterProps {
     onButtonClick?: (count: number) => void;
     max?: number
 }
-const Counter: React.FC<CounterProps> = ({num, onCounterChange, onButtonClick, max}) => {
+const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, max}) => {
     const [number, setNumber] = useState<number>(1);
     useEffect(() => {
         if (onCounterChange) {

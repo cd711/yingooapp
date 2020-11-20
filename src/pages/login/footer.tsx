@@ -5,8 +5,8 @@ import './index.less'
 import IconFont from '../../components/iconfont';
 import { is_weixin } from '../../utils/common';
 
-const LoginFooter: React.FC<any> = () => {
-    
+const LoginFooter: Taro.FC<any> = () => {
+
     const wxLogin = () => {
         // @ts-ignore
         // eslint-disable-next-line no-undef
@@ -14,7 +14,7 @@ const LoginFooter: React.FC<any> = () => {
         // @ts-ignore
         // eslint-disable-next-line no-undef
         const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent("http://m.playbox.yingoo.com/me")}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
-        window.location.href = url;   
+        window.location.href = url;
     }
     return <View className='footer'>
         <View className='otherlogin'>

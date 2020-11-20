@@ -1,6 +1,6 @@
 import Taro, {  } from '@tarojs/taro'
 
-const WarmIcon: React.FC<{
+const WarmIcon: Taro.FC<{
     width:number,
     height:number
 }> = ({width,height}) => {

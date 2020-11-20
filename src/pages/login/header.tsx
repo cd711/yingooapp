@@ -4,7 +4,7 @@ import { View, Text } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
 
-const HeaderTop: React.FC<any> = ({rightText,url}) => {
+const HeaderTop: Taro.FC<any> = ({rightText,url}) => {
     return <View className='tops'>
         <View className='close' onClick={()=>{
             Taro.reLaunch({

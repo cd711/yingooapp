@@ -6,7 +6,7 @@ import IconFont from '../../components/iconfont'
 import Fragment from '../../components/Fragment'
 import lodash from 'lodash';
 
-const OrderModal: React.FC<any> = ({data, isShow, onClose, defaultActive, onSkuChange, onNowBuy}) => {
+const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuChange, onNowBuy}) => {
 
     const [itemActive, setItemActive] = useState([])
     const [tags, setTags] = useState([]);

@@ -23,7 +23,7 @@ interface PopoverProps {
     onChange?: (isOpened: boolean) => void;
     value?: any;  // 关联值，作为列表渲染时可把要关联的值填入
 }
-const Popover: React.FC<PopoverProps> = (props) => {
+const Popover: Taro.FC<PopoverProps> = (props) => {
 
     const {popoverItem = [], className, offsetBottom = 0, children, onChange, value} = props;
     const _childRef = Taro.createRef();

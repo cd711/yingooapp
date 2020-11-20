@@ -8,7 +8,7 @@ interface LoginProps {
     onOk?: () => void;
     showClose?: boolean;
 }
-const Login: React.FC<LoginProps> = props => {
+const Login: Taro.FC<LoginProps> = props => {
 
     const {onOk, onClose,
         showClose = true
