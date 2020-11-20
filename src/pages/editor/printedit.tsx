@@ -1086,56 +1086,6 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     const [series, setSeries] = useState<BrandType[]>([]);
     const [info, setInfo] = useState<any>({});
 
-    const [tempCurrentModel, setTempCurrentModel] = useState<any>(parent.defaultModel as any);
-
-    useEffect((async () => {
-        if (!parent.defaultModel) {
-            return;
-        }
-        setTempCurrentModel(parent.defaultModel);
-        switch (type) {
-            case 1:
-                let list = null;
-                try {
-                    //@ts-ignore
-                    const res = Taro.getStorageSync("phone_brand");
-                    if (res && res.time + 15 * 86400000 > Date.now()) {
-                        list = res.list;
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-                if (!list) {
-                    try {
-                        list = await api("/editor.phone_shell/phonebrand");
-                    } catch (e) {
-                        console.warn(e);
-                    }
-                }
-                if (!list) {
-                    return;
-                }
-
-                setBrandList(list);
-
-                for (let i = 0; i < list.length; i ++) {
-                    if (list[i].id == tempCurrentModel.brand.id) {
-                        setBrand(i);
-                        break;
-                    }
-                }
-
-
-                Taro.setStorage({
-                    key: "phone_brand", data: {
-                        time: Date.now(),
-                        list: list
-                    }
-                });
-
-
-        }
-    }) as any, [type, parent.defaultModel])
 
     //系列
     useEffect((async () => {
@@ -1264,7 +1214,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     public editorProxy: WindowProxy | null | undefined;
-    public defaultModel: any;
+
     async componentDidMount() {
         // Taro.showLoading({title: "请稍候"});
         // @ts-ignore
@@ -1272,23 +1222,6 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
 
-        try {
-            const mod = Taro.getStorageSync("phone_model");
-            this.defaultModel = mod;
-        } catch(e) {
-
-        }
-        if (!this.defaultModel) {
-            Taro.showLoading({title: "请稍候"});
-            this.defaultModel = await api("editor.phone_shell/default");
-            Taro.setStorageSync("phone_model", this.defaultModel);
-            Taro.hideLoading();
-
-        }
-
-
-        // console.log(this.defaultModel);
-        // Taro.hideLoading();
     }
 
 
@@ -1298,11 +1231,23 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoad = async (_?: number) => {
-        if (this.defaultModel) {
-            const mod = this.defaultModel;
-            sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
-        }
+        try {
+            const res = await api("editor.tpl/index", {cid: 63});
+            await callEditor("setDoc", res.list[0].id, this.$router.params.img)
 
+        }catch (e) {
+            console.log("初始化失败：", e)
+        }
+    }
+
+    onLoadEmpty = async (_?: number) => {
+        try {
+            const res = await api("editor.tpl/index", {cid: 63});
+            await callEditor("setDoc", res.list[0].id, this.$router.params.img)
+
+        }catch (e) {
+            console.log("初始化失败：", e)
+        }
     }
 
     _res = (data) => {
@@ -1355,19 +1300,11 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                     return;
 
                 case "onLoadEmpty":
-                    if (!this.tplId && !this.docId) {
-                        try {
-                            const {doc} = Taro.getStorageSync("doc_draft");
-                            await callEditor("setDoc", doc);
-                            // this.tplId = tplId;
-                        } catch (e) {
-                            alert(e);
-                        }
-                    }
-
+                    console.log(2222222)
                     this.setState({
                         loadingTemplate: false
                     });
+                    this.onLoadEmpty(data.data);
                     // callEditor("loadDraft")
                     break;
 
@@ -1426,14 +1363,14 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         });
         // await callEditor("saveDraft");
         const doc = await callEditor("getDoc");
-        Taro.setStorageSync("doc_draft", {
-            tplId: this.tplId,
-            docId: this.docId,
-            modelId: this.defaultModel.id,
-            doc: doc
-        });
-        Taro.hideLoading();
-        window.location.replace(`/pages/template/preview`);
+        // Taro.setStorageSync("doc_draft", {
+        //     tplId: this.tplId,
+        //     docId: this.docId,
+        //     modelId: this.defaultModel.id,
+        //     doc: doc
+        // });
+        // Taro.hideLoading();
+        // window.location.replace(`/pages/template/preview`);
     }
 
 
