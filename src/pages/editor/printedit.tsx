@@ -1231,13 +1231,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoad = async (_?: number) => {
-        try {
-            const res = await api("editor.tpl/index", {cid: 63});
-            await callEditor("setDoc", res.list[0].id, this.$router.params.img)
 
-        }catch (e) {
-            console.log("初始化失败：", e)
-        }
     }
 
     onLoadEmpty = async (_?: number) => {
