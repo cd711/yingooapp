@@ -22,7 +22,10 @@
             }
         }
     }
-    .container{
+    .inde_page_container{
+        box-sizing: border-box;
+        display: block;
+        padding-bottom: 32px;
         .temp-warp{
             width: 670px;
             // height: 912px;
@@ -32,7 +35,7 @@
             box-sizing: border-box;
             margin: 40px auto 0;
             overflow: hidden;
-            transition: all 0.5s;
+            transition: all 0.5s ease-in;
             .mask{
                 width: 100%;
                 height: 100%;
@@ -46,10 +49,12 @@
                     display: block;
                     font-size: 48px;
                     color: #121314;
+                    transition: all .5s ease-in;
                 }
                 .sub-title{
                     font-size: 24px;
                     color:#9C9DA6;
+                    transition: all .5s ease-in;
                 }
             }
             .swiper-back{
@@ -331,4 +336,11 @@
     .show_bar{
         top: 0;
     }
+}
+
+
+.index_swiper_main{
+    width: 574px;
+    height: 366px;
+    border-radius: 20px;
 }
