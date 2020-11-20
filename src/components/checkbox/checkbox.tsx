@@ -5,7 +5,7 @@ import './checkbox.less'
 import IconFont from '../iconfont';
 
 
-const Checkbox: React.FC<{
+const Checkbox: Taro.FC<{
     className?:string;
     disabled?:boolean;
     isChecked:boolean;

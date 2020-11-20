@@ -8,7 +8,7 @@ import {debounce, deviceInfo, notNull} from "../../utils/common";
 import {api} from "../../utils/net";
 import searchStore from "../../store/search";
 
-const Search:React.FC<any> = () => {
+const Search:Taro.FC<any> = () => {
 
     const [touched, setTouched] = useState(false);
     const [searchList, setSearchList] = useState([]);

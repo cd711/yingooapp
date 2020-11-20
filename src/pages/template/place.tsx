@@ -8,7 +8,7 @@ import Fragment from '../../components/Fragment'
 import lodash from 'lodash';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: React.FC<any> = ({data, isShow, onClose, onButtonClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, isShow, onClose, onButtonClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
     const [itemActive, setItemActive] = useState([])
     const [tags, setTags] = useState([]);
     const [price, setPrice] = useState("0");

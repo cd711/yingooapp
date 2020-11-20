@@ -1,7 +1,7 @@
 import Taro, {  } from '@tarojs/taro'
 import Fragment from '../Fragment';
 
-const CartRightIcon: React.FC<{
+const CartRightIcon: Taro.FC<{
     width:number,
     height:number,
     linght:boolean
@@ -29,7 +29,7 @@ const CartRightIcon: React.FC<{
                     </g>
             </svg>
         }
-        
+
          </Fragment>
 }
 export default CartRightIcon;

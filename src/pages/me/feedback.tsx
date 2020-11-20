@@ -6,7 +6,7 @@ import UploadFile from "../../components/Upload/Upload";
 import "./feedback.less";
 import {deviceInfo} from "../../utils/common";
 
-const Feedback: React.FC<any> = (_) => {
+const Feedback: Taro.FC<any> = (_) => {
 
     const feedBackArr = [
         {name: "页面闪退", icon: "24_yemianshantui"},

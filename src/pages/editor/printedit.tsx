@@ -3,15 +3,14 @@ import {Image, ScrollView, Text, View} from '@tarojs/components';
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
 import './editor.less';
 import './shell.less';
-
 import {api, getToken} from '../../utils/net';
 import IconFont from '../../components/iconfont';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
-import Fragment from '../../components/Fragment';
 import UploadFile from "../../components/Upload/Upload";
-import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
+import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
 import {userStore} from "../../store/user";
+import Photos from "../me/photos";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -60,7 +59,7 @@ interface BrandType {
 }
 
 // 换模板
-const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
+const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
     const prodList = Taro.useRef([]);
     const [typeList, setTypeList] = useState([]);
@@ -1077,63 +1076,16 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     </View>
 }
 
-const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
+const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
+
+    const router = parent.$router;
+
     const [type, setType] = useState(0);
     const [brandList, setBrandList] = useState<BrandType[]>([]);
     const [brandIndex, setBrand] = useState<number>(0);
     const [series, setSeries] = useState<BrandType[]>([]);
+    const [info, setInfo] = useState<any>({});
 
-
-    const [tempCurrentModel, setTempCurrentModel] = useState<any>(parent.defaultModel as any);
-
-    useEffect((async () => {
-        if (!parent.defaultModel) {
-            return;
-        }
-        setTempCurrentModel(parent.defaultModel);
-        switch (type) {
-            case 1:
-                let list = null;
-                try {
-                    //@ts-ignore
-                    const res = Taro.getStorageSync("phone_brand");
-                    if (res && res.time + 15 * 86400000 > Date.now()) {
-                        list = res.list;
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-                if (!list) {
-                    try {
-                        list = await api("/editor.phone_shell/phonebrand");
-                    } catch (e) {
-                        console.warn(e);
-                    }
-                }
-                if (!list) {
-                    return;
-                }
-
-                setBrandList(list);
-
-                for (let i = 0; i < list.length; i ++) {
-                    if (list[i].id == tempCurrentModel.brand.id) {
-                        setBrand(i);
-                        break;
-                    }
-                }
-
-
-                Taro.setStorage({
-                    key: "phone_brand", data: {
-                        time: Date.now(),
-                        list: list
-                    }
-                });
-
-
-        }
-    }) as any, [type, parent.defaultModel])
 
     //系列
     useEffect((async () => {
@@ -1176,27 +1128,13 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
         });
     }) as any, [brandList, brandIndex]);
 
-
-    const selectPhone = () => {
-        setType(0);
-
-        const mod = {
-            id: tempCurrentModel.id,
-            name: tempCurrentModel.name,
-            mask: tempCurrentModel.phoneshell ? tempCurrentModel.phoneshell.image : "",
-            brank: {
-                name: brandList[brandIndex].name,
-                id: brandList[brandIndex].id,
-            },
-            series: tempCurrentModel.series
-        };
-
-        if (mod.mask) {
-            sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
-        }
-        parent.defaultModel = mod;
-        Taro.setStorage({key: "phone_model", data: mod});
-    };
+    useEffect(() => {
+        api("editor.tpl/index", {cid: 63}).then(res => {
+            setInfo({...res})
+        }).catch(e => {
+            console.log("获取模板系信息出错：", e)
+        })
+    }, [])
 
     const cancelMode = () => {
         setType(0);
@@ -1204,13 +1142,27 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
         // setTempCurrentModel(currentModel);
     }
 
+    const onPhotoSelect = async (data: {ids: [], imgs: []}) => {
+        console.log(router)
+        setType(0)
+        if (info.id) {
+            try {
+                await callEditor("setDoc", info.id, data.imgs)
+            }catch (e) {
+                console.log("选图出错：", e)
+            }
+        } else {
+
+        }
+    }
+
     return ([type].map((t) => {
         switch (t) {
             case 0:
-                return <View className='tools' style='padding: 0 13%'>
+                return <View className='tools' style={t == 0 ? {padding: 0} : {padding: "0 13%"} }>
                     <View className='btn' onClick={() => setType(1)}>
-                        <IconFont name='24_bianjiqi_jixing' size={48}/>
-                        <Text className='txt'>机型</Text>
+                        <IconFont name='24_bianjiqi_chongyin' size={48}/>
+                        <Text className='txt'>添加</Text>
                     </View>
                     <View onClick={() => setType(2)} className='btn'>
                         <IconFont name='24_bianjiqi_moban' size={48}/>
@@ -1219,49 +1171,16 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
                 </View>;
 
             case 1: //机型
-                return <Fragment>
-                    <View className='tools'/>
-                    <View className='mask'/>
-                    <View className='switch-brank'>
-                        <View className='brand'>
-                            <ScrollView className='brand cate_list' scrollX>
-                                <View className='warp'>
-                                    {
-                                        brandList.length > 0 ? brandList.map((item: any, idx) => (
-                                            <View className={idx == brandIndex ? 'item active' : 'item'} key={item.id}
-                                                  onClick={() => setBrand(idx)}>
-                                                <Text className='text'>{item.name}</Text>
-                                                {idx == brandIndex ? <Image className='icon'
-                                                                            src={require("../../source/switchBottom.png")}/> : null}
-                                            </View>
-                                        )) : <AtActivityIndicator size={64} mode='center'/>
-                                    }
-                                </View>
-                            </ScrollView>
-                        </View>
-                        <ScrollView className='list' scrollY>
-                            {series ? series.map((ses) => {
-                                    return <View key={`mod-${ses.id}`}>
-                                        <Text className='head'>{ses.name}系列</Text>
-                                        <View className='phone'>
-                                            {ses.models.map((mod) => {
-                                                return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}
-                                                             className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>
-                                                    <Text>{mod.name}</Text>
-                                                </View>
-                                            })}
-                                        </View>
-                                    </View>
-                                }
-                            ) : <AtActivityIndicator className="phoneLoading" size={64}/>}
-                        </ScrollView>
-                        <View className='optBar'>
-                            <View onClick={cancelMode} className="icon"><IconFont name='24_guanbi' size={48}/></View>
-                            <Text className='txt'>机型</Text>
-                            <View onClick={selectPhone} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
-                        </View>
-                    </View>
-                </Fragment>;
+                return <View className="photo_picker_container photo_picker_animate" style={{
+                    width: deviceInfo.windowWidth,
+                    height: deviceInfo.windowHeight,
+                    padding: 0
+                }}>
+                    <Photos editSelect
+                            onClose={cancelMode}
+                            onPhotoSelect={onPhotoSelect}
+                    />
+                </View>;
 
             //模板
             case 2:
@@ -1270,13 +1189,13 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
     }))[0] as any;
 }
 
-@observer
-export default class Shell extends Component<{}, {
+interface PrintEditState {
     size?: { width: string | number; height: string | number };
-
     data?: number;
     loadingTemplate?: boolean;
-}> {
+}
+@observer
+export default class PrintEdit extends Component<any, PrintEditState> {
 
     public store = new Store();
 
@@ -1295,7 +1214,7 @@ export default class Shell extends Component<{}, {
     }
 
     public editorProxy: WindowProxy | null | undefined;
-    public defaultModel: any;
+
     async componentDidMount() {
         // Taro.showLoading({title: "请稍候"});
         // @ts-ignore
@@ -1303,23 +1222,6 @@ export default class Shell extends Component<{}, {
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
 
-        try {
-            const mod = Taro.getStorageSync("phone_model");
-            this.defaultModel = mod;
-        } catch(e) {
-
-        }
-        if (!this.defaultModel) {
-            Taro.showLoading({title: "请稍候"});
-            this.defaultModel = await api("editor.phone_shell/default");
-            Taro.setStorageSync("phone_model", this.defaultModel);
-            Taro.hideLoading();
-
-        }
-
-
-        // console.log(this.defaultModel);
-        // Taro.hideLoading();
     }
 
 
@@ -1329,11 +1231,18 @@ export default class Shell extends Component<{}, {
     }
 
     onLoad = async (_?: number) => {
-        if (this.defaultModel) {
-            const mod = this.defaultModel;
-            sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
-        }
 
+    }
+
+    onLoadEmpty = async (_?: number) => {
+        console.log([this.$router.params.img])
+        try {
+            const res = await api("editor.tpl/index", {cid: 63});
+            await callEditor("setDoc", res.list[0].id, [this.$router.params.img])
+
+        }catch (e) {
+            console.log("初始化失败：", e)
+        }
     }
 
     _res = (data) => {
@@ -1386,22 +1295,11 @@ export default class Shell extends Component<{}, {
                     return;
 
                 case "onLoadEmpty":
-                    if (!this.tplId && !this.docId) {
-                        try {
-                            const {doc} = Taro.getStorageSync("doc_draft");
-                            console.log(doc)
-                            if (doc) {
-                                await callEditor("setDoc", doc);
-                            }
-                            // this.tplId = tplId;
-                        } catch (e) {
-                            alert(e);
-                        }
-                    }
-
+                    console.log(2222222)
                     this.setState({
                         loadingTemplate: false
                     });
+                    this.onLoadEmpty(data.data);
                     // callEditor("loadDraft")
                     break;
 
@@ -1433,6 +1331,7 @@ export default class Shell extends Component<{}, {
         }
         switch (item.type) {
             case "img":
+            case "container":
                 this.store.tool = 1;
                 break;
             case "text":
@@ -1460,14 +1359,14 @@ export default class Shell extends Component<{}, {
         });
         // await callEditor("saveDraft");
         const doc = await callEditor("getDoc");
-        Taro.setStorageSync("doc_draft", {
-            tplId: this.tplId,
-            docId: this.docId,
-            modelId: this.defaultModel.id,
-            doc: doc
-        });
-        Taro.hideLoading();
-        window.location.replace(`/pages/template/preview`);
+        // Taro.setStorageSync("doc_draft", {
+        //     tplId: this.tplId,
+        //     docId: this.docId,
+        //     modelId: this.defaultModel.id,
+        //     doc: doc
+        // });
+        // Taro.hideLoading();
+        // window.location.replace(`/pages/template/preview`);
     }
 
 
@@ -1538,7 +1437,7 @@ export default class Shell extends Component<{}, {
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`}></iframe>
+                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.100:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`}/>
                 {loadingTemplate ?
                     <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
             </View>

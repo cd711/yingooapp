@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo} from "../../utils/common";
+import {deviceInfo, notNull} from "../../utils/common";
 import {api} from "../../utils/net";
 import Photos from "../me/photos";
 import {userStore} from "../../store/user";
@@ -92,6 +92,16 @@ const Index: Taro.FC<any> = () => {
         }, 500)
     }
 
+    const getBoxSize = (val: string) => {
+        if (notNull(val)) {
+            return " "
+        }
+        const strArr = val.split("*");
+        const x = parseInt(strArr[0]) * 0.085;
+        const y = parseInt(strArr[1]) * 0.085;
+        return `${parseInt(x.toString())}*${parseInt(y.toString())}mm`
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
@@ -101,19 +111,19 @@ const Index: Taro.FC<any> = () => {
             <ScrollView scrollY className="printing_scroll_container" style={{height: deviceInfo.windowHeight - 110}}>
                 <View className="printing_main">
                     {
-                        sizeItem.map((value, index) => (
-                            <View className="printing_item" key={index} onClick={() => selectSize(value.id)}>
+                        sizeItem.map((item, index) => (
+                            <View className="printing_item" key={index} onClick={() => selectSize(item.id)}>
                                 <View className="left">
                                     <Image src={require("../../source/print.png")} className="icon"/>
                                     <View className="info">
-                                        <Text className="h2">{value.name}</Text>
-                                        <Text className="txt">68*89mm</Text>
+                                        <Text className="h2">{item.name}</Text>
+                                        <Text className="txt">{getBoxSize(item.value)}</Text>
                                     </View>
                                 </View>
                                 <View className="right">
                                     <View className="check_icon">
                                         <IconFont
-                                            name={Number(value.id) === checked ? "22_yixuanzhong" : "22_touming-weixuanzhong"}
+                                            name={Number(item.id) === checked ? "22_yixuanzhong" : "22_touming-weixuanzhong"}
                                             size={44}/>
                                     </View>
                                 </View>

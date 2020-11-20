@@ -6,7 +6,7 @@ import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
 import {ossUrl} from "../../utils/common";
 
-const SearchResult:React.FC<any> = () => {
+const SearchResult:Taro.FC<any> = () => {
 
     const [list, setList] = useState([]);
     const total = Taro.useRef(0);

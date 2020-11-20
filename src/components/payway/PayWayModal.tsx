@@ -13,7 +13,7 @@ import {is_weixin,jsApiList} from '../../utils/common';
 
 
 
-const PayWayModal: React.FC<{
+const PayWayModal: Taro.FC<{
     isShow:boolean,
     totalPrice:string,
 
@@ -85,7 +85,7 @@ const PayWayModal: React.FC<{
             console.log(e)
             errorback(e)
         })
-    }    
+    }
     const payOrder = (d:any,callback:(res: any)=>void,errorback:(err:any)=>void) =>{
         api("app.pay/index",d).then((res)=>{
             callback && callback(res);
@@ -235,7 +235,7 @@ const PayWayModal: React.FC<{
         </FloatModal>
 </View>
 }
-const PayWay: React.FC<any> = ({isCheck,icon,name,onPress}) => {
+const PayWay: Taro.FC<any> = ({isCheck,icon,name,onPress}) => {
     const [isSelect,setIsSelect] = useState(false);
     useEffect(()=>{
         if (isCheck != isSelect) {
