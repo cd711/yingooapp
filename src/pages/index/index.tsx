@@ -6,7 +6,7 @@ import './index.less'
 import IconFont from '../../components/iconfont'
 import {api} from "../../utils/net";
 import {ossUrl} from "../../utils/common";
-import analyze from 'rgbaster'
+// import analyze from 'rgbaster'
 
 const pics = [
     "https://i.ibb.co/sK68FQ0/c6a8dc33e8a84646b4cdc30f5cea391efc8a141c2bef0-UJ8-MBJ.jpg",
@@ -54,18 +54,18 @@ class Index extends Component<any, IndexState> {
     }
 
     componentDidMount() {
-        api("app.index/h5", {
-            area_size: JSON.stringify({
-                tpl_product: 3,
-                product: 9,
-                special: 6
-            })
-        }).then(data => {
-            this.setState({data})
-        }).catch(e => {
-            console.log("获取首页列表出错：", e)
-        })
-        this.test()
+        // api("app.index/h5", {
+        //     area_size: JSON.stringify({
+        //         tpl_product: 3,
+        //         product: 9,
+        //         special: 6
+        //     })
+        // }).then(data => {
+        //     this.setState({data})
+        // }).catch(e => {
+        //     console.log("获取首页列表出错：", e)
+        // })
+        // this.test()
     }
 
     test = () => {

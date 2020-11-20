@@ -13,11 +13,19 @@
         }
         .pwd{
             margin-bottom: 14px;
+            position: relative;
             .pwd-input{
                 font-size: 28px;
                 padding-bottom: 28px;
                 border-bottom: 1PX solid #EDEDEF;
                 text-align: left;
+            }
+            .show{
+                width: 48px;
+                height: 48px;
+                position: absolute;
+                right: 0;
+                top:0
             }
         }
         .forget-pwd{
@@ -30,6 +38,7 @@
             }
         }
         .loginbtn{
+            width: 622px;
             height: 98px;
             background: #FFC4C8;
             border-radius: 48px;
@@ -40,6 +49,11 @@
             justify-content: center;
             border: none;
             outline: none;
+        }
+        .loginbtnActive {
+            background: #FF4966;
+            box-shadow: 0px 20px 48px -14px rgba(255, 73, 102, 0.5);
+            border-radius: 48px;
         }
         .zhuce{
             font-size: 28px;

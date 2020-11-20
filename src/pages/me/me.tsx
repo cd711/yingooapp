@@ -363,7 +363,7 @@ export default class Me extends Component<any, MeProps> {
                                     <View className='carts'  onClick={() => this.jumpTo('/pages/cart/index')}>
                                         <IconFont name='24_gouwuche' size={48} color='#121314'/>
                                     </View>
-                                    <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314'/></View>
+                                    <View className='coupon' onClick={()=>this.jumpTo('/pages/me/ticket')}><IconFont name='24_youhuiquan' size={48} color='#121314'/></View>
                                     <View className='set' onClick={() => this.jumpTo('/pages/me/setting')}>
                                         <IconFont name='24_shezhi' size={48} color='#121314'/>
                                     </View>
@@ -404,7 +404,7 @@ export default class Me extends Component<any, MeProps> {
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
-                                <View className='oitem'>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=4')}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
                                 </View>

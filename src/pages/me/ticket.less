@@ -1,0 +1,123 @@
+.ticket_page{
+    flex:1;
+    background: #F5F6F9;
+    display: flex;
+    flex-direction: column;
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 88px;
+        width: 100%;
+        box-sizing: border-box;
+        background: #FFF;
+        position: relative;
+        .left{
+            padding-left: 32px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
+            .title{
+                font-size: 36px;
+                font-weight: 500;
+                color: #121314;
+            }
+        }
+    }
+    .container{
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        .status-switch-bar{
+            // height: 104px;
+            background: #FFFFFF;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-around;
+            padding: 24px 45px 8px;
+            box-sizing: border-box;
+            
+            .item{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                .txt{
+                    font-size: 32px;
+                    color: #707177;
+                }
+                .img{
+                    width: 64px;
+                    height: 16px;
+                }
+            }
+            .active{
+                transition: all 0.5s;
+                .txt{
+                    color: #121314;
+                    transition: all 0.5s;
+                }
+            }
+        }
+        .black{
+            background: #FFFFFF;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 306px;
+            border-top: 16px solid #F5F6F9;
+            .img{
+                width: 400px;
+                height: 284px;
+                margin-bottom: 8px;
+            }
+            .txt{
+                font-size: 24px;
+                font-weight: 400;
+                color: #9C9DA6;
+            }
+        }
+        .ticket_list_scroll{
+            flex: 1;
+            position: relative;
+            border-top: 16px solid #F5F6F9;
+            .ticket_list{
+                height: 84vh;
+                margin-bottom: 16px;
+                padding: 0 32px;
+                .item_right{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-left: auto;
+                    margin-right: 24px;
+                    .use_button{
+                        width: 120px;
+                        height: 56px;
+                        background: #FF4966;
+                        border-radius: 48px;
+                        font-size: 28px;
+                        font-weight: 500;
+                        color: #FFFFFF;
+
+                    }
+                    .used_txt{
+                        font-size: 28px;
+                        font-weight: 400;
+                        color: #707177;
+                    }
+                    .ticket_fuck{
+                        width: 96px;
+                        height: 74px;
+                    }
+                }
+            }
+        }
+
+    }
+}

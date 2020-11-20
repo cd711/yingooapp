@@ -6,15 +6,15 @@ import IconFont from '../iconfont';
 import Checkbox from '../checkbox/checkbox';
 import moment from "moment";
 
-const Ticket: React.FC<any> = ({isNew, isSelected, onChange, ticket}) => {
+const Ticket: React.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
 
     useEffect(() => {
-        console.log(ticket)
+        // console.log(ticket)
     }, [])
 
 
     useEffect(() => {
-        console.log(isSelected)
+        // console.log(isSelected)
     }, [isSelected])
 
 
@@ -35,14 +35,17 @@ const Ticket: React.FC<any> = ({isNew, isSelected, onChange, ticket}) => {
             <View className='right-part'>
                 <Text className='name'>{ticket.name}</Text>
                 <Text className='time'>
-                    {`${moment(ticket.use_start_time).format("YYYY-MM-DD")} - ${moment(ticket.use_end_time).format("YYYY-MM-DD")}`}
+                    {`${moment.unix(ticket.use_start_time).format("YYYY-MM-DD")} - ${moment.unix(ticket.use_end_time).format("YYYY-MM-DD")}`}
                 </Text>
                 <View className='apply'>
                     <Text className='txt'>{ticket.desc}</Text>
                     <IconFont name='16_xiangxiazhankai' size={32} color='#9C9DA6' />
                 </View>
             </View>
-            <Checkbox className='checkbox' isChecked={isSelected} />
+            {
+                right?right:<Checkbox className='checkbox' isChecked={isSelected} />
+            }
+            
         </View>
     </View>
 }

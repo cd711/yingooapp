@@ -51,7 +51,6 @@ const page =(option?: {
                             Taro.reLaunch({
                                 url:'/pages/index/index'
                             });
-                            console.log(e);
                         })
                     } else {
                         // @ts-ignore
@@ -73,6 +72,7 @@ const page =(option?: {
 
 
         clazz.showLoginModal = function () {
+
             if (userStore.id == null) {
                 const key = Modal.show(
                     <Login onClose={() => UITop.remove(key)}
@@ -86,7 +86,7 @@ const page =(option?: {
         }
 
         clazz.render = function () {
-            return <View className='ext-page'>
+            return <View className='ext-page' style={{display:"flex",flexDirection:"column",position:"fixed",width:"100%",height:"100%"}}>
                 <UITopProvider />
                 {
                     render && render.apply(this,arguments)

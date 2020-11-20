@@ -21,7 +21,8 @@ export default class Order extends Component<any,{
     data:ListModel;
     showPayWayModal:boolean;
     order_price:string;
-    order_sn:string
+    order_sn:string;
+    orderId:number
 }> {
 
     config: Config = {
@@ -41,7 +42,8 @@ export default class Order extends Component<any,{
             },
             showPayWayModal:false,
             order_price:"0.00",
-            order_sn:""
+            order_sn:"",
+            orderId:0
         }
     }
     componentDidMount(){
@@ -76,10 +78,23 @@ export default class Order extends Component<any,{
             size:20,
             status
         }).then((res)=>{
+            // console.log("list",res)
             Taro.hideLoading();
             this.setState({
                 data:res
             })
+        }).catch((e)=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                duration:1500,
+                icon:"none",
+            });
+            setTimeout(() => {
+                Taro.reLaunch({
+                    url:'/pages/me/me'
+                })
+            }, 1500);
         })
     }
 
@@ -139,33 +154,24 @@ export default class Order extends Component<any,{
         this.setState({
             showPayWayModal:false,
         });
-        let title = '';
-        let url = '';
-        switch (res.code) {
-            case 1:
-                title = '支付成功';
-                url = '/pages/me/order?tab=2';
-                break;
-            case 2:
-                url = '/pages/me/order?tab=1';
-                break;
-            default:
-                title = res.data;
-                url = '/pages/me/order?tab=1';
-                break;
+        let title = res.data;
+        const {orderId} =this.state;
+        let url = `/pages/me/orderdetail?id=${orderId}`;
+        if (res.code == 1) {
+            title = '支付成功';
         }
         if (title.length>0) {
             Taro.showToast({
                 title,
                 icon: 'none',
-                duration: 2000
+                duration: 1500
             });
         }
         setTimeout(() => {
             Taro.navigateTo({
                 url
             })
-        }, 2000);
+        }, 1500);
     }
     render() {
         const {switchTabActive,data,showPayWayModal,order_price,order_sn} = this.state;
@@ -221,7 +227,7 @@ export default class Order extends Component<any,{
                                         <Text className='txt'>订单编号：{item.order_sn}</Text>
                                         <IconFont name='20_fuzhi' size={40} color='#D7D7DA' />
                                     </View>
-                                    <Text className={`status ${item.status==1?'pay':(item.status==2||item.status==3?'deliver':'complete')}`}>{item.state_tip}</Text>
+                                    <Text className={`status ${item.state_tip.value==1?'pay':(item.state_tip.value==2||item.state_tip.value==3?'deliver':'complete')}`}>{item.after_sale_status_tip.value!=0?item.after_sale_status_tip.text:item.state_tip.text}</Text>
                                 </View>
                                 {
                                     item.products.map((product)=>(
@@ -261,7 +267,7 @@ export default class Order extends Component<any,{
                                     </View>
                                 </View>
                                 {
-                                    item.status == 1 ? <View className='ops'>
+                                    item.state_tip.value == 1 && item.after_sale_status_tip.value==0 ? <View className='ops'>
                                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,item.id)}>取消订单</Button>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
@@ -273,23 +279,24 @@ export default class Order extends Component<any,{
                                             this.setState({
                                                 order_price:item.order_price,
                                                 order_sn:item.order_sn,
-                                                showPayWayModal:true
+                                                showPayWayModal:true,
+                                                orderId:item.id
                                             })
                                         }}>去支付</Button>
-                                    </View>:item.status == 2 ? <View className='ops'>
+                                    </View>:item.state_tip.value == 2 && item.after_sale_status_tip.value==0 ? <View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
                                                 url:`/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
-                                    </View>:item.status == 3 ?<View className='ops'>
+                                    </View>:item.state_tip.value == 3&& item.after_sale_status_tip.value==0  ?<View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
                                                 url:`/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
                                         <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,item.id)}>确定收货</Button>
-                                    </View>:item.status == 4 || item.status == -1 ? <View className='ops'>
+                                    </View>:(item.state_tip.value == 4 || item.state_tip.value == -1) && item.after_sale_status_tip.value==0  ? <View className='ops'>
                                         <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,item.id)}>删除订单</Button>
                                         <Button className='gray-border-btn' onClick={()=>{
                                             Taro.navigateTo({

@@ -334,18 +334,17 @@ export default class Confirm extends Component<any, {
             showPayWayModal:false,
         });
         let title = '';
-        let url = '';
+        let url = '/pages/me/order?tab=1';
         switch (res.code) {
             case 1:
                 title = '支付成功';
-                url = '/pages/me/order?tab=2';
+                url = `/pages/template/success?way=${res.way}&price=${res.total}`;
                 break;
             case 2:
                 url = '/pages/me/order?tab=1';
                 break;
             default:
                 title = res.data;
-                url = '/pages/me/order?tab=1';
                 break;
         }
         if (title.length>0) {

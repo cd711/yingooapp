@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image,Button } from '@tarojs/components'
+import { View, Text,Image,Button,ScrollView } from '@tarojs/components'
 import './orderdetail.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
@@ -9,16 +9,18 @@ import moment from "moment";
 import PayWayModal from '../../components/payway/PayWayModal';
 import { templateStore } from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-
+import page from '../../utils/ext';
 
 @inject("templateStore")
 @observer
+@page({wechatAutoLogin:true})
 export default class OrderDetail extends Component<any,{
     data:any,
     hours:string,
     minutes:string,
     seconds:string,
-    showPayWayModal:boolean
+    showPayWayModal:boolean,
+    navBarChange:boolean
 }> {
 
     config: Config = {
@@ -32,7 +34,8 @@ export default class OrderDetail extends Component<any,{
             hours:"00",
             minutes:"00",
             seconds:"00",
-            showPayWayModal:false
+            showPayWayModal:false,
+            navBarChange:false
         }
     }
     componentDidMount(){
@@ -169,17 +172,45 @@ export default class OrderDetail extends Component<any,{
             });
         }
     }
+    onScroll = (e) => {
+        const top = e.detail.scrollTop;
+        let navBarChange = true;
+        if (top>24) {
+            navBarChange = false;
+        }
+        this.setState({
+            navBarChange
+        })
+    }
     render() {
-        const { data,hours,minutes,seconds,showPayWayModal } = this.state;
-        const status = data.state_tip?data.state_tip:"";
+        const { data,hours,minutes,seconds,showPayWayModal,navBarChange } = this.state;
+        const status = data.state_tip?data.state_tip.text:"";
         const plist = lodash.isEmpty(data.products)?[]:data.products;
+        const state = data.state_tip?data.state_tip.value:0
         return (
             <View className='order-detail'>
+                <View className='nav-bar' style={navBarChange?{background:"#FFF"}:{}}>
+                    <View className='left' onClick={() => {
+                        Taro.navigateTo({
+                            url:"/pages/me/order?tab=0"
+                        })
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#FFF' />
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>我的订单</Text>
+                    </View>
+                    <View className='right'>
+                        <IconFont name='24_kefu' size={48} color='#FFF' />
+                    </View>
+                </View>
+                <ScrollView scrollY className='order_content_page' onScroll={this.onScroll}>
+                <View className='container'>
                 <View className='top'>
                     <View className='status'>
                         <Text className='statustxt'>{status}</Text>
                         <View className='time-tip'>
-                        {data.status==1?<View className='waiting-pay'>
+                        {state==1?<View className='waiting-pay'>
                                 <Text className='waiting-pay-txt'>剩余</Text>
                                 <View className='time'>
                                     <View className='item'>
@@ -195,7 +226,7 @@ export default class OrderDetail extends Component<any,{
                                     </View>
                                 </View>
                                 <Text className='waiting-pay-txt'>秒，将自动取消订单</Text>
-                            </View>:data.status==2?<View className='waiting-pay'>
+                            </View>:state==2?<View className='waiting-pay'>
                                 <Text className='waiting-pay-txt'>等待卖家发货</Text>
                             </View>:null}
                         </View>
@@ -268,8 +299,10 @@ export default class OrderDetail extends Component<any,{
                     </View>
                 </View>
                 <Text className='order-tips'>如收到商品出现质量、错发、漏发，可申请售后退款</Text>
+                </View>
+                </ScrollView>
                 {
-                    data.status == 1?<View className='ops'>
+                    state == 1?<View className='ops'>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
                         <Button className='red-border-btn' onClick={()=>{
                             Taro.navigateTo({
@@ -303,6 +336,7 @@ export default class OrderDetail extends Component<any,{
                             showPayWayModal:false
                         })
                     }}/>
+                
             </View>
         )
     }
