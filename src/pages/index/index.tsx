@@ -76,6 +76,32 @@ class Index extends Component<any, IndexState> {
         this.getIndexList()
     }
 
+    onItemClick = (item, parentIdx) => {
+        console.log(item, parentIdx)
+        if (item.info.jump_url) {
+            Taro.navigateTo({url: item.info.jump_url});
+            return
+        }
+        Taro.navigateTo({
+            url: `/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
+        })
+    }
+
+    viewMoreSpecial = (item) => {
+        if (item.more_url) {
+            Taro.navigateTo({url: item.more_url})
+        } else {
+            Taro.navigateTo({url: `/pages/index/special?specialid=${item.id}`})
+        }
+    }
+
+    onCustomized = (item, _) => {
+        if (item.info.jump_url) {
+            Taro.navigateTo({url: item.info.jump_url});
+            return
+        }
+    }
+
     renderTemplateItem = (item, index) => {
         let ele = null;
         // let currentColor = this.state.currentColor;
@@ -93,17 +119,17 @@ class Index extends Component<any, IndexState> {
                                         <Text className='txt'>{item.title}</Text>
                                         {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
                                     </View>
-                                    <View className='swiper-back'>
+                                    <View className='swiper-back' onClick={() => this.onItemClick(item.clist[0], index)}>
                                         <View className='temp-swiper'>
                                             <Image src={ossUrl(item.clist[0].thumb_image, 1)} className='photo' mode='aspectFill'/>
                                         </View>
                                     </View>
-                                    <Button className='now-design-btn'>立即设计</Button>
+                                    <Button className='now-design-btn' onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
                                 </View>
                             </View>
                         )
                     } else if (itemLen > 1 && itemLen < 6) {
-                        ele = <ImageSwiper key={index} item={item} />
+                        ele = <ImageSwiper key={index} item={item} onItemClick={current => this.onItemClick(current, index)} />
                     } else {
                         ele = (
                             <View className='temp-warp' key={index}>
@@ -114,7 +140,7 @@ class Index extends Component<any, IndexState> {
                                 <View className='grid'>
                                     {
                                         item.clist.slice(1, 7).map((child, cIdx) => (
-                                            <View className='photo-warp' key={`tel_${cIdx}`}>
+                                            <View className='photo-warp' key={`tel_${cIdx}`} onClick={() => this.onItemClick(child, index)}>
                                                 <Image src={ossUrl(child.thumb_image, 1)} className='photo' mode='aspectFill'/>
                                             </View>
                                         ))
@@ -122,7 +148,7 @@ class Index extends Component<any, IndexState> {
                                 </View>
                                 {
                                     item.clist.length > 6
-                                        ? <View className='seemore'>
+                                        ? <View className='seemore' onClick={() => this.viewMoreSpecial(item)}>
                                             <Text className='txt'>查看更多</Text>
                                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
                                         </View>
@@ -135,22 +161,20 @@ class Index extends Component<any, IndexState> {
             } else if (item.model === "product") {  // 商品
                 ele = <Fragment>
                     {
-                        item.clist.map((product, prodIndex) => (
-                            <View className='product-item' key={prodIndex}>
+                        item.clist.map((product, prodIndex) => {
+                            return product.info.jump_url && <View className='product-item' key={prodIndex}>
                                 <Image src={ossUrl(product.thumb_image, 1)} className='image' mode='aspectFill'/>
                                 <View className='bottom'>
                                     <View className='left'>
                                         <Text className='title'>{product.title || " "}</Text>
                                         {product.subtitle ? <Text className='subtitle'>{product.subtitle}</Text> : null}
                                     </View>
-                                    <View className='right-btn' onClick={() => {
-                                        // value.info.jump_url
-                                    }}>
+                                    <View className='right-btn' onClick={() => this.onCustomized(product, index)}>
                                         <Text className='txt'>我要定制</Text>
                                     </View>
                                 </View>
                             </View>
-                        ))
+                        })
                     }
                 </Fragment>
             }

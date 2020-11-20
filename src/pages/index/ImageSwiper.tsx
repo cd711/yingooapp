@@ -4,12 +4,16 @@ import "./index.less";
 import {ossUrl} from "../../utils/common";
 import RGBAster from "rgbaster";
 
-const ImageSwiper: Taro.FC<any> = props => {
+interface ImageSwiperProps {
+    item: any;
+    onItemClick?: (current: any) => void;
+}
+const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
-    const {item} = props;
+    const {item, onItemClick} = props;
 
-    const [current, setCurrent] = useState(0);
-    const [color, setColor] = useState("transparent");
+    const [current, setCurrent] = useState<number>(0);
+    const [color, setColor] = useState<string>("transparent");
 
     const getCurrentSwiperColor = (index) => {
         setCurrent(index)
@@ -19,12 +23,19 @@ const ImageSwiper: Taro.FC<any> = props => {
             scale: 0.6
         }).then(res => {
             const cArr = res.slice(1, 10);
-
-            setColor(cArr[0].color)
+            // console.log(cArr)
+            setColor(cArr[2].color)
 
         }).catch(e => {
             console.log(e)
         })
+    }
+
+    const onClick = () => {
+        const currentItem = item.clist[current];
+        if (currentItem) {
+            onItemClick && onItemClick(currentItem)
+        }
     }
 
     return (
@@ -42,7 +53,7 @@ const ImageSwiper: Taro.FC<any> = props => {
                     >
                         {
                             item.clist.map((child, cIdx) => (
-                                <SwiperItem key={`child_${cIdx}`}>
+                                <SwiperItem key={`child_${cIdx}`} onClick={onClick}>
                                     <Image src={ossUrl(child.thumb_image, 1)} className='photo' mode='aspectFill'/>
                                 </SwiperItem>
                             ))
@@ -57,7 +68,7 @@ const ImageSwiper: Taro.FC<any> = props => {
                         }
                     </View>
                 </View>
-                <Button className='now-design-btn'>立即设计</Button>
+                <Button className='now-design-btn' onClick={onClick}>立即设计</Button>
             </View>
         </View>
     )

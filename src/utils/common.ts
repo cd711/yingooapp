@@ -2,6 +2,9 @@ import Taro from "@tarojs/taro";
 import ENV_TYPE = Taro.ENV_TYPE;
 
 export function ossUrl(url: string, type: number) {
+    if (!url) {
+        return ""
+    }
     let u = '';
     switch (type) {
         case 0:
