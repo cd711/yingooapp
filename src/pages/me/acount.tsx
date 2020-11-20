@@ -30,7 +30,7 @@ export default class Setting extends Component<any,{
 
     render() {
         const {tipModalShow} = this.state;
-        const {id,mobile} = userStore;
+        const {id,mobile,set_pwd} = userStore;
         
         return (
             <View className='acounts'>
@@ -67,11 +67,14 @@ export default class Setting extends Component<any,{
                     <View className='item'>
                         <Text className='name'>密码</Text>
                         <View className='right' onClick={()=>{
+                            if (set_pwd) {
+                                return;
+                            }
                             Taro.navigateTo({
                                 url:'/pages/login/set'
                             })
                         }}>
-                            <Text className='rtxt'>{'未设置'}</Text>
+                            <Text className='rtxt'>{set_pwd?'已设置':'未设置'}</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
                     </View>
