@@ -195,7 +195,7 @@ const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) 
     return <View className='switch-template'>
         <View className='brand'>
             <ScrollView className='type_list_view' scrollX>
-                <View className='warp'>
+                <View className='warp brand_fixed_wrap'>
                     {typeList.map((value, index) => (
                         <View className="type_item" key={index} onClick={() => changeType(index)}>
                             <Text className={`txt ${active === index ? "active" : ""}`}>{value.name}</Text>

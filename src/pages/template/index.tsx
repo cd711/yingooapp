@@ -245,7 +245,7 @@ export default class Template extends Component<any,{
                                         return
                                     }
                                     Taro.navigateTo({
-                                        url:`pages/printing/index?id=32`
+                                        url:`pages/printing/index?id=34`
                                     })
                                 }}>
                                     <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>

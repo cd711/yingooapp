@@ -46,11 +46,26 @@ const Index: Taro.FC<any> = () => {
             }).catch(e => {
                 console.log("获取--app.product/info出错：", e)
             })
+
         }
     }, [])
 
     const selectSize = id => {
         setChecked(Number(id))
+    }
+
+    function renderParams(path) {
+        const temp = {path, sku: checked, id: router.params.id};
+        try {
+            Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp))
+        }catch (e) {
+            console.log("存储错误：", e)
+        }
+        templateStore.photoSizeParams = temp;
+
+        Taro.navigateTo({
+            url: `/pages/printing/change?id=${router.params.id}`
+        })
     }
 
     const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
@@ -68,20 +83,30 @@ const Index: Taro.FC<any> = () => {
             })
         }
 
-        const temp = {path, sku: checked, id: router.params.id};
-        try {
-            Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp))
-        }catch (e) {
-            console.log("存储错误：", e)
-        }
-        templateStore.photoSizeParams = temp;
+        renderParams(path)
 
-        Taro.navigateTo({
-            url: `/pages/printing/change?id=${router.params.id}`
-        })
+    }
+
+    function allowJump() {
+        const {imgid, img, attr, status} = router.params;
+        return !notNull(imgid) && !notNull(img) && !notNull(attr) && !notNull(status) && status == "t"
     }
 
     const selectPhoto = () => {
+
+        if (allowJump()) {
+            let arr = []
+            arr.push({
+                id: router.params.imgid,
+                url: router.params.img,
+                attr: router.params.attr,
+                edited: false,
+                doc: ""
+            });
+            renderParams(arr);
+            return
+        }
+
         setPhotoPickerVisible(true);
         setTimeout(() => {
             setAnimating(true)
@@ -137,7 +162,7 @@ const Index: Taro.FC<any> = () => {
             </ScrollView>
             <View className="print_foot">
                 <View className="submit" onClick={selectPhoto}>
-                    <Text className="txt">添加照片</Text>
+                    <Text className="txt">{allowJump() ? "下一步" : "添加照片"}</Text>
                 </View>
             </View>
             {
