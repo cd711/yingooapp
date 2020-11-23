@@ -11,11 +11,14 @@ import { api } from '../../utils/net';
 import { ListModel, ossUrl } from '../../utils/common';
 
 import PayWayModal from '../../components/payway/PayWayModal';
+import page from '../../utils/ext';
+import copy from 'copy-to-clipboard';
 
 const tabs = ["全部","待付款","待发货","待收货","已完成"];
 
 @inject("userStore","templateStore")
 @observer
+@page({wechatAutoLogin:true})
 export default class Order extends Component<any,{
     switchTabActive:number;
     data:ListModel;
@@ -75,7 +78,7 @@ export default class Order extends Component<any,{
         Taro.showLoading({title:"加载中"})
         api('app.order/list',{
             start:0,
-            size:20,
+            size:40,
             status
         }).then((res)=>{
             // console.log("list",res)
@@ -110,10 +113,10 @@ export default class Order extends Component<any,{
                 duration:2000
             });
             this.getList(this.state.switchTabActive)
-        }).catch(()=>{
+        }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
-                title:'服务器开小差了，稍后再试',
+                title:e,
                 icon:'none',
                 duration:2000
             });
@@ -178,22 +181,19 @@ export default class Order extends Component<any,{
         const list = data && data.list && data.list.length>0 ? data.list:[];
         return (
             <View className='order'>
-                <AtNavBar
-                    onClickLeftIcon={()=>{
+                <View className='nav-bar'>
+                    <View className='left' onClick={() => {
+                        // Taro.navigateBack();
                         Taro.reLaunch({
-                            url:'/pages/me/me'
-                        });
-                    }}
-                    color='#121314'
-                    title='我的订单'
-                    border={false}
-                    // fixed
-                    leftIconType={{
-                        value:'chevron-left',
-                        color:'#121314',
-                        size:24
-                    }}
-                />
+                            url:"/pages/me/me"
+                        })
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>我的订单</Text>
+                    </View>
+                </View>
                 <View className='status-switch-bar'>
                     {
                         tabs.map((item,index)=>(
@@ -209,7 +209,7 @@ export default class Order extends Component<any,{
                         ))
                     }
                 </View>
-                <ScrollView scrollY>
+                <ScrollView scrollY className='order_list_page_scroll'>
                 <View className='container'>
                     {
                         list.length == 0 ? <View className='empty'>
@@ -225,7 +225,14 @@ export default class Order extends Component<any,{
                                 <View className='order-state'>
                                     <View className='order-num'>
                                         <Text className='txt'>订单编号：{item.order_sn}</Text>
-                                        <IconFont name='20_fuzhi' size={40} color='#D7D7DA' />
+                                        <View onClick={()=>{
+                                            copy(item.order_sn);
+                                            Taro.showToast({
+                                                title:"复制成功",
+                                                icon:'none',
+                                                duration:1000
+                                            })
+                                        }}><IconFont name='20_fuzhi' size={40} color='#D7D7DA' /></View>
                                     </View>
                                     <Text className={`status ${item.state_tip.value==1?'pay':(item.state_tip.value==2||item.state_tip.value==3?'deliver':'complete')}`}>{item.after_sale_status_tip.value!=0?item.after_sale_status_tip.text:item.state_tip.text}</Text>
                                 </View>

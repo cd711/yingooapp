@@ -49,19 +49,21 @@ export default class Detail extends Component<any,{
         }
         
         this.lastBottomTime = moment().unix();
-        this.getLikeList();
+        
     }
     getCurrentItem(id){
+        Taro.showLoading({title:"加载中..."});
         api('app.product_tpl/info',{id}).then((res)=>{
             if (this.$router.params.id != res.id) {
                 window.history.replaceState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
-            console.log("info",res)
+            
             this.setState({
                 
                 currentItem: res,
                 isLike: res.favorite !== 0
-            })
+            });
+            this.getLikeList(res.category_id);
         }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
@@ -74,18 +76,17 @@ export default class Detail extends Component<any,{
             }, 2000);
         })
     }
-    getLikeList = () => {
-        Taro.showLoading({title:"加载中..."});
+    getLikeList = (id) => {
         api("app.product_tpl/like",{
             size:20,
-            start:0
+            start:0,
+            category_id:id
         }).then((res)=>{
             Taro.hideLoading();
             this.setState({
                 likeList:res
             })
         }).catch((e)=>{
-            Taro.hideLoading();
             Taro.showToast({
                 title:e,
                 icon:'none',

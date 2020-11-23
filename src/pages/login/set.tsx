@@ -98,8 +98,6 @@ export default class Set extends Component<any,{
                 </View>
                 <Button className={btnAtive?'loginbtn loginbtnActive':'loginbtn'} onClick={this.onSetPassword}>确定</Button>
             </View>
-
-
     </View>
     }
 
