@@ -113,10 +113,10 @@ export default class Order extends Component<any,{
                 duration:2000
             });
             this.getList(this.state.switchTabActive)
-        }).catch(()=>{
+        }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
-                title:'服务器开小差了，稍后再试',
+                title:e,
                 icon:'none',
                 duration:2000
             });

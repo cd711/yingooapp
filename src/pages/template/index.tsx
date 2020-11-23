@@ -287,9 +287,16 @@ export default class Template extends Component<any,{
 
                                     <View className='pic-box' style={cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone" ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
                                         // templateStore.selectItem = item;
-                                        Taro.navigateTo({
-                                            url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
-                                        });
+                                        if (cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone") {
+                                            Taro.navigateTo({
+                                                url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
+                                            });
+                                        }
+                                        if (cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo") {
+                                            Taro.navigateTo({
+                                                url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}`
+                                            });
+                                        }
                                     }} key={item.id}>
                                         {
                                             cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone" ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>

@@ -132,10 +132,10 @@ export default class OrderDetail extends Component<{},{
                 icon:'none',
                 duration:2000
             });
-        }).catch(()=>{
+        }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
-                title:'服务器开小差了，稍后再试',
+                title:e,
                 icon:'none',
                 duration:2000
             });
