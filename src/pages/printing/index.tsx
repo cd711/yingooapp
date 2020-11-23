@@ -62,7 +62,9 @@ const Index: Taro.FC<any> = () => {
             path.push({
                 id: data.ids[i],
                 url: data.imgs[i],
-                attr: data.attrs[i]
+                attr: data.attrs[i],
+                edited: false,
+                doc: ""
             })
         }
 

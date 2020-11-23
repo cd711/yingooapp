@@ -131,22 +131,6 @@ const PrintChange: Taro.FC<any> = () => {
         arr.push(paramsObj.current.sku);
         arr.push(id);
 
-        // const tempArr = data.attrGroup.map((v, index) => {
-        //     if (notNull(v.special_show)) {
-        //         return index
-        //     } else {
-        //         return null
-        //     }
-        // }) || [];
-        // for (let i = 0; i < tempArr.length; i++) {
-        //     if (!notNull(tempArr[i])) {
-        //         const c = tempArr[i];
-        //         const item = data.attrItems[c];
-        //         if (item && item[0]) {
-        //             arr.push(item[0].id)
-        //         }
-        //     }
-        // }
         console.log("追加的skuID：", arr)
         setSkus([...arr])
     }
@@ -156,7 +140,7 @@ const PrintChange: Taro.FC<any> = () => {
         try {
             const res = await api("app.product/info", {id: paramsObj.current.id});
             if (res.attrGroup && res.attrGroup instanceof Array) {
-                res.attrGroup = res.attrGroup.map(val => ({...val, disable: !notNull(val.special_show) ? true : false}))
+                res.attrGroup = res.attrGroup.map(val => ({...val, disable: !notNull(val.special_show)}))
             }
             goodsInfo.current = res;
 
@@ -267,7 +251,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onEditClick = (item ,index) => {
         Taro.navigateTo({
-            url: `/pages/editor/printedit?img=${item.url}&idx=${index}`
+            url: `/pages/editor/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`
         })
     }
 

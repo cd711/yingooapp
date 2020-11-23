@@ -32,6 +32,9 @@ export class TemplateStore {
     @observable
     public photoSizeParams: object = {};
 
+    @observable
+    public editorPhotos: { id: string | number, url: string }[] = [];
+
 }
 
 

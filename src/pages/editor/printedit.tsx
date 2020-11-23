@@ -11,6 +11,8 @@ import UploadFile from "../../components/Upload/Upload";
 import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
 import {userStore} from "../../store/user";
 import Photos from "../me/photos";
+import {templateStore} from "../../store/template";
+import moment from "moment";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -50,18 +52,11 @@ interface BaseProps {
     onOk?: () => void,
 }
 
-interface BrandType {
-    id: any;
-    name: string;
-    models?: BrandType[];
-    phoneshell: any;
-    brandIndex?: number;
-}
-
 // 换模板
 const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
     const prodList = Taro.useRef([]);
+
     const [typeList, setTypeList] = useState([]);
     const [active, setActive] = useState(0);
     const [templateList, setTemplateList] = useState([]);
@@ -104,12 +99,14 @@ const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) 
     async function resetTemplate() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
+                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
             console.log("重置出错：", e)
         }
-    }  // 获取初始化的DOC
+    }
+
+    // 获取初始化的DOC
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
@@ -163,7 +160,9 @@ const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) 
         Taro.showLoading({title: "正在为您设置..."})
         try {
             const res = await api("editor.tpl/one", {id: item.id});
-            await callEditor("setDoc", res)
+            console.log(res)
+
+            await callEditor("setDoc", res, templateStore.editorPhotos.map(v => v.url))
         }catch (e) {
             console.log("设置DOC出错：", e)
         }
@@ -364,7 +363,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
+                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -606,7 +605,7 @@ const ChangeText:Taro.FC<BaseProps> = props => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
+                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -662,6 +661,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
 
     const {onClose, onOk} = props;
 
+
     const defaultDoc = Taro.useRef(null);
     const [fontList, setFontList] = useState([]);
     const [fontSelected, setFontSelected] = useState(null);
@@ -707,7 +707,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
+                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -852,6 +852,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         ]
     }
 
+
     const defaultDoc = Taro.useRef(null);
     const activeStyle = Taro.useRef(0);
     const alignActive = Taro.useRef(0);
@@ -873,7 +874,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current);
+                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -1081,52 +1082,33 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     const router = parent.$router;
 
     const [type, setType] = useState(0);
-    const [brandList, setBrandList] = useState<BrandType[]>([]);
-    const [brandIndex, setBrand] = useState<number>(0);
-    const [series, setSeries] = useState<BrandType[]>([]);
     const [info, setInfo] = useState<any>({});
 
-
-    //系列
-    useEffect((async () => {
-        if (!brandList || brandList.length == 0) {
-            return;
-        }
-        setSeries(null);
-        let list = null;
+    const getPhotoParams = () => {
+        // 解析参数
+        let params: any = {};
 
         try {
-            //@ts-ignore
-            const res = brandList[brandIndex] ? Taro.getStorageSync("phone_series_" + brandList[brandIndex].id) : null;
-            if (res && res.time + 3 * 86400000 > Date.now()) {
-                list = res.list;
+            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+            if (res) {
+                params = JSON.parse(res)
+            } else {
+                if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                    params = templateStore.photoSizeParams
+                } else {
+                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+                }
             }
         } catch (e) {
-
-            console.error(e);
-        }
-        if (!list) {
-            try {
-                list = await api("/editor.phone_shell/series", {
-                    id: brandList[brandIndex].id
-                });
-                console.log(list);
-            } catch (e) {
-                console.warn(e);
+            if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                params = templateStore.photoSizeParams
+            } else {
+                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
             }
         }
-        if (!list) {
-            return;
-        }
-        setSeries(list);
 
-        Taro.setStorage({
-            key: "phone_series_" + brandList[brandIndex].id, data: {
-                time: Date.now(),
-                list: list
-            }
-        });
-    }) as any, [brandList, brandIndex]);
+        return params
+    }
 
     useEffect(() => {
         api("editor.tpl/index", {cid: 63}).then(res => {
@@ -1144,15 +1126,40 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
 
     const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
         console.log(router)
-        setType(0)
-        if (info.id) {
+        setType(0);
+
+        if (info.list[0]) {
             try {
-                await callEditor("setDoc", info.id, data.imgs)
+                let temp = info.list[0].id;
+                const localParams = getPhotoParams();
+                const current = localParams.path[Number(router.params.idx)];
+                if (current.edited && !notNull(current.doc)) {
+                    temp = current.doc;
+                }
+
+                let arr = [...templateStore.editorPhotos];
+
+                data.ids.forEach((value, index) => {
+                    const idx = arr.findIndex(v => v.id == value);
+                    if (idx === -1) {
+                        arr.push({
+                            id: value,
+                            url: data.imgs[index]
+                        })
+                    }
+                })
+
+                templateStore.editorPhotos = arr;
+                console.log(arr.map(v => v.url))
+                await callEditor("setDoc", temp, templateStore.editorPhotos.map(v => v.url));
             }catch (e) {
                 console.log("选图出错：", e)
             }
         } else {
-
+            Taro.showToast({
+                title: "系统错误，请稍后再试~",
+                icon: "none"
+            })
         }
     }
 
@@ -1170,7 +1177,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                     </View>
                 </View>;
 
-            case 1: //机型
+            case 1: // 添加
                 return <View className="photo_picker_container photo_picker_animate" style={{
                     width: deviceInfo.windowWidth,
                     height: deviceInfo.windowHeight,
@@ -1222,6 +1229,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
 
+        templateStore.editorPhotos = [{id: "", url: this.$router.params.img}]
     }
 
 
@@ -1230,15 +1238,48 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         window.removeEventListener("message", this.onMsg);
     }
 
+    getPhotoParams = () => {
+        // 解析参数
+        let params: any = {};
+
+        try {
+            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+            if (res) {
+                params = JSON.parse(res)
+            } else {
+                if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                    params = templateStore.photoSizeParams
+                } else {
+                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+                }
+            }
+        } catch (e) {
+            if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                params = templateStore.photoSizeParams
+            } else {
+                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+            }
+        }
+
+        return params
+    }
+
     onLoad = async (_?: number) => {
 
     }
 
     onLoadEmpty = async (_?: number) => {
-        console.log([this.$router.params.img])
         try {
             const res = await api("editor.tpl/index", {cid: 63});
-            await callEditor("setDoc", res.list[0].id, [this.$router.params.img])
+
+            let data = res.list[0].id;
+            const localParams = this.getPhotoParams();
+            const current = localParams.path[Number(this.$router.params.idx)];
+            if (current.edited && !notNull(current.doc)) {
+                data = current.doc;
+            }
+
+            await callEditor("setDoc", data, [this.$router.params.img])
 
         }catch (e) {
             console.log("初始化失败：", e)
@@ -1340,7 +1381,6 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
     }
 
-
     back = () => {
         if (Taro.getCurrentPages().length > 1) {
             Taro.navigateBack();
@@ -1354,19 +1394,32 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     next = async () => {
-        Taro.showLoading({
-            title: "请稍候"
-        });
-        // await callEditor("saveDraft");
-        const doc = await callEditor("getDoc");
-        // Taro.setStorageSync("doc_draft", {
-        //     tplId: this.tplId,
-        //     docId: this.docId,
-        //     modelId: this.defaultModel.id,
-        //     doc: doc
-        // });
-        // Taro.hideLoading();
-        // window.location.replace(`/pages/template/preview`);
+        const doc: any = await callEditor("getDoc");
+        console.log(doc)
+        const img = doc.pages[0].thumbnail;
+
+        const localParams = this.getPhotoParams();
+
+        console.log("本地数据：", localParams)
+
+        const temp = {...localParams}
+
+        temp.path[Number(this.$router.params.idx)].url = img;
+        temp.path[Number(this.$router.params.idx)].attr = `${doc.width}*${doc.height}`;
+        temp.path[Number(this.$router.params.idx)].edited = true;
+        temp.path[Number(this.$router.params.idx)].doc = doc;
+
+        console.log("更新后的params：", temp);
+
+        try {
+            Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp));
+            templateStore.photoSizeParams = temp
+        } catch (e) {
+            console.log("本地存储出错：将存入store", e)
+            templateStore.photoSizeParams = temp
+        }
+
+        Taro.navigateBack()
     }
 
 
@@ -1433,7 +1486,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 <View onClick={this.back}>
                     <IconFont name='24_shangyiye' color='#000' size={48}/>
                 </View>
-                <View onClick={this.next} className='right'>下一步</View>
+                <View onClick={this.next} className='right'>完成</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
