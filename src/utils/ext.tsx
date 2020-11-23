@@ -5,8 +5,6 @@ import UITopProvider, {UITop} from "../components/UITopProvider";
 import Modal from "../components/UITopProvider/modal";
 import Login from "../components/login/login";
 import { is_weixin } from "./common";
-import lodash from 'lodash';
-import { Base64 } from "js-base64";
 import { api } from "./net";
 
 const page =(option?: {
@@ -24,10 +22,10 @@ const page =(option?: {
                 if (option.wechatAutoLogin) {
                     if (code && code.length>5) {
                         const params = this.$router.params;
-                        let exportUrl = window.location.href.split("?")[0]+(Object.keys(params).length>0?"?":"");                          
+                        let exportUrl = window.location.href.split("?")[0]+(Object.keys(params).length>0?"?":"");
                         Object.keys(params).map((key)=>{
                             if (key != "code" && key != "state") {
-                                exportUrl += key + '=' + params[key] +'&';	
+                                exportUrl += key + '=' + params[key] +'&';
                             }
                         })
                         exportUrl = exportUrl[exportUrl.length-1]==='&' ? exportUrl.substring(0,exportUrl.length-2):exportUrl;
@@ -57,7 +55,7 @@ const page =(option?: {
                         const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent(option.redirectUrl)}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
                         window.location.href = url;
                     }
-                }                    
+                }
             }
         }
         clazz.componentWillMount = function () {
@@ -66,7 +64,7 @@ const page =(option?: {
                 this.__option = Object.assign({}, option);
                 this.checkLogin();
             }
-            
+
             mount && mount.apply(this, arguments);
         };
 

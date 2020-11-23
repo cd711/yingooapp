@@ -44,6 +44,20 @@ const PrintChange: Taro.FC<any> = () => {
     }, [])
 
     useEffect(() => {
+
+        // 读取本地存储print_attrItems
+        try {
+            const res = Taro.getStorageSync("print_attrItems");
+            console.log("本地的：", res)
+            if (res) {
+                const parse = JSON.parse(res);
+                console.log("本地的items：", parse)
+                printAttrItems.current = parse;
+            }
+        } catch (e) {
+            console.log("读取print_attrItems出错：", e)
+        }
+
         // 解析参数
         let params: any = {};
 
@@ -66,38 +80,38 @@ const PrintChange: Taro.FC<any> = () => {
             }
         }
 
+        console.log("读取的photo params：", params)
         paramsObj.current = params || {};
-        params.path = params.path.map(v => {
+        params.path = params.path.map((v) => {
             return {
                 ...v,
-                count: 1
+                count: 1,
+                hasRotate: checkHasRotate(v.attr, params.sku),
             }
         })
         setPhotos([...params.path] || [])
-
-        // 读取本地存储print_attrItems
-        try {
-            const res = Taro.getStorageSync("print_attrItems");
-            console.log("本地的：", res)
-            if (res) {
-                const parse = JSON.parse(res);
-                console.log("本地的items：", parse)
-                printAttrItems.current = parse;
-            }
-        } catch (e) {
-            console.log("读取print_attrItems出错：", e)
-        }
 
         backHandlePress()
 
     }, [])
 
-    function checkHasRotate(img: string): boolean {
+    function checkHasRotate(attribute: string, sku: number | string): boolean {
         if (router.params.id) {
-            for (const item of printAttrItems.current) {
-
+            let pix = "";
+            for (const item of printAttrItems.current.attrItems[0]) {
+                if (sku == item.id) {
+                    pix = item.value;
+                    break;
+                }
+            }
+            if (!notNull(pix)) {
+                const pixArr = pix.split("*");
+                const imgPix = attribute.split("*");
+                const num = Number(pixArr[0]) / Number(imgPix[1]);
+                return num > 1
             }
         }
+        return false
     }
 
     const onCountChange = (num, idx) => {
@@ -223,12 +237,13 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }
 
-    const onPhotoSelect = (data: {ids: [], imgs: []}) => {
+    const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
         const arr = [...photos];
         for (let i = 0; i < data.ids.length; i++) {
             arr.push({
                 id: data.ids[i],
                 url: data.imgs[i],
+                attr: data.attrs[i],
                 count: 1
             });
         }
@@ -251,9 +266,9 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onEditClick = (item ,index) => {
-        // Taro.navigateTo({
-        //     url: `/pages/editor/printedit?img=${item.url}&idx=${index}`
-        // })
+        Taro.navigateTo({
+            url: `/pages/editor/printedit?img=${item.url}&idx=${index}`
+        })
     }
 
     return (
@@ -278,7 +293,16 @@ const PrintChange: Taro.FC<any> = () => {
                                     <View className="print_change_del" onClick={() => onDeleteImg(index)}>
                                         <IconFont name="32_guanbi" size={32}/>
                                     </View>
-                                    <Image src={ossUrl(value.url, 1)} className="img" mode="aspectFill" onClick={() => onEditClick(value, index)} />
+                                    <View className="print_change_img">
+                                        <Image src={ossUrl(value.url, 1)} className="p_img" mode={value.hasRotate ? "aspectFill" : "aspectFill"}
+                                               onClick={() => onEditClick(value, index)}
+                                               style={{
+                                                   transform: value.hasRotate ? "rotateZ(90deg)" : "none",
+                                                   width: value.hasRotate ? 203 : 152,
+                                                   height: value.hasRotate ? 152 : 203
+                                               }}
+                                        />
+                                    </View>
                                     <View className="print_change_count">
                                         <Counter max={100} num={value.count}
                                                  onCounterChange={c => onCountChange(c, index)}/>

@@ -13,7 +13,7 @@ import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 
 interface PhotosProps {
     editSelect?: boolean;
-    onPhotoSelect?: ({ids: [], imgs: []}) => void;
+    onPhotoSelect?: ({ids: [], imgs: [], attrs: []}) => void;
     defaultSelect?: Array<{id: string | number, img: string}>;
     onClose?: () => void;
 }
@@ -29,6 +29,7 @@ export default class Photos extends Component<PhotosProps,{
     sortActive: object;
     editSelectImgs: string[];
     editSelectImgIds: any[];
+    editSelectAttr: string[];
 }> {
 
     static defaultProps = {
@@ -53,7 +54,8 @@ export default class Photos extends Component<PhotosProps,{
             isOpened: false,
             sortActive: {},
             editSelectImgs: [],
-            editSelectImgIds: []
+            editSelectImgIds: [],
+            editSelectAttr: []
         }
     }
 
@@ -63,17 +65,17 @@ export default class Photos extends Component<PhotosProps,{
             const {imageList, navSwitchActive} = this.state;
 
             if (defaultSelect && navSwitchActive === 0) {
-                const editSelectImgs = this.state.editSelectImgs;
-                const editSelectImgIds = this.state.editSelectImgIds;
-                for (const p of imageList) {
-                    for (const c of defaultSelect) {
-                        if (c.id == p.id) {
-                            editSelectImgIds.push(c.id);
-                            editSelectImgs.push(c.img);
-                        }
-                    }
-                }
-                this.setState({editSelectImgs, editSelectImgIds})
+                // const editSelectImgs = this.state.editSelectImgs;
+                // const editSelectImgIds = this.state.editSelectImgIds;
+                // for (const p of imageList) {
+                //     for (const c of defaultSelect) {
+                //         if (c.id == p.id) {
+                //             editSelectImgIds.push(c.id);
+                //             editSelectImgs.push(c.img);
+                //         }
+                //     }
+                // }
+                // this.setState({editSelectImgs, editSelectImgIds})
             }
         })
     }
@@ -121,24 +123,27 @@ export default class Photos extends Component<PhotosProps,{
         this.getList({start: 0})
     }
 
-    imageSelect = (id: any, url) => {
+    imageSelect = (id: any, url, attr) => {
         const {editSelect} = this.props;
 
         if (editSelect) {
             const editSelectImgs = this.state.editSelectImgs;
             const editSelectImgIds = this.state.editSelectImgIds;
+            const editSelectAttr = this.state.editSelectAttr;
             const idx = editSelectImgIds.findIndex(v => v == id);
             if (idx > -1) {
                 editSelectImgs.splice(idx, 1);
-                editSelectImgIds.splice(idx, 1)
+                editSelectImgIds.splice(idx, 1);
+                editSelectAttr.splice(idx, 1)
             } else {
                 if (editSelectImgIds.length >= 4) {
                     return;
                 }
                 editSelectImgs.push(url);
                 editSelectImgIds.push(id);
+                editSelectAttr.push(attr)
             }
-            this.setState({editSelectImgs, editSelectImgIds})
+            this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
             return
         }
 
@@ -155,13 +160,15 @@ export default class Photos extends Component<PhotosProps,{
     delEditSelectImg = idx => {
         const editSelectImgs = this.state.editSelectImgs;
         const editSelectImgIds = this.state.editSelectImgIds;
+        const editSelectAttr = this.state.editSelectAttr;
         editSelectImgs.splice(idx, 1);
         editSelectImgIds.splice(idx, 1);
-        this.setState({editSelectImgs, editSelectImgIds})
+        editSelectAttr.splice(idx, 1);
+        this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
     }
 
     submitEditSelect = () => {
-        const {editSelectImgs, editSelectImgIds} = this.state;
+        const {editSelectImgs, editSelectImgIds, editSelectAttr} = this.state;
         const {onPhotoSelect} = this.props;
         if (editSelectImgs.length === 0 || editSelectImgIds.length === 0) {
             Taro.showToast({title: "未选择素材", icon: "none"})
@@ -169,7 +176,8 @@ export default class Photos extends Component<PhotosProps,{
         }
         onPhotoSelect && onPhotoSelect({
             ids: editSelectImgIds,
-            imgs: editSelectImgs
+            imgs: editSelectImgs,
+            attrs: editSelectAttr
         })
     }
 
@@ -371,11 +379,11 @@ export default class Photos extends Component<PhotosProps,{
                                         {
                                             list.map((item, idx) => {
                                                 return <View className="list_item" key={idx}>
-                                                    <View className="img_item" key={idx} onClick={() => this.imageSelect(item.id, item.url)}>
+                                                    <View className="img_item" key={idx} onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
                                                         <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
                                                     </View>
                                                     {editSelect && editSelectImgIds.indexOf(item.id) > -1
-                                                        ? <View className="edit_select_index" onClick={() => this.imageSelect(item.id, item.url)}>
+                                                        ? <View className="edit_select_index" onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
                                                             <Text className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
                                                         </View>
                                                         : null}

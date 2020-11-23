@@ -1142,7 +1142,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         // setTempCurrentModel(currentModel);
     }
 
-    const onPhotoSelect = async (data: {ids: [], imgs: []}) => {
+    const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
         console.log(router)
         setType(0)
         if (info.id) {

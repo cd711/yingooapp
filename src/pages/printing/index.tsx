@@ -53,7 +53,7 @@ const Index: Taro.FC<any> = () => {
         setChecked(Number(id))
     }
 
-    const onPhotoSelect = (data: {ids: [], imgs: []}) => {
+    const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
         console.log("返回的结果：", data)
 
         setPhotoPickerVisible(false)
@@ -61,7 +61,8 @@ const Index: Taro.FC<any> = () => {
         for (let i = 0; i < data.ids.length; i++) {
             path.push({
                 id: data.ids[i],
-                url: data.imgs[i]
+                url: data.imgs[i],
+                attr: data.attrs[i]
             })
         }
 

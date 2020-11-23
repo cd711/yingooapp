@@ -6,6 +6,7 @@ import { api } from '../../utils/net'
 import {AtActivityIndicator} from 'taro-ui'
 import { observer, inject } from '@tarojs/mobx'
 import {ossUrl} from '../../utils/common'
+import page from "../../utils/ext";
 
 interface TagData{
     list:Array<any>,
@@ -16,6 +17,9 @@ interface TagData{
 
 @inject("templateStore")
 @observer
+@page({
+    wechatAutoLogin: false
+})
 export default class Template extends Component<any,{
     switchActive:number;
     cates:Array<any>;
@@ -237,6 +241,9 @@ export default class Template extends Component<any,{
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
                             {
                                 !showTemplateLoading && cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo"?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
+                                    if (!this.showLoginModal()) {
+                                        return
+                                    }
                                     Taro.navigateTo({
                                         url:`pages/printing/index?id=32`
                                     })

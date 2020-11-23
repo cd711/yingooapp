@@ -142,6 +142,7 @@
         border-radius: 12px;
         margin: 16px 0 32px 0;
         padding-top: 8px;
+        overflow: hidden;
     }
     .print_change_del{
         position: absolute;
@@ -154,12 +155,27 @@
         align-items: center;
         justify-content: center;
     }
-    .img{
+    .p_img{
         width: 304px;
         height: 406px;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
     }
     .print_change_count{
         padding: 20px 0;
+    }
+    .print_change_img{
+        width: 304px;
+        height: 406px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
     }
 }
 
