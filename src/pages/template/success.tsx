@@ -6,6 +6,7 @@ import { observer, inject } from '@tarojs/mobx';
 
 import SuccessIcon from '../../components/icon/SuccessIcon';
 import WarmIcon from '../../components/icon/WarmIcon';
+import { api } from '../../utils/net';
 // interface LikeData{
 //     list:Array<any>,
 //     size:number,
@@ -15,8 +16,9 @@ import WarmIcon from '../../components/icon/WarmIcon';
 
 @inject("templateStore")
 @observer
-export default class Success extends Component<any,{
-
+export default class Success extends Component<{},{
+    way:string,
+    price:string
 }> {
 
     config: Config = {
@@ -25,19 +27,60 @@ export default class Success extends Component<any,{
     constructor(props){
         super(props);
         this.state = {
-
+            way:"wechat",
+            price:"0.00"
         }
     }
 
     componentDidMount() {
         console.log();
+        Taro.showLoading({title:"查询订单状态"});
+        const {pay_order_sn} = this.$router.params;
+        setTimeout(() => {
+            this.getOrderStatus(pay_order_sn);
+        }, 3000);
+        
+    }
+    private request = 0;
+    getOrderStatus = (pay_order_sn) => {
+        api("app.pay/payStatus",{
+            pay_order_sn,
+        }).then((res)=>{
+            if (parseInt(res.status+"")>=1) {
+                Taro.hideLoading();
+                this.setState({
+                    way:res.pay_type,
+                    price:res.pay_price
+                });
+            }else{
+                if (this.request<=1) {
+                    setTimeout(() => {
+                        this.getOrderStatus(pay_order_sn);
+                        this.request += 1;
+                    }, 5000);
+                }else{
+                    Taro.navigateTo({
+                        url:'/pages/me/order?tab=1'
+                    })
+                }
+            }
+        }).catch((e)=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                icon:"none",
+                duration:2000
+            });
+            setTimeout(() => {
+                Taro.navigateTo({
+                    url:'/pages/me/order?tab=1'
+                })
+            }, 2000);
+        })
     }
 
-
-
     render() {
-        const {  } = this.state;
-        const {way,price} = this.$router.params;
+        const { way,price } = this.state;
         return (
             <View className='success'>
                 <View className='nav-bar'>

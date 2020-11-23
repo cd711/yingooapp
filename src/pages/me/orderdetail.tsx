@@ -10,6 +10,8 @@ import PayWayModal from '../../components/payway/PayWayModal';
 import { templateStore } from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 import page from '../../utils/ext';
+import { AtModal,AtModalContent } from "taro-ui"
+import copy from 'copy-to-clipboard';
 
 @inject("templateStore")
 @observer
@@ -21,6 +23,7 @@ export default class OrderDetail extends Component<{},{
     seconds:string,
     showPayWayModal:boolean,
     navBarChange:boolean,
+    showServiceModal:boolean
 }> {
 
     config: Config = {
@@ -35,7 +38,8 @@ export default class OrderDetail extends Component<{},{
             minutes:"00",
             seconds:"00",
             showPayWayModal:false,
-            navBarChange:false
+            navBarChange:false,
+            showServiceModal:false
         }
     }
     componentDidMount(){
@@ -197,8 +201,13 @@ export default class OrderDetail extends Component<{},{
             });
         })
     }
+    onServiceModalShow = () => {
+        this.setState({
+            showServiceModal:true
+        })
+    }
     render() {
-        const { data,hours,minutes,seconds,showPayWayModal,navBarChange } = this.state;
+        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal } = this.state;
         const state = data.state_tip?data.state_tip.value:0;
         const afterState = data.after_sale_status_tip?data.after_sale_status_tip.value:0;
         let status = data.state_tip?data.state_tip.text:"";
@@ -218,7 +227,7 @@ export default class OrderDetail extends Component<{},{
                     <View className='center'>
                         <Text className='title'>我的订单</Text>
                     </View>
-                    <View className='right'>
+                    <View className='right' onClick={this.onServiceModalShow}>
                         <IconFont name='24_kefu' size={48} color={navBarChange?'#121314':'#FFF'} />
                     </View>
                 </View>
@@ -318,7 +327,14 @@ export default class OrderDetail extends Component<{},{
                     <View className='box'>
                         <View className='order-num'>
                             <Text className='txt'>订单编号：{data.order_sn}</Text>
-                            <IconFont name='20_fuzhi' size={40} color='#9C9DA6' />
+                            <View onClick={()=>{
+                                copy(data.order_sn);
+                                Taro.showToast({
+                                    title:"复制成功",
+                                    icon:'none',
+                                    duration:1000
+                                })
+                            }}><IconFont name='20_fuzhi' size={40} color='#9C9DA6' /></View>
                         </View>
                         <Text className='order-time'>下单时间：{moment.unix(data.create_time).format("YYYY-MM-DD HH:mm:ss")}</Text>
                         <Text className='pay-way'>支付方式：微信支付</Text>
@@ -364,7 +380,39 @@ export default class OrderDetail extends Component<{},{
                             showPayWayModal:false
                         })
                     }}/>
-                
+                    <AtModal isOpened={showServiceModal} onClose={()=>{
+                            this.setState({
+                                showServiceModal:false
+                            })
+                        }}>
+                        <AtModalContent>
+                            <View className='service_content'>
+                                <View className='title'>
+                                    <Text className='txt'>映果客服</Text>
+                                </View>
+                                <View className='line_item'>
+                                    <Text className='name'>微信：</Text>
+                                    <Text className='content'>13198561713</Text>
+                                </View>
+                                <View className='line_item'>
+                                    <Text className='name'>电话：</Text>
+                                    <Text className='content'>18628087932</Text>
+                                </View>
+                                <View className='line_item last_item'>
+                                    <Text className='name'>邮箱：</Text>
+                                    <a href="mailto:18628087932@qq.com"><Text className='content'>18628087932@qq.com</Text></a>
+                                </View>
+                                <Button className='copy_wechat' onClick={()=>{
+                                    copy('13198561713');
+                                    Taro.showToast({
+                                        title:"复制成功",
+                                        icon:'none',
+                                        duration:1000
+                                    })
+                                }}>复制微信号</Button>
+                            </View>
+                        </AtModalContent>
+                    </AtModal>
             </View>
         )
     }

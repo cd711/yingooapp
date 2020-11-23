@@ -58,6 +58,13 @@ export default class Template extends Component<any,{
         }
         Taro.showLoading({title:"加载中..."});
         api("app.product/cate").then((res)=>{
+            res = res.map((item)=>{
+                item.tags.unshift({
+                    id:0,
+                    name:"全部"
+                });
+                return item
+            });
             this.setState({
                 cates:res,
             },()=>{
@@ -104,26 +111,49 @@ export default class Template extends Component<any,{
     }
 
     getTagContext = (tag) => {
-        const {switchActive,cates} = this.state;
+        const {switchActive,cates,tagData} = this.state;
         if (tag) {
+            const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
+            // const tagTotal = tagData && tagData.total && tagData.total>=0?tagData.total:0;
             this.setState({
                 showTemplateLoading:true
             })
             api("app.product_tpl/list",{
-                start:0,
-                size:30,
+                start:tagList.length,
+                size:10,
                 category_id:cates[switchActive].tpl_category_id,
                 tag_id:tag.id
             }).then((res)=>{
+                res.list = tagList.concat(res.list);
                 this.setState({
                     tagData:res,
                     showTemplateLoading:false
                 });
                 Taro.hideLoading();
+            }).catch((e)=>{
+                this.setState({
+                    showTemplateLoading:false
+                });
+                Taro.showToast({
+                    title:e,
+                    icon:"none",
+                    duration:1500
+                });
             })
         }
-
     }
+
+    onScrollToLower = () => {
+        const {switchActive,cates,switchTagActive,tagData} = this.state;
+        const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
+        const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
+        const tagTotal = tagData && tagData.total && tagData.total>=0?tagData.total:0;
+        if (tags.length>0 && tagList.length<tagTotal) {
+            const tag = tags[switchTagActive];
+            this.getTagContext(tag)
+        }
+    }
+
     render() {
         const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,showTemplateLoading} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
@@ -161,6 +191,7 @@ export default class Template extends Component<any,{
                                                 },()=>{
 
                                                     const tagsa = cates && cates[index]?cates[index].tags:[];
+
                                                     if (tagsa.length>0) {
                                                         this.getTagContext(tagsa[0]);
                                                     }
@@ -189,7 +220,6 @@ export default class Template extends Component<any,{
                                                 tagData:{}
                                             },()=>{
                                                 const tagsa = cates && cates[index]?cates[index].tags:[];
-
                                                 if (tagsa.length>0) {
                                                     this.getTagContext(tagsa[0]);
                                                 }
@@ -223,8 +253,9 @@ export default class Template extends Component<any,{
                                             this.setState({
                                                 switchTagActive:index,
                                                 tagData:{}
+                                            },()=>{
+                                                this.getTagContext(item)
                                             });
-                                            this.getTagContext(item)
                                         }
                                     }}>
                                         <Text className='txt'>{item.name}</Text>
@@ -233,7 +264,7 @@ export default class Template extends Component<any,{
                             }
                         </ScrollView>
                     </View>
-                    <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`}>
+                    <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`} onScrollToLower={this.onScrollToLower}>
                         <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
                             {
                                 !showTemplateLoading && cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo"?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
