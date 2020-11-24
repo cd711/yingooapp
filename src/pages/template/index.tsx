@@ -301,6 +301,10 @@ export default class Template extends Component<any,{
                                             });
                                         }
                                         if (cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo") {
+                                            // @ts-ignore
+                                            if (!this.showLoginModal()) {
+                                                return
+                                            }
                                             Taro.navigateTo({
                                                 url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
                                             });
