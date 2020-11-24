@@ -265,8 +265,17 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onEditClick = (item ,index) => {
+
+        const str = getURLParamsStr(urlEncode({
+            idx: index,
+            cid: router.params.id,
+            status: item.edited && !notNull(item.doc) ? "t" : "f",
+            tplmax: router.params.tplmax,
+            img: item.url,
+        }))
+
         Taro.navigateTo({
-            url: `/pages/editor/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`
+            url: `/pages/editor/printedit?${str}`
         })
     }
 
@@ -303,7 +312,7 @@ const PrintChange: Taro.FC<any> = () => {
                                         />
                                     </View>
                                     <View className="print_change_count">
-                                        <Counter max={100} num={value.count}
+                                        <Counter max={Number(router.params.max)} num={value.count}
                                                  onCounterChange={c => onCountChange(c, index)}/>
                                     </View>
                                 </View>

@@ -55,6 +55,8 @@ interface BaseProps {
 // 换模板
 const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
+    const router = Taro.useRouter();
+
     const prodList = Taro.useRef([]);
 
     const [typeList, setTypeList] = useState([]);
@@ -68,7 +70,7 @@ const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) 
     async function getListOfCategory(params: {tagId?: number | string, page?: number, size?: number, loadMore?: boolean} = {}) {
 
         const opt = {
-            cid: 41,
+            cid: router.params.cid || 41,
             tagId: params.tagId || "",
             page: params.page || 0,
             size: params.size || 15,
@@ -119,7 +121,7 @@ const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) 
 
     useEffect(() => {
 
-        api("app.product/cate").then(res => {
+        api("app.product/cate", {cid: router.params.cid}).then(res => {
             prodList.current = res;
 
             // 获取标签分类
@@ -160,9 +162,11 @@ const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) 
         Taro.showLoading({title: "正在为您设置..."})
         try {
             const res = await api("editor.tpl/one", {id: item.id});
-            console.log(res)
-
-            await callEditor("setDoc", res, templateStore.editorPhotos.map(v => v.url))
+            console.log("修改前：",res)
+            const temp = {...res};
+            temp.pages[0].thumbnail = "";
+            console.log("修改后：", temp)
+            await callEditor("setDoc", temp, templateStore.editorPhotos.map(v => v.url))
         }catch (e) {
             console.log("设置DOC出错：", e)
         }
@@ -1083,6 +1087,11 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
 
     const [type, setType] = useState(0);
     const [info, setInfo] = useState<any>({});
+    const [templateList, setTemplateList] = useState<any[]>([]);
+    const currentData = Taro.useRef({
+        total: 0,
+        curr: 0
+    })
 
     const getPhotoParams = () => {
         // 解析参数
@@ -1118,16 +1127,62 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         })
     }, [])
 
+    useEffect(() => {
+        getTemplateForPhotoNum().then(res => {
+            setTemplateList([...res])
+        })
+    }, [])
+
     const cancelMode = () => {
         setType(0);
-        // setBrand(currentModel.brandIndex);
-        // setTempCurrentModel(currentModel);
+    }
+
+    async function renderTemplateDoc(id) {
+        // // 获取模板详情并向DOC更新
+        Taro.showLoading({title: "正在为您设置..."})
+        try {
+            const res = await api("editor.tpl/one", {id});
+            console.log("修改前：",res)
+            const temp = {...res};
+            // temp.pages[0].thumbnail = "";
+            console.log("修改后：", temp)
+            await callEditor("setDoc", temp, templateStore.editorPhotos.map(v => v.url))
+        }catch (e) {
+            console.log("设置DOC出错：", e)
+        }
+        Taro.hideLoading()
+    }
+
+    function getTemplateForPhotoNum(params: { cid?: string | number, num?: number } = {}) {
+        return new Promise<any>(async (resolve, reject) => {
+            const opt = {
+                cid: params.cid || router.params.cid,
+                num: params.num || 1,
+            }
+            try {
+                const res = await api("editor.tpl/index", {
+                    cid: opt.cid,
+                    num: opt.num,
+                    page: 0,
+                    size: 20
+                });
+                currentData.current = {...currentData.current, total: res.total};
+                resolve(res.list || [])
+            }catch (e) {
+                reject(e)
+            }
+        })
     }
 
     const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
-        console.log(router)
         setType(0);
-
+        if (data.ids.length + templateStore.editorPhotos.length > Number(router.params.tplmax)) {
+            Taro.showToast({
+                title: `最多选择${router.params.tplmax}张图片`,
+                icon: "none"
+            })
+            return
+        }
         if (info.list[0]) {
             try {
                 let temp = info.list[0].id;
@@ -1150,8 +1205,16 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 })
 
                 templateStore.editorPhotos = arr;
-                console.log(arr.map(v => v.url))
-                await callEditor("setDoc", temp, templateStore.editorPhotos.map(v => v.url));
+
+                getTemplateForPhotoNum({num: arr.length}).then(res => {
+                    console.log(res)
+                    setTemplateList([...res]);
+                    const cur = res[currentData.current.curr];
+                    if (cur) {
+                        renderTemplateDoc(cur.id)
+                    }
+                })
+
             }catch (e) {
                 console.log("选图出错：", e)
             }
@@ -1163,6 +1226,20 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         }
     }
 
+    const onChangeTemplate = () => {
+        const obj = {...currentData.current};
+        obj.curr += 1;
+        if (obj.curr > obj.total) {
+            obj.curr = 0
+        }
+        const curr = templateList[obj.curr];
+        if (curr) {
+            renderTemplateDoc(curr.id)
+        }
+        console.log("自增结果：", obj)
+        currentData.current = {...obj}
+    }
+
     return ([type].map((t) => {
         switch (t) {
             case 0:
@@ -1171,7 +1248,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                         <IconFont name='24_bianjiqi_chongyin' size={48}/>
                         <Text className='txt'>添加</Text>
                     </View>
-                    <View onClick={() => setType(2)} className='btn'>
+                    <View onClick={onChangeTemplate} className='btn'>
                         <IconFont name='24_bianjiqi_moban' size={48}/>
                         <Text className='txt'>模板</Text>
                     </View>
@@ -1190,8 +1267,8 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 </View>;
 
             //模板
-            case 2:
-                return <Template parent={parent} onClose={() => setType(0)} onOk={() => setType(0)} />;
+            // case 2:
+            //     return <Template parent={parent} onClose={() => setType(0)} onOk={() => setType(0)} />;
         }
     }))[0] as any;
 }
@@ -1422,64 +1499,64 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         Taro.navigateBack()
     }
 
+    changeImage = () => {
+        this.store.tool = 4;
+        this.store.isEdit = true;
+    }
+
+    onOk = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false
+    }
+
+    cancelEdit = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false;
+    }
+
+    changeTxt = () => {
+        this.store.tool = 6;
+        this.store.isEdit = true;
+    }
+
+    selectFont = () => {
+        this.store.tool = 7;
+        this.store.isEdit = true;
+    }
+
+    changeFontStyle = () => {
+        this.store.tool = 8;
+        this.store.isEdit = true;
+    }
+
+    // 水平翻转
+    onFilpY = async () => {
+        try {
+            await callEditor("flipH");
+        } catch (e) {
+        }
+    }
+
+    // 垂直翻转
+    onFilpX = async () => {
+        try {
+            await callEditor("flipV")
+        } catch (e) {
+
+        }
+    }
+
+    onChangeAlpha = () => {
+        // alpha
+        this.store.tool = 5;
+        this.store.isEdit = true;
+    }
+
+
 
     render() {
         const {loadingTemplate, size } = this.state;
         const {tool} = this.store;
-
-
-        const changeImage = () => {
-            this.store.tool = 4;
-            this.store.isEdit = true;
-        }
-
-        const onOk = () => {
-            this.store.tool = 0;
-            this.store.isEdit = false
-        }
-
-        const cancelEdit = () => {
-            this.store.tool = 0;
-            this.store.isEdit = false;
-        }
-
-        const changeTxt = () => {
-            this.store.tool = 6;
-            this.store.isEdit = true;
-        }
-
-        const selectFont = () => {
-            this.store.tool = 7;
-            this.store.isEdit = true;
-        }
-
-        const changeFontStyle = () => {
-            this.store.tool = 8;
-            this.store.isEdit = true;
-        }
-
-        // 水平翻转
-        const onFilpY = async () => {
-            try {
-                await callEditor("flipH");
-            } catch (e) {
-            }
-        }
-
-        // 垂直翻转
-        const onFilpX = async () => {
-            try {
-                await callEditor("flipV")
-            } catch (e) {
-
-            }
-        }
-
-        const onChangeAlpha = () => {
-            // alpha
-            this.store.tool = 5;
-            this.store.isEdit = true;
-        }
 
         return <View className='editor-page'>
             <View className='header'>
@@ -1502,19 +1579,19 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
                     case 1:
                         return <View key={s} className='tools'>
-                            <View className='btn' onClick={changeImage}>
+                            <View className='btn' onClick={this.changeImage}>
                                 <IconFont name='24_bianjiqi_chongyin' size={48}/>
                                 <Text className='txt'>换图</Text>
                             </View>
-                            <View className='btn' onClick={onFilpY}>
+                            <View className='btn' onClick={this.onFilpY}>
                                 <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48}/>
                                 <Text className='txt'>水平</Text>
                             </View>
-                            <View className='btn' onClick={onFilpX}>
+                            <View className='btn' onClick={this.onFilpX}>
                                 <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48}/>
                                 <Text className='txt'>垂直</Text>
                             </View>
-                            <View className='btn' onClick={onChangeAlpha}>
+                            <View className='btn' onClick={this.onChangeAlpha}>
                                 <View className='icon'>
                                     <Image className="icon_img" src={require("../../source/trans.png")}/>
                                 </View>
@@ -1530,15 +1607,15 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
                     case 2: // 文字编辑
                         return <View key={s} className='tools'>
-                            <View className='btn' onClick={changeTxt}>
+                            <View className='btn' onClick={this.changeTxt}>
                                 <IconFont name='24_bianjiqi_huantu' size={48}/>
                                 <Text className='txt'>编辑</Text>
                             </View>
-                            <View className='btn' onClick={selectFont}>
+                            <View className='btn' onClick={this.selectFont}>
                                 <IconFont name='24_bianjiqi_ziti' size={48}/>
                                 <Text className='txt'>字体</Text>
                             </View>
-                            <View className='btn' onClick={changeFontStyle}>
+                            <View className='btn' onClick={this.changeFontStyle}>
                                 <IconFont name='24_bianjiqi_yangshi' size={48}/>
                                 <Text className='txt'>样式</Text>
                             </View>
@@ -1552,21 +1629,21 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
                     case 4: // 换图
                         return <ChangeImage
-                            onClose={cancelEdit}
-                            onOk={onOk}
+                            onClose={this.cancelEdit}
+                            onOk={this.onOk}
                         />
 
                     case 5: // 透明度
-                        return <ChangeAlpha onClose={cancelEdit} onOk={onOk}/>
+                        return <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
 
                     case 6: // 编辑文字
-                        return <ChangeText onClose={cancelEdit} onOk={onOk} />
+                        return <ChangeText onClose={this.cancelEdit} onOk={this.onOk} />
 
                     case 7: // 选择字体
-                        return <SelectFont onClose={cancelEdit} onOk={onOk} />
+                        return <SelectFont onClose={this.cancelEdit} onOk={this.onOk} />
 
                     case 8: // 修改字体样式
-                        return <ChangeFontStyle onClose={cancelEdit} onOk={onOk} />
+                        return <ChangeFontStyle onClose={this.cancelEdit} onOk={this.onOk} />
 
                 }
             }))[0]}
