@@ -5,6 +5,9 @@ import IconFont from "../iconfont";
 import {getToken, options} from "../../utils/net";
 import {notNull} from "../../utils/common";
 import {userStore} from "../../store/user";
+import Fragment from "../Fragment";
+import UITopProvider from "../UITopProvider";
+import page from "../../utils/ext";
 
 export interface UploadFileChangeProps {
     id: string, cdnUrl: string, url: string
@@ -28,6 +31,9 @@ interface UploadFileProps{
 interface UploadFileState {
     files: Array<any>;
 }
+@page({
+    wechatAutoLogin: true
+})
 export default class UploadFile extends Component<UploadFileProps, UploadFileState>{
 
     static defaultProps = {
@@ -181,16 +187,19 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
     render(): React.ReactNode {
         const {type, className, style, title} = this.props;
         return (
-            <View className={`upload_container ${className}`} onClick={this._upload} style={style}>
-                {
-                    type === "button"
-                        ? this.props.children
-                        : <View className="card_view">
-                            <IconFont size={96} name="24_paizhaoshangchuan" color="#fff" />
-                            <Text className="title">{title || "上传图片"}</Text>
-                        </View>
-                }
-            </View>
+            <Fragment>
+                <UITopProvider />
+                <View className={`upload_container ${className}`} onClick={this._upload} style={style}>
+                    {
+                        type === "button"
+                            ? this.props.children
+                            : <View className="card_view">
+                                <IconFont size={96} name="24_paizhaoshangchuan" color="#fff" />
+                                <Text className="title">{title || "上传图片"}</Text>
+                            </View>
+                    }
+                </View>
+            </Fragment>
         )
     }
 }
