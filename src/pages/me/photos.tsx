@@ -62,7 +62,7 @@ export default class Photos extends Component<PhotosProps,{
     componentDidMount() {
         this.getList({start: 0}).then(() => {
             const {defaultSelect} = this.props;
-            const {imageList, navSwitchActive} = this.state;
+            const {navSwitchActive} = this.state;
 
             if (defaultSelect && navSwitchActive === 0) {
                 // const editSelectImgs = this.state.editSelectImgs;
