@@ -22,6 +22,7 @@ const Login: Taro.FC<LoginProps> = props => {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
+        Taro.hideTabBar()
         setVisible(true)
     }, [])
 
@@ -33,7 +34,8 @@ const Login: Taro.FC<LoginProps> = props => {
     const _onClose = () => {
         setVisible(false)
         setTimeout(() => {
-            onClose && onClose()
+            onClose && onClose();
+            Taro.showTabBar()
         }, 200)
     }
 
