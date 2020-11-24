@@ -4,7 +4,7 @@ import {View, Text, Image, ScrollView} from "@tarojs/components";
 import IconFont from "../../components/iconfont";
 import {AtInput} from "taro-ui";
 import Empty from "../../components/empty";
-import {debounce, deviceInfo, notNull} from "../../utils/common";
+import {debounce, deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import searchStore from "../../store/search";
 
@@ -45,6 +45,28 @@ const Search:Taro.FC<any> = () => {
         searchStore.searchList = []
     }
 
+    const onItemClick = (item) => {
+        switch (item.category.type) {
+            case "phone":
+                Taro.navigateTo({
+                    url: `/pages/template/detail?id=${item.id}&cid=${item.category.id}`
+                });
+                break;
+            case "photo":
+                const str = getURLParamsStr(urlEncode({
+                    id: 34,
+                    imgid: item.id,
+                    attr: `${item.attr.width}*${item.attr.height}`,
+                    status: "t",
+                    img: item.thumb_image,
+                }))
+                Taro.navigateTo({
+                    url: `/pages/printing/index?${str}`
+                });
+                break;
+        }
+    }
+
     return (
         <View className="search_index_container">
             <View className="search_top_bar">
@@ -73,7 +95,7 @@ const Search:Taro.FC<any> = () => {
                                         {
                                             value.list.map((item, childIdx) => (
                                                 <View className="search_item_wrap" key={childIdx}>
-                                                    <View className="search_item circle">
+                                                    <View className="search_item circle" onClick={() => onItemClick(item)}>
                                                         <Image src={item.thumb_image} className="search_item_img" mode="aspectFill" />
                                                     </View>
                                                 </View>
