@@ -133,23 +133,23 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                                     <Text className='title'>{item.name}</Text>
                                     <View className='params'>
                                         {
-                                            tags && tags[index] && tags[index].map((tag) => (
-                                                <Fragment key={tag.id}>
-                                                    <View
-                                                        className={itemActive[index] == tag.id ? 'item active' : tag.over ? 'item over' : 'item'}
-                                                        style={item.disable ? {opacity: 0.7} : null}
-                                                        onClick={() => {
-                                                            if (item.disable) {
-                                                                return
-                                                            }
-                                                            if (!tag.over) {
-                                                                onItemSelect(index, item.id, tag.id)
-                                                            }
-                                                        }}>
+                                            tags && tags[index] && tags[index].map((tag) => {
+                                                console.log("循环的TAg：", tag, itemActive)
+                                                return <Fragment key={tag.id}>
+                                                    <View className={itemActive.indexOf(tag.id) > -1 ? 'item active' : tag.over ? 'item over' : 'item'}
+                                                          style={item.disable ? {opacity: 0.7} : null}
+                                                          onClick={() => {
+                                                              if (item.disable) {
+                                                                  return
+                                                              }
+                                                              if (!tag.over) {
+                                                                  onItemSelect(index, item.id, tag.id)
+                                                              }
+                                                          }}>
                                                         <Text className='txt'>{tag.name}</Text>
                                                     </View>
                                                 </Fragment>
-                                            ))
+                                            })
                                         }
                                     </View>
                                 </View>

@@ -198,7 +198,22 @@ const PrintChange: Taro.FC<any> = () => {
             skuid: skuInfo.id,
             total: count,
             page: "photo",
-            parintImges: photos.map(v => ({url: v.url, num: v.count}))
+            parintImges: photos.map(v => {
+                const item = printAttrItems.current[printAttrItems.current.index];
+
+                if (v.hasRotate && !notNull(item.value)) {
+                    const wArr = item.value.split("*");
+                   return {
+                       url: v.url,
+                       num: v.count,
+                       style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
+                   }
+                }
+                return {
+                    url: v.url,
+                    num: v.count,
+                }
+            })
         }
         const paramsStr = getURLParamsStr(urlEncode(data));
 
