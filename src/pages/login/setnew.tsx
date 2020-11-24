@@ -4,20 +4,14 @@ import './index.less'
 import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
-import {userStore} from "../../store/user";
-import { observer, inject } from '@tarojs/mobx'
-import page from '../../utils/ext';
 
-@inject("userStore")
-@observer
-@page({wechatAutoLogin:true})
 export default class Set extends Component<any,{
     btnAtive:boolean;
     pwd:string;
     again:string
 }> {
     config: Config = {
-        navigationBarTitleText: '设置密码'
+        navigationBarTitleText: '设置新密码'
     }
 
     constructor(props) {
@@ -36,21 +30,27 @@ export default class Set extends Component<any,{
     onSetPassword = () => {
         // 
         const {pwd,again} = this.state;
-        if (pwd.length>=6 && again.length>=6 && again == pwd) {
+        const {mobile,code} = this.$router.params;
+        console.log(pwd,again,mobile,code)
+        if (pwd.length>=6 && again.length>=6 && again == pwd && mobile.length==11 && code.length==6) {
             Taro.showLoading({title:"正在设置"})
-            api("user/newpwd",{
-                newpassword:again
+            api("user/resetpwd",{
+                mobile,
+                newpassword:again,
+                captcha:code
             }).then((res)=>{
                 console.log(res);
                 // userStore.getUserInfo();
                 Taro.hideLoading();
                 Taro.showToast({
-                    title:"密码设置成功",
+                    title:"密码重置成功",
                     icon:"none",
                     duration:1500
                 });
                 setTimeout(() => {
-                    Taro.navigateBack();
+                    Taro.navigateTo({
+                        url:'/pages/login/acount'
+                    });
                 }, 1500);
             }).catch((e)=>{
                 Taro.hideLoading();

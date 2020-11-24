@@ -33,18 +33,6 @@ export default class Login extends Component<{},{
         
     }
 
-    componentDidUpdate(){
-        const {account,pwd} = this.state;
-        if (account.length>=4 && pwd.length>=6) {
-            this.setState({
-                loginBtnAtive:true
-            })
-        } else {
-            this.setState({
-                loginBtnAtive:false
-            })
-        }
-    }
     onLogin = () => {
         const {account,pwd} = this.state;
         if (account.length==0 || pwd.length==0) {
@@ -76,6 +64,34 @@ export default class Login extends Component<{},{
             })
         }
     }
+    onInputAccount = ({detail:{value}}) => {
+        this.setState({account:value});
+        const {pwd} = this.state;
+        if (value.length>=4 && pwd.length>=6) {
+            this.setState({
+                loginBtnAtive:true
+            })
+        } else {
+            this.setState({
+                loginBtnAtive:false
+            })
+        }
+    }
+
+    onInputPwd = ({detail:{value}}) => {
+        this.setState({pwd:value});
+        const {account} = this.state;
+        if (account.length>=4 && value.length>=6) {
+            this.setState({
+                loginBtnAtive:true
+            })
+        } else {
+            this.setState({
+                loginBtnAtive:false
+            })
+        }
+    }
+
     render() {
         const {loginBtnAtive,pwdShow} = this.state;
         return (
@@ -88,10 +104,10 @@ export default class Login extends Component<{},{
                     </View>
                     <View className='acount-logins'>
                         <View className='acounts'>
-                            <Input type='text' placeholder='请输入手机号/账号' className='acounts-input' onInput={({detail:{value}})=>this.setState({account:value})}/>
+                            <Input type='text' placeholder='请输入手机号/账号' className='acounts-input' onInput={this.onInputAccount}/>
                         </View>
                         <View className='pwd'>
-                            <Input type='text' password={!pwdShow} placeholder='密码' className='pwd-input' onInput={({detail:{value}})=>this.setState({pwd:value})}/>
+                            <Input type='text' password={!pwdShow} placeholder='密码' className='pwd-input' onInput={this.onInputPwd}/>
                             <View className='show' onClick={()=>{
                                 this.setState({
                                     pwdShow:!pwdShow
@@ -100,13 +116,14 @@ export default class Login extends Component<{},{
                                 <IconFont name={pwdShow?'24_mimaxianshi':'24_mimayincang'} color='' size={48} />
                             </View>
                         </View>
-                        <View className='forget-pwd'>
+                        <View className='forget-pwd' onClick={()=>{
+                            Taro.navigateTo({
+                                url:'/pages/login/find'
+                            })
+                        }}>
                             <Text className='ftexts'>忘记密码</Text>
                         </View>
                         <Button className={loginBtnAtive?'loginbtn loginbtnActive':'loginbtn'} onClick={this.onLogin}>登录</Button>
-                        {/* <View className='zhuce'>
-                            <Text>注册</Text>
-                        </View> */}
                     </View>
                 </View>
                 <LoginFooter />

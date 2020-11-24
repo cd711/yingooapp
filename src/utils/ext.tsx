@@ -57,6 +57,11 @@ const page =(option?: {
                     }
                 }
             }
+            // if (userStore.id == null) {
+            //     Taro.reLaunch({
+            //         url:'/pages/index/index'
+            //     });
+            // }
         }
         clazz.componentWillMount = function () {
             this.__option = {};
