@@ -26,16 +26,20 @@ const Login: Taro.FC<LoginProps> = props => {
         setVisible(true)
     }, [])
 
+    const didClose = () => {
+        onClose && onClose();
+        Taro.showTabBar()
+    }
+
     const privacyView = type => {
-        onClose && onClose()
+        didClose()
         Taro.navigateTo({url: `/pages/me/privacy?pageType=${type}`})
     }
 
     const _onClose = () => {
         setVisible(false)
         setTimeout(() => {
-            onClose && onClose();
-            Taro.showTabBar()
+            didClose()
         }, 200)
     }
 
