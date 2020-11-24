@@ -8,7 +8,7 @@ import IconFont from '../../components/iconfont';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import UploadFile from "../../components/Upload/Upload";
-import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
+import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal, urlDeCode} from "../../utils/common";
 import {userStore} from "../../store/user";
 import Photos from "../me/photos";
 import {templateStore} from "../../store/template";
@@ -1356,7 +1356,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 data = current.doc;
             }
 
-            await callEditor("setDoc", data, [this.$router.params.img])
+            const {img}: any = urlDeCode(this.$router.params);
+            await callEditor("setDoc", data, [img])
 
         }catch (e) {
             console.log("初始化失败：", e)
