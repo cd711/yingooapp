@@ -3,11 +3,9 @@ import { View, Text,Image,ScrollView } from '@tarojs/components'
 import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
-
 import { observer, inject } from '@tarojs/mobx';
 import moment from 'moment';
-import {notNull, ossUrl} from '../../utils/common'
-import {userStore} from "../../store/user";
+import {ossUrl} from '../../utils/common'
 
 import page from '../../utils/ext';
 
@@ -43,13 +41,13 @@ export default class Detail extends Component<any,{
         if (!id || !cid) {
             Taro.navigateBack();
         }
-        
+
         if (parseInt(id)>0) {
             this.getCurrentItem(id);
         }
-        
+
         this.lastBottomTime = moment().unix();
-        
+
     }
     getCurrentItem(id){
         Taro.showLoading({title:"加载中..."});
@@ -57,9 +55,9 @@ export default class Detail extends Component<any,{
             if (this.$router.params.id != res.id) {
                 window.history.replaceState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
-            
+
             this.setState({
-                
+
                 currentItem: res,
                 isLike: res.favorite !== 0
             });

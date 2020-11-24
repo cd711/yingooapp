@@ -588,11 +588,22 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
 }
 
 // 编辑文字
-const ChangeText:Taro.FC<BaseProps> = props => {
+interface ChangeTextProps {
+    data?: any
+}
+const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
 
-    const {onClose, onOk} = props;
+    const {onClose, onOk, data} = props;
 
     const defaultDoc = Taro.useRef(null);
+
+    const [txt, setTxt] = useState("");
+
+    useEffect(() => {
+        if (data.r && data.r.text) {
+            setTxt(data.r.text)
+        }
+    }, [])
 
     async function getDefaultDoc() {
         try {
@@ -630,6 +641,7 @@ const ChangeText:Taro.FC<BaseProps> = props => {
 
     const onTextChange = (val, _) => {
         console.log(val)
+        setTxt(val)
         if (!notNull(val)) {
             // @ts-ignore
             debounceFn(val)
@@ -652,7 +664,7 @@ const ChangeText:Taro.FC<BaseProps> = props => {
                 <View className="submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
             </View>
             <View className="input">
-                <AtInput name="txt" className="input_act" onChange={onTextChange} autoFocus focus />
+                <AtInput name="txt" value={txt} className="input_act" onChange={onTextChange} autoFocus focus />
             </View>
         </View>
     )
@@ -1273,9 +1285,9 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 @observer
 export default class Shell extends Component<{}, {
     size?: { width: string | number; height: string | number };
-
     data?: number;
     loadingTemplate?: boolean;
+    textInfo: any
 }> {
 
     public store = new Store();
@@ -1290,7 +1302,8 @@ export default class Shell extends Component<{}, {
         this.docId = this.$router.params['id'] || 0;
 
         this.state = {
-            loadingTemplate: true
+            loadingTemplate: true,
+            textInfo: null
         };
     }
 
@@ -1437,6 +1450,7 @@ export default class Shell extends Component<{}, {
                 break;
             case "text":
                 this.store.tool = 2;
+                this.setState({textInfo: item})
                 break;
         }
     }
@@ -1471,63 +1485,63 @@ export default class Shell extends Component<{}, {
     }
 
 
+    changeImage = () => {
+        this.store.tool = 4;
+        this.store.isEdit = true;
+    }
+
+    onOk = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false
+    }
+
+    cancelEdit = () => {
+        this.store.tool = 0;
+        this.store.isEdit = false;
+    }
+
+    changeTxt = () => {
+        this.store.tool = 6;
+        this.store.isEdit = true;
+    }
+
+    selectFont = () => {
+        this.store.tool = 7;
+        this.store.isEdit = true;
+    }
+
+    changeFontStyle = () => {
+        this.store.tool = 8;
+        this.store.isEdit = true;
+    }
+
+    // 水平翻转
+    onFilpY = async () => {
+        try {
+            await callEditor("flipH");
+        } catch (e) {
+        }
+    }
+
+    // 垂直翻转
+    onFilpX = async () => {
+        try {
+            await callEditor("flipV")
+        } catch (e) {
+
+        }
+    }
+
+    onChangeAlpha = () => {
+        // alpha
+        this.store.tool = 5;
+        this.store.isEdit = true;
+    }
+
+
     render() {
         const {loadingTemplate, size } = this.state;
         const {tool} = this.store;
-
-
-        const changeImage = () => {
-            this.store.tool = 4;
-            this.store.isEdit = true;
-        }
-
-        const onOk = () => {
-            this.store.tool = 0;
-            this.store.isEdit = false
-        }
-
-        const cancelEdit = () => {
-            this.store.tool = 0;
-            this.store.isEdit = false;
-        }
-
-        const changeTxt = () => {
-            this.store.tool = 6;
-            this.store.isEdit = true;
-        }
-
-        const selectFont = () => {
-            this.store.tool = 7;
-            this.store.isEdit = true;
-        }
-
-        const changeFontStyle = () => {
-            this.store.tool = 8;
-            this.store.isEdit = true;
-        }
-
-        // 水平翻转
-        const onFilpY = async () => {
-            try {
-                await callEditor("flipH");
-            } catch (e) {
-            }
-        }
-
-        // 垂直翻转
-        const onFilpX = async () => {
-            try {
-                await callEditor("flipV")
-            } catch (e) {
-
-            }
-        }
-
-        const onChangeAlpha = () => {
-            // alpha
-            this.store.tool = 5;
-            this.store.isEdit = true;
-        }
 
         return <View className='editor-page'>
             <View className='header'>
@@ -1550,19 +1564,19 @@ export default class Shell extends Component<{}, {
 
                     case 1:
                         return <View key={s} className='tools'>
-                            <View className='btn' onClick={changeImage}>
+                            <View className='btn' onClick={this.changeImage}>
                                 <IconFont name='24_bianjiqi_chongyin' size={48}/>
                                 <Text className='txt'>换图</Text>
                             </View>
-                            <View className='btn' onClick={onFilpY}>
+                            <View className='btn' onClick={this.onFilpY}>
                                 <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48}/>
                                 <Text className='txt'>水平</Text>
                             </View>
-                            <View className='btn' onClick={onFilpX}>
+                            <View className='btn' onClick={this.onFilpX}>
                                 <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48}/>
                                 <Text className='txt'>垂直</Text>
                             </View>
-                            <View className='btn' onClick={onChangeAlpha}>
+                            <View className='btn' onClick={this.onChangeAlpha}>
                                 <View className='icon'>
                                     <Image className="icon_img" src={require("../../source/trans.png")}/>
                                 </View>
@@ -1578,15 +1592,15 @@ export default class Shell extends Component<{}, {
 
                     case 2: // 文字编辑
                         return <View key={s} className='tools'>
-                            <View className='btn' onClick={changeTxt}>
+                            <View className='btn' onClick={this.changeTxt}>
                                 <IconFont name='24_bianjiqi_huantu' size={48}/>
                                 <Text className='txt'>编辑</Text>
                             </View>
-                            <View className='btn' onClick={selectFont}>
+                            <View className='btn' onClick={this.selectFont}>
                                 <IconFont name='24_bianjiqi_ziti' size={48}/>
                                 <Text className='txt'>字体</Text>
                             </View>
-                            <View className='btn' onClick={changeFontStyle}>
+                            <View className='btn' onClick={this.changeFontStyle}>
                                 <IconFont name='24_bianjiqi_yangshi' size={48}/>
                                 <Text className='txt'>样式</Text>
                             </View>
@@ -1600,21 +1614,21 @@ export default class Shell extends Component<{}, {
 
                     case 4: // 换图
                         return <ChangeImage
-                            onClose={cancelEdit}
-                            onOk={onOk}
+                            onClose={this.cancelEdit}
+                            onOk={this.onOk}
                         />
 
                     case 5: // 透明度
-                        return <ChangeAlpha onClose={cancelEdit} onOk={onOk}/>
+                        return <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
 
                     case 6: // 编辑文字
-                        return <ChangeText onClose={cancelEdit} onOk={onOk} />
+                        return <ChangeText onClose={this.cancelEdit} data={this.state.textInfo} onOk={this.onOk} />
 
                     case 7: // 选择字体
-                        return <SelectFont onClose={cancelEdit} onOk={onOk} />
+                        return <SelectFont onClose={this.cancelEdit} onOk={this.onOk} />
 
                     case 8: // 修改字体样式
-                        return <ChangeFontStyle onClose={cancelEdit} onOk={onOk} />
+                        return <ChangeFontStyle onClose={this.cancelEdit} onOk={this.onOk} />
 
                 }
             }))[0]}

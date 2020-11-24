@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {backHandlePress, deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import Counter from "../../components/counter/counter";
 import OrderModal from "./orederModal";
@@ -43,8 +43,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }, [])
 
-    useEffect(() => {
-
+    Taro.useDidShow(() => {
         // 读取本地存储print_attrItems
         try {
             const res = Taro.getStorageSync("print_attrItems");
@@ -91,9 +90,7 @@ const PrintChange: Taro.FC<any> = () => {
         })
         setPhotos([...params.path] || [])
 
-        backHandlePress()
-
-    }, [])
+    })
 
     function checkHasRotate(attribute: string, sku: number | string): boolean {
         if (router.params.id) {
@@ -203,11 +200,11 @@ const PrintChange: Taro.FC<any> = () => {
 
                 if (v.hasRotate && !notNull(item.value)) {
                     const wArr = item.value.split("*");
-                   return {
-                       url: v.url,
-                       num: v.count,
-                       style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
-                   }
+                    return {
+                        url: v.url,
+                        num: v.count,
+                        style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
+                    }
                 }
                 return {
                     url: v.url,
@@ -265,8 +262,17 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onEditClick = (item ,index) => {
+
+        const str = getURLParamsStr(urlEncode({
+            idx: index,
+            cid: router.params.id,
+            status: item.edited && !notNull(item.doc) ? "t" : "f",
+            tplmax: router.params.tplmax,
+            img: item.url,
+        }))
+
         Taro.navigateTo({
-            url: `/pages/editor/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`
+            url: `/pages/editor/printedit?${str}`
         })
     }
 
@@ -303,7 +309,7 @@ const PrintChange: Taro.FC<any> = () => {
                                         />
                                     </View>
                                     <View className="print_change_count">
-                                        <Counter max={100} num={value.count}
+                                        <Counter max={Number(router.params.max)} num={value.count}
                                                  onCounterChange={c => onCountChange(c, index)}/>
                                     </View>
                                 </View>

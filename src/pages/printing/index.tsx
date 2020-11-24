@@ -1,9 +1,9 @@
-import Taro, {useEffect, useState} from "@tarojs/taro";
+import Taro, {useEffect, useState, useRef} from "@tarojs/taro";
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, notNull} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import Photos from "../me/photos";
 import {userStore} from "../../store/user";
@@ -16,12 +16,14 @@ const Index: Taro.FC<any> = () => {
     const router = Taro.useRouter();
     const [sizeItem, setSizeItem] = useState([]);
     const [photoVisible, setPhotoPickerVisible] = useState(false);
-    const [animating, setAnimating] = useState(false)
+    const [animating, setAnimating] = useState(false);
+    const info = useRef<any>({});
 
     useEffect(() => {
         const id = router.params.id;
         if (id) {
             api("app.product/info", {id}).then(res => {
+                info.current = {...res} || {};
                 let arr = [];
                 const idx = res.attrGroup.findIndex(v => v.special_show === "photosize");
                 const numIdx = res.attrGroup.findIndex(v => v.special_show === "photonumber");
@@ -63,8 +65,15 @@ const Index: Taro.FC<any> = () => {
         }
         templateStore.photoSizeParams = temp;
 
+        const str = getURLParamsStr(urlEncode({
+            id: router.params.id,
+            cid: info.current.category.tpl_category_id,
+            max: info.current.max,
+            tplmax: info.current.tpl_max
+        }))
+        console.log(str)
         Taro.navigateTo({
-            url: `/pages/printing/change?id=${router.params.id}`
+            url: `/pages/printing/change?${str}`
         })
     }
 
@@ -161,7 +170,7 @@ const Index: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot">
-                <View className="submit" onClick={selectPhoto}>
+                <View className="print_submit" onClick={selectPhoto}>
                     <Text className="txt">{allowJump() ? "下一步" : "添加照片"}</Text>
                 </View>
             </View>
