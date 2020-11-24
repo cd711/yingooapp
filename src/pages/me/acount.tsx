@@ -57,16 +57,20 @@ export default class Setting extends Component<any,{
                             {/* <IconFont name='20_xiayiye' size={40} color="#9C9DA6" /> */}
                         </View>
                     </View>
-                    <View className='item'>
+                    <View className='item' onClick={()=>{
+                        if (mobile.length==11) {
+                            Taro.navigateTo({
+                                url:`/pages/login/mobile`
+                            })
+                        }
+                    }}>
                         <Text className='name'>手机绑定</Text>
                         <View className='right'>
                             <Text className='rtxt'>{mobile.length==11?`${mobile.substr(0,3)}****${mobile.substr(mobile.length-4,4)}`:"未绑定"}</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
                     </View>
-                    <View className='item'>
-                        <Text className='name'>密码</Text>
-                        <View className='right' onClick={()=>{
+                    <View className='item' onClick={()=>{
                             if (set_pwd) {
                                 return;
                             }
@@ -74,6 +78,8 @@ export default class Setting extends Component<any,{
                                 url:'/pages/login/set'
                             })
                         }}>
+                        <Text className='name'>密码</Text>
+                        <View className='right'>
                             <Text className='rtxt'>{set_pwd?'已设置':'未设置'}</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>

@@ -1,25 +1,30 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input } from '@tarojs/components'
+import { View, Text,Input,Button } from '@tarojs/components'
 import './index.less'
-import HeaderTop from './header'
+import './find.less'
 import IconFont from '../../components/iconfont';
-import LoginFooter from './footer'
-// import { api } from 'src/utils/net';
-// import { api } from '../../utils/net'
+import { api } from '../../utils/net';
+import {userStore} from "../../store/user";
+import { observer, inject } from '@tarojs/mobx'
+// import page from '../../utils/ext';
 
-export default class Login extends Component<any,{
+@inject("userStore")
+@observer
+// @page({wechatAutoLogin:true})
+export default class Set extends Component<any,{
     codeBtnActive:boolean;
     showMobileClear:boolean;
     inputActive:boolean
     inputValue:string;
-}> {
 
+}> {
     config: Config = {
-        navigationBarTitleText: '首页'
+        navigationBarTitleText: '设置密码'
     }
-    private inputRef: { inputRef: { focus: () => void; }; };
-    constructor(props: any){
+
+    constructor(props) {
         super(props);
+
         this.state = {
             codeBtnActive:false,
             showMobileClear:false,
@@ -27,9 +32,11 @@ export default class Login extends Component<any,{
             inputActive:false
         }
     }
+    private inputRef: { inputRef: { focus: () => void; }; };
     componentDidMount(){
-    }
+        
 
+    }
     onMobileInput = ({detail:{value}}) => {
         const pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
         this.setState({
@@ -68,7 +75,7 @@ export default class Login extends Component<any,{
         const { codeBtnActive,inputValue } = this.state;
         if (codeBtnActive && inputValue.length == 11) {
             Taro.navigateTo({
-                url:`/pages/login/sms?mobile=${inputValue}&status=l`
+                url:`/pages/login/sms?mobile=${inputValue}&status=f`
             })
             // Taro.showLoading({title:"正在发送..."});
             // api("sms/send",{
@@ -80,18 +87,20 @@ export default class Login extends Component<any,{
             // })
         }
     }
-    render() {
-        console.log("render")
+    render(){
         const { codeBtnActive,showMobileClear,inputValue,inputActive } = this.state;
-        return (
-            <View className='login'>
-                <HeaderTop rightText='账号登录' url='/pages/login/acount' />
-                <View className='container'>
-                    <View className='title'>
-                        <Text className='ttext'>Hi,</Text>
-                        <Text className='ttext'>欢迎来到映果定制</Text>
-                    </View>
-                    <View className='acount'>
+        return <View className='login find_page'>
+            <View className='back' onClick={()=>{
+                Taro.navigateBack();
+            }}>
+                <IconFont name='24_shangyiye' size={48} color='#121314' />
+            </View>
+            <View className='container'>
+                <View className='title'>
+                    <Text className='ttext'>Hi,</Text>
+                    <Text className='ttext'>输入原手机号，找回密码</Text>
+                </View>
+                <View className='acount'>
                         <Input type='number' placeholder='请输入手机号' className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
                             this.setState({inputActive:true})
                         }} onBlur={()=>{
@@ -105,11 +114,10 @@ export default class Login extends Component<any,{
                         }
                     </View>
                     <View className={codeBtnActive?'getcode codeActive':'getcode'} onClick={this.sendSMS}>
-                        <Text className='gtext'>获取验证码</Text>
+                        <Text className='gtext'>下一步</Text>
                     </View>
-                </View>
-                <LoginFooter />
             </View>
-        )
+        </View>
     }
+
 }

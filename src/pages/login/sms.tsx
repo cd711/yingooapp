@@ -31,11 +31,11 @@ export default class SMS extends Component<any,{
         this.sendCode();
     }
     sendCode = () => {
-        const {mobile} = this.$router.params;
+        const {mobile,status} = this.$router.params;
         Taro.showLoading({title:"正在发送..."});
         api("sms/send",{
             mobile,
-            event:"login"
+            event:status=="l"?"login":"resetpwd"
         }).then((res)=>{
             Taro.hideLoading();
             console.log(res)
@@ -64,26 +64,48 @@ export default class SMS extends Component<any,{
         })
     }
     mobileLogin = (code) => {
-        const {mobile} = this.$router.params;
+        const {mobile,status} = this.$router.params;
         Taro.showLoading({title:"加载中..."});
-        api("user/mobilelogin",{
-            mobile,
-            captcha:code,
-        }).then((res)=>{
-            userStore.setInfo(res);
-            Taro.hideLoading();
-            Taro.reLaunch({
-                url:"/pages/me/me"
+        if(status=="l"){
+            api("user/mobilelogin",{
+                mobile,
+                captcha:code,
+            }).then((res)=>{
+                userStore.setInfo(res);
+                Taro.hideLoading();
+                Taro.reLaunch({
+                    url:"/pages/me/me"
+                })
+            }).catch((e)=>{
+                Taro.hideLoading();
+                console.log(e)
+                Taro.showToast({
+                    title:e,
+                    icon:"none",
+                    duration:1500
+                })
             })
-        }).catch((e)=>{
-            Taro.hideLoading();
-            console.log(e)
-            Taro.showToast({
-                title:e,
-                icon:"none",
-                duration:1500
+        } else {
+            api("sms/check",{
+                mobile,
+                captcha:code,
+                event:"resetpwd"
+            }).then(()=>{
+                Taro.hideLoading();
+                Taro.reLaunch({
+                    url:`/pages/login/setnew?mobile=${mobile}&code=${code}`
+                })
+            }).catch((e)=>{
+                Taro.hideLoading();
+                console.log(e)
+                Taro.showToast({
+                    title:e,
+                    icon:"none",
+                    duration:1500
+                })
             })
-        })
+        }
+
     }
     onCodeInput = ({detail:{value}})=>{
         console.log(value)
