@@ -4,7 +4,7 @@ import {View, Image, ScrollView} from "@tarojs/components";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
-import {ossUrl} from "../../utils/common";
+import {getURLParamsStr, ossUrl, urlEncode} from "../../utils/common";
 
 const SearchResult:Taro.FC<any> = () => {
 
@@ -62,6 +62,28 @@ const SearchResult:Taro.FC<any> = () => {
         })
     }
 
+    const onItemClick = (item) => {
+        switch (item.category.type) {
+            case "phone":
+                Taro.navigateTo({
+                    url: `/pages/template/detail?id=${item.id}&cid=${item.category.id}`
+                });
+                break;
+            case "photo":
+                const str = getURLParamsStr(urlEncode({
+                    id: 34,
+                    imgid: item.id,
+                    attr: `${item.attr.width}*${item.attr.height}`,
+                    status: "t",
+                    img: item.thumb_image,
+                }))
+                Taro.navigateTo({
+                    url: `/pages/printing/index?${str}`
+                });
+                break;
+        }
+    }
+
     return (
         <View className="search_result_container">
             <AtNavBar
@@ -85,6 +107,7 @@ const SearchResult:Taro.FC<any> = () => {
                                 width: window.screen.width / 2
                             }}>
                                 <View className="search_item"
+                                      onClick={() => onItemClick(value)}
                                       style={{
                                           width: window.screen.width / 2 - 8,
                                       }}

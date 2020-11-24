@@ -53,7 +53,7 @@ interface BaseProps {
 }
 
 // 换模板
-const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
+export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
     const router = Taro.useRouter();
 
@@ -1197,6 +1197,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         }
         if (info.list[0]) {
             try {
+                // @ts-ignore
                 let temp = info.list[0].id;
                 const localParams = getPhotoParams();
                 const current = localParams.path[Number(router.params.idx)];
