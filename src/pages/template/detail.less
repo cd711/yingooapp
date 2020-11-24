@@ -39,24 +39,33 @@
         height: 100%;
         padding-top: 32px;
     }
-    .thumb{
+    .shell_thumb{
         width: 472px;
         height: 868px;
-        border-radius: 16px;
-        margin: 0 auto;
-        display: block;
-        &>img{
+        margin: 0 auto 48px;
+        position: relative;
+        .shell{
             width: 472px;
             height: 868px;
-            border-radius: 16px;
         }
+        .thumb{
+            width: 472px;
+            height: 868px;
+            border-radius: 68px;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+
+        }
+        
     }
+
     .doyoulike{
         // height: 80vh;
         background: #FFFFFF;
         border-radius: 32px 32px 0 0;
         padding: 20px 32px;
-        margin-top: 48px;
         .opsline{
             width: 64px;
             height: 8px;
