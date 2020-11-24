@@ -301,7 +301,7 @@ export default class Template extends Component<any,{
                                         }
                                         if (cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo") {
                                             Taro.navigateTo({
-                                                url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status="t"`
+                                                url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
                                             });
                                         }
                                     }} key={item.id}>
