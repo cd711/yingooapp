@@ -170,7 +170,7 @@ const Index: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot">
-                <View className="submit" onClick={selectPhoto}>
+                <View className="print_submit" onClick={selectPhoto}>
                     <Text className="txt">{allowJump() ? "下一步" : "添加照片"}</Text>
                 </View>
             </View>

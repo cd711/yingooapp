@@ -651,7 +651,7 @@ const ChangeText:Taro.FC<BaseProps> = props => {
         <View className="template_change_text_container">
             <View className="act_bar">
                 <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={48} color="#fff"/></View>
-                <View className="submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
+                <View className="print_submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
             </View>
             <View className="input">
                 <AtInput name="txt" className="input_act" onChange={onTextChange} autoFocus focus />
