@@ -590,11 +590,22 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
 }
 
 // 编辑文字
-const ChangeText:Taro.FC<BaseProps> = props => {
+interface ChangeTextProps {
+    data?: any
+}
+const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
 
-    const {onClose, onOk} = props;
+    const {onClose, onOk, data} = props;
 
     const defaultDoc = Taro.useRef(null);
+
+    const [txt, setTxt] = useState("");
+
+    useEffect(() => {
+        if (data.r && data.r.text) {
+            setTxt(data.r.text)
+        }
+    }, [])
 
     async function getDefaultDoc() {
         try {
@@ -632,6 +643,7 @@ const ChangeText:Taro.FC<BaseProps> = props => {
 
     const onTextChange = (val, _) => {
         console.log(val)
+        setTxt(val)
         if (!notNull(val)) {
             // @ts-ignore
             debounceFn(val)
@@ -654,7 +666,7 @@ const ChangeText:Taro.FC<BaseProps> = props => {
                 <View className="print_submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
             </View>
             <View className="input">
-                <AtInput name="txt" className="input_act" onChange={onTextChange} autoFocus focus />
+                <AtInput name="txt" value={txt} className="input_act" onChange={onTextChange} autoFocus focus />
             </View>
         </View>
     )
@@ -1277,6 +1289,7 @@ interface PrintEditState {
     size?: { width: string | number; height: string | number };
     data?: number;
     loadingTemplate?: boolean;
+    textInfo: any
 }
 @observer
 export default class PrintEdit extends Component<any, PrintEditState> {
@@ -1293,7 +1306,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         this.docId = this.$router.params['id'] || 0;
 
         this.state = {
-            loadingTemplate: true
+            loadingTemplate: true,
+            textInfo: null
         };
     }
 
@@ -1455,6 +1469,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 break;
             case "text":
                 this.store.tool = 2;
+                this.setState({textInfo: item})
                 break;
         }
     }
@@ -1513,6 +1528,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     cancelEdit = () => {
         this.store.tool = 0;
         this.store.isEdit = false;
+        this.setState({textInfo: null})
     }
 
     changeTxt = () => {
@@ -1638,7 +1654,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                         return <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
 
                     case 6: // 编辑文字
-                        return <ChangeText onClose={this.cancelEdit} onOk={this.onOk} />
+                        return <ChangeText onClose={this.cancelEdit} data={this.state.textInfo} onOk={this.onOk} />
 
                     case 7: // 选择字体
                         return <SelectFont onClose={this.cancelEdit} onOk={this.onOk} />
