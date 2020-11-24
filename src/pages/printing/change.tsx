@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {backHandlePress, deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import Counter from "../../components/counter/counter";
 import OrderModal from "./orederModal";
@@ -43,8 +43,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }, [])
 
-    useEffect(() => {
-
+    Taro.useDidShow(() => {
         // 读取本地存储print_attrItems
         try {
             const res = Taro.getStorageSync("print_attrItems");
@@ -91,9 +90,7 @@ const PrintChange: Taro.FC<any> = () => {
         })
         setPhotos([...params.path] || [])
 
-        backHandlePress()
-
-    }, [])
+    })
 
     function checkHasRotate(attribute: string, sku: number | string): boolean {
         if (router.params.id) {
@@ -203,11 +200,11 @@ const PrintChange: Taro.FC<any> = () => {
 
                 if (v.hasRotate && !notNull(item.value)) {
                     const wArr = item.value.split("*");
-                   return {
-                       url: v.url,
-                       num: v.count,
-                       style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
-                   }
+                    return {
+                        url: v.url,
+                        num: v.count,
+                        style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
+                    }
                 }
                 return {
                     url: v.url,
