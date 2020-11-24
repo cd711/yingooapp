@@ -129,6 +129,7 @@ export default class Template extends Component<any,{
                 tag_id:tag.id
             }).then((res)=>{
                 res.list = tagList.concat(res.list);
+                console.log(res.list)
                 this.setState({
                     tagData:res,
                     showTemplateLoading:false
