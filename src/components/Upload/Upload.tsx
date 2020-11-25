@@ -181,7 +181,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
     render(): React.ReactNode {
         const {type, className, style, title} = this.props;
         return (
-            <View className={`upload_container ${className ? className : ""}`} style={style}>
+            <View className={`upload_container ${className ? className : ""}`} style={style} onClick={this._upload}>
                 {
                     type === "button"
                         ? this.props.children

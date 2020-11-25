@@ -136,7 +136,7 @@ export default class Photos extends Component<PhotosProps,{
                 editSelectImgIds.splice(idx, 1);
                 editSelectAttr.splice(idx, 1)
             } else {
-                if (editSelectImgIds.length >= 4) {
+                if (editSelectImgIds.length >= 100) {
                     return;
                 }
                 editSelectImgs.push(url);
@@ -239,10 +239,11 @@ export default class Photos extends Component<PhotosProps,{
         const {selects} = this.state;
         try {
             await api("app.profile/delImgs", {ids: selects.join(",")});
+            this.setState({selects: []})
             this.getList({start: 0})
         }catch (e) {
             console.log("删除出错：", e)
-        };
+        }
         this.setState({isOpened: false})
     }
 
@@ -291,7 +292,9 @@ export default class Photos extends Component<PhotosProps,{
 
     getScrollHeight = () => {
         const {editSelect} = this.props;
-        return editSelect ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45
+        const {editSelectImgIds, imageList, videoList,navSwitchActive} = this.state;
+        const list = navSwitchActive === 0 ? imageList : videoList;
+        return editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45
     }
 
 
@@ -404,12 +407,12 @@ export default class Photos extends Component<PhotosProps,{
                         {list.length > 0 ? <LoadMore status={loadStatus} /> : null}
                     </ScrollView>
                     {
-                        editSelect
+                        editSelect && list.length > 0 && editSelectImgIds.length > 0
                             ? <View className="photo_edit_selector_container">
                                 <View className="select_head">
                                     <View className="left">
-                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材（3~4个素材）</Text>
-                                        <Text className="ext">长按素材拖动排序</Text>
+                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材</Text>
+                                        {/*<Text className="ext">长按素材拖动排序</Text>*/}
                                     </View>
                                     <View className="right">
                                         <View className="submit" onClick={this.submitEditSelect}>
@@ -417,22 +420,24 @@ export default class Photos extends Component<PhotosProps,{
                                         </View>
                                     </View>
                                 </View>
-                                <View className="select_items">
-                                    {
-                                        editSelectImgs.map((value, index) => (
-                                            <View className="select_items_wrap" key={index}>
-                                                <View className="clear" onClick={() => this.delEditSelectImg(index)}>
-                                                    <IconFont name="16_qingkong" size={32} />
+                                <ScrollView scrollX className="select_items_scroll_view">
+                                    <View className="select_items">
+                                        {
+                                            editSelectImgs.map((value, index) => (
+                                                <View className="select_items_wrap" key={index}>
+                                                    <View className="clear" onClick={() => this.delEditSelectImg(index)}>
+                                                        <IconFont name="16_qingkong" size={32} />
+                                                    </View>
+                                                    <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img" />
                                                 </View>
-                                                <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img" />
-                                            </View>
-                                        ))
-                                    }
-                                </View>
+                                            ))
+                                        }
+                                    </View>
+                                </ScrollView>
                             </View>
                             : null
                     }
-                    {loading ? <AtActivityIndicator mode='center'></AtActivityIndicator> : null}
+                    {loading ? <AtActivityIndicator mode='center' /> : null}
                     {
                         isEdit
                             ? <View className="select_all_container">

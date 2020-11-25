@@ -62,6 +62,8 @@ interface BrandType {
 // 换模板
 const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
+    const router = Taro.useRouter();
+
     const prodList = Taro.useRef([]);
     const [typeList, setTypeList] = useState([]);
     const [active, setActive] = useState(0);
@@ -74,7 +76,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
     async function getListOfCategory(params: {tagId?: number | string, page?: number, size?: number, loadMore?: boolean} = {}) {
 
         const opt = {
-            cid: 41,
+            cid: router.params.cid,
             tagId: params.tagId || "",
             page: params.page || 0,
             size: params.size || 15,
@@ -110,7 +112,9 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
         } catch (e) {
             console.log("重置出错：", e)
         }
-    }  // 获取初始化的DOC
+    }
+
+    // 获取初始化的DOC
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
@@ -129,7 +133,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
             // 获取标签分类
             let arr = [];
             for (const item of res) {
-                if (Number(item.tpl_category_id) === Number("41")) {
+                if (Number(item.tpl_category_id) === Number(router.params.cid)) {
                     arr = item.tags;
                     break;
                 }
@@ -1090,6 +1094,7 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
 }
 
 const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
+
     const [type, setType] = useState(0);
     const [brandList, setBrandList] = useState<BrandType[]>([]);
     const [brandIndex, setBrand] = useState<number>(0);
@@ -1187,6 +1192,64 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
             }
         });
     }) as any, [brandList, brandIndex]);
+
+    function getFirstTemplateDoc() {
+        return new Promise(async (resolve, reject) => {
+            api("app.product/cate").then(res => {
+
+                // 获取标签分类
+                let arr = [];
+                for (const item of res) {
+                    if (item.tpl_category_id == parent.$router.params.cid) {
+                        arr = item.tags;
+                        break;
+                    }
+                }
+                if (arr.length > 0) {
+                    api("editor.tpl/index", {
+                        cid: parent.$router.params.cid,
+                        tag_id: arr[0].id,
+                        page: 0,
+                        size: 5
+                    }).then(tplData => {
+                        if (tplData.list[0]) {
+                            api("editor.tpl/one", {id: tplData.list[0].id}).then(doc => {
+                                resolve(doc)
+                            }).catch(e => {
+                                reject(e)
+                            })
+                        } else {
+                            resolve(null)
+                        }
+                    }).catch(e => {
+                        reject(e)
+                    })
+                } else {
+                    resolve(null)
+                }
+
+            }).catch(e => {
+                console.log("获取商品分类出错：", e)
+            })
+        })
+    }
+
+    async function setDefaultDoc(){
+        try {
+            const res = await getFirstTemplateDoc();
+            if (res) {
+                await callEditor("setDoc", res)
+            }
+        } catch (e) {
+            console.log("初始化出错：", e)
+        }
+    }
+
+    useEffect(() => {
+        setTimeout(() => {
+            // setDefaultDoc()
+        }, 1500)
+    }, [])
 
 
     const selectPhone = () => {
@@ -1349,6 +1412,22 @@ export default class Shell extends Component<{}, {
 
     }
 
+    onLoadEmpty = async () => {
+        if (!this.tplId && !this.docId) {
+            try {
+
+                const {doc} = Taro.getStorageSync("doc_draft");
+                console.log(doc)
+                if (doc) {
+                    await callEditor("setDoc", doc);
+                }
+                // this.tplId = tplId;
+            } catch (e) {
+
+            }
+        }
+    }
+
     _res = (data) => {
         const {id, res, err} = data.data;
         if (rpcList[id]) {
@@ -1399,23 +1478,12 @@ export default class Shell extends Component<{}, {
                     return;
 
                 case "onLoadEmpty":
-                    if (!this.tplId && !this.docId) {
-                        try {
-                            const {doc} = Taro.getStorageSync("doc_draft");
-                            console.log(doc)
-                            if (doc) {
-                                await callEditor("setDoc", doc);
-                            }
-                            // this.tplId = tplId;
-                        } catch (e) {
-                            alert(e);
-                        }
-                    }
+                    this.onLoadEmpty()
 
                     this.setState({
                         loadingTemplate: false
                     });
-                    // callEditor("loadDraft")
+
                     break;
 
                 case "onload":
@@ -1552,7 +1620,7 @@ export default class Shell extends Component<{}, {
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`}></iframe>
+                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`} />
                 {loadingTemplate ?
                     <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
             </View>

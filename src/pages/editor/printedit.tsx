@@ -1318,14 +1318,16 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoadEmpty = async (_?: number) => {
-        console.log(9999999)
+
         try {
             const res = await api("editor.tpl/index", {cid: this.$router.params.tplid, num: 1});
 
-            let data = res.list[0].id;
+            const proId = this.$router.params.proid || null;
+
+            let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
             const localParams = this.getPhotoParams();
             const current = localParams.path[Number(this.$router.params.idx)];
-            if (current.edited && current.edited == true && !notNull(current.doc)) {
+            if (current && current.edited && current.edited == true && !notNull(current.doc)) {
                 console.log("已编辑过的模板")
                 data = current.doc;
             } else {

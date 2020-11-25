@@ -102,7 +102,7 @@ class Index extends Component<any, IndexState> {
     receiveCoupon = async item => {
         Taro.showLoading({title: "请稍后..."})
         try {
-            await api("app.coupon/add", {id: item.id});
+            await api("app.coupon/add", {id: item.info.id});
             Taro.hideLoading()
             Taro.showToast({
                 title: '领取成功',
