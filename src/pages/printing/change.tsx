@@ -43,16 +43,59 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }, [])
 
-    Taro.useDidShow(() => {
+    function getProductInfo() {
+        return new Promise<any>((resolve, reject) => {
+            api("app.product/info", {id: router.params.id}).then(res => {
+                const idx = res.attrGroup.findIndex(v => v.special_show === "photosize");
+                const numIdx = res.attrGroup.findIndex(v => v.special_show === "photonumber");
+                if (idx > -1) {
+                    // 向本地存储attrItems
+                    Taro.setStorageSync("print_attrItems", JSON.stringify({
+                        attrItems: res.attrItems,
+                        index: idx,
+                        numIdx
+                    }))
+                    resolve({
+                        attrItems: res.attrItems,
+                        index: idx,
+                        numIdx
+                    })
+                } else {
+                    console.log("初始化尺寸时没找到尺寸：", res)
+                }
+            }).catch(e => {
+                reject(e)
+            })
+        })
+    }
+
+    function getRouterParams(path = []) {
+        let obj = {};
+        if (!router.params.sku_id) {
+            Taro.showToast({
+                title: "没有相关ID信息",
+                icon: "none"
+            })
+            return {}
+        }
+        obj = {
+            path,
+            sku: router.params.sku_id,
+            id: router.params.id
+        }
+        Taro.setStorage({
+            key: `${userStore.id}_photo_${moment().date()}`,
+            data: JSON.stringify(obj)
+        })
+        return obj
+    }
+
+    Taro.useDidShow(async () => {
         // 读取本地存储print_attrItems
         try {
-            const res = Taro.getStorageSync("print_attrItems");
-            console.log("本地的：", res)
-            if (res) {
-                const parse = JSON.parse(res);
-                console.log("本地的items：", parse)
-                printAttrItems.current = parse;
-            }
+            const info = await getProductInfo();
+            printAttrItems.current = info
+
         } catch (e) {
             console.log("读取print_attrItems出错：", e)
         }
@@ -68,14 +111,14 @@ const PrintChange: Taro.FC<any> = () => {
                 if (Object.keys(templateStore.photoSizeParams).length > 0) {
                     params = templateStore.photoSizeParams
                 } else {
-                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+                    params = getRouterParams()
                 }
             }
         }catch (e) {
             if (Object.keys(templateStore.photoSizeParams).length > 0) {
                 params = templateStore.photoSizeParams
             } else {
-                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+                params = getRouterParams()
             }
         }
 
@@ -84,7 +127,7 @@ const PrintChange: Taro.FC<any> = () => {
         params.path = params.path.map((v) => {
             return {
                 ...v,
-                count: 1,
+                count: notNull(v.count) ? 1 : parseInt(v.count),
                 hasRotate: checkHasRotate(v.attr, params.sku),
             }
         })
@@ -113,8 +156,20 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onCountChange = (num, idx) => {
         const arr = [...photos];
-        arr[idx].count = Number(num);
-        setPhotos([...arr])
+
+        let count = 0;
+        for (const item of arr) {
+            count += parseInt(item.count)
+        }
+        if (count >= Number(router.params.max)) {
+            Taro.showToast({
+                title: `最多打印${router.params.max}张`,
+                icon: "none"
+            })
+        } else {
+            arr[idx].count = Number(num);
+            setPhotos([...arr])
+        }
     }
 
     const onDeleteImg = idx => {
@@ -240,14 +295,36 @@ const PrintChange: Taro.FC<any> = () => {
                 id: data.ids[i],
                 url: data.imgs[i],
                 attr: data.attrs[i],
-                count: 1
+                count: 1,
+                hasRotate: checkHasRotate(data.attrs[i], paramsObj.current.sku),
+                edited: false,
+                doc: ""
             });
         }
         setPhotos([...arr]);
         setPhotoPickerVisible(false)
+
+        Taro.setStorage({
+            key: `${userStore.id}_photo_${moment().date()}`,
+            data: JSON.stringify({
+                ...paramsObj.current,
+                path: arr
+            })
+        })
     }
 
     const selectPhoto = () => {
+        let num = 0;
+        for (const item of photos) {
+            num += parseInt(item.count)
+        }
+        if (num >= Number(router.params.max)) {
+            Taro.showToast({
+                title: `最多打印${router.params.max}张`,
+                icon: "none"
+            })
+            return
+        }
         setPhotoPickerVisible(true);
         setTimeout(() => {
             setAnimating(true)
@@ -266,6 +343,7 @@ const PrintChange: Taro.FC<any> = () => {
         const str = getURLParamsStr(urlEncode({
             idx: index,
             cid: router.params.id,
+            tplid: router.params.cid,
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             tplmax: router.params.tplmax,
             img: item.url,
@@ -309,8 +387,9 @@ const PrintChange: Taro.FC<any> = () => {
                                         />
                                     </View>
                                     <View className="print_change_count">
-                                        <Counter max={Number(router.params.max)} num={value.count}
-                                                 onCounterChange={c => onCountChange(c, index)}/>
+                                        <Counter num={value.count}
+                                                 disabled={value.count == Number(router.params.max)}
+                                                 onButtonClick={c => onCountChange(c, index)}/>
                                     </View>
                                 </View>
                             </View>

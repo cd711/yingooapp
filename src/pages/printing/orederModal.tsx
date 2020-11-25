@@ -8,6 +8,7 @@ import lodash from 'lodash';
 
 const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuChange, onNowBuy}) => {
 
+    const [activeCur, setActiveCur] = useState([]);
     const [itemActive, setItemActive] = useState([])
     const [tags, setTags] = useState([]);
     const [price, setPrice] = useState("0");
@@ -19,17 +20,28 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
 
     useEffect(() => {
         if (defaultActive && defaultActive instanceof Array) {
-            setItemActive(defaultActive)
+            setItemActive(defaultActive);
+            setActiveCur([-2, -2])
         }
     }, [])
 
-    const onItemSelect = (idx, _, tagId) => {
-        const items = itemActive;
-        items[idx] = tagId;
-        setItemActive(items);
+    const onItemSelect = (idx, itemId, tagId) => {
+        const items = [...itemActive];
+        const tArr = [...activeCur];
+        const index = tArr.findIndex(val => {
+            return val !== -2 && val == itemId
+        });
+        if (index > -1) {
+            items[index] = tagId;
+        } else {
+            items.push(tagId);
+            tArr.push(itemId)
+        }
+        setActiveCur([...tArr])
+        setItemActive([...items]);
         let temp = "";
         const skus = data.skus.filter(item => item.value.indexOf(tagId) != -1);
-        const sku = [];
+        let sku = [];
         let overskus = '';
         for (let index = 0; index < skus.length; index++) {
             const iterator = skus[index];
@@ -57,13 +69,13 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
             }
         }
 
+        sku = sku.sort((a, b) => a - b)
         if (sku.length == data.attrGroup.length) {
 
             const sk = sku.join(",");
             const a = data.skus.filter(item => item.value == sk)[0];
             const imgs = data.imgs.filter(item => item.value == sk)[0];
             setImgs(imgs && imgs.image && imgs.image.length > 0 ? imgs.image : data.image)
-            // console.log(imgs.image);
             if (a) {
                 setPrice(a.price);
                 setMarketPriceShow(true);
@@ -134,7 +146,6 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                                     <View className='params'>
                                         {
                                             tags && tags[index] && tags[index].map((tag) => {
-                                                console.log("循环的TAg：", tag, itemActive)
                                                 return <Fragment key={tag.id}>
                                                     <View className={itemActive.indexOf(tag.id) > -1 ? 'item active' : tag.over ? 'item over' : 'item'}
                                                           style={item.disable ? {opacity: 0.7} : null}

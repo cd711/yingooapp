@@ -60,7 +60,7 @@ export function getToken(): string {
     Taro.removeStorage({key:'TaroInfoKey'});
     return "";
 }
-export function api(name: string, params?: any): Promise<any> {
+export function api(name: string, params?: any, allowJson = false): Promise<any> {
     return new Promise<any>( (resolve, reject) => {
 
         params = {
@@ -82,7 +82,7 @@ export function api(name: string, params?: any): Promise<any> {
             data: params,
             method: "POST",
             header: {
-                'content-type': 'application/x-www-form-urlencoded'
+                'content-type': allowJson ? "application/json" : 'application/x-www-form-urlencoded'
             }
         }).then((res: any) => {
             if(res.data.code == 401){
