@@ -320,7 +320,7 @@ const PrintChange: Taro.FC<any> = () => {
             key: `${userStore.id}_photo_${moment().date()}`,
             data: JSON.stringify({
                 ...paramsObj.current,
-                path: photos
+                path: arr
             })
         })
 
@@ -355,14 +355,18 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onEditClick = (item ,index) => {
 
-        const str = getURLParamsStr(urlEncode({
+        let obj:any = {
             idx: index,
             cid: router.params.id,
             tplid: router.params.cid,
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             tplmax: router.params.tplmax,
             img: item.url,
-        }))
+        };
+        if (router.params.proid) {
+            obj = {...obj, proid: router.params.proid}
+        }
+        const str = getURLParamsStr(urlEncode(obj))
 
         Taro.navigateTo({
             url: `/pages/editor/printedit?${str}`

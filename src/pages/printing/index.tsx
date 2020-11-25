@@ -69,7 +69,8 @@ const Index: Taro.FC<any> = () => {
             id: router.params.id,
             cid: info.current.category.tpl_category_id,
             max: info.current.max,
-            tplmax: info.current.tpl_max
+            tplmax: info.current.tpl_max,
+            proid: router.params.imgid
         }))
         console.log(str)
         Taro.navigateTo({
@@ -112,7 +113,7 @@ const Index: Taro.FC<any> = () => {
                 edited: false,
                 doc: ""
             });
-            renderParams(arr);
+            renderParams([]);
             return
         }
 
