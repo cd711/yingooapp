@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Button,Image } from '@tarojs/components'
+import { View, Text, Button,Image,ScrollView } from '@tarojs/components'
 import './preview.less';
 import IconFont from '../../components/iconfont';
 import { api, getToken } from '../../utils/net'
@@ -40,7 +40,7 @@ function callEditor(name, ...args) {
 @page()
 export default class Preview extends Component<{}, {
     placeOrderShow: boolean;
-    saveId:number;
+    workId:number;
     productInfo:any;
     buyTotal:number;
     sku:any;
@@ -57,7 +57,7 @@ export default class Preview extends Component<{}, {
         super(props);
         this.state = {
             placeOrderShow: false,
-            saveId: 0,
+            workId: 0,
             productInfo: {},
             buyTotal:0,
             sku:{},
@@ -67,20 +67,16 @@ export default class Preview extends Component<{}, {
         }
     }
     componentDidMount() {
-        const {doc_id,workid} = this.$router.params;
+        const {workid} = this.$router.params;
         if (workid && parseInt(workid)>0) {
-            this.getWorkInfo(workid)
-        }
-        if (parseInt(doc_id)>0) {
+            this.getWorkInfo(workid);
             this.setState({
-                saveId:parseInt(doc_id)
+                workId:parseInt(workid)
             })
-        }
-        if (!workid) {
+        } else {
             editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
             window.addEventListener("message", this.onMsg);
         }
-
     }
 
     getWorkInfo = (id) => {
@@ -89,7 +85,7 @@ export default class Preview extends Component<{}, {
             id
         }).then((res)=>{
             Taro.hideLoading();
-            console.log(res)
+            window.history.replaceState(null,null,`/pages/template/preview?workid=${res.id}`);
             this.setState({
                 workInfo:res
             })
@@ -158,11 +154,12 @@ export default class Preview extends Component<{}, {
 
                 case "onLoadEmpty":
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
-                    const {doc_id} = this.$router.params;
-                    window.history.replaceState(null,null,`/pages/template/preview?doc_id=${parseInt(doc_id+"")>0?doc_id:docId}`);
-
+                    // const {doc_id} = this.$router.params;
+                    if (parseInt(docId+"")>0) {
+                        window.history.replaceState(null,null,`/pages/template/preview?workid=${docId}`);
+                    }
                     this.setState({
-                        saveId:parseInt(doc_id+"")>=0?doc_id:docId,
+                        workId:parseInt(docId+"")>=0?docId:0,
                         modalId:modelId
                     });
                     callEditor("setDoc", doc);
@@ -199,10 +196,10 @@ export default class Preview extends Component<{}, {
 
         }).then((res)=>{
             this.setState({
-                saveId: res.id
+                workId: res.id
             })
             Taro.hideLoading();
-            window.history.replaceState(null,null,`/pages/template/preview?doc_id=${res.id}`)
+            window.history.replaceState(null,null,`/pages/template/preview?workid=${res.id}`)
             Taro.showToast({
                 title:"保存成功",
                 icon:"success",
@@ -233,19 +230,19 @@ export default class Preview extends Component<{}, {
         })
     }
     onEditor = () => {
-        const { saveId,workInfo } = this.state;
+        const { workId,workInfo } = this.state;
         
-        window.location.replace(`/editor/shell?id=${workInfo?workInfo.id:saveId}`);
+        window.location.replace(`/editor/shell?id=${workInfo?workInfo.id:workId}`);
     }
 
     onOrderIng = () => {
-        const {saveId} = this.state;
+        const {workId} = this.state;
         const {id} = userStore;
         if (!id) {
             this.setState({isOpened: true})
             return
         }
-        if (parseInt(saveId+'')>0) {
+        if (parseInt(workId+'')>0) {
             this.getShellInfo()
         } else {
             this.onSave(null,()=>{
@@ -255,7 +252,7 @@ export default class Preview extends Component<{}, {
     }
 
     render() {
-        const { placeOrderShow,saveId,productInfo,workInfo} = this.state;
+        const { placeOrderShow,workId,productInfo,workInfo} = this.state;
         const workid = workInfo && workInfo.id ? workInfo.id : 0;
         return (
             <View className='preview'>
@@ -274,8 +271,8 @@ export default class Preview extends Component<{}, {
                 } */}
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
-                        if (saveId) {
-                            window.location.replace(`/editor/shell?id=${saveId}`);
+                        if (workId) {
+                            window.location.replace(`/editor/shell?id=${workId}`);
                         } else {
                             window.location.replace('/editor/shell');
                         }
@@ -290,15 +287,14 @@ export default class Preview extends Component<{}, {
                     </View>
                 </View>
                 <View className='container'>
-                     {/* eslint-disable-next-line react/forbid-elements */}
-                     {
-                         workid?<Image src={workInfo.thumb_image} />:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
-                     }
-                    
+                    {/* eslint-disable-next-line react/forbid-elements */}
+                    {
+                        workid?<Image src={workInfo.thumb_image} style={`width:225px;height: 458.664px;`} mode='aspectFill'/>:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
+                    }
                 </View>
                 <View className='bottom'>
                     {
-                        parseInt(saveId+"")>0 || parseInt(workid+"")>0?<View className='editor' onClick={this.onEditor}>
+                        parseInt(workId+"")>0 || parseInt(workid+"")>0?<View className='editor' onClick={this.onEditor}>
                             <IconFont name='24_qubianji' size={48} color='#707177' />
                             <Text className='txt'>编辑</Text>
                         </View>:<View className='editor' onClick={this.onSave}>
@@ -314,12 +310,12 @@ export default class Preview extends Component<{}, {
                         buyTotal:n
                     })
                 }} onAddCart={()=>{
-                    const {buyTotal,sku,saveId,modalId} = this.state;
+                    const {buyTotal,sku,workId,modalId} = this.state;
                     if (!lodash.isEmpty(sku) && Number(sku.id)>0) {
                         Taro.showLoading({title:"加载中"})
                         api("app.cart/add",{
                             sku_id:sku.id,
-                            user_tpl_id:saveId,
+                            user_tpl_id:workId,
                             phone_model_id:modalId,
                             quantity:buyTotal
                         }).then(()=>{
@@ -345,10 +341,10 @@ export default class Preview extends Component<{}, {
                         });
                     }
                 }} onNowBuy={()=>{
-                    const {buyTotal,sku,saveId,modalId} = this.state;
+                    const {buyTotal,sku,workId,modalId} = this.state;
                     if (!lodash.isEmpty(sku) && Number(sku.id)>0) {
                         Taro.navigateTo({
-                            url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${saveId}&model=${modalId}`
+                            url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
                         })
                     } else {
                         Taro.showToast({

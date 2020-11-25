@@ -327,7 +327,7 @@ export default class Me extends Component<any, MeProps> {
     previewOrder = (item: WorksProps) => {
         console.log(item.id)
         Taro.navigateTo({
-            url: `/pages/template/preview?workid=${item.id}&isWork=1`
+            url: `/pages/template/preview?workid=${item.id}`
         })
     }
 
