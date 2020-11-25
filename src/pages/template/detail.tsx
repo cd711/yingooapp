@@ -12,7 +12,7 @@ import page from '../../utils/ext';
 @inject("templateStore")
 @observer
 @page({wechatAutoLogin:true})
-export default class Detail extends Component<any,{
+export default class Detail extends Component<{},{
     isLike:boolean;
     likeList:Array<any>;
     currentItem:any;
@@ -98,7 +98,6 @@ export default class Detail extends Component<any,{
         query().select(".taro-tabbar__panel").fields({
             scrollOffset: true,
         },(e)=>{
-            // console.log(e.scrollHeight);
             const scrollHeight = e.scrollHeight;
             const scrollTop = e.scrollTop;
             const clientHeight = Taro.getSystemInfoSync().windowHeight;
@@ -108,7 +107,7 @@ export default class Detail extends Component<any,{
                 this.lastBottomTime = nowUnixTime;
                 console.log("触及底线了...");
             }
-          }).exec();
+        }).exec();
     }
 
     onEditor = () => {

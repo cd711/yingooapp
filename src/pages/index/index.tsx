@@ -130,7 +130,7 @@ class Index extends Component<any, IndexState> {
                     if (itemLen === 1) {
                         ele = (
                             <View className='temp-warp' key={index}>
-                                <View className='mask'>
+                                <View className='masks'>
                                     <View className='title'>
                                         <Text className='txt'>{item.title}</Text>
                                         {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}

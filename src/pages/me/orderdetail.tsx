@@ -49,6 +49,7 @@ export default class OrderDetail extends Component<{},{
             api("app.order/info",{
                 id
             }).then((res)=>{
+                
                 clearInterval(this.intervalTime);
                 this.setState({
                     data:res,
@@ -56,7 +57,7 @@ export default class OrderDetail extends Component<{},{
                     minutes:"00",
                     seconds:"00"
                 });
-                if (res.status == 1) {
+                if (res.state_tip.value == 1) {
                     this.calcTime(res.create_time);
                 }
             }).catch((e)=>{
@@ -79,17 +80,17 @@ export default class OrderDetail extends Component<{},{
                 address_id:templateStore.address.id
             }).then((res)=>{
                 Taro.hideLoading();
+                clearInterval(this.intervalTime);
                 this.setState({
                     data:res,
                     hours:"00",
                     minutes:"00",
                     seconds:"00"
                 });
-                if (res.status == 1) {
+                if (res.state_tip.value == 1) {
                     this.calcTime(res.create_time);
                 }
             }).catch((e)=>{
-                console.log(e)
                 Taro.hideLoading();
                 Taro.showToast({
                     title:e||"服务器开小差了，稍后再试",
@@ -100,17 +101,21 @@ export default class OrderDetail extends Component<{},{
         }
 
     }
+    
     private intervalTime:any = 0;
     calcTime = (time) =>{
         const ftime:any = moment.unix(time).add(30,'m');
         const dd = () => {
             const nowt:any = moment();
             const du = moment.duration(ftime - nowt, 'ms');
-            const hours = du.get('hours');
-            const mins = du.get('minutes');
-            const ss = du.get('seconds');
+            let hours = du.get('hours');
+            let mins = du.get('minutes');
+            let ss = du.get('seconds');
             if (hours<=0 && mins<=0 && ss<=0) {
                 clearInterval(this.intervalTime);
+                hours = 0;
+                mins = 0;
+                ss = 0;
             }
             this.setState({
                 hours:hours>=0 && hours<=9 ? `0${hours}` : `${hours}`,
@@ -125,8 +130,18 @@ export default class OrderDetail extends Component<{},{
         Taro.showLoading({title:"处理中"})
         api("app.order/cancel",{
             id
-        }).then(()=>{
+        }).then((res)=>{
             Taro.hideLoading();
+            clearInterval(this.intervalTime);
+            this.setState({
+                data:res,
+                hours:"00",
+                minutes:"00",
+                seconds:"00"
+            });
+            if (res.state_tip.value == 1) {
+                this.calcTime(res.create_time);
+            }
             Taro.showToast({
                 title:'取消成功',
                 icon:'none',

@@ -69,14 +69,33 @@ export default class Template extends Component<any,{
                 });
                 return item
             });
+            const {c,t} = this.$router.params;
+            let ca = 0;
+            let ta = 0;
+            const cid = c?parseInt(c):0;
+            const tid = t?parseInt(t):0;
+            for (let index = 0; index < res.length; index++) {
+                const element = res[index];
+                ca = parseInt(element.id+"") == cid ? index : 0; 
+                for (let i = 0; i < element.tags.length; i++) {
+                    const tag = element.tags[i];
+                    if (parseInt(tag.id+"") == tid) {
+                        ta = i;
+                        break;
+                    }
+                }
+            }
             this.setState({
                 cates:res,
+                switchActive:ca,
+                switchTagActive:ta
             },()=>{
                 Taro.hideLoading();
-                this.getTagContext(res[0].tags[0]);
+                this.getTagContext(res[ca].tags[ta]);
                 this.calcDeviceRota();
             })
         }).catch((e)=>{
+            console.log(e)
             Taro.hideLoading();
             Taro.showToast({
                 title:e,
@@ -162,6 +181,7 @@ export default class Template extends Component<any,{
         const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,showTemplateLoading} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
         const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
+        
         const searchBox = <View className='top-search'>
             <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                 <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
