@@ -8,7 +8,7 @@ interface CounterProps {
     onCounterChange?: (count: number) => void;
     onButtonClick?: (count: number) => void;
     max?: number
-    disabled: boolean
+    disabled?: boolean
 }
 const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, max, disabled = false}) => {
     const [number, setNumber] = useState<number>(1);

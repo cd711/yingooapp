@@ -143,6 +143,7 @@ export default class Confirm extends Component<any, {
                 return;
             }
         }
+        console.log(this.state.data,templateStore.address,this.state.data.prepay_id)
         if (!lodash.isEmpty(templateStore.address) && this.state.data && this.state.data.prepay_id) {
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/address", {
@@ -177,7 +178,6 @@ export default class Confirm extends Component<any, {
         }).catch(e => {
             Taro.hideLoading();
             setTimeout(() => {
-                console.log('aaaaaaa')
                 window.history.replaceState(null, null, '/pages/me/me');
                 Taro.navigateTo({
                     url: '/pages/me/order?tab=1'
