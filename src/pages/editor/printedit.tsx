@@ -1322,7 +1322,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         try {
             const res = await api("editor.tpl/index", {cid: this.$router.params.tplid, num: 1});
 
-            let data = res.list[0].id;
+            let data = process.env.NODE_ENV == 'production' ? "20201251" : res.list[0].id;
             const localParams = this.getPhotoParams();
             const current = localParams.path[Number(this.$router.params.idx)];
             if (current.edited && current.edited == true && !notNull(current.doc)) {

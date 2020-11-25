@@ -292,7 +292,9 @@ export default class Photos extends Component<PhotosProps,{
 
     getScrollHeight = () => {
         const {editSelect} = this.props;
-        return editSelect ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45
+        const {editSelectImgIds, imageList, videoList,navSwitchActive} = this.state;
+        const list = navSwitchActive === 0 ? imageList : videoList;
+        return editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45
     }
 
 
@@ -405,12 +407,12 @@ export default class Photos extends Component<PhotosProps,{
                         {list.length > 0 ? <LoadMore status={loadStatus} /> : null}
                     </ScrollView>
                     {
-                        editSelect
+                        editSelect && list.length > 0 && editSelectImgIds.length > 0
                             ? <View className="photo_edit_selector_container">
                                 <View className="select_head">
                                     <View className="left">
                                         <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材</Text>
-                                        <Text className="ext">长按素材拖动排序</Text>
+                                        {/*<Text className="ext">长按素材拖动排序</Text>*/}
                                     </View>
                                     <View className="right">
                                         <View className="submit" onClick={this.submitEditSelect}>
@@ -435,7 +437,7 @@ export default class Photos extends Component<PhotosProps,{
                             </View>
                             : null
                     }
-                    {loading ? <AtActivityIndicator mode='center'></AtActivityIndicator> : null}
+                    {loading ? <AtActivityIndicator mode='center' /> : null}
                     {
                         isEdit
                             ? <View className="select_all_container">
