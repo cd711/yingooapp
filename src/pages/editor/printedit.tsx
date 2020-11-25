@@ -663,7 +663,7 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
         <View className="template_change_text_container">
             <View className="act_bar">
                 <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={48} color="#fff"/></View>
-                <View className="print_submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
+                <View className="submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
             </View>
             <View className="input">
                 <AtInput name="txt" value={txt} className="input_act" onChange={onTextChange} autoFocus focus />
@@ -1098,56 +1098,11 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     const router = parent.$router;
 
     const [type, setType] = useState(0);
-    const [info, setInfo] = useState<any>({});
     const [templateList, setTemplateList] = useState<any[]>([]);
     const currentData = Taro.useRef({
         total: 0,
         curr: 0
     })
-
-    const getPhotoParams = () => {
-        // 解析参数
-        let params: any = {};
-
-        try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
-            if (res) {
-                params = JSON.parse(res)
-            } else {
-                if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                    params = templateStore.photoSizeParams
-                } else {
-                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-                }
-            }
-        } catch (e) {
-            if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                params = templateStore.photoSizeParams
-            } else {
-                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-            }
-        }
-
-        return params
-    }
-
-    useEffect(() => {
-        api("editor.tpl/index", {cid: 63}).then(res => {
-            setInfo({...res})
-        }).catch(e => {
-            console.log("获取模板系信息出错：", e)
-        })
-    }, [])
-
-    useEffect(() => {
-        getTemplateForPhotoNum().then(res => {
-            setTemplateList([...res])
-        })
-    }, [])
-
-    const cancelMode = () => {
-        setType(0);
-    }
 
     async function renderTemplateDoc(id) {
         // // 获取模板详情并向DOC更新
@@ -1168,14 +1123,14 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     function getTemplateForPhotoNum(params: { cid?: string | number, num?: number } = {}) {
         return new Promise<any>(async (resolve, reject) => {
             const opt = {
-                cid: params.cid || router.params.cid,
+                cid: params.cid || router.params.tplid,
                 num: params.num || 1,
             }
             try {
                 const res = await api("editor.tpl/index", {
                     cid: opt.cid,
                     num: opt.num,
-                    page: 0,
+                    page: 1,
                     size: 20
                 });
                 currentData.current = {...currentData.current, total: res.total};
@@ -1186,6 +1141,17 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         })
     }
 
+    useEffect(() => {
+        getTemplateForPhotoNum().then(res => {
+            setTemplateList([...res])
+        })
+    }, [])
+
+    const cancelMode = () => {
+        setType(0);
+    }
+
+    // 从图集选图后
     const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
         setType(0);
         if (data.ids.length + templateStore.editorPhotos.length > Number(router.params.tplmax)) {
@@ -1195,47 +1161,37 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
             })
             return
         }
-        if (info.list[0]) {
-            try {
-                // @ts-ignore
-                let temp = info.list[0].id;
-                const localParams = getPhotoParams();
-                const current = localParams.path[Number(router.params.idx)];
-                if (current.edited && !notNull(current.doc)) {
-                    temp = current.doc;
+        try {
+
+            currentData.current = {...currentData.current, curr: 0}
+
+            let arr = [...templateStore.editorPhotos];
+
+            data.ids.forEach((value, index) => {
+                const idx = arr.findIndex(v => v.id == value);
+                if (idx === -1) {
+                    arr.push({
+                        id: value,
+                        url: data.imgs[index]
+                    })
                 }
-
-                let arr = [...templateStore.editorPhotos];
-
-                data.ids.forEach((value, index) => {
-                    const idx = arr.findIndex(v => v.id == value);
-                    if (idx === -1) {
-                        arr.push({
-                            id: value,
-                            url: data.imgs[index]
-                        })
-                    }
-                })
-
-                templateStore.editorPhotos = arr;
-
-                getTemplateForPhotoNum({num: arr.length}).then(res => {
-                    console.log(res)
-                    setTemplateList([...res]);
-                    const cur = res[currentData.current.curr];
-                    if (cur) {
-                        renderTemplateDoc(cur.id)
-                    }
-                })
-
-            }catch (e) {
-                console.log("选图出错：", e)
-            }
-        } else {
-            Taro.showToast({
-                title: "系统错误，请稍后再试~",
-                icon: "none"
             })
+
+            templateStore.editorPhotos = arr;
+
+            getTemplateForPhotoNum({num: arr.length}).then(res => {
+
+                setTemplateList([...res]);
+                const cur = res[currentData.current.curr];
+                if (cur) {
+                    renderTemplateDoc(cur.id)
+                } else {
+                    console.log(`没有查询到对应图片数量（${arr.length}）的模板`, res)
+                }
+            })
+
+        }catch (e) {
+            console.log("选图出错：", e)
         }
     }
 
@@ -1321,7 +1277,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
 
-        templateStore.editorPhotos = [{id: "", url: this.$router.params.img}]
+        const {img}: any = urlDeCode(this.$router.params);
+        templateStore.editorPhotos = [{id: "", url: img}]
     }
 
 
@@ -1363,13 +1320,16 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     onLoadEmpty = async (_?: number) => {
         console.log(9999999)
         try {
-            const res = await api("editor.tpl/index", {cid: 63, num: 1});
+            const res = await api("editor.tpl/index", {cid: this.$router.params.tplid, num: 1});
 
             let data = res.list[0].id;
             const localParams = this.getPhotoParams();
             const current = localParams.path[Number(this.$router.params.idx)];
             if (current.edited && current.edited == true && !notNull(current.doc)) {
+                console.log("已编辑过的模板")
                 data = current.doc;
+            } else {
+                console.log("没有编辑过的模板")
             }
 
             const {img}: any = urlDeCode(this.$router.params);
@@ -1489,30 +1449,51 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     next = async () => {
         const doc: any = await callEditor("getDoc");
         console.log(doc)
-        const img = doc.pages[0].thumbnail;
-
-        const localParams = this.getPhotoParams();
-
-        console.log("本地数据：", localParams)
-
-        const temp = {...localParams}
-
-        temp.path[Number(this.$router.params.idx)].url = img;
-        temp.path[Number(this.$router.params.idx)].attr = `${doc.width}*${doc.height}`;
-        temp.path[Number(this.$router.params.idx)].edited = true;
-        temp.path[Number(this.$router.params.idx)].doc = doc;
-
-        console.log("更新后的params：", temp);
-
+        Taro.showLoading({
+            title: "合成中..."
+        })
         try {
-            Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp));
-            templateStore.photoSizeParams = temp
-        } catch (e) {
-            console.log("本地存储出错：将存入store", e)
-            templateStore.photoSizeParams = temp
-        }
+            const res = await api("editor.upload/preview", {
+                content: {
+                    type: "page",
+                    data: {...doc},
+                },
+                key: `photo_${userStore.id}_1`
+            }, true);
 
-        Taro.navigateBack()
+            const img = res.cdnUrl;
+
+            const localParams = this.getPhotoParams();
+
+            console.log("本地数据：", localParams)
+
+            const temp = {...localParams}
+
+            temp.path[Number(this.$router.params.idx)].url = img;
+            temp.path[Number(this.$router.params.idx)].attr = `${doc.width}*${doc.height}`;
+            temp.path[Number(this.$router.params.idx)].edited = true;
+            temp.path[Number(this.$router.params.idx)].doc = doc;
+
+            console.log("更新后的params：", temp);
+
+            try {
+                Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp));
+                templateStore.photoSizeParams = temp
+            } catch (e) {
+                console.log("本地存储出错：将存入store", e)
+                templateStore.photoSizeParams = temp
+            }
+            Taro.hideLoading()
+            Taro.navigateBack()
+
+        }catch (e) {
+            Taro.hideLoading()
+            Taro.showToast({
+                title: "生成预览图出错",
+                icon: "none"
+            })
+        }
+        Taro.hideLoading()
     }
 
     changeImage = () => {
