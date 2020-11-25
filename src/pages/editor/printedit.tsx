@@ -1361,13 +1361,14 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoadEmpty = async (_?: number) => {
+        console.log(9999999)
         try {
-            const res = await api("editor.tpl/index", {cid: 63});
+            const res = await api("editor.tpl/index", {cid: 63, num: 1});
 
             let data = res.list[0].id;
             const localParams = this.getPhotoParams();
             const current = localParams.path[Number(this.$router.params.idx)];
-            if (current.edited && !notNull(current.doc)) {
+            if (current.edited && current.edited == true && !notNull(current.doc)) {
                 data = current.doc;
             }
 
@@ -1429,12 +1430,10 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                     return;
 
                 case "onLoadEmpty":
-                    console.log(2222222)
                     this.setState({
                         loadingTemplate: false
                     });
                     this.onLoadEmpty(data.data);
-                    // callEditor("loadDraft")
                     break;
 
                 case "onload":

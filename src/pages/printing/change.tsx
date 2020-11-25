@@ -43,16 +43,38 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }, [])
 
-    Taro.useDidShow(() => {
+    function getProductInfo() {
+        return new Promise<any>((resolve, reject) => {
+            api("app.product/info", {id: router.params.id}).then(res => {
+                const idx = res.attrGroup.findIndex(v => v.special_show === "photosize");
+                const numIdx = res.attrGroup.findIndex(v => v.special_show === "photonumber");
+                if (idx > -1) {
+                    // 向本地存储attrItems
+                    Taro.setStorageSync("print_attrItems", JSON.stringify({
+                        attrItems: res.attrItems,
+                        index: idx,
+                        numIdx
+                    }))
+                    resolve({
+                        attrItems: res.attrItems,
+                        index: idx,
+                        numIdx
+                    })
+                } else {
+                    console.log("初始化尺寸时没找到尺寸：", res)
+                }
+            }).catch(e => {
+                reject(e)
+            })
+        })
+    }
+
+    Taro.useDidShow(async () => {
         // 读取本地存储print_attrItems
         try {
-            const res = Taro.getStorageSync("print_attrItems");
-            console.log("本地的：", res)
-            if (res) {
-                const parse = JSON.parse(res);
-                console.log("本地的items：", parse)
-                printAttrItems.current = parse;
-            }
+            const info = await getProductInfo();
+            printAttrItems.current = info
+
         } catch (e) {
             console.log("读取print_attrItems出错：", e)
         }
