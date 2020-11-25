@@ -55,6 +55,7 @@ export default class Template extends Component<any,{
     }
 
     componentDidMount() {
+        
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
             window.addEventListener("resize", ()=>{
                 this.calcDeviceRota();
@@ -90,9 +91,9 @@ export default class Template extends Component<any,{
                 switchActive:ca,
                 switchTagActive:ta
             },()=>{
-                Taro.hideLoading();
                 this.getTagContext(res[ca].tags[ta]);
-                this.calcDeviceRota();
+                this.calcDeviceRota();                
+                Taro.hideLoading();
             })
         }).catch((e)=>{
             console.log(e)
@@ -108,23 +109,29 @@ export default class Template extends Component<any,{
             });
         })
     }
+
     calcDeviceRota = () => {
         const query = Taro.createSelectorQuery;
         query().selectViewport().boundingClientRect((vres)=>{
             query().select(".t_tops").boundingClientRect((res)=>{
-                console.log("topsHeight",res.height)
                 this.setState({
-                    topsHeight:res.height,
+                    topsHeight:res.height>0?res.height:104,
                     otherHeight:vres.height-res.height-50
                 });
             }).exec();
         }).exec();
         const ww = Taro.getSystemInfoSync().windowWidth;
-        query().select('.left-menu').boundingClientRect((rect)=>{
+        setTimeout(() => {
+            console.log(document.querySelector("#template_left_menu").clientWidth,this)
+        }, 10000);
+        
+        query().select('#template_left_menu').boundingClientRect((rect)=>{
+            console.log(rect);
             this.setState({
                 mainRightWidth:ww-rect.width
             });
         }).exec();
+
     }
     componentWillUnmount() {
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
@@ -268,7 +275,7 @@ export default class Template extends Component<any,{
                 </View>
 
                 <View className='main' style={`top:${topsHeight}px;height:${otherHeight}px;width:100vw;`}>
-                    <View className='left-menu' style={`height:${otherHeight}px;background:#FFF`}>
+                    <View className='left-menu' id="template_left_menu" style={`height:${otherHeight}px;background:#FFF`}>
                         <ScrollView scrollY className='left-scroll' style={`height:${otherHeight}px;background:#FFF`}>
                             {
                                 tags && tags.map((item,index)=>(

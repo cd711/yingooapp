@@ -37,6 +37,9 @@ export default class Detail extends Component<{},{
 
     componentDidMount() {
         // const {selectItem} = templateStore;
+        const url = window.location.href;
+        window.history.pushState(null,null,'/pages/template/index');
+        window.history.pushState(null,'模板详情',url);
         const { id,cid } = this.$router.params
         if (!id || !cid) {
             Taro.navigateBack();
@@ -144,9 +147,8 @@ export default class Detail extends Component<{},{
             <View className='detail'>
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
-                        Taro.reLaunch({
-                            url:'/pages/template/index'
-                        });
+                        // window.location.href = '/pages/template/index'
+                        Taro.navigateBack();
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
