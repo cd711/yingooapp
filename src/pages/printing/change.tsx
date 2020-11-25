@@ -5,7 +5,6 @@ import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
 import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
-import Counter from "../../components/counter/counter";
 import OrderModal from "./orederModal";
 import {userStore} from "../../store/user";
 import moment from "moment";
@@ -154,7 +153,22 @@ const PrintChange: Taro.FC<any> = () => {
         return false
     }
 
-    const onCountChange = (num, idx) => {
+    const onReducer = (prevNum, idx) => {
+        let num = Number(prevNum);
+        num = num - 1;
+        if (num < 1) {
+            num = 1
+        }
+
+        const arr = [...photos];
+        arr[idx].count = Number(num);
+        setPhotos([...arr])
+    }
+
+    const onAddCount = (num, idx) => {
+        let _num = Number(num);
+        _num = _num + 1;
+
         const arr = [...photos];
 
         let count = 0;
@@ -167,7 +181,7 @@ const PrintChange: Taro.FC<any> = () => {
                 icon: "none"
             })
         } else {
-            arr[idx].count = Number(num);
+            arr[idx].count = Number(_num);
             setPhotos([...arr])
         }
     }
@@ -301,16 +315,17 @@ const PrintChange: Taro.FC<any> = () => {
                 doc: ""
             });
         }
-        setPhotos([...arr]);
-        setPhotoPickerVisible(false)
 
         Taro.setStorage({
             key: `${userStore.id}_photo_${moment().date()}`,
             data: JSON.stringify({
                 ...paramsObj.current,
-                path: arr
+                path: photos
             })
         })
+
+        setPhotos([...arr]);
+        setPhotoPickerVisible(false)
     }
 
     const selectPhoto = () => {
@@ -387,9 +402,15 @@ const PrintChange: Taro.FC<any> = () => {
                                         />
                                     </View>
                                     <View className="print_change_count">
-                                        <Counter num={value.count}
-                                                 disabled={value.count == Number(router.params.max)}
-                                                 onButtonClick={c => onCountChange(c, index)}/>
+                                        <View className='counter-fc'>
+                                            <View className='reduce' onClick={() => onReducer(value.count, index)}>
+                                                <Image src={require("../../source/reduce.png")} className='img'/>
+                                            </View>
+                                            <Text className='num'>{value.count || 1}</Text>
+                                            <View className='add' onClick={() => onAddCount(value.count, index)}>
+                                                <Image src={require("../../source/add.png")} className='img'/>
+                                            </View>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
