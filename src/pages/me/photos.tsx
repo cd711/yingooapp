@@ -136,7 +136,7 @@ export default class Photos extends Component<PhotosProps,{
                 editSelectImgIds.splice(idx, 1);
                 editSelectAttr.splice(idx, 1)
             } else {
-                if (editSelectImgIds.length >= 4) {
+                if (editSelectImgIds.length >= 100) {
                     return;
                 }
                 editSelectImgs.push(url);
@@ -409,7 +409,7 @@ export default class Photos extends Component<PhotosProps,{
                             ? <View className="photo_edit_selector_container">
                                 <View className="select_head">
                                     <View className="left">
-                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材（3~4个素材）</Text>
+                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材</Text>
                                         <Text className="ext">长按素材拖动排序</Text>
                                     </View>
                                     <View className="right">
@@ -418,18 +418,20 @@ export default class Photos extends Component<PhotosProps,{
                                         </View>
                                     </View>
                                 </View>
-                                <View className="select_items">
-                                    {
-                                        editSelectImgs.map((value, index) => (
-                                            <View className="select_items_wrap" key={index}>
-                                                <View className="clear" onClick={() => this.delEditSelectImg(index)}>
-                                                    <IconFont name="16_qingkong" size={32} />
+                                <ScrollView scrollX className="select_items_scroll_view">
+                                    <View className="select_items">
+                                        {
+                                            editSelectImgs.map((value, index) => (
+                                                <View className="select_items_wrap" key={index}>
+                                                    <View className="clear" onClick={() => this.delEditSelectImg(index)}>
+                                                        <IconFont name="16_qingkong" size={32} />
+                                                    </View>
+                                                    <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img" />
                                                 </View>
-                                                <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img" />
-                                            </View>
-                                        ))
-                                    }
-                                </View>
+                                            ))
+                                        }
+                                    </View>
+                                </ScrollView>
                             </View>
                             : null
                     }

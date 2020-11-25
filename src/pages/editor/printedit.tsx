@@ -1318,7 +1318,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoadEmpty = async (_?: number) => {
-        console.log(9999999)
+
         try {
             const res = await api("editor.tpl/index", {cid: this.$router.params.tplid, num: 1});
 
