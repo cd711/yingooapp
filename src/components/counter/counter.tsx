@@ -8,19 +8,23 @@ interface CounterProps {
     onCounterChange?: (count: number) => void;
     onButtonClick?: (count: number) => void;
     max?: number
+    disabled: boolean
 }
-const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, max}) => {
+const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, max, disabled = false}) => {
     const [number, setNumber] = useState<number>(1);
+
     useEffect(() => {
         if (onCounterChange) {
             onCounterChange(number);
         }
     }, [number]);
+
     useEffect(() => {
         if (!notNull(num)) {
             setNumber(num);
         }
     }, [num])
+
     return <View className='counter-fc'>
         <View className='reduce' onClick={(e) => {
             e.stopPropagation();
@@ -37,6 +41,10 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
                 return
             }
             e.stopPropagation();
+            if (disabled) {
+                onButtonClick && onButtonClick(number + 1)
+                return;
+            }
             if (onButtonClick) {
                 onButtonClick(number + 1);
             }

@@ -161,16 +161,15 @@ const PrintChange: Taro.FC<any> = () => {
         for (const item of arr) {
             count += parseInt(item.count)
         }
-        if (count > Number(router.params.max)) {
+        if (count >= Number(router.params.max)) {
             Taro.showToast({
                 title: `最多打印${router.params.max}张`,
                 icon: "none"
             })
-            return
+        } else {
+            arr[idx].count = Number(num);
+            setPhotos([...arr])
         }
-
-        arr[idx].count = Number(num);
-        setPhotos([...arr])
     }
 
     const onDeleteImg = idx => {
@@ -302,9 +301,16 @@ const PrintChange: Taro.FC<any> = () => {
                 doc: ""
             });
         }
-        getRouterParams(arr)
         setPhotos([...arr]);
         setPhotoPickerVisible(false)
+
+        Taro.setStorage({
+            key: `${userStore.id}_photo_${moment().date()}`,
+            data: JSON.stringify({
+                ...paramsObj.current,
+                path: arr
+            })
+        })
     }
 
     const selectPhoto = () => {
@@ -312,7 +318,7 @@ const PrintChange: Taro.FC<any> = () => {
         for (const item of photos) {
             num += parseInt(item.count)
         }
-        if (num > Number(router.params.max)) {
+        if (num >= Number(router.params.max)) {
             Taro.showToast({
                 title: `最多打印${router.params.max}张`,
                 icon: "none"
@@ -382,7 +388,8 @@ const PrintChange: Taro.FC<any> = () => {
                                     </View>
                                     <View className="print_change_count">
                                         <Counter num={value.count}
-                                                 onCounterChange={c => onCountChange(c, index)}/>
+                                                 disabled={value.count == Number(router.params.max)}
+                                                 onButtonClick={c => onCountChange(c, index)}/>
                                     </View>
                                 </View>
                             </View>
