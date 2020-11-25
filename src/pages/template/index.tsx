@@ -58,6 +58,7 @@ export default class Template extends Component<any,{
         
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
             window.addEventListener("resize", ()=>{
+                Taro.removeStorage({key:'template_tops'})
                 this.calcDeviceRota();
             }, false)
         }
@@ -111,6 +112,12 @@ export default class Template extends Component<any,{
     }
 
     calcDeviceRota = () => {
+        const template_tops = Taro.getStorageSync('template_tops');
+        const template_left_menu = Taro.getStorageSync('template_left_menu');
+        if (template_tops && template_left_menu) {
+            this.setState(Object.assign(template_tops,template_left_menu))
+            return;
+        }
         const query = Taro.createSelectorQuery;
         query().selectViewport().boundingClientRect((vres)=>{
             query().select(".t_tops").boundingClientRect((res)=>{
@@ -118,18 +125,26 @@ export default class Template extends Component<any,{
                     topsHeight:res.height>0?res.height:104,
                     otherHeight:vres.height-res.height-50
                 });
+                Taro.setStorage({
+                    key:'template_tops',
+                    data:{
+                        topsHeight:res.height>0?res.height:104,
+                        otherHeight:vres.height-res.height-50
+                    }
+                })
             }).exec();
         }).exec();
         const ww = Taro.getSystemInfoSync().windowWidth;
-        setTimeout(() => {
-            console.log(document.querySelector("#template_left_menu").clientWidth,this)
-        }, 10000);
-        
         query().select('#template_left_menu').boundingClientRect((rect)=>{
-            console.log(rect);
             this.setState({
                 mainRightWidth:ww-rect.width
             });
+            Taro.setStorage({
+                key:"template_left_menu",
+                data:{
+                    mainRightWidth:ww-rect.width
+                }
+            })
         }).exec();
 
     }
