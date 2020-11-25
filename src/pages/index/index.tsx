@@ -100,22 +100,20 @@ class Index extends Component<any, IndexState> {
     }
 
     receiveCoupon = async item => {
-        if (item.clist.length > 1) {
-            Taro.showLoading({title: "请稍后..."})
-            try {
-                await api("app.coupon/add", {id: item.clist[0].info.id});
-                Taro.hideLoading()
-                Taro.showToast({
-                    title: '领取成功',
-                    icon: "none"
-                })
-            }catch (e) {
-                Taro.hideLoading()
-                Taro.showToast({
-                    title: e,
-                    icon: "none"
-                })
-            }
+        Taro.showLoading({title: "请稍后..."})
+        try {
+            await api("app.coupon/add", {id: item.id});
+            Taro.hideLoading()
+            Taro.showToast({
+                title: '领取成功',
+                icon: "none"
+            })
+        }catch (e) {
+            Taro.hideLoading()
+            Taro.showToast({
+                title: e,
+                icon: "none"
+            })
         }
     }
 
@@ -194,12 +192,18 @@ class Index extends Component<any, IndexState> {
                     }
                 </Fragment>
             } else if (item.model === "coupon") {
-                ele = <View className="index_coupon_main" key={index} onClick={() => this.receiveCoupon(item)}>
-                    <Image src={ossUrl(item.image, 1)} className="coupon_img" />
-                    <View className="receive_btn">
-                        <Image src={require("../../source/lq.png")} className="receive_img" mode="widthFix" />
-                    </View>
-                </View>
+                ele = <Fragment>
+                    {
+                        item.clist.map((coupon, cIndex) => (
+                            <View className="index_coupon_main" key={`${index}_${cIndex}`} onClick={() => this.receiveCoupon(coupon)}>
+                                <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" />
+                                <View className="receive_btn">
+                                    <Image src={require("../../source/lq.png")} className="receive_img" mode="widthFix" />
+                                </View>
+                            </View>
+                        ))
+                    }
+                </Fragment>
             }
         }
 
