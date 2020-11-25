@@ -112,6 +112,10 @@ export default class Detail extends Component<any,{
     }
 
     onEditor = () => {
+        // @ts-ignore
+        if (!this.showLoginModal()) {
+            return
+        }
         const {currentItem} = this.state;
         Taro.navigateTo({
             url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
@@ -141,7 +145,9 @@ export default class Detail extends Component<any,{
             <View className='detail'>
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
-                        Taro.navigateBack();
+                        Taro.reLaunch({
+                            url:'/pages/template/index'
+                        });
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
@@ -151,7 +157,10 @@ export default class Detail extends Component<any,{
                 </View>
                 <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop}>
                     {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
-                    <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' />
+                    <View className='shell_thumb' style={`height:${Taro.pxTransform(472/(795/1635))}`}>
+                        <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
+                        <Image src={require('../../source/ke.png')} className='shell' mode='scaleToFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
+                    </View>
                     <View className='doyoulike'>
                         <View className='opsline'></View>
                         <Text className='liketxt'>猜你喜欢</Text>

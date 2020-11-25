@@ -57,12 +57,19 @@ const Login: Taro.FC<LoginProps> = props => {
                 </View>
                 <View className="oth"><Text className="exp">其他方式</Text></View>
                 <View className="other_login_way">
-                    <View className="item" onClick={() => onThirdPartyAuth("qq")}>
-                        <IconFont name="24_QQ-Color" size={48}/><Text className="name">QQ登录</Text>
-                    </View>
+                    {
+                        is_weixin()?null:<View className="item" onClick={() => onThirdPartyAuth("qq")}>
+                            <IconFont name="24_QQ-Color" size={48}/><Text className="name">QQ登录</Text>
+                        </View>
+                    }
                     {
                         is_weixin()
-                            ? <View className="item" onClick={() => onThirdPartyAuth("wechat")}>
+                            ? <View className="item" onClick={() => {
+                                onThirdPartyAuth && onThirdPartyAuth("wechat");
+                                // @ts-ignore
+                                const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent(window.location.href)}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
+                                window.location.href = url;
+                            }}>
                                 <IconFont name="24_weixin-Color" size={48}/><Text className="name">微信登录</Text>
                             </View>
                             : null
