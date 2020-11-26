@@ -8,13 +8,15 @@ import { AtTextarea,AtSwitch } from 'taro-ui';
 import TipModal from '../../../components/tipmodal/TipModal'
 import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../store/user';
+import {templateStore} from '../../../store/template';
+import lodash from 'lodash';
 
 interface CityModal {
     province:any,
     city:Array<any>
     area:Array<any>
 }
-@inject("userStore")
+@inject("userStore","templateStore")
 @observer
 export default class Editor extends Component<any,{
     pickerRange:Array<any>;
@@ -321,6 +323,9 @@ export default class Editor extends Component<any,{
             api('app.address/del',{id}).then(()=>{
                 Taro.hideLoading();
                 userStore.getUserInfo();
+                if (!lodash.isEmpty(templateStore.address)) {
+                    templateStore.address = null;
+                }
                 setTimeout(() => {
                     Taro.navigateBack();
                 }, 1500);

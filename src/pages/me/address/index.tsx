@@ -33,14 +33,21 @@ export default class Address extends Component<any,{
         const {t,id} = this.$router.params;
         api("app.address/list").then((res)=>{
             Taro.hideLoading();
+            let delId = true;
             res = res.map((item)=>{
                 item["isChecked"] = false;
                 if (t && t=="select" && id && parseInt(id)>0 && id == item.id) {
                     item["isChecked"] = true;
                     templateStore.address = item;
+                    delId = false;
                 }
                 return item;
             });
+            if (t && t=="select" && delId && res.length>0) {
+                res[0]["isChecked"] = true;
+                templateStore.address = res[0];
+                window.history.replaceState(null,null,`/pages/me/address/index?t=select&id=${res[0].id}`)
+            }
             this.setState({
                 addressList:res
             });

@@ -54,6 +54,7 @@ export default class Order extends Component<any,{
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
         templateStore.address = null;
+        
         if(parseInt(tab)>=0){
             if (switchTabActive != parseInt(tab)) {
                 this.setState({

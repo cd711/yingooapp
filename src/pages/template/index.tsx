@@ -3,10 +3,10 @@ import { View, Text,Image,ScrollView } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont'
 import { api } from '../../utils/net'
-import {AtActivityIndicator} from 'taro-ui'
 import { observer, inject } from '@tarojs/mobx'
 import {ossUrl} from '../../utils/common'
 import page from "../../utils/ext";
+import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 
 interface TagData{
     list:Array<any>,
@@ -29,7 +29,8 @@ export default class Template extends Component<any,{
     tagData:TagData | any;
     mainRightWidth:number;
     showAllCates:boolean;
-    showTemplateLoading:boolean;
+    loadStatus:LoadMoreEnum;
+    colHeight:any
 }> {
     config: Config = {
         navigationBarTitleText: '模板'
@@ -50,7 +51,8 @@ export default class Template extends Component<any,{
             },
             mainRightWidth:0,
             showAllCates:false,
-            showTemplateLoading:false
+            loadStatus:LoadMoreEnum.more,
+            colHeight:{}
         }
     }
 
@@ -58,7 +60,6 @@ export default class Template extends Component<any,{
         
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
             window.addEventListener("resize", ()=>{
-                Taro.removeStorage({key:'template_tops'})
                 this.calcDeviceRota();
             }, false)
         }
@@ -92,9 +93,10 @@ export default class Template extends Component<any,{
                 switchActive:ca,
                 switchTagActive:ta
             },()=>{
-                this.getTagContext(res[ca].tags[ta]);
-                this.calcDeviceRota();                
-                Taro.hideLoading();
+                this.calcDeviceRota().then(()=>{
+                    this.getTagContext(res[ca].tags[ta]);  
+                    Taro.hideLoading();
+                }); 
             })
         }).catch((e)=>{
             console.log(e)
@@ -112,72 +114,113 @@ export default class Template extends Component<any,{
     }
 
     calcDeviceRota = () => {
-        const template_tops = Taro.getStorageSync('template_tops');
-        const template_left_menu = Taro.getStorageSync('template_left_menu');
-        if (template_tops && template_left_menu) {
-            this.setState(Object.assign(template_tops,template_left_menu))
-            return;
-        }
-        const query = Taro.createSelectorQuery;
-        query().selectViewport().boundingClientRect((vres)=>{
-            query().select(".t_tops").boundingClientRect((res)=>{
-                this.setState({
-                    topsHeight:res.height>0?res.height:104,
-                    otherHeight:vres.height-res.height-50
-                });
-                Taro.setStorage({
-                    key:'template_tops',
-                    data:{
-                        topsHeight:res.height>0?res.height:104,
-                        otherHeight:vres.height-res.height-50
-                    }
-                })
+        return new Promise<any>( (resolve, reject) => {
+            const template_tops = Taro.getStorageSync('template_tops');
+            const ww = Taro.getSystemInfoSync().windowWidth;
+            if (template_tops) {
+                template_tops.mainRightWidth = ww - template_tops.leftWidth;
+                this.setState(template_tops);
+                setTimeout(() => {
+                    resolve();
+                }, 100);
+                return;
+            }
+            const query = Taro.createSelectorQuery;
+            if (!query) {
+                reject();
+                return;
+            }
+            query().selectViewport().boundingClientRect((vres)=>{
+                query().select(".t_tops").boundingClientRect((res)=>{
+                    query().select('#template_left_menu').boundingClientRect((rect)=>{
+                        Taro.setStorage({
+                            key:'template_tops',
+                            data:{
+                                topsHeight:res.height>0?res.height:104,
+                                otherHeight:vres.height-res.height-50,
+                                mainRightWidth:ww-rect.width,
+                                leftWidth:rect.width
+                            }
+                        })
+                        this.setState({
+                            topsHeight:res.height>0?res.height:104,
+                            otherHeight:vres.height-res.height-50,
+                            mainRightWidth:ww-rect.width
+                        });
+                        setTimeout(() => {
+                            resolve();
+                        }, 100);
+                    }).exec();
+                }).exec();
             }).exec();
-        }).exec();
-        const ww = Taro.getSystemInfoSync().windowWidth;
-        query().select('#template_left_menu').boundingClientRect((rect)=>{
-            this.setState({
-                mainRightWidth:ww-rect.width
-            });
-            Taro.setStorage({
-                key:"template_left_menu",
-                data:{
-                    mainRightWidth:ww-rect.width
-                }
-            })
-        }).exec();
+        })
 
     }
     componentWillUnmount() {
-        if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
+        if (process.env.TARO_ENV === 'h5')  {
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             window.removeEventListener("resize",()=>{},false)
         }
     }
 
     getTagContext = (tag) => {
-        const {switchActive,cates,tagData} = this.state;
+        const {switchActive,cates,tagData,mainRightWidth,colHeight} = this.state;
         if (tag) {
             const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
             // const tagTotal = tagData && tagData.total && tagData.total>=0?tagData.total:0;
+            const tplid = cates[switchActive].tpl_category_id;
+            const tagid = tag.id;
+            if (tagList.length==0) {
+                
+                colHeight[`${tplid}-${tagid}`] = [];
+            }
             this.setState({
-                showTemplateLoading:true
+                loadStatus:LoadMoreEnum.loading
             })
             api("app.product_tpl/list",{
                 start:tagList.length,
                 size:10,
-                category_id:cates[switchActive].tpl_category_id,
-                tag_id:tag.id
+                category_id:tplid,
+                tag_id:tagid
             }).then((res)=>{
+                const tpl_type=cates && cates[switchActive] && cates[switchActive].tpl_type?cates[switchActive].tpl_type:"";
+                res.list=res.list.map((item,index)=>{
+                    const width = (mainRightWidth-(14*3))/2;
+                    const height = tpl_type == "phone" ?width/(795/1635):width/(item.attr.width/item.attr.height);
+                    let top = 0;
+                    let left = 0;
+                    if (tagList.length==0 && index < 2) {
+                        if (tpl_type == "photo" && index == 0) {
+                            left = width + (2*14);
+                            colHeight[`${tplid}-${tagid}`][0] = width;
+                            colHeight[`${tplid}-${tagid}`][index+1] = height;
+                        } else {
+                            left = index%2==0?14:width + (2*14);
+                            colHeight[`${tplid}-${tagid}`][index] = height;
+                        }
+                    } else {
+                        const minHeight = Math.min(...colHeight[`${tplid}-${tagid}`]);
+                        const minIndex = colHeight[`${tplid}-${tagid}`].indexOf(minHeight);
+                        top = minHeight + 14;
+                        left = minIndex%2==0?14:width + (2*14);
+                        colHeight[`${tplid}-${tagid}`][minIndex] += (height+14);
+                    }
+                    item["width"] = width;
+                    item["height"] = height;
+                    item["top"] = top;
+                    item["left"] = left;
+                    return item;
+                });
+
                 res.list = tagList.concat(res.list);
                 this.setState({
                     tagData:res,
-                    showTemplateLoading:false
+                    loadStatus:LoadMoreEnum.more
                 });
                 Taro.hideLoading();
             }).catch((e)=>{
                 this.setState({
-                    showTemplateLoading:false
+                    loadStatus:LoadMoreEnum.noMore
                 });
                 Taro.showToast({
                     title:e,
@@ -196,14 +239,21 @@ export default class Template extends Component<any,{
         if (tags.length>0 && tagList.length<tagTotal) {
             const tag = tags[switchTagActive];
             this.getTagContext(tag)
+        } else {
+            this.setState({
+                loadStatus:LoadMoreEnum.noMore 
+            })
         }
     }
 
     render() {
-        const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,showTemplateLoading} = this.state;
+        const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,loadStatus,colHeight} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
         const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
-        
+        const tpl_type=cates && cates[switchActive] && cates[switchActive].tpl_type?cates[switchActive].tpl_type:"";
+        const tplid = cates && cates[switchActive] && cates[switchActive].tpl_category_id?cates[switchActive].tpl_category_id:0;
+        const tagid = tags && tags[switchTagActive] && tags[switchTagActive].id?tags[switchTagActive].id:0;
+        console.log(colHeight)
         const searchBox = <View className='top-search'>
             <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                 <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
@@ -311,15 +361,16 @@ export default class Template extends Component<any,{
                         </ScrollView>
                     </View>
                     <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`} onScrollToLower={this.onScrollToLower}>
-                        <View className='warp' style={`width:${mainRightWidth}px;padding:0 14px;box-sizing:border-box;column-gap:14px`}>
+                        {/* min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px */}
+                        <View className='warp' style={`width:${mainRightWidth}px;box-sizing:border-box;position: relative;min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px`}>
                             {
-                                !showTemplateLoading && cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo"?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`} onClick={()=>{
+                                tpl_type == "photo"?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;position: absolute;top:0;left:14px`} onClick={()=>{
                                     // @ts-ignore
                                     if (!this.showLoginModal()) {
                                         return
                                     }
                                     Taro.navigateTo({
-                                        url:`pages/printing/index?id=34`
+                                        url:`/pages/printing/index?id=34`
                                     })
                                 }}>
                                     <View className='print-warp' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;`}>
@@ -329,39 +380,41 @@ export default class Template extends Component<any,{
                                     <View className='nook'>
                                         <Text className='ntxt'>快速</Text>
                                     </View>
-                                </View>:<AtActivityIndicator isOpened={showTemplateLoading} mode='center'></AtActivityIndicator>
+                                </View>:null
                             }
-
                             {
-                                tagList.map((item)=>(
+                                tagList.map((item)=>{
 
-                                    <View className='pic-box' style={cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone" ?`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`:`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;`} onClick={()=>{
-                                        // templateStore.selectItem = item;
-                                        if (cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone") {
-                                            Taro.navigateTo({
-                                                url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
-                                            });
-                                        }
-                                        if (cates && cates[switchActive] &&cates[switchActive].tpl_type == "photo") {
-                                            // @ts-ignore
-                                            if (!this.showLoginModal()) {
-                                                return
+                                    return <View className='pic-box' 
+                                        style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`} 
+                                        onClick={()=>{
+                                            if (tpl_type == "phone") {
+                                                Taro.navigateTo({
+                                                    url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
+                                                });
                                             }
-                                            Taro.navigateTo({
-                                                url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
-                                            });
-                                        }
-                                    }} key={item.id}>
-                                        {
-                                            cates && cates[switchActive] &&cates[switchActive].tpl_type == "phone" ?<View className='ke' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`}>
-                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />
-                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(795/1635)}px;`} mode='scaleToFill' />
-                                            </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${(mainRightWidth-(14*3))/2}px;height:${((mainRightWidth-(14*3))/2)/(item.attr.width/item.attr.height)}px;border-radius: ${Taro.pxTransform(16)};`} />
-                                        }
+                                            if (tpl_type == "photo") {
+                                                // @ts-ignore
+                                                if (!this.showLoginModal()) {
+                                                    return
+                                                }
+                                                Taro.navigateTo({
+                                                    url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
+                                                });
+                                            }
+                                        }} key={item.id}>
+                                            {
+                                            tpl_type=="phone"?<View className='ke' style={`width:${item.width}px;height:${item.height}px;`}>
+                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />
+                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${item.width}px;height:${item.height}px;`} mode='scaleToFill' />
+                                            </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(16)};overflow: hidden;`} />
+                                            }
                                     </View>
-                                ))
+                                })
                             }
+                            
                         </View>
+                        <LoadMore status={loadStatus} />
                     </ScrollView>
                 </View>
             </View>

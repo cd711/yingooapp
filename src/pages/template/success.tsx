@@ -102,14 +102,17 @@ export default class Success extends Component<{},{
                     </View>
                     <View className="ops">
                         <Button className='look-order-btn' onClick={()=>{
+                            window.history.pushState(null,null,'/pages/me/me');
                             Taro.navigateTo({
-                                url:'/pages/me/order?tab=1'
+                                url:'/pages/me/order?tab=0'
                             })
                         }}>查看订单</Button>
                         <Button className='back-home-btn' onClick={()=>{
-                            Taro.reLaunch({
-                                url:'/pages/index/index'
-                            })
+                            // Taro.reLaunch({
+                            //     url:'/pages/index/index'
+                            // })
+                            window.history.pushState(null,null,'/pages/me/order?tab=0');
+                            window.location.href = '/pages/index/index';
                         }}>返回首页</Button>
                     </View>
                 </View>

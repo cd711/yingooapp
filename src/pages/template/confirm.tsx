@@ -143,11 +143,11 @@ export default class Confirm extends Component<any, {
                 return;
             }
         }
-        console.log(this.state.data,templateStore.address,this.state.data.prepay_id)
-        if (!lodash.isEmpty(templateStore.address) && this.state.data && this.state.data.prepay_id) {
+        const { orderid } = this.$router.params;
+        if (!lodash.isEmpty(templateStore.address) && orderid) {
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/address", {
-                prepay_id: this.state.data.prepay_id,
+                prepay_id: orderid,
                 address_id: templateStore.address.id
             }).then((res) => {
                 Taro.hideLoading();
@@ -155,6 +155,8 @@ export default class Confirm extends Component<any, {
                 this.setState({
                     data: res
                 })
+            }).catch((e)=>{
+                console.log(e);
             })
         }
     }
@@ -431,9 +433,12 @@ export default class Confirm extends Component<any, {
                                                         <Text className='sym'>¥</Text>
                                                         <Text className='num'>{product.price}</Text>
                                                     </View>
-                                                    <Counter num={parseInt(product.quantity)} onButtonClick={(e) => {
-                                                        this.onCounterChange(e, data.prepay_id, item.pre_order_id, product);
-                                                    }}/>
+                                                    {
+                                                        this.isPhoto?<Text>{parseInt(product.quantity)}</Text>:<Counter num={parseInt(product.quantity)} onButtonClick={(e) => {
+                                                            this.onCounterChange(e, data.prepay_id, item.pre_order_id, product);
+                                                        }}/>
+                                                    }
+                                                    
                                                 </View>
                                             </View>
                                         ))
