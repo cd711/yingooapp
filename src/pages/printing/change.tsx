@@ -290,13 +290,13 @@ const PrintChange: Taro.FC<any> = () => {
                     return {
                         url: v.url,
                         num: v.count,
-                        style: `image/auto-orient,1/resize,m_fill,w_${pixArr[0]},h_${pixArr[1]}/rotate,90`
+                        style: [pixArr[0], pixArr[1], 90].join(",")
                     }
                 }
                 return {
                     url: v.url,
                     num: v.count,
-                    style: `image/auto-orient,1/resize,m_fill,w_${pixArr[0]},h_${pixArr[1]}`
+                    style: [pixArr[0], pixArr[1], 0].join(",")
                 }
             })
         }
