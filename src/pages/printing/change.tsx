@@ -93,6 +93,7 @@ const PrintChange: Taro.FC<any> = () => {
         // 读取本地存储print_attrItems
         try {
             const info = await getProductInfo();
+            console.log("读取本地存储print_attrItems：", info)
             printAttrItems.current = info
 
         } catch (e) {
@@ -137,7 +138,7 @@ const PrintChange: Taro.FC<any> = () => {
     function checkHasRotate(attribute: string, sku: number | string): boolean {
         if (router.params.id) {
             let pix = "";
-            for (const item of printAttrItems.current.attrItems[0]) {
+            for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
                 if (sku == item.id) {
                     pix = item.value;
                     break;
@@ -256,6 +257,25 @@ const PrintChange: Taro.FC<any> = () => {
         for (const item of photos) {
             count += parseInt(item.count)
         }
+
+        let pix = "";
+        for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
+            if (paramsObj.current.sku == item.id) {
+                pix = item.value;
+                break;
+            }
+        }
+
+        console.log("尺寸参数：", pix)
+
+        if (notNull(pix)) {
+            Taro.showToast({
+                title: "没有尺寸参数，请联系客服",
+                icon: "none"
+            })
+            return;
+        }
+
         if (notNull(skuInfo.id) || skuInfo.id == 0) {
             Taro.showToast({title: "请选择规格", icon: "none"})
             return
@@ -265,19 +285,18 @@ const PrintChange: Taro.FC<any> = () => {
             total: count,
             page: "photo",
             parintImges: photos.map(v => {
-                const item = printAttrItems.current[printAttrItems.current.index];
-
-                if (v.hasRotate && !notNull(item.value)) {
-                    const wArr = item.value.split("*");
+                const pixArr = pix.split("*");
+                if (v.hasRotate && v.hasRotate === true) {
                     return {
                         url: v.url,
                         num: v.count,
-                        style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
+                        style: `image/auto-orient,1/resize,m_fill,w_${pixArr[0]},h_${pixArr[1]}/rotate,90`
                     }
                 }
                 return {
                     url: v.url,
                     num: v.count,
+                    style: `image/auto-orient,1/resize,m_fill,w_${pixArr[0]},h_${pixArr[1]}`
                 }
             })
         }
