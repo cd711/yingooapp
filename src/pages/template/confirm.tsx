@@ -100,8 +100,13 @@ export default class Confirm extends Component<any, {
                 sku_id: skuid,
                 quantity: total,
                 user_tpl_id: this.isPhoto ? -1 : tplid,
-                phone_model_id: model ? model : 336
             };
+            if (!this.isPhoto) {
+                data = {
+                    ...data,
+                    phone_model_id: model ? model : 336
+                }
+            }
             if (cartIds) {
                 data = {
                     cart_ids: Base64.decode(cartIds)
