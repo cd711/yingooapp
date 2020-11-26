@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Button,Image,ScrollView } from '@tarojs/components'
+import { View, Text, Button,Image } from '@tarojs/components'
 import './preview.less';
 import IconFont from '../../components/iconfont';
 import { api, getToken } from '../../utils/net'
@@ -7,7 +7,6 @@ import { observer, inject } from '@tarojs/mobx';
 import lodash from 'lodash';
 import { PlaceOrder } from './place';
 import {userStore} from "../../store/user";
-import {AtModal} from "taro-ui";
 import page from '../../utils/ext';
 
 
@@ -38,7 +37,7 @@ function callEditor(name, ...args) {
 @inject("templateStore")
 @observer
 @page()
-export default class Preview extends Component<{}, {
+export default class Preview extends Component<any, {
     placeOrderShow: boolean;
     workId:number;
     productInfo:any;
@@ -46,7 +45,8 @@ export default class Preview extends Component<{}, {
     sku:any;
     modalId:number;
     isOpened: boolean,
-    workInfo:any
+    workInfo:any,
+    doc: any
 }> {
 
     config: Config = {
@@ -63,7 +63,8 @@ export default class Preview extends Component<{}, {
             sku:{},
             isOpened: false,
             modalId:0,
-            workInfo:{}
+            workInfo:{},
+            doc: {}
         }
     }
     componentDidMount() {
@@ -117,6 +118,7 @@ export default class Preview extends Component<{}, {
         }
     }
 
+
     onMsg: { (e: MessageEvent): void } = async ({ data }) => {
         console.log("msg", data);
         if (!data) {
@@ -160,7 +162,8 @@ export default class Preview extends Component<{}, {
                     }
                     this.setState({
                         workId:parseInt(docId+"")>=0?docId:0,
-                        modalId:modelId
+                        modalId:modelId,
+                        doc
                     });
                     callEditor("setDoc", doc);
 
@@ -230,9 +233,9 @@ export default class Preview extends Component<{}, {
         })
     }
     onEditor = () => {
-        const { workId,workInfo } = this.state;
+        const { workId,workInfo, doc} = this.state;
         console.log(workId, workInfo)
-        window.location.replace(`/editor/shell?id=${workInfo && workInfo.id || workId}`);
+        window.location.replace(`/editor/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}`);
     }
 
     onOrderIng = () => {
@@ -289,7 +292,7 @@ export default class Preview extends Component<{}, {
                 <View className='container'>
                     {/* eslint-disable-next-line react/forbid-elements */}
                     {
-                        workid?<Image src={workInfo.thumb_image} style={`width:225px;height: 458.664px;`} mode='aspectFill'/>:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%"></iframe>
+                        workid?<Image src={workInfo.thumb_image} style={`width:225px;height: 458.664px;`} mode='aspectFill'/>:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%" />
                     }
                 </View>
                 <View className='bottom'>
