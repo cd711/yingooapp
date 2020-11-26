@@ -24,7 +24,9 @@ const PrintChange: Taro.FC<any> = () => {
     const [skus, setSkus] = useState([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
     const [photoVisible, setPhotoPickerVisible] = useState(false);
-    const [animating, setAnimating] = useState(false)
+    const [animating, setAnimating] = useState(false);
+    const _imgstyle = Taro.useRef("");
+    const sizeArr = Taro.useRef<any[]>([])
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -45,6 +47,7 @@ const PrintChange: Taro.FC<any> = () => {
     function getProductInfo() {
         return new Promise<any>((resolve, reject) => {
             api("app.product/info", {id: router.params.id}).then(res => {
+                _imgstyle.current = res.photostyle
                 const idx = res.attrGroup.findIndex(v => v.special_show === "photosize");
                 const numIdx = res.attrGroup.findIndex(v => v.special_show === "photonumber");
                 if (idx > -1) {
@@ -89,10 +92,55 @@ const PrintChange: Taro.FC<any> = () => {
         return obj
     }
 
+    function checkHasRotate(attribute: string): boolean {
+        if (router.params.id) {
+            const pixArr = sizeArr.current;
+            const imgPix = attribute.split("*");
+            const num = Number(pixArr[0]) / Number(pixArr[1]);
+            const cNum = Number(imgPix[0]) / Number(imgPix[1])
+            console.log("超级计算：", num)
+            /**
+             * pixArr: 打印尺寸, imgPix：图片尺寸
+             * 打印尺寸 大于 1，就判定为打印的是横图，图片尺寸不满足条件（也就是图片尺寸小于1）的话就旋转
+             * 或
+             * 打印尺寸小于1，就能判定为竖图，但是图片尺寸不满足条件的话（也就是图片尺寸大于1）就旋转
+             */
+            return cNum > 1 && num < 1 || cNum < 1 && num > 1
+        }
+        return false
+    }
+
+    function getTailoringImg(arr: any[]) {
+        if (!_imgstyle.current && arr.length !== 3) {
+            return ""
+        }
+        let path = "";
+
+        const getUrl = (arr: any[], url: string, i: number) => {
+            let c = i;
+            let str = url;
+            if (c === arr.length) {
+                path = str;
+                return
+            } else {
+                const reg = new RegExp(`#${arr[c].key}#`);
+                str = url.replace(reg, arr[c].val)
+                c += 1;
+                getUrl(arr, str, c)
+            }
+        }
+
+        getUrl(arr, _imgstyle.current, 0)
+
+        return path
+    }
+
+
     Taro.useDidShow(async () => {
         // 读取本地存储print_attrItems
         try {
             const info = await getProductInfo();
+            console.log("读取本地存储print_attrItems：", info)
             printAttrItems.current = info
 
         } catch (e) {
@@ -123,35 +171,45 @@ const PrintChange: Taro.FC<any> = () => {
 
         console.log("读取的photo params：", params)
         paramsObj.current = params || {};
-        params.path = params.path.map((v) => {
-            return {
-                ...v,
-                count: notNull(v.count) ? 1 : parseInt(v.count),
-                hasRotate: checkHasRotate(v.attr, params.sku),
-            }
-        })
-        setPhotos([...params.path] || [])
 
-    })
-
-    function checkHasRotate(attribute: string, sku: number | string): boolean {
-        if (router.params.id) {
-            let pix = "";
-            for (const item of printAttrItems.current.attrItems[0]) {
-                if (sku == item.id) {
-                    pix = item.value;
-                    break;
-                }
-            }
-            if (!notNull(pix)) {
-                const pixArr = pix.split("*");
-                const imgPix = attribute.split("*");
-                const num = Number(pixArr[0]) / Number(imgPix[1]);
-                return num > 1
+        let pix = "";
+        for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
+            if (paramsObj.current.sku == item.id) {
+                console.log("超级判读：" ,item)
+                pix = item.value;
+                break;
             }
         }
-        return false
-    }
+
+        console.log("尺寸参数：", pix)
+        if (!notNull(pix)) {
+            const pixArr = pix.split("*");
+            console.log("格式化素组：", pixArr)
+            sizeArr.current = pixArr;
+            const tArr = [
+                {key: "w", val: pixArr[0]},
+                {key: "h", val: pixArr[1]},
+                {key: "r", val: 0},
+            ];
+
+            params.path = params.path.map((v) => {
+                const allowRotate = checkHasRotate(v.attr);
+                let arr = [...tArr];
+                if (allowRotate) {
+                    arr[2].val = 90;
+                }
+                return {
+                    ...v,
+                    url: v.url,
+                    count: notNull(v.count) ? 1 : parseInt(v.count),
+                    hasRotate: allowRotate,
+                    osx: getTailoringImg(arr)
+                }
+            })
+            setPhotos([...params.path] || [])
+        }
+
+    })
 
     const onReducer = (prevNum, idx) => {
         let num = Number(prevNum);
@@ -256,6 +314,25 @@ const PrintChange: Taro.FC<any> = () => {
         for (const item of photos) {
             count += parseInt(item.count)
         }
+
+        let pix = "";
+        for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
+            if (paramsObj.current.sku == item.id) {
+                pix = item.value;
+                break;
+            }
+        }
+
+        console.log("尺寸参数：", pix)
+
+        if (notNull(pix)) {
+            Taro.showToast({
+                title: "没有尺寸参数，请联系客服",
+                icon: "none"
+            })
+            return;
+        }
+
         if (notNull(skuInfo.id) || skuInfo.id == 0) {
             Taro.showToast({title: "请选择规格", icon: "none"})
             return
@@ -265,19 +342,18 @@ const PrintChange: Taro.FC<any> = () => {
             total: count,
             page: "photo",
             parintImges: photos.map(v => {
-                const item = printAttrItems.current[printAttrItems.current.index];
-
-                if (v.hasRotate && !notNull(item.value)) {
-                    const wArr = item.value.split("*");
+                const pixArr = pix.split("*");
+                if (v.hasRotate && v.hasRotate === true) {
                     return {
                         url: v.url,
                         num: v.count,
-                        style: `image/auto-orient,1/resize,m_fill,w_${wArr[0]},h_${wArr[1]}/rotate,90`
+                        style: [pixArr[0], pixArr[1], 90].join(",")
                     }
                 }
                 return {
                     url: v.url,
                     num: v.count,
+                    style: [pixArr[0], pixArr[1], 0].join(",")
                 }
             })
         }
@@ -310,21 +386,44 @@ const PrintChange: Taro.FC<any> = () => {
                 url: data.imgs[i],
                 attr: data.attrs[i],
                 count: 1,
-                hasRotate: checkHasRotate(data.attrs[i], paramsObj.current.sku),
                 edited: false,
                 doc: ""
             });
+        }
+
+        let exArr = [...arr];
+        if (sizeArr.current[0] && sizeArr.current[1]) {
+            const tArr = [
+                {key: "w", val: sizeArr.current[0]},
+                {key: "h", val: sizeArr.current[1]},
+                {key: "r", val: 0},
+            ];
+            exArr = arr.map(v => {
+                const allowRotate = checkHasRotate(v.attr);
+                let arr = [...tArr];
+
+                if (allowRotate) {
+                    arr[2].val = 90;
+                }
+                console.log("处理后的旋转度：", arr[2],allowRotate, sizeArr.current, v.attr)
+                return {
+                    ...v,
+                    hasRotate: allowRotate,
+                    osx: getTailoringImg(arr),
+                    url: v.url,
+                }
+            })
         }
 
         Taro.setStorage({
             key: `${userStore.id}_photo_${moment().date()}`,
             data: JSON.stringify({
                 ...paramsObj.current,
-                path: arr
+                path: photos
             })
         })
 
-        setPhotos([...arr]);
+        setPhotos([...exArr]);
         setPhotoPickerVisible(false)
     }
 
@@ -396,12 +495,14 @@ const PrintChange: Taro.FC<any> = () => {
                                         <IconFont name="32_guanbi" size={32}/>
                                     </View>
                                     <View className="print_change_img">
-                                        <Image src={ossUrl(value.url, 1)} className="p_img" mode={value.hasRotate ? "aspectFill" : "aspectFill"}
+                                        <Image src={value.hasRotate ? `${value.url}?${value.osx}` : value.url}
+                                               className="p_img"
+                                               mode="aspectFill"
                                                onClick={() => onEditClick(value, index)}
                                                style={{
-                                                   transform: value.hasRotate ? "rotateZ(90deg)" : "none",
-                                                   width: value.hasRotate ? 203 : 152,
-                                                   height: value.hasRotate ? 152 : 203
+                                                   // transform: value.hasRotate ? "rotateZ(90deg)" : "none",
+                                                   // width: value.hasRotate ? 203 : 152,
+                                                   // height: value.hasRotate ? 152 : 203
                                                }}
                                         />
                                     </View>

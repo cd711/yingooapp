@@ -12,6 +12,7 @@ import Fragment from '../../components/Fragment';
 import UploadFile from "../../components/Upload/Upload";
 import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
 import {userStore} from "../../store/user";
+import moment from "moment";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -1371,7 +1372,22 @@ export default class Shell extends Component<{}, {
     }
 
     public editorProxy: WindowProxy | null | undefined;
-    public defaultModel: any;
+    public defaultModel: any = null;
+
+    getDefaultPhoneShell() {
+        return new Promise<any>(async (resolve, reject) => {
+            try {
+                Taro.showLoading({title: "请稍候"});
+                const res = await api("editor.phone_shell/default");
+                Taro.setStorageSync("phone_model", {mod: res, time: moment().add(30, "minutes").valueOf()});
+                Taro.hideLoading();
+                resolve(res)
+            } catch (e) {
+                reject(e)
+            }
+        })
+
+    }
     async componentDidMount() {
         // Taro.showLoading({title: "请稍候"});
         // @ts-ignore
@@ -1380,16 +1396,23 @@ export default class Shell extends Component<{}, {
         window.addEventListener("message", this.onMsg);
 
         try {
-            const mod = Taro.getStorageSync("phone_model");
-            this.defaultModel = mod;
+            const modData = Taro.getStorageSync("phone_model");
+
+            if (!modData.time || !modData.mod) {
+                this.defaultModel = await this.getDefaultPhoneShell();
+            } else {
+                const isAfter = moment().isBefore(moment(modData.time));
+                if (!isAfter) {
+                    this.defaultModel = await this.getDefaultPhoneShell();
+                } else {
+                    this.defaultModel = modData.mod;
+                }
+            }
         } catch(e) {
 
         }
         if (!this.defaultModel) {
-            Taro.showLoading({title: "请稍候"});
-            this.defaultModel = await api("editor.phone_shell/default");
-            Taro.setStorageSync("phone_model", this.defaultModel);
-            Taro.hideLoading();
+            this.defaultModel = await this.getDefaultPhoneShell();
 
         }
 

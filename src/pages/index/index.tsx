@@ -198,7 +198,12 @@ class Index extends Component<any, IndexState> {
                             <View className="index_coupon_main" key={`${index}_${cIndex}`} onClick={() => this.receiveCoupon(coupon)}>
                                 <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" />
                                 <View className="receive_btn">
-                                    <Image src={require("../../source/lq.png")} className="receive_img" mode="widthFix" />
+                                    <View className="anim_btn_receive">
+                                        <Text className="txt">立即领取</Text>
+                                        <View className="icon">
+                                            <IconFont name="16_xiayiye" color="#fff" size={32} />
+                                        </View>
+                                    </View>
                                 </View>
                             </View>
                         ))

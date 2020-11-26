@@ -365,14 +365,54 @@
     }
     .receive_btn{
         position: absolute;
-        bottom: 0px;
+        bottom: 42px;
         left: 40px;
         z-index: 100;
-        width: 220px;
+        width: 200px;
         //height: 80px;
         .receive_img{
-            width: 220px;
+            width: 200px;
             //height: 80px;
         }
+        .anim_btn_receive{
+            width: 200px;
+            height: 64px;
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ff3d3c;
+            box-shadow: 0 14px 32px -10px #ff4966;
+            animation: coupon_inf_anim infinite 1s ease-in-out;
+            padding-left: 10px;
+            line-height: 2px;
+            .txt{
+                color: #fff;
+                font-size: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                vertical-align: middle;
+                font-weight: 600;
+            }
+            .icon{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                vertical-align: middle;
+                padding-top: 2px;
+            }
+        }
+    }
+}
+@keyframes coupon_inf_anim {
+    0%{
+        transform: scale(1);
+    }
+    50%{
+        transform: scale(1.1);
+    }
+    100%{
+        transform: scale(1);
     }
 }
