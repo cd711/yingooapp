@@ -231,8 +231,8 @@ export default class Preview extends Component<{}, {
     }
     onEditor = () => {
         const { workId,workInfo } = this.state;
-        
-        window.location.replace(`/editor/shell?id=${workInfo?workInfo.id:workId}`);
+        console.log(workId, workInfo)
+        window.location.replace(`/editor/shell?id=${workInfo && workInfo.id || workId}`);
     }
 
     onOrderIng = () => {
