@@ -1470,11 +1470,17 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             console.log("本地数据：", localParams)
 
             const temp = {...localParams}
-
-            temp.path[Number(this.$router.params.idx)].url = img;
-            temp.path[Number(this.$router.params.idx)].attr = `${doc.width}*${doc.height}`;
-            temp.path[Number(this.$router.params.idx)].edited = true;
-            temp.path[Number(this.$router.params.idx)].doc = doc;
+            const obj = {
+                url: img,
+                attr: `${doc.width}*${doc.height}`,
+                edited: true,
+                doc
+            };
+            if (temp.path[Number(this.$router.params.idx)]) {
+                temp.path[Number(this.$router.params.idx)] = obj;
+            } else {
+                temp.path.push(obj)
+            }
 
             console.log("更新后的params：", temp);
 
@@ -1489,6 +1495,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             Taro.navigateBack()
 
         }catch (e) {
+            console.log("生成预览图出错：", e)
             Taro.hideLoading()
             Taro.showToast({
                 title: "生成预览图出错",

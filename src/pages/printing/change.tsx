@@ -339,7 +339,7 @@ const PrintChange: Taro.FC<any> = () => {
             key: `${userStore.id}_photo_${moment().date()}`,
             data: JSON.stringify({
                 ...paramsObj.current,
-                path: arr
+                path: photos
             })
         })
 
