@@ -56,7 +56,7 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
     return (
         <View className='temp-warp' style={{background: color}}>
-            <View style='background:rgba(0, 0, 0, 0.03);' className='mask'>
+            <View style='background:rgba(0, 0, 0, 0.03);' className='masks'>
                 <View className='title'>
                     <Text className='txt' style={{color: fontColor}}>{item.title}</Text>
                     {item.subtitle ? <Text className='sub-title' style={{color: fontColor}}>{item.subtitle}</Text> : null}
