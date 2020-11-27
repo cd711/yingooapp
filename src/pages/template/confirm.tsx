@@ -30,7 +30,8 @@ export default class Confirm extends Component<any, {
     currentTicketOrderId: string,
     currentOrderTicketId: number,
     usedTickets: Array<any>
-    order_sn: string
+    order_sn: string;
+    payStatus:number
 }> {
 
     config: Config = {
@@ -49,7 +50,8 @@ export default class Confirm extends Component<any, {
             usedTicket: false,
             currentTicketOrderId: "",
             currentOrderTicketId: 0,
-            usedTickets: []
+            usedTickets: [],
+            payStatus:0
         }
     }
 
@@ -228,9 +230,16 @@ export default class Confirm extends Component<any, {
         }).then((res) => {
             // console.log(res);
             Taro.hideLoading();
+            if (res.status > 0) {
+                Taro.navigateTo({
+                    url:`/pages/template/success?status=${Base64.encodeURI(res.order_sn+"-"+"0")}`
+                });
+                return;
+            }
             this.setState({
                 order_sn: res.order_sn,
-                showPayWayModal: true
+                showPayWayModal: true,
+                payStatus:res.status
             })
         }).catch((e) => {
             Taro.hideLoading();
@@ -370,7 +379,7 @@ export default class Confirm extends Component<any, {
     }
 
     render() {
-        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn} = this.state;
+        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn,payStatus} = this.state;
         const {address} = templateStore;
         return (
             <View className='confirm'>
@@ -419,7 +428,7 @@ export default class Confirm extends Component<any, {
                                 <View className='goods-info'>
                                     <View className='title'>
                                         <Text className='txt'>商品信息</Text>
-                                        <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                        {/* <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/> */}
                                     </View>
                                     {
                                         item.products.map((product) => (

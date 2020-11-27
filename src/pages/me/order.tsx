@@ -6,13 +6,14 @@ import IconFont from '../../components/iconfont';
 import {userStore} from "../../store/user";
 import {templateStore} from "../../store/template";
 import { observer, inject } from '@tarojs/mobx'
-import { AtNavBar} from 'taro-ui'
 import { api } from '../../utils/net';
 import { ListModel, ossUrl } from '../../utils/common';
 
 import PayWayModal from '../../components/payway/PayWayModal';
 import page from '../../utils/ext';
 import copy from 'copy-to-clipboard';
+import TipModal from '../../components/tipmodal/TipModal';
+
 
 const tabs = ["全部","待付款","待发货","待收货","已完成"];
 
@@ -25,7 +26,8 @@ export default class Order extends Component<any,{
     showPayWayModal:boolean;
     order_price:string;
     order_sn:string;
-    orderId:number
+    orderId:number;
+    showCancelModal:boolean;
 }> {
 
     config: Config = {
@@ -46,7 +48,8 @@ export default class Order extends Component<any,{
             showPayWayModal:false,
             order_price:"0.00",
             order_sn:"",
-            orderId:0
+            orderId:0,
+            showCancelModal:false
         }
     }
     componentDidMount(){
@@ -101,18 +104,32 @@ export default class Order extends Component<any,{
             }, 1500);
         })
     }
-
+    private cancelId = 0;
     onCancelOrder = (id) => {
+        this.cancelId = id;
+        this.setState({
+            showCancelModal:true
+        })
+
+    }
+    handleCancel = () => {
+        this.setState({showCancelModal:false})
+        if (this.cancelId == 0) {
+            this.cancelId = 0;
+            return;
+        }
         Taro.showLoading({title:"处理中"})
         api("app.order/cancel",{
-            id
+            id:this.cancelId
         }).then(()=>{
+
             Taro.hideLoading();
             Taro.showToast({
                 title:'取消成功',
                 icon:'none',
                 duration:2000
             });
+            
             this.getList(this.state.switchTabActive)
         }).catch((e)=>{
             Taro.hideLoading();
@@ -121,7 +138,8 @@ export default class Order extends Component<any,{
                 icon:'none',
                 duration:2000
             });
-        })
+        });
+        this.cancelId = 0;
     }
     onDelOrder = (id) => {
         Taro.showLoading({title:"处理中"})
@@ -178,7 +196,7 @@ export default class Order extends Component<any,{
         }, 1500);
     }
     render() {
-        const {switchTabActive,data,showPayWayModal,order_price,order_sn} = this.state;
+        const {switchTabActive,data,showPayWayModal,order_price,order_sn,showCancelModal} = this.state;
         const list = data && data.list && data.list.length>0 ? data.list:[];
         return (
             <View className='order'>
@@ -271,7 +289,7 @@ export default class Order extends Component<any,{
                                     </View>
                                     <View className='pay'>
                                         <Text className='name'>实付款</Text>
-                                        <Text className='num'>￥{item.payed_price}</Text>
+                                        <Text className='num'>￥{item.pay_price}</Text>
                                     </View>
                                 </View>
                                 {
@@ -283,7 +301,14 @@ export default class Order extends Component<any,{
                                             })
                                         }}>查看订单</Button>
                                         <Button className='red-full-btn' onClick={()=>{
-                                            console.log(item.order_sn)
+                                            if (parseFloat(item.pay_price+"")==0) {
+                                                Taro.showToast({
+                                                    title:'订单异常，请联系客服!',
+                                                    icon:"none",
+                                                    duration:1500
+                                                })
+                                                return;
+                                            }
                                             this.setState({
                                                 order_price:item.order_price,
                                                 order_sn:item.order_sn,
@@ -329,6 +354,14 @@ export default class Order extends Component<any,{
                             showPayWayModal:false
                         })
                     }}/>
+                <TipModal isShow={showCancelModal} tip="是否要取消订单" cancelText="不取消" okText="取消订单" onCancel={()=>{
+                    this.setState({
+                        showCancelModal:false
+                    });
+                    this.cancelId = 0;
+                }} onOK={()=>{
+                    this.handleCancel();
+                }} />
             </View>
         )
     }

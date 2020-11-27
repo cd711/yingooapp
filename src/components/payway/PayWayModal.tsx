@@ -19,7 +19,7 @@ const PayWayModal: Taro.FC<{
 
     onResult?:(res:any)=>void,
     onClose:()=>void,
-    order_sn:string
+    order_sn:string,
 }> = ({isShow,totalPrice,order_sn,onResult,onClose}) => {
     const [isOpened,setIsOpened] = useState(false);
     const [price,setPrice] = useState("0.00");
@@ -110,6 +110,14 @@ const PayWayModal: Taro.FC<{
             }, 2000);
             return;
         }
+        // if (totalPrice && parseInt(totalPrice+"")==0 && parseInt(payStatus+"")>0) {
+        //     window.history.pushState(null,null,'/pages/me/me')
+        //     window.history.pushState(null,null,'/pages/me/order?tab=0')
+        //     Taro.navigateTo({
+        //         url:`/pages/template/success?pay_order_sn=${orderSN}`
+        //     });
+        //     return;
+        // }
         Taro.showLoading({title:"支付中..."});
         if (is_weixin()) {
             // d["pay_method"] = 'mp';

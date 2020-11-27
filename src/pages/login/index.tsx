@@ -10,7 +10,8 @@ import LoginFooter from './footer'
 export default class Login extends Component<any,{
     codeBtnActive:boolean;
     showMobileClear:boolean;
-    inputActive:boolean
+    inputActive:boolean;
+    textActive:boolean;
     inputValue:string;
 }> {
 
@@ -24,7 +25,8 @@ export default class Login extends Component<any,{
             codeBtnActive:false,
             showMobileClear:false,
             inputValue:"",
-            inputActive:false
+            inputActive:false,
+            textActive:false
         }
     }
     componentDidMount(){
@@ -32,6 +34,11 @@ export default class Login extends Component<any,{
 
     onMobileInput = ({detail:{value}}) => {
         const pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
+        if (value.length<=0) {
+            this.setState({textActive:false})
+        }else{
+            this.setState({textActive:true})
+        }
         this.setState({
             inputValue:value
         })
@@ -60,7 +67,7 @@ export default class Login extends Component<any,{
             inputValue:"",
             showMobileClear:false,
             codeBtnActive:false,
-            inputActive:false
+            textActive:false
         });
         this.inputRef.inputRef.focus();
     }
@@ -82,7 +89,7 @@ export default class Login extends Component<any,{
     }
     render() {
         console.log("render")
-        const { codeBtnActive,showMobileClear,inputValue,inputActive } = this.state;
+        const { codeBtnActive,showMobileClear,inputValue,inputActive,textActive } = this.state;
         return (
             <View className='login'>
                 <HeaderTop rightText='账号登录' url='/pages/login/acount' />
@@ -92,11 +99,12 @@ export default class Login extends Component<any,{
                         <Text className='ttext'>欢迎来到映果定制</Text>
                     </View>
                     <View className='acount'>
-                        <Input type='number' placeholder='请输入手机号' className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
+                        <Input type='number' placeholder='请输入手机号' style={`font-size:${Taro.pxTransform(textActive?36:28)}`} className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
                             this.setState({inputActive:true})
                         }} onBlur={()=>{
+                            this.setState({inputActive:false})
                             if (inputValue.length<=0) {
-                                this.setState({inputActive:false})
+                                this.setState({textActive:false})
                             }
                         }} ref={(node)=>{this.inputRef = node}} value={inputValue} />
                         {/* <Text className='forget'>忘记密码</Text> */}

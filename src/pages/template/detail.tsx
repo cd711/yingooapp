@@ -181,7 +181,7 @@ export default class Detail extends Component<{},{
                 </ScrollView>
                 <View className='bottom_bar'>
                     <View className='favorite' onClick={this.collectedProd}>
-                        <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color='#707177' />
+                        <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color={isLike?'#FFAF39':'#707177'} />
                         <Text className='txt'>收藏</Text>
                     </View>
                     <View className='now-editor' onClick={this.onEditor}>

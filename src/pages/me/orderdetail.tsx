@@ -12,6 +12,7 @@ import { observer, inject } from '@tarojs/mobx';
 import page from '../../utils/ext';
 import { AtModal,AtModalContent } from "taro-ui"
 import copy from 'copy-to-clipboard';
+import TipModal from '../../components/tipmodal/TipModal';
 
 @inject("templateStore")
 @observer
@@ -23,7 +24,8 @@ export default class OrderDetail extends Component<{},{
     seconds:string,
     showPayWayModal:boolean,
     navBarChange:boolean,
-    showServiceModal:boolean
+    showServiceModal:boolean,
+    showCancelModal:boolean
 }> {
 
     config: Config = {
@@ -39,7 +41,8 @@ export default class OrderDetail extends Component<{},{
             seconds:"00",
             showPayWayModal:false,
             navBarChange:false,
-            showServiceModal:false
+            showServiceModal:false,
+            showCancelModal:false
         }
     }
     componentDidMount(){
@@ -126,10 +129,23 @@ export default class OrderDetail extends Component<{},{
         dd();
         this.intervalTime = setInterval(dd, 1000);
     }
+    private cancelId = 0;
     onCancelOrder = (id) => {
+        this.cancelId = id;
+        this.setState({
+            showCancelModal:true
+        })
+
+    }
+    handleCancel = () => {
+        this.setState({showCancelModal:false})
+        if (this.cancelId == 0) {
+            this.cancelId = 0;
+            return;
+        }
         Taro.showLoading({title:"处理中"})
         api("app.order/cancel",{
-            id
+            id:this.cancelId
         }).then((res)=>{
             Taro.hideLoading();
             clearInterval(this.intervalTime);
@@ -222,7 +238,7 @@ export default class OrderDetail extends Component<{},{
         })
     }
     render() {
-        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal } = this.state;
+        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal,showCancelModal } = this.state;
         const state = data.state_tip?data.state_tip.value:0;
         const afterState = data.after_sale_status_tip?data.after_sale_status_tip.value:0;
         let status = data.state_tip?data.state_tip.text:"";
@@ -428,6 +444,14 @@ export default class OrderDetail extends Component<{},{
                             </View>
                         </AtModalContent>
                     </AtModal>
+                    <TipModal isShow={showCancelModal} tip="是否要取消订单" cancelText="不取消" okText="取消订单" onCancel={()=>{
+                        this.setState({
+                            showCancelModal:false
+                        });
+                        this.cancelId = 0;
+                    }} onOK={()=>{
+                        this.handleCancel();
+                    }} />
             </View>
         )
     }
