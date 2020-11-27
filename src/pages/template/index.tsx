@@ -14,7 +14,9 @@ interface TagData{
     start:number,
     total:number
 }
-
+interface TagList {
+    [key: string]: TagData;
+ } 
 @inject("templateStore")
 @observer
 @page({
@@ -26,7 +28,7 @@ export default class Template extends Component<any,{
     topsHeight:number;
     otherHeight:number;
     switchTagActive:number;
-    tagData:TagData | any;
+    tagData:TagList;
     mainRightWidth:number;
     showAllCates:boolean;
     loadStatus:LoadMoreEnum;
@@ -43,13 +45,8 @@ export default class Template extends Component<any,{
             topsHeight:208,
             otherHeight:500,
             switchTagActive:0,
-            tagData:{
-                list:[],
-                size:0,
-                start:0,
-                total:0
-            },
-            mainRightWidth:0,
+            tagData:{},
+            mainRightWidth:104,
             showAllCates:false,
             loadStatus:LoadMoreEnum.more,
             colHeight:{}
@@ -57,13 +54,21 @@ export default class Template extends Component<any,{
     }
 
     componentDidMount() {
-        
+        Taro.removeStorage({key:'template_tops'});
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
             window.addEventListener("resize", ()=>{
                 this.calcDeviceRota();
             }, false)
         }
         Taro.showLoading({title:"加载中..."});
+        Taro.getStorage({key:"template_cate"}).then((res)=>{
+            this.handleCate(res.data);
+            this.getCate();
+        }).catch(()=>{
+            this.getCate();
+        })
+    }
+    getCate = () => {
         api("app.product/cate").then((res)=>{
             res = res.map((item)=>{
                 item.tags.unshift({
@@ -72,32 +77,8 @@ export default class Template extends Component<any,{
                 });
                 return item
             });
-            const {c,t} = this.$router.params;
-            let ca = 0;
-            let ta = 0;
-            const cid = c?parseInt(c):0;
-            const tid = t?parseInt(t):0;
-            for (let index = 0; index < res.length; index++) {
-                const element = res[index];
-                ca = parseInt(element.id+"") == cid ? index : 0; 
-                for (let i = 0; i < element.tags.length; i++) {
-                    const tag = element.tags[i];
-                    if (parseInt(tag.id+"") == tid) {
-                        ta = i;
-                        break;
-                    }
-                }
-            }
-            this.setState({
-                cates:res,
-                switchActive:ca,
-                switchTagActive:ta
-            },()=>{
-                this.calcDeviceRota().then(()=>{
-                    this.getTagContext(res[ca].tags[ta]);  
-                    Taro.hideLoading();
-                }); 
-            })
+            Taro.setStorage({key:"template_cate",data:res});
+            this.handleCate(res);
         }).catch((e)=>{
             console.log(e)
             Taro.hideLoading();
@@ -112,7 +93,34 @@ export default class Template extends Component<any,{
             });
         })
     }
-
+    handleCate = (res) => {
+        const {c,t} = this.$router.params;
+        let ca = 0;
+        let ta = 0;
+        const cid = c?parseInt(c):0;
+        const tid = t?parseInt(t):0;
+        for (let index = 0; index < res.length; index++) {
+            const element = res[index];
+            ca = parseInt(element.id+"") == cid ? index : 0; 
+            for (let i = 0; i < element.tags.length; i++) {
+                const tag = element.tags[i];
+                if (parseInt(tag.id+"") == tid) {
+                    ta = i;
+                    break;
+                }
+            }
+        }
+        this.setState({
+            cates:res,
+            switchActive:ca,
+            switchTagActive:ta
+        },()=>{
+            this.calcDeviceRota().then(()=>{
+                this.getTagContext(res[ca].tags[ta]);  
+                Taro.hideLoading();
+            }); 
+        })
+    }
     calcDeviceRota = () => {
         return new Promise<any>( (resolve, reject) => {
             const template_tops = Taro.getStorageSync('template_tops');
@@ -133,6 +141,8 @@ export default class Template extends Component<any,{
             query().selectViewport().boundingClientRect((vres)=>{
                 query().select(".t_tops").boundingClientRect((res)=>{
                     query().select('#template_left_menu').boundingClientRect((rect)=>{
+                        console.log(document.querySelector('#template_left_menu').clientWidth)
+                        console.log(rect.width)
                         Taro.setStorage({
                             key:'template_tops',
                             data:{
@@ -166,10 +176,10 @@ export default class Template extends Component<any,{
     getTagContext = (tag) => {
         const {switchActive,cates,tagData,mainRightWidth,colHeight} = this.state;
         if (tag) {
-            const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
-            // const tagTotal = tagData && tagData.total && tagData.total>=0?tagData.total:0;
             const tplid = cates[switchActive].tpl_category_id;
             const tagid = tag.id;
+            const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
+            // const tagTotal = tagData && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
             if (tagList.length==0) {
                 
                 colHeight[`${tplid}-${tagid}`] = [];
@@ -190,11 +200,20 @@ export default class Template extends Component<any,{
                     let top = 0;
                     let left = 0;
                     if (tagList.length==0 && index < 2) {
-                        if (tpl_type == "photo" && index == 0) {
-                            left = width + (2*14);
-                            colHeight[`${tplid}-${tagid}`][0] = width;
-                            colHeight[`${tplid}-${tagid}`][index+1] = height;
-                        } else {
+                        if (tpl_type == "photo") {
+                            if (index == 0) {
+                                left = width + (2*14);
+                                colHeight[`${tplid}-${tagid}`][0] = width;
+                                colHeight[`${tplid}-${tagid}`][index+1] = height;
+                            } else {
+                                const minHeight = Math.min(...colHeight[`${tplid}-${tagid}`]);
+                                const minIndex = colHeight[`${tplid}-${tagid}`].indexOf(minHeight);
+                                top = minHeight + 14;
+                                left = minIndex%2==0?14:width + (2*14);
+                                colHeight[`${tplid}-${tagid}`][minIndex] += (height+14);
+                            }
+                        }
+                        if (tpl_type != "photo"){
                             left = index%2==0?14:width + (2*14);
                             colHeight[`${tplid}-${tagid}`][index] = height;
                         }
@@ -213,12 +232,22 @@ export default class Template extends Component<any,{
                 });
 
                 res.list = tagList.concat(res.list);
+                const {tagData} = this.state;
+                tagData[`${tplid}-${tagid}`] = res;
                 this.setState({
-                    tagData:res,
-                    loadStatus:LoadMoreEnum.more
+                    tagData,
+                    loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
                 });
+
+                // setTimeout(() => {
+                //     this.setState({
+                //         tagData,
+                //         loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
+                //     });
+                // }, 3000);
                 Taro.hideLoading();
             }).catch((e)=>{
+                console.log(e)
                 this.setState({
                     loadStatus:LoadMoreEnum.noMore
                 });
@@ -232,14 +261,19 @@ export default class Template extends Component<any,{
     }
 
     onScrollToLower = () => {
-        const {switchActive,cates,switchTagActive,tagData} = this.state;
+        const {switchActive,cates,switchTagActive,tagData,loadStatus} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
-        const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
-        const tagTotal = tagData && tagData.total && tagData.total>=0?tagData.total:0;
-        if (tags.length>0 && tagList.length<tagTotal) {
-            const tag = tags[switchTagActive];
+        // [`${tplid}-${tagid}`]
+        const tplid = cates[switchActive].tpl_category_id;
+        const tag = tags[switchTagActive];
+        const tagid = tag.id;
+        const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
+        const tagTotal = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
+        if (tags.length>0 && tagList.length<tagTotal && loadStatus != LoadMoreEnum.loading) {
+            
             this.getTagContext(tag)
-        } else {
+        } 
+        if (tagList.length==tagTotal) {
             this.setState({
                 loadStatus:LoadMoreEnum.noMore 
             })
@@ -249,11 +283,11 @@ export default class Template extends Component<any,{
     render() {
         const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,loadStatus,colHeight} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
-        const tagList = tagData && tagData.list && tagData.list.length>0?tagData.list:[];
-        const tpl_type=cates && cates[switchActive] && cates[switchActive].tpl_type?cates[switchActive].tpl_type:"";
         const tplid = cates && cates[switchActive] && cates[switchActive].tpl_category_id?cates[switchActive].tpl_category_id:0;
         const tagid = tags && tags[switchTagActive] && tags[switchTagActive].id?tags[switchTagActive].id:0;
-        console.log(colHeight)
+        const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
+        const tpl_type=cates && cates[switchActive] && cates[switchActive].tpl_type?cates[switchActive].tpl_type:"";
+
         const searchBox = <View className='top-search'>
             <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                 <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
@@ -364,7 +398,7 @@ export default class Template extends Component<any,{
                         {/* min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px */}
                         <View className='warp' style={`width:${mainRightWidth}px;box-sizing:border-box;position: relative;min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px`}>
                             {
-                                tpl_type == "photo"?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;position: absolute;top:0;left:14px`} onClick={()=>{
+                                tpl_type == "photo" && loadStatus != LoadMoreEnum.loading && tagList.length>0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;position: absolute;top:0;left:14px`} onClick={()=>{
                                     // @ts-ignore
                                     if (!this.showLoginModal()) {
                                         return
