@@ -54,7 +54,11 @@ export default class Template extends Component<any,{
     }
 
     componentDidMount() {
-        if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
+
+        if (process.env.TARO_ENV === 'h5')  {
+            if (window.location.href.indexOf("template")==-1) {
+                return;
+            }
             window.addEventListener("resize", ()=>{
                 this.calcDeviceRota();
             }, false)
@@ -264,7 +268,38 @@ export default class Template extends Component<any,{
             })
         }
     }
-
+    onTagItemClick = (item,cid,tpl_type) => {
+        if (tpl_type == "phone") {
+            Taro.navigateTo({
+                url:`/pages/template/detail?id=${item.id}&cid=${cid}`
+            });
+        }
+        if (tpl_type == "photo") {
+            // @ts-ignore
+            if (!this.showLoginModal()) {
+                return
+            }
+            Taro.setStorage({
+                key: "imageCount",
+                data: item.image_num
+            })
+            Taro.navigateTo({
+                url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
+            });
+        }
+    }
+    onCateSwitch = (index,tags) => {
+        this.setState({
+            switchActive:index,
+            switchTagActive:0,
+            tagData:{},
+            showAllCates:false
+        },()=>{
+            if (tags.length>0) {
+                this.getTagContext(tags[0]);
+            }
+        });
+    }
     render() {
         const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,loadStatus,colHeight} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
@@ -297,21 +332,7 @@ export default class Template extends Component<any,{
                                 <View className='all-item'>
                                     {
                                         cates.length>0 && cates.map((item,index)=>(
-                                            <View className='item' key={item.id} onClick={()=>{
-                                                this.setState({
-                                                    switchActive:index,
-                                                    switchTagActive:0,
-                                                    tagData:{},
-                                                    showAllCates:false
-                                                },()=>{
-
-                                                    const tagsa = cates && cates[index]?cates[index].tags:[];
-
-                                                    if (tagsa.length>0) {
-                                                        this.getTagContext(tagsa[0]);
-                                                    }
-                                                });
-                                            }}>
+                                            <View className='item' key={item.id} onClick={()=>this.onCateSwitch(index,cates && cates[index]?cates[index].tags:[])}>
                                                 <Image src={item.image} className='img' />
                                                 <Text className='name'>{item.name}</Text>
                                             </View>
@@ -327,20 +348,7 @@ export default class Template extends Component<any,{
                             <View className='warp' style={`width:${Taro.pxTransform((cates.length+1)*128)}`}>
                                 {
                                     cates.length>0 && cates.map((item,index)=>(
-                                        <View className={index==switchActive?'item active':'item'} key={item.id} onClick={()=>{
-
-                                            this.setState({
-                                                switchActive:index,
-                                                switchTagActive:0,
-                                                tagData:{}
-                                            },()=>{
-                                                const tagsa = cates && cates[index]?cates[index].tags:[];
-                                                if (tagsa.length>0) {
-                                                    this.getTagContext(tagsa[0]);
-                                                }
-                                            });
-
-                                        }}>
+                                        <View className={index==switchActive?'item active':'item'} key={item.id} onClick={()=>this.onCateSwitch(index,cates && cates[index]?cates[index].tags:[])}>
                                             <Text className='text'>{item.name}</Text>
                                             {index==switchActive?<Image className='icon' src={require("../../source/switchBottom.png")} />:null}
                                         </View>
@@ -406,26 +414,7 @@ export default class Template extends Component<any,{
 
                                     return <View className='pic-box'
                                         style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`}
-                                        onClick={()=>{
-                                            if (tpl_type == "phone") {
-                                                Taro.navigateTo({
-                                                    url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
-                                                });
-                                            }
-                                            if (tpl_type == "photo") {
-                                                // @ts-ignore
-                                                if (!this.showLoginModal()) {
-                                                    return
-                                                }
-                                                Taro.setStorage({
-                                                    key: "imageCount",
-                                                    data: item.image_num
-                                                })
-                                                Taro.navigateTo({
-                                                    url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
-                                                });
-                                            }
-                                        }} key={item.id}>
+                                        onClick={()=>this.onTagItemClick(item,cates[switchActive].tpl_category_id,tpl_type)} key={item.id}>
                                             {
                                             tpl_type=="phone"?<View className='ke' style={`width:${item.width}px;height:${item.height}px;`}>
                                                 <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />

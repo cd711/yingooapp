@@ -4,7 +4,7 @@ import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
-import moment from 'moment';
+// import moment from 'moment';
 import {ossUrl} from '../../utils/common'
 
 import page from '../../utils/ext';
@@ -33,7 +33,7 @@ export default class Detail extends Component<{},{
             scrollTop:0
         }
     }
-    private lastBottomTime = 0;
+    // private lastBottomTime = 0;
 
     componentDidMount() {
         // const {selectItem} = templateStore;
@@ -49,7 +49,7 @@ export default class Detail extends Component<{},{
             this.getCurrentItem(id);
         }
 
-        this.lastBottomTime = moment().unix();
+        // this.lastBottomTime = moment().unix();
 
     }
     getCurrentItem(id){
@@ -96,22 +96,22 @@ export default class Detail extends Component<{},{
         })
     }
 
-    onPageScroll(){
-        const query = Taro.createSelectorQuery;
-        query().select(".taro-tabbar__panel").fields({
-            scrollOffset: true,
-        },(e)=>{
-            const scrollHeight = e.scrollHeight;
-            const scrollTop = e.scrollTop;
-            const clientHeight = Taro.getSystemInfoSync().windowHeight;
-            const distance = 300;  //距离视窗还用50的时候，开始触发；
-            const nowUnixTime = moment().unix();
-            if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
-                this.lastBottomTime = nowUnixTime;
-                console.log("触及底线了...");
-            }
-        }).exec();
-    }
+    // onPageScroll(){
+    //     const query = Taro.createSelectorQuery;
+    //     query().select(".taro-tabbar__panel").fields({
+    //         scrollOffset: true,
+    //     },(e)=>{
+    //         const scrollHeight = e.scrollHeight;
+    //         const scrollTop = e.scrollTop;
+    //         const clientHeight = Taro.getSystemInfoSync().windowHeight;
+    //         const distance = 300;  //距离视窗还用50的时候，开始触发；
+    //         const nowUnixTime = moment().unix();
+    //         if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
+    //             this.lastBottomTime = nowUnixTime;
+    //             console.log("触及底线了...");
+    //         }
+    //     }).exec();
+    // }
 
     onEditor = () => {
         // @ts-ignore
@@ -147,7 +147,7 @@ export default class Detail extends Component<{},{
             <View className='detail'>
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
-                        window.location.href = '/pages/template/index';
+                        window.location.href = '/template';
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
@@ -156,7 +156,6 @@ export default class Detail extends Component<{},{
                     </View>
                 </View>
                 <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop}>
-                    {/* style={`height:${236/(selectItem.attr.width/selectItem.attr.height)}px`} */}
                     <View className='shell_thumb' style={`height:${Taro.pxTransform(472/(795/1635))}`}>
                         <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
                         <Image src={require('../../source/ke.png')} className='shell' mode='scaleToFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
