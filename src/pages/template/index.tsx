@@ -16,7 +16,7 @@ interface TagData{
 }
 interface TagList {
     [key: string]: TagData;
- } 
+ }
 @inject("templateStore")
 @observer
 @page({
@@ -101,7 +101,7 @@ export default class Template extends Component<any,{
         const tid = t?parseInt(t):0;
         for (let index = 0; index < res.length; index++) {
             const element = res[index];
-            ca = parseInt(element.id+"") == cid ? index : 0; 
+            ca = parseInt(element.id+"") == cid ? index : 0;
             for (let i = 0; i < element.tags.length; i++) {
                 const tag = element.tags[i];
                 if (parseInt(tag.id+"") == tid) {
@@ -116,9 +116,9 @@ export default class Template extends Component<any,{
             switchTagActive:ta
         },()=>{
             this.calcDeviceRota().then(()=>{
-                this.getTagContext(res[ca].tags[ta]);  
+                this.getTagContext(res[ca].tags[ta]);
                 Taro.hideLoading();
-            }); 
+            });
         })
     }
     calcDeviceRota = () => {
@@ -181,7 +181,7 @@ export default class Template extends Component<any,{
             const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
             // const tagTotal = tagData && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
             if (tagList.length==0) {
-                
+
                 colHeight[`${tplid}-${tagid}`] = [];
             }
             this.setState({
@@ -270,12 +270,12 @@ export default class Template extends Component<any,{
         const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
         const tagTotal = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
         if (tags.length>0 && tagList.length<tagTotal && loadStatus != LoadMoreEnum.loading) {
-            
+
             this.getTagContext(tag)
-        } 
+        }
         if (tagList.length==tagTotal) {
             this.setState({
-                loadStatus:LoadMoreEnum.noMore 
+                loadStatus:LoadMoreEnum.noMore
             })
         }
     }
@@ -416,37 +416,37 @@ export default class Template extends Component<any,{
                                     </View>
                                 </View>:null
                             }
-                            {
-                                tagList.map((item)=>{
+                            {/*{*/}
+                            {/*    tagList.map((item)=>{*/}
 
-                                    return <View className='pic-box' 
-                                        style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`} 
-                                        onClick={()=>{
-                                            if (tpl_type == "phone") {
-                                                Taro.navigateTo({
-                                                    url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
-                                                });
-                                            }
-                                            if (tpl_type == "photo") {
-                                                // @ts-ignore
-                                                if (!this.showLoginModal()) {
-                                                    return
-                                                }
-                                                Taro.navigateTo({
-                                                    url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
-                                                });
-                                            }
-                                        }} key={item.id}>
-                                            {
-                                            tpl_type=="phone"?<View className='ke' style={`width:${item.width}px;height:${item.height}px;`}>
-                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />
-                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${item.width}px;height:${item.height}px;`} mode='scaleToFill' />
-                                            </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(16)};overflow: hidden;`} />
-                                            }
-                                    </View>
-                                })
-                            }
-                            
+                            {/*        return <View className='pic-box' */}
+                            {/*            style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`} */}
+                            {/*            onClick={()=>{*/}
+                            {/*                if (tpl_type == "phone") {*/}
+                            {/*                    Taro.navigateTo({*/}
+                            {/*                        url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`*/}
+                            {/*                    });*/}
+                            {/*                }*/}
+                            {/*                if (tpl_type == "photo") {*/}
+                            {/*                    // @ts-ignore*/}
+                            {/*                    if (!this.showLoginModal()) {*/}
+                            {/*                        return*/}
+                            {/*                    }*/}
+                            {/*                    Taro.navigateTo({*/}
+                            {/*                        url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`*/}
+                            {/*                    });*/}
+                            {/*                }*/}
+                            {/*            }} key={item.id}>*/}
+                            {/*                {*/}
+                            {/*                tpl_type=="phone"?<View className='ke' style={`width:${item.width}px;height:${item.height}px;`}>*/}
+                            {/*                    <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />*/}
+                            {/*                    <Image src={require('../../source/ke.png')} className='phone' style={`width:${item.width}px;height:${item.height}px;`} mode='scaleToFill' />*/}
+                            {/*                </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(16)};overflow: hidden;`} />*/}
+                            {/*                }*/}
+                            {/*        </View>*/}
+                            {/*    })*/}
+                            {/*}*/}
+
                         </View>
                         <LoadMore status={loadStatus} />
                     </ScrollView>
