@@ -59,7 +59,7 @@ export default class Template extends Component<any,{
                 this.calcDeviceRota();
             }, false)
         }
-        Taro.showLoading({title:"加载中..."});
+
         // Taro.getStorage({key:"template_cate"}).then((res)=>{
         //     this.handleCate(res.data);
         //     this.getCate();
@@ -69,6 +69,7 @@ export default class Template extends Component<any,{
         this.getCate();
     }
     getCate = () => {
+        Taro.showLoading({title:"加载中..."});
         api("app.product/cate").then((res)=>{
             res = res.map((item)=>{
                 item.tags.unshift({
@@ -80,7 +81,6 @@ export default class Template extends Component<any,{
             // Taro.setStorage({key:"template_cate",data:res});
             this.handleCate(res);
         }).catch((e)=>{
-            console.log(e)
             Taro.hideLoading();
             Taro.showToast({
                 title:e,
@@ -118,8 +118,11 @@ export default class Template extends Component<any,{
             this.calcDeviceRota().then(()=>{
                 this.getTagContext(res[ca].tags[ta]);
                 Taro.hideLoading();
+            }).catch(()=>{
+                Taro.hideLoading();
             });
         })
+        Taro.hideLoading();
     }
     calcDeviceRota = () => {
         return new Promise<any>( (resolve, reject) => {
@@ -130,7 +133,6 @@ export default class Template extends Component<any,{
                 return;
             }
             query().selectViewport().boundingClientRect((vres)=>{
-                console.log(vres)
                 query().selectAll(".t_tops").boundingClientRect((res:any)=>{
                     query().selectAll('.left-menu').boundingClientRect((rect:any)=>{
                         res.forEach((t_rect)=>{
@@ -154,7 +156,6 @@ export default class Template extends Component<any,{
                 }).exec();
             }).exec();
         })
-
     }
     componentWillUnmount() {
         if (process.env.TARO_ENV === 'h5')  {
@@ -228,13 +229,6 @@ export default class Template extends Component<any,{
                     tagData,
                     loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
                 });
-
-                // setTimeout(() => {
-                //     this.setState({
-                //         tagData,
-                //         loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
-                //     });
-                // }, 3000);
                 Taro.hideLoading();
             }).catch((e)=>{
                 console.log(e)
