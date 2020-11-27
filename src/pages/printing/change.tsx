@@ -205,6 +205,9 @@ const PrintChange: Taro.FC<any> = () => {
                 {key: "r", val: 0},
             ];
 
+            if (params.path.length === 0) {
+                selectPhoto()
+            }
             params.path = params.path.map((v) => {
                 const allowRotate = checkHasRotate(v.attr);
                 let arr = [...tArr];

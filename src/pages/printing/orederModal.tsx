@@ -142,7 +142,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                         {
                             data && data.attrGroup && data.attrGroup.map((item, index) => (
                                 <View className='param' key={item.id}>
-                                    <Text className='title'>{item.name}</Text>
+                                    {!item.disable ? <Text className='title'>{item.name}</Text> : null}
                                     <View className='params'>
                                         {
                                             tags && tags[index] && tags[index].map((tag) => {
