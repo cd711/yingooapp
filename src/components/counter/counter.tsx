@@ -33,7 +33,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             }
             number > 1 ? setNumber(number - 1) : setNumber(1);
         }}>
-            <Image src={require("../../source/reduce.png")} className='img'/>
+            <Image src={number>1?require("../../source/reduceActive.png"):require("../../source/reduce.png")} className='img'/>
         </View>
         <Text className='num'>{number}</Text>
         <View className='add' onClick={(e) => {
