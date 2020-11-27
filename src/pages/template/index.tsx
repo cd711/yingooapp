@@ -406,36 +406,36 @@ export default class Template extends Component<any,{
                                     </View>
                                 </View>:null
                             }
-                            {/*{*/}
-                            {/*    tagList.map((item)=>{*/}
+                            {
+                                tagList.map((item)=>{
 
-                            {/*        return <View className='pic-box' */}
-                            {/*            style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`} */}
-                            {/*            onClick={()=>{*/}
-                            {/*                if (tpl_type == "phone") {*/}
-                            {/*                    Taro.navigateTo({*/}
-                            {/*                        url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`*/}
-                            {/*                    });*/}
-                            {/*                }*/}
-                            {/*                if (tpl_type == "photo") {*/}
-                            {/*                    // @ts-ignore*/}
-                            {/*                    if (!this.showLoginModal()) {*/}
-                            {/*                        return*/}
-                            {/*                    }*/}
-                            {/*                    Taro.navigateTo({*/}
-                            {/*                        url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`*/}
-                            {/*                    });*/}
-                            {/*                }*/}
-                            {/*            }} key={item.id}>*/}
-                            {/*                {*/}
-                            {/*                tpl_type=="phone"?<View className='ke' style={`width:${item.width}px;height:${item.height}px;`}>*/}
-                            {/*                    <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />*/}
-                            {/*                    <Image src={require('../../source/ke.png')} className='phone' style={`width:${item.width}px;height:${item.height}px;`} mode='scaleToFill' />*/}
-                            {/*                </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(16)};overflow: hidden;`} />*/}
-                            {/*                }*/}
-                            {/*        </View>*/}
-                            {/*    })*/}
-                            {/*}*/}
+                                    return <View className='pic-box'
+                                        style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`}
+                                        onClick={()=>{
+                                            if (tpl_type == "phone") {
+                                                Taro.navigateTo({
+                                                    url:`/pages/template/detail?id=${item.id}&cid=${cates[switchActive].tpl_category_id}`
+                                                });
+                                            }
+                                            if (tpl_type == "photo") {
+                                                // @ts-ignore
+                                                if (!this.showLoginModal()) {
+                                                    return
+                                                }
+                                                Taro.navigateTo({
+                                                    url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
+                                                });
+                                            }
+                                        }} key={item.id}>
+                                            {
+                                            tpl_type=="phone"?<View className='ke' style={`width:${item.width}px;height:${item.height}px;`}>
+                                                <Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`} mode='scaleToFill' />
+                                                <Image src={require('../../source/ke.png')} className='phone' style={`width:${item.width}px;height:${item.height}px;`} mode='scaleToFill' />
+                                            </View>:<Image src={ossUrl(item.thumb_image,1)} className='item' style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(16)};overflow: hidden;`} />
+                                            }
+                                    </View>
+                                })
+                            }
 
                         </View>
                         <LoadMore status={loadStatus} />
