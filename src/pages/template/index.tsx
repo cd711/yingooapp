@@ -59,7 +59,7 @@ export default class Template extends Component<any,{
                 this.calcDeviceRota();
             }, false)
         }
-        Taro.showLoading({title:"加载中..."});
+        
         // Taro.getStorage({key:"template_cate"}).then((res)=>{
         //     this.handleCate(res.data);
         //     this.getCate();
@@ -69,6 +69,7 @@ export default class Template extends Component<any,{
         this.getCate();
     }
     getCate = () => {
+        Taro.showLoading({title:"加载中..."});
         api("app.product/cate").then((res)=>{
             res = res.map((item)=>{
                 item.tags.unshift({
@@ -117,8 +118,11 @@ export default class Template extends Component<any,{
             this.calcDeviceRota().then(()=>{
                 this.getTagContext(res[ca].tags[ta]);  
                 Taro.hideLoading();
+            }).catch(()=>{
+                Taro.hideLoading();
             }); 
         })
+        Taro.hideLoading();
     }
     calcDeviceRota = () => {
         return new Promise<any>( (resolve, reject) => {
@@ -225,13 +229,6 @@ export default class Template extends Component<any,{
                     tagData,
                     loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
                 });
-
-                // setTimeout(() => {
-                //     this.setState({
-                //         tagData,
-                //         loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
-                //     });
-                // }, 3000);
                 Taro.hideLoading();
             }).catch((e)=>{
                 console.log(e)

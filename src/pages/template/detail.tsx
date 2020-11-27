@@ -147,8 +147,7 @@ export default class Detail extends Component<{},{
             <View className='detail'>
                 <View className='nav-bar'>
                     <View className='left' onClick={() => {
-                        // window.location.href = '/pages/template/index'
-                        Taro.navigateBack();
+                        window.location.href = '/pages/template/index';
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
