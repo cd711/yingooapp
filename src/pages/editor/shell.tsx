@@ -1248,7 +1248,9 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
     useEffect(() => {
         setTimeout(() => {
-            // setDefaultDoc()
+            if (!parent.$router.params.id) {
+                setDefaultDoc()
+            }
         }, 1500)
     }, [])
 
@@ -1510,6 +1512,7 @@ export default class Shell extends Component<{}, {
                     break;
 
                 case "onload":
+                    console.log(5555555)
                     this.setState({
                         loadingTemplate: false
                     });
