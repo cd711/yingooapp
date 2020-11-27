@@ -43,7 +43,7 @@ const page = (option?: {
                         })
                         location.replace(exportUrl)
                         this.wechatLoginSuccess && this.wechatLoginSuccess(res);
-                    }).catch((e) => {
+                    }).catch(() => {
                         Taro.hideLoading();
                         Taro.reLaunch({
                             url: '/pages/index/index'

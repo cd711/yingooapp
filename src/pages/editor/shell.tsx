@@ -3,7 +3,6 @@ import {Image, ScrollView, Text, View} from '@tarojs/components';
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
 import './editor.less';
 import './shell.less';
-
 import {api, getToken} from '../../utils/net';
 import IconFont from '../../components/iconfont';
 import {observable} from 'mobx';
@@ -13,6 +12,7 @@ import UploadFile from "../../components/Upload/Upload";
 import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
 import {userStore} from "../../store/user";
 import moment from "moment";
+import LoadMore from "../../components/listMore/loadMore";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -71,7 +71,9 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
     const [templateList, setTemplateList] = useState([]);
     const [selected, setSelected] = useState(null);
     const defaultDoc = Taro.useRef(null);
-    let total: number = 0;
+    const total = Taro.useRef(0)
+    const [status, setStatus] = useState<'more' | 'loading' | 'noMore'>("more");
+    const [page, setPage] = useState(1);
 
     // 获取列表
     async function getListOfCategory(params: {tagId?: number | string, page?: number, size?: number, loadMore?: boolean} = {}) {
@@ -79,7 +81,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
         const opt = {
             cid: router.params.cid,
             tagId: params.tagId || "",
-            page: params.page || 0,
+            page: params.page || 1,
             size: params.size || 15,
             loadMore: params.loadMore || false
         }
@@ -90,13 +92,15 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
                 page: opt.page,
                 size: opt.size
             });
-            total = Number(res.total);
+            total.current = Number(res.total);
             let list = [];
             if (opt.loadMore) {
                 list = [...templateList, ...res.list]
             } else {
                 list = [...res.list]
             }
+
+            setStatus(list.length == res.total ? "noMore" : "more")
             setTemplateList([...list])
         }catch (e) {
             console.log("根据ID获取模板列表出错：", e)
@@ -139,7 +143,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
                     break;
                 }
             }
-            getListOfCategory({tagId: arr[0].id, page: 0})
+            getListOfCategory({tagId: arr[0].id, page: 1})
             setTypeList([...arr])
         }).catch(e => {
             console.log("获取商品分类出错：", e)
@@ -152,7 +156,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
         setActive(idx);
         getListOfCategory({
             tagId: typeList[idx].id,
-            page: 0
+            page: 1
         })
     }
 
@@ -178,16 +182,19 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
 
     const loadMore = () => {
         console.log("加载更多")
-        if (total === templateList.length || total <= 15) {
+
+        const pagtion = getNextPage(page, pageTotal(total.current, 15));
+
+        if (total.current === templateList.length || total.current <= 15) {
             return
         }
-        if (templateList.length < total) {
-            getListOfCategory({
-                tagId: typeList[active].id,
-                page: templateList.length,
-                loadMore: true
-            })
-        }
+        setPage(pagtion.page)
+        setStatus("loading")
+        getListOfCategory({
+            tagId: typeList[active].id,
+            page: pagtion.page,
+            loadMore: true
+        })
     }
 
     const onCancel = () => {
@@ -231,6 +238,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
                     </View>
                 ))}
             </View>
+            {templateList.length > 0 ? <LoadMore status={status} /> : null}
         </ScrollView>
         <View className='optBar'>
             <View onClick={onCancel} className="icon"><IconFont name='24_guanbi' size={48}/></View>
@@ -1248,7 +1256,9 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
     useEffect(() => {
         setTimeout(() => {
-            // setDefaultDoc()
+            if (!parent.$router.params.tpl_id) {
+                setDefaultDoc()
+            }
         }, 1500)
     }, [])
 
@@ -1510,6 +1520,7 @@ export default class Shell extends Component<{}, {
                     break;
 
                 case "onload":
+                    console.log(5555555)
                     this.setState({
                         loadingTemplate: false
                     });

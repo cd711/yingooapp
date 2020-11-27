@@ -1312,7 +1312,19 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
 
         const {img}: any = urlDeCode(this.$router.params);
-        templateStore.editorPhotos = [{id: "", url: img}]
+        templateStore.editorPhotos = [{id: "", url: img}];
+
+        // 再次编辑时使用存储的图片数据
+        if (routerParams.local && routerParams.local == "t") {
+            try {
+                const res = Taro.getStorageSync(`${userStore.id}_originalData`);
+                if (res) {
+                    templateStore.editorPhotos = [...res]
+                }
+            }catch (e) {
+                console.log("获取存储的图片旧数据出错：", e)
+            }
+        }
     }
 
 
@@ -1366,15 +1378,19 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             } else {
                 const localParams = this.getPhotoParams();
                 const current = localParams.path[Number(routerParams.idx)];
+                let imgArr = [];
+                const {img}: any = urlDeCode(routerParams);
                 if (current && current.edited && current.edited == true && !notNull(current.doc)) {
                     console.log("已编辑过的模板")
                     data = current.doc;
+                    imgArr = templateStore.editorPhotos.map(v => v.url)
                 } else {
                     console.log("没有编辑过的模板")
+
+                    imgArr = [img]
                 }
 
-                const {img}: any = urlDeCode(routerParams);
-                await callEditor("setDoc", data, [img])
+                await callEditor("setDoc", data, imgArr)
             }
 
         }catch (e) {
@@ -1489,12 +1505,14 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     next = async () => {
-        const doc: any = await callEditor("getDoc");
-        console.log(doc)
+
         Taro.showLoading({
             title: "合成中..."
         })
         try {
+            const doc: any = await callEditor("getDoc");
+            console.log(doc)
+
             const res = await api("editor.upload/preview", {
                 content: {
                     type: "page",
@@ -1507,15 +1525,20 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
             const localParams = this.getPhotoParams();
 
-            console.log("本地数据：", localParams)
-
             const temp = {...localParams}
-            const obj = {
+
+            let obj: any = {
                 url: img,
                 attr: `${doc.width}*${doc.height}`,
                 edited: true,
-                doc
+                doc,
+                originalData: templateStore.editorPhotos
             };
+
+
+
+            console.log("本地数据：", localParams)
+
             if (temp.path[Number(this.$router.params.idx)]) {
                 temp.path[Number(this.$router.params.idx)] = obj;
             } else {

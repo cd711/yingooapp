@@ -216,7 +216,8 @@ const PrintChange: Taro.FC<any> = () => {
                     url: v.url,
                     count: notNull(v.count) ? 1 : parseInt(v.count),
                     hasRotate: allowRotate,
-                    osx: getTailoringImg(arr)
+                    osx: getTailoringImg(arr),
+                    readLocal: v.originalData && v.originalData.length > 0
                 }
             })
             setPhotos([...params.path] || [])
@@ -517,17 +518,28 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onEditClick = (item ,index) => {
 
-        let obj:any = {
+        let obj: any = {
             idx: index,
             cid: router.params.id,
             tplid: router.params.cid,
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             tplmax: router.params.tplmax,
             img: item.url,
+            local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f"
         };
         if (router.params.proid) {
             obj = {...obj, proid: router.params.proid}
         }
+
+        try {
+            if (!notNull(item.readLocal) && item.readLocal === true) {
+                Taro.setStorageSync(`${userStore.id}_originalData`, item.originalData);
+                templateStore.editorPhotos = [...item.originalData]
+            }
+        }catch (e) {
+            console.log("向本地存储旧数据出错：", e)
+        }
+
         const str = getURLParamsStr(urlEncode(obj))
 
         Taro.navigateTo({
