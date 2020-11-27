@@ -68,6 +68,7 @@ export default class Template extends Component<any,{
         // })
         this.getCate();
     }
+
     getCate = () => {
         Taro.showLoading({title:"加载中..."});
         api("app.product/cate").then((res)=>{
