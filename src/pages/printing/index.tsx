@@ -56,7 +56,7 @@ const Index: Taro.FC<any> = () => {
         setChecked(Number(id))
     }
 
-    function renderParams(path) {
+    function renderParams(path: any[], allowFastJump: boolean = false) {
         const temp = {path, sku: checked, id: router.params.id};
         try {
             Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp))
@@ -65,13 +65,19 @@ const Index: Taro.FC<any> = () => {
         }
         templateStore.photoSizeParams = temp;
 
-        const str = getURLParamsStr(urlEncode({
+        let obj: any = {
             id: router.params.id,
             cid: info.current.category.tpl_category_id,
             max: info.current.max,
             tplmax: info.current.tpl_max,
             proid: router.params.imgid
-        }))
+        }
+
+        if (allowFastJump) {
+            obj = {...obj, status: "t"}
+        }
+
+        const str = getURLParamsStr(urlEncode(obj))
         console.log(str)
         Taro.navigateTo({
             url: `/pages/printing/change?${str}`
@@ -113,7 +119,7 @@ const Index: Taro.FC<any> = () => {
                 edited: false,
                 doc: ""
             });
-            renderParams([]);
+            renderParams([], true);
             return
         }
 

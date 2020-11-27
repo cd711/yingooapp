@@ -1270,12 +1270,46 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     public editorProxy: WindowProxy | null | undefined;
 
+    getLocalEditPhotos = () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const res = Taro.getStorageSync(`${moment().date()}_${userStore.id}_editPhotos`);
+                console.log("本地可编辑的图片：", res)
+                if (res) {
+                    resolve(res)
+                } else {
+                    if (templateStore.editorPhotos.length > 0) {
+                        resolve([...templateStore.editorPhotos])
+                    } else {
+                        reject(null)
+                    }
+                }
+            }catch (e) {
+                if (templateStore.editorPhotos.length > 0) {
+                    resolve(templateStore.editorPhotos)
+                } else {
+                    reject(null)
+                }
+            }
+        })
+    }
+
     async componentDidMount() {
-        // Taro.showLoading({title: "请稍候"});
-        // @ts-ignore
+        const routerParams = this.$router.params;
+
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
+
+        if (routerParams.init && routerParams.init == "t") {
+            try {
+                const arr: any = await this.getLocalEditPhotos();
+                templateStore.editorPhotos = [...arr];
+            }catch (e) {
+                templateStore.editorPhotos = [{id: "", url: ""}]
+            }
+            return
+        }
 
         const {img}: any = urlDeCode(this.$router.params);
         templateStore.editorPhotos = [{id: "", url: img}]
@@ -1318,24 +1352,30 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onLoadEmpty = async (_?: number) => {
-
+        const routerParams = this.$router.params;
         try {
-            const res = await api("editor.tpl/index", {cid: this.$router.params.tplid, num: 1});
+            const res = await api("editor.tpl/index", {cid: routerParams.tplid, num: templateStore.editorPhotos.length});
 
-            const proId = this.$router.params.proid || null;
+            const proId = routerParams.proid || null;
 
             let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
-            const localParams = this.getPhotoParams();
-            const current = localParams.path[Number(this.$router.params.idx)];
-            if (current && current.edited && current.edited == true && !notNull(current.doc)) {
-                console.log("已编辑过的模板")
-                data = current.doc;
-            } else {
-                console.log("没有编辑过的模板")
-            }
 
-            const {img}: any = urlDeCode(this.$router.params);
-            await callEditor("setDoc", data, [img])
+            if (routerParams.init && routerParams.init == "t") {
+                console.log("开始初始化图片：", data, templateStore.editorPhotos.map(v => v.url))
+                await callEditor("setDoc", data, templateStore.editorPhotos.map(v => v.url))
+            } else {
+                const localParams = this.getPhotoParams();
+                const current = localParams.path[Number(routerParams.idx)];
+                if (current && current.edited && current.edited == true && !notNull(current.doc)) {
+                    console.log("已编辑过的模板")
+                    data = current.doc;
+                } else {
+                    console.log("没有编辑过的模板")
+                }
+
+                const {img}: any = urlDeCode(routerParams);
+                await callEditor("setDoc", data, [img])
+            }
 
         }catch (e) {
             console.log("初始化失败：", e)

@@ -26,7 +26,8 @@ const PrintChange: Taro.FC<any> = () => {
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
     const _imgstyle = Taro.useRef("");
-    const sizeArr = Taro.useRef<any[]>([])
+    const sizeArr = Taro.useRef<any[]>([]);
+    const allowInit = Taro.useRef(false);
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -209,6 +210,13 @@ const PrintChange: Taro.FC<any> = () => {
             setPhotos([...params.path] || [])
         }
 
+        console.log(router.params.status)
+        // 从模板首页选择列表某一个的模板后才会触发
+        if (router.params.status && router.params.status === "t" && params.path.length === 0) {
+            allowInit.current = true;
+            selectPhoto()
+        }
+
     })
 
     const onReducer = (prevNum, idx) => {
@@ -260,6 +268,9 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onCreateOrder = async () => {
+        if (photos.length <= 0) {
+            return
+        }
         Taro.showLoading({title: "请稍后..."});
         try {
             const res = await api("app.product/info", {id: paramsObj.current.id});
@@ -379,6 +390,46 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
+
+        // 在模板首页选择列表某一个后才会触发
+        if (allowInit.current) {
+            allowInit.current = false
+            closeSelectPhoto()
+            let obj: any = {
+                cid: router.params.id,
+                tplid: router.params.cid,
+                status: "f",
+                tplmax: router.params.tplmax,
+                init: "t"
+            };
+
+            if (router.params.proid) {
+                obj = {...obj, proid: router.params.proid}
+            }
+
+            const str = getURLParamsStr(urlEncode(obj))
+
+            let photos = data.ids.map((value, index) => {
+                return {
+                    id: value,
+                    url: data.imgs[index]
+                }
+            });
+
+            templateStore.editorPhotos = [...photos];
+            try {
+                Taro.setStorageSync(`${moment().date()}_${userStore.id}_editPhotos`, photos)
+            } catch (e) {
+                console.log("向本地存储选择的相册错误：", e)
+            }
+
+            Taro.navigateTo({
+                url: `/pages/editor/printedit?${str}`
+            })
+
+            return
+        }
+
         const arr = [...photos];
         for (let i = 0; i < data.ids.length; i++) {
             arr.push({
@@ -527,7 +578,7 @@ const PrintChange: Taro.FC<any> = () => {
                 <View className="btn default" onClick={selectPhoto}>
                     <Text className="txt">添加图片</Text>
                 </View>
-                <View className="btn" onClick={onCreateOrder}>
+                <View className="btn" onClick={onCreateOrder} style={{opacity: photos.length > 0 ? 1 : 0.7}}>
                     <Text className="txt">立即下单</Text>
                 </View>
             </View>
