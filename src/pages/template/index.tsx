@@ -46,7 +46,7 @@ export default class Template extends Component<any,{
             otherHeight:500,
             switchTagActive:0,
             tagData:{},
-            mainRightWidth:104,
+            mainRightWidth:0,
             showAllCates:false,
             loadStatus:LoadMoreEnum.more,
             colHeight:{}
@@ -54,19 +54,19 @@ export default class Template extends Component<any,{
     }
 
     componentDidMount() {
-        Taro.removeStorage({key:'template_tops'});
         if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
             window.addEventListener("resize", ()=>{
                 this.calcDeviceRota();
             }, false)
         }
         Taro.showLoading({title:"加载中..."});
-        Taro.getStorage({key:"template_cate"}).then((res)=>{
-            this.handleCate(res.data);
-            this.getCate();
-        }).catch(()=>{
-            this.getCate();
-        })
+        // Taro.getStorage({key:"template_cate"}).then((res)=>{
+        //     this.handleCate(res.data);
+        //     this.getCate();
+        // }).catch(()=>{
+        //     this.getCate();
+        // })
+        this.getCate();
     }
     getCate = () => {
         api("app.product/cate").then((res)=>{
@@ -77,7 +77,7 @@ export default class Template extends Component<any,{
                 });
                 return item
             });
-            Taro.setStorage({key:"template_cate",data:res});
+            // Taro.setStorage({key:"template_cate",data:res});
             this.handleCate(res);
         }).catch((e)=>{
             console.log(e)
@@ -123,43 +123,33 @@ export default class Template extends Component<any,{
     }
     calcDeviceRota = () => {
         return new Promise<any>( (resolve, reject) => {
-            const template_tops = Taro.getStorageSync('template_tops');
             const ww = Taro.getSystemInfoSync().windowWidth;
-            if (template_tops) {
-                template_tops.mainRightWidth = ww - template_tops.leftWidth;
-                this.setState(template_tops);
-                setTimeout(() => {
-                    resolve();
-                }, 100);
-                return;
-            }
             const query = Taro.createSelectorQuery;
             if (!query) {
                 reject();
                 return;
             }
             query().selectViewport().boundingClientRect((vres)=>{
-                query().select(".t_tops").boundingClientRect((res)=>{
-                    query().select('#template_left_menu').boundingClientRect((rect)=>{
-                        console.log(document.querySelector('#template_left_menu').clientWidth)
-                        console.log(rect.width)
-                        Taro.setStorage({
-                            key:'template_tops',
-                            data:{
-                                topsHeight:res.height>0?res.height:104,
-                                otherHeight:vres.height-res.height-50,
-                                mainRightWidth:ww-rect.width,
-                                leftWidth:rect.width
+                console.log(vres)
+                query().selectAll(".t_tops").boundingClientRect((res:any)=>{
+                    query().selectAll('.left-menu').boundingClientRect((rect:any)=>{
+                        res.forEach((t_rect)=>{
+                            if (t_rect.height>0) {
+                                rect.forEach((l_rect)=>{
+                                    if (l_rect.width>0) {
+                                        this.setState({
+                                            topsHeight:t_rect.height,
+                                            otherHeight:vres.height-t_rect.height-50,
+                                            mainRightWidth:ww-l_rect.width
+                                        });
+                                        setTimeout(() => {
+                                            resolve();
+                                        }, 100);
+                                    }
+                                })
                             }
                         })
-                        this.setState({
-                            topsHeight:res.height>0?res.height:104,
-                            otherHeight:vres.height-res.height-50,
-                            mainRightWidth:ww-rect.width
-                        });
-                        setTimeout(() => {
-                            resolve();
-                        }, 100);
+
                     }).exec();
                 }).exec();
             }).exec();
@@ -373,7 +363,7 @@ export default class Template extends Component<any,{
                     </View>
                 </View>
 
-                <View className='main' style={`top:${topsHeight}px;height:${otherHeight}px;width:100vw;`}>
+                <View className='main' style={`top:${topsHeight}px;height:${otherHeight}px;`}>
                     <View className='left-menu' id="template_left_menu" style={`height:${otherHeight}px;background:#FFF`}>
                         <ScrollView scrollY className='left-scroll' style={`height:${otherHeight}px;background:#FFF`}>
                             {
