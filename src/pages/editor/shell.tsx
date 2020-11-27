@@ -1248,7 +1248,7 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
     useEffect(() => {
         setTimeout(() => {
-            if (!parent.$router.params.id) {
+            if (!parent.$router.params.tpl_id) {
                 setDefaultDoc()
             }
         }, 1500)
