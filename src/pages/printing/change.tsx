@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import OrderModal from "./orederModal";
 import {userStore} from "../../store/user";
