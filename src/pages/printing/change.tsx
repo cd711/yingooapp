@@ -28,6 +28,7 @@ const PrintChange: Taro.FC<any> = () => {
     const _imgstyle = Taro.useRef("");
     const sizeArr = Taro.useRef<any[]>([]);
     const allowInit = Taro.useRef(false);
+    const [imgCount, setImgCount] = useState<number>(1)
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -146,6 +147,17 @@ const PrintChange: Taro.FC<any> = () => {
 
         } catch (e) {
             console.log("读取print_attrItems出错：", e)
+        }
+
+        try {
+            const res = Taro.getStorageSync("imageCount");
+            if (res) {
+                setImgCount(Number(res))
+            } else {
+                setImgCount(1)
+            }
+        }catch (e) {
+            console.log("获取本地图片数出错：", e)
         }
 
         // 解析参数
@@ -598,6 +610,7 @@ const PrintChange: Taro.FC<any> = () => {
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
                         <Photos editSelect
                                 onClose={closeSelectPhoto}
+                                count={imgCount}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
                         />

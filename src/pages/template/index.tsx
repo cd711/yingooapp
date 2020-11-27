@@ -422,6 +422,10 @@ export default class Template extends Component<any,{
                                                 if (!this.showLoginModal()) {
                                                     return
                                                 }
+                                                Taro.setStorage({
+                                                    key: "imageCount",
+                                                    data: item.image_num
+                                                })
                                                 Taro.navigateTo({
                                                     url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
                                                 });
