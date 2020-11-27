@@ -80,7 +80,6 @@ export default class Template extends Component<any,{
             // Taro.setStorage({key:"template_cate",data:res});
             this.handleCate(res);
         }).catch((e)=>{
-            console.log(e)
             Taro.hideLoading();
             Taro.showToast({
                 title:e,
@@ -130,7 +129,6 @@ export default class Template extends Component<any,{
                 return;
             }
             query().selectViewport().boundingClientRect((vres)=>{
-                console.log(vres)
                 query().selectAll(".t_tops").boundingClientRect((res:any)=>{
                     query().selectAll('.left-menu').boundingClientRect((rect:any)=>{
                         res.forEach((t_rect)=>{
@@ -154,7 +152,6 @@ export default class Template extends Component<any,{
                 }).exec();
             }).exec();
         })
-
     }
     componentWillUnmount() {
         if (process.env.TARO_ENV === 'h5')  {
