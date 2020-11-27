@@ -46,7 +46,7 @@ export default class Template extends Component<any,{
             otherHeight:500,
             switchTagActive:0,
             tagData:{},
-            mainRightWidth:0,
+            mainRightWidth:104,
             showAllCates:false,
             loadStatus:LoadMoreEnum.more,
             colHeight:{}
@@ -141,6 +141,8 @@ export default class Template extends Component<any,{
             query().selectViewport().boundingClientRect((vres)=>{
                 query().select(".t_tops").boundingClientRect((res)=>{
                     query().select('#template_left_menu').boundingClientRect((rect)=>{
+                        console.log(document.querySelector('#template_left_menu').clientWidth)
+                        console.log(rect.width)
                         Taro.setStorage({
                             key:'template_tops',
                             data:{
@@ -178,7 +180,6 @@ export default class Template extends Component<any,{
             const tagid = tag.id;
             const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
             // const tagTotal = tagData && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
-            console.log(tagList)
             if (tagList.length==0) {
                 
                 colHeight[`${tplid}-${tagid}`] = [];
@@ -231,18 +232,19 @@ export default class Template extends Component<any,{
                 });
 
                 res.list = tagList.concat(res.list);
-                // this.setState({
-                //     tagData:res,
-                //     loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
-                // });
                 const {tagData} = this.state;
                 tagData[`${tplid}-${tagid}`] = res;
-                setTimeout(() => {
-                    this.setState({
-                        tagData,
-                        loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
-                    });
-                }, 3000);
+                this.setState({
+                    tagData,
+                    loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
+                });
+
+                // setTimeout(() => {
+                //     this.setState({
+                //         tagData,
+                //         loadStatus:res.list.length==res.total?LoadMoreEnum.noMore:LoadMoreEnum.more
+                //     });
+                // }, 3000);
                 Taro.hideLoading();
             }).catch((e)=>{
                 console.log(e)
