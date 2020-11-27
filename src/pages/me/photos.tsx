@@ -16,6 +16,10 @@ interface PhotosProps {
     onPhotoSelect?: ({ids: [], imgs: [], attrs: []}) => void;
     defaultSelect?: Array<{id: string | number, img: string}>;
     onClose?: () => void;
+    // 选择图片必选多少张
+    count?: number;
+    // 选择图片最大多少张
+    max?: number;
 }
 export default class Photos extends Component<PhotosProps,{
     navSwitchActive:number;
@@ -33,7 +37,9 @@ export default class Photos extends Component<PhotosProps,{
 }> {
 
     static defaultProps = {
-        editSelect: false
+        editSelect: false,
+        count: 0,
+        max: 100
     }
 
     config: Config = {
@@ -158,9 +164,18 @@ export default class Photos extends Component<PhotosProps,{
     }
 
     delEditSelectImg = idx => {
+        const {max, editSelect} = this.props;
         const editSelectImgs = this.state.editSelectImgs;
         const editSelectImgIds = this.state.editSelectImgIds;
         const editSelectAttr = this.state.editSelectAttr;
+
+        if (editSelect && editSelectImgIds.length >= max) {
+            Taro.showToast({
+                title: `最多选择${max}张`
+            })
+            return
+        }
+
         editSelectImgs.splice(idx, 1);
         editSelectImgIds.splice(idx, 1);
         editSelectAttr.splice(idx, 1);
@@ -168,11 +183,16 @@ export default class Photos extends Component<PhotosProps,{
     }
 
     submitEditSelect = () => {
+        const {count} = this.props;
         const {editSelectImgs, editSelectImgIds, editSelectAttr} = this.state;
         const {onPhotoSelect} = this.props;
         if (editSelectImgs.length === 0 || editSelectImgIds.length === 0) {
             Taro.showToast({title: "未选择素材", icon: "none"})
             return
+        }
+        if (count > 0 && count !== editSelectImgs.length) {
+            Taro.showToast({title: `必须选择${count}张`, icon: "none"})
+            return;
         }
         onPhotoSelect && onPhotoSelect({
             ids: editSelectImgIds,

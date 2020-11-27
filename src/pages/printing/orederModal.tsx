@@ -146,7 +146,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                                     <View className='params'>
                                         {
                                             tags && tags[index] && tags[index].map((tag) => {
-                                                return <Fragment key={tag.id}>
+                                                return !item.disable && <Fragment key={tag.id}>
                                                     <View className={itemActive.indexOf(tag.id) > -1 ? 'item active' : tag.over ? 'item over' : 'item'}
                                                           style={item.disable ? {opacity: 0.7} : null}
                                                           onClick={() => {

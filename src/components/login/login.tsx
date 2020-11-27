@@ -15,7 +15,6 @@ interface LoginProps {
 const Login: Taro.FC<LoginProps> = props => {
 
     const {onOk, onClose, onThirdPartyAuth,
-        showClose = true,
         loginTxt = "手机号登录"
     } = props;
 
@@ -48,7 +47,7 @@ const Login: Taro.FC<LoginProps> = props => {
             <View className={`login_model_main ${visible ? "animtion_login_model" : ""}`}>
                 <View className="head">
                     <Text className="h2">登录后体验全面功能</Text>
-                    {showClose ? <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={40} /></View> : null}
+                    <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={40} /></View>
                 </View>
                 <View className="login_btn">
                     <View className="btn_lo" onClick={onOk}>

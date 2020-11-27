@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import OrderModal from "./orederModal";
 import {userStore} from "../../store/user";
@@ -26,7 +26,9 @@ const PrintChange: Taro.FC<any> = () => {
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
     const _imgstyle = Taro.useRef("");
-    const sizeArr = Taro.useRef<any[]>([])
+    const sizeArr = Taro.useRef<any[]>([]);
+    const allowInit = Taro.useRef(false);
+    const [imgCount, setImgCount] = useState<number>(1)
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -147,6 +149,17 @@ const PrintChange: Taro.FC<any> = () => {
             console.log("读取print_attrItems出错：", e)
         }
 
+        try {
+            const res = Taro.getStorageSync("imageCount");
+            if (res) {
+                setImgCount(Number(res))
+            } else {
+                setImgCount(1)
+            }
+        }catch (e) {
+            console.log("获取本地图片数出错：", e)
+        }
+
         // 解析参数
         let params: any = {};
 
@@ -209,6 +222,13 @@ const PrintChange: Taro.FC<any> = () => {
             setPhotos([...params.path] || [])
         }
 
+        console.log(router.params.status)
+        // 从模板首页选择列表某一个的模板后才会触发
+        if (router.params.status && router.params.status === "t" && params.path.length === 0) {
+            allowInit.current = true;
+            selectPhoto()
+        }
+
     })
 
     const onReducer = (prevNum, idx) => {
@@ -260,6 +280,9 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onCreateOrder = async () => {
+        if (photos.length <= 0) {
+            return
+        }
         Taro.showLoading({title: "请稍后..."});
         try {
             const res = await api("app.product/info", {id: paramsObj.current.id});
@@ -379,6 +402,46 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
+
+        // 在模板首页选择列表某一个后才会触发
+        if (allowInit.current) {
+            allowInit.current = false
+            closeSelectPhoto()
+            let obj: any = {
+                cid: router.params.id,
+                tplid: router.params.cid,
+                status: "f",
+                tplmax: router.params.tplmax,
+                init: "t"
+            };
+
+            if (router.params.proid) {
+                obj = {...obj, proid: router.params.proid}
+            }
+
+            const str = getURLParamsStr(urlEncode(obj))
+
+            let photos = data.ids.map((value, index) => {
+                return {
+                    id: value,
+                    url: data.imgs[index]
+                }
+            });
+
+            templateStore.editorPhotos = [...photos];
+            try {
+                Taro.setStorageSync(`${moment().date()}_${userStore.id}_editPhotos`, photos)
+            } catch (e) {
+                console.log("向本地存储选择的相册错误：", e)
+            }
+
+            Taro.navigateTo({
+                url: `/pages/editor/printedit?${str}`
+            })
+
+            return
+        }
+
         const arr = [...photos];
         for (let i = 0; i < data.ids.length; i++) {
             arr.push({
@@ -527,7 +590,7 @@ const PrintChange: Taro.FC<any> = () => {
                 <View className="btn default" onClick={selectPhoto}>
                     <Text className="txt">添加图片</Text>
                 </View>
-                <View className="btn" onClick={onCreateOrder}>
+                <View className="btn" onClick={onCreateOrder} style={{opacity: photos.length > 0 ? 1 : 0.7}}>
                     <Text className="txt">立即下单</Text>
                 </View>
             </View>
@@ -547,6 +610,7 @@ const PrintChange: Taro.FC<any> = () => {
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
                         <Photos editSelect
                                 onClose={closeSelectPhoto}
+                                count={imgCount}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
                         />

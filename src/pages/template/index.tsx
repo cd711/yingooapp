@@ -16,7 +16,7 @@ interface TagData{
 }
 interface TagList {
     [key: string]: TagData;
- } 
+ }
 @inject("templateStore")
 @observer
 @page({
@@ -59,7 +59,7 @@ export default class Template extends Component<any,{
                 this.calcDeviceRota();
             }, false)
         }
-        
+
         // Taro.getStorage({key:"template_cate"}).then((res)=>{
         //     this.handleCate(res.data);
         //     this.getCate();
@@ -102,7 +102,7 @@ export default class Template extends Component<any,{
         const tid = t?parseInt(t):0;
         for (let index = 0; index < res.length; index++) {
             const element = res[index];
-            ca = parseInt(element.id+"") == cid ? index : 0; 
+            ca = parseInt(element.id+"") == cid ? index : 0;
             for (let i = 0; i < element.tags.length; i++) {
                 const tag = element.tags[i];
                 if (parseInt(tag.id+"") == tid) {
@@ -117,11 +117,11 @@ export default class Template extends Component<any,{
             switchTagActive:ta
         },()=>{
             this.calcDeviceRota().then(()=>{
-                this.getTagContext(res[ca].tags[ta]);  
+                this.getTagContext(res[ca].tags[ta]);
                 Taro.hideLoading();
             }).catch(()=>{
                 Taro.hideLoading();
-            }); 
+            });
         })
         Taro.hideLoading();
     }
@@ -173,7 +173,7 @@ export default class Template extends Component<any,{
             const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
             // const tagTotal = tagData && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
             if (tagList.length==0) {
-                
+
                 colHeight[`${tplid}-${tagid}`] = [];
             }
             this.setState({
@@ -255,12 +255,12 @@ export default class Template extends Component<any,{
         const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
         const tagTotal = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].total && tagData[`${tplid}-${tagid}`].total>=0?tagData[`${tplid}-${tagid}`].total:0;
         if (tags.length>0 && tagList.length<tagTotal && loadStatus != LoadMoreEnum.loading) {
-            
+
             this.getTagContext(tag)
-        } 
+        }
         if (tagList.length==tagTotal) {
             this.setState({
-                loadStatus:LoadMoreEnum.noMore 
+                loadStatus:LoadMoreEnum.noMore
             })
         }
     }
@@ -404,8 +404,8 @@ export default class Template extends Component<any,{
                             {
                                 tagList.map((item)=>{
 
-                                    return <View className='pic-box' 
-                                        style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`} 
+                                    return <View className='pic-box'
+                                        style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`}
                                         onClick={()=>{
                                             if (tpl_type == "phone") {
                                                 Taro.navigateTo({
@@ -417,6 +417,10 @@ export default class Template extends Component<any,{
                                                 if (!this.showLoginModal()) {
                                                     return
                                                 }
+                                                Taro.setStorage({
+                                                    key: "imageCount",
+                                                    data: item.image_num
+                                                })
                                                 Taro.navigateTo({
                                                     url:`/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width+"*"+item.attr.height}&status=t`
                                                 });
@@ -431,7 +435,7 @@ export default class Template extends Component<any,{
                                     </View>
                                 })
                             }
-                            
+
                         </View>
                         <LoadMore status={loadStatus} />
                     </ScrollView>

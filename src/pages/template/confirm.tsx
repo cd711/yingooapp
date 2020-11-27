@@ -135,6 +135,7 @@ export default class Confirm extends Component<any, {
                 Taro.hideLoading();
                 Taro.showToast({
                     title: e,
+                    icon: "none",
                     duration: 2000
                 })
             })
@@ -443,7 +444,7 @@ export default class Confirm extends Component<any, {
                                                             this.onCounterChange(e, data.prepay_id, item.pre_order_id, product);
                                                         }}/>
                                                     }
-                                                    
+
                                                 </View>
                                             </View>
                                         ))
