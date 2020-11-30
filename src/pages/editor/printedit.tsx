@@ -1370,12 +1370,13 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
             const proId = routerParams.proid || null;
 
-            let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
-
             if (routerParams.init && routerParams.init == "t") {
-                console.log("开始初始化图片：", data, templateStore.editorPhotos.map(v => v.url))
-                await callEditor("setDoc", data, templateStore.editorPhotos.map(v => v.url))
+                const id = res.list[0].id;
+                console.log("开始初始化图片：", id, templateStore.editorPhotos.map(v => v.url))
+                await callEditor("setDoc", id, templateStore.editorPhotos.map(v => v.url))
             } else {
+                let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
+
                 const localParams = this.getPhotoParams();
                 const current = localParams.path[Number(routerParams.idx)];
                 let imgArr = [];
