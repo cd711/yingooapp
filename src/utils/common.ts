@@ -1,4 +1,6 @@
 import Taro from "@tarojs/taro";
+import Rgbaster from "rgbaster";
+import {wxColors} from "./wxColor";
 import ENV_TYPE = Taro.ENV_TYPE;
 
 export function ossUrl(url: string, type: number) {
@@ -247,4 +249,57 @@ export function backHandlePress() {
             console.log("监听到返回")
         })
     }
+}
+
+
+/**
+ * @param src {string} 图片地址
+ * @param options {Object} 配置参数
+ * @param canvasId {string} DOM id、仅微信小程序使用此参数
+ */
+interface RGBAsterParams {
+    // 图片地址
+    src: string,
+    // 配置参数
+    options?: {[key: string]: any},
+    // 仅微信小程序使用此参数
+    canvasId?: string
+}
+/**
+ * 获取图片主色调，已兼容小程序、web
+ * @param params {RGBAsterParams} 参数
+ * @constructor
+ * @return Promise<any[]>
+ */
+export function RGBAster (params:RGBAsterParams = {src: ""}) {
+    const opt: any = {
+        src: params.src,
+        options: params.options || {},
+        canvasId: params.canvasId || null,
+    }
+    return new Promise<any[]>((resolve, reject) => {
+        if (!opt.src) {
+            reject("未找到图片地址");
+            return
+        }
+        if (Taro.getEnv() === ENV_TYPE.WEB) {
+            Rgbaster(opt.src, {...opt.options}).then(res => {
+                resolve(res)
+            }).catch(e => {
+                reject(e)
+            })
+        } else if (Taro.getEnv() === ENV_TYPE.WEAPP) {
+            if (!opt.canvasId) {
+                reject("未设置canvasId")
+            } else {
+                wxColors.colors(opt.src, opt.canvasId, {
+                    width: deviceInfo.windowWidth,
+                    height: 280,
+                    success: res => {
+                        resolve(res)
+                    }
+                })
+            }
+        }
+    })
 }
