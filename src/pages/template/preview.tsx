@@ -235,7 +235,7 @@ export default class Preview extends Component<any, {
     onEditor = () => {
         const { workId,workInfo, doc} = this.state;
         console.log(workId, workInfo)
-        window.location.replace(`/editor/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}`);
+        window.location.replace(`/editor/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`);
     }
 
     onOrderIng = () => {
@@ -256,7 +256,7 @@ export default class Preview extends Component<any, {
 
     render() {
         const { placeOrderShow,workId,productInfo,workInfo} = this.state;
-        const workid = workInfo && workInfo.id ? workInfo.id : 0;
+        const workid = workInfo && workInfo.id ? workInfo.id : workId;
         return (
             <View className='preview'>
                 {/* {
