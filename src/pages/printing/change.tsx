@@ -28,7 +28,7 @@ const PrintChange: Taro.FC<any> = () => {
     const _imgstyle = Taro.useRef("");
     const sizeArr = Taro.useRef<any[]>([]);
     const allowInit = Taro.useRef(false);
-    const [imgCount, setImgCount] = useState<number>(1)
+    const [imgCount, setImgCount] = useState<number>(0)
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -154,7 +154,7 @@ const PrintChange: Taro.FC<any> = () => {
             if (res) {
                 setImgCount(Number(res))
             } else {
-                setImgCount(1)
+                setImgCount(0)
             }
         }catch (e) {
             console.log("获取本地图片数出错：", e)
@@ -486,7 +486,7 @@ const PrintChange: Taro.FC<any> = () => {
             key: `${userStore.id}_photo_${moment().date()}`,
             data: JSON.stringify({
                 ...paramsObj.current,
-                path: photos
+                path: exArr
             })
         })
 
@@ -550,9 +550,16 @@ const PrintChange: Taro.FC<any> = () => {
         })
     }
 
+    const onBackHandle = () => {
+        Taro.removeStorage({
+            key: `${userStore.id}_photo_${moment().date()}`
+        })
+        Taro.navigateBack()
+    }
+
     return (
         <View className="printing_container">
-            <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
+            <AtNavBar onClickLeftIcon={onBackHandle}
                       color='#121314' title="照片冲印列表" border fixed
                       leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
             />
