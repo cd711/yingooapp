@@ -5,7 +5,6 @@ import IconFont from '../../components/iconfont';
 // / npx iconfont-taro
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import { AtNavBar} from 'taro-ui'
 import TipModal from '../../components/tipmodal/TipModal'
 
 @inject("userStore")
@@ -15,7 +14,7 @@ export default class Setting extends Component<any,{
 }> {
 
     config: Config = {
-        navigationBarTitleText: '设置',
+        navigationBarTitleText: '账号管理',
         // backgroundColor:'#F5F6F9'
     }
 
@@ -34,21 +33,16 @@ export default class Setting extends Component<any,{
         
         return (
             <View className='acounts'>
-                <AtNavBar
-                  onClickLeftIcon={()=>{
+                <View className='nav-bar'>
+                    <View className='left' onClick={() => {
                         Taro.navigateBack();
-                    }}
-                    // eslint-disable-next-line react/jsx-indent-props
-                    color='#121314'
-                    title='设置'
-                    border={false}
-                    // fixed
-                    leftIconType={{
-                        value:'chevron-left',
-                        color:'#121314',
-                        size:24
-                    }}
-                />
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>{this.config.navigationBarTitleText}</Text>
+                    </View>
+                </View>
                 <View className='alist'>
                     <View className='item'>
                         <Text className='name'>映果号</Text>
