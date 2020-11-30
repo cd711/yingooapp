@@ -1142,7 +1142,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     }
 
     useEffect(() => {
-        getTemplateForPhotoNum().then(res => {
+        getTemplateForPhotoNum({num: templateStore.editorPhotos.length}).then(res => {
             setTemplateList([...res])
         })
     }, [])
@@ -1371,7 +1371,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             const proId = routerParams.proid || null;
 
             if (routerParams.init && routerParams.init == "t") {
-                const id = res.list[0].id;
+                const id = proId ? proId : res.list[0].id;
                 console.log("开始初始化图片：", id, templateStore.editorPhotos.map(v => v.url))
                 await callEditor("setDoc", id, templateStore.editorPhotos.map(v => v.url))
             } else {
