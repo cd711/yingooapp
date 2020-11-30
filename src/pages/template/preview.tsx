@@ -256,7 +256,7 @@ export default class Preview extends Component<any, {
 
     render() {
         const { placeOrderShow,workId,productInfo,workInfo} = this.state;
-        const workid = workInfo && workInfo.id ? workInfo.id : 0;
+        const workid = workInfo && workInfo.id ? workInfo.id : workId;
         return (
             <View className='preview'>
                 {/* {
