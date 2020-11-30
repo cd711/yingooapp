@@ -150,11 +150,13 @@ const PrintChange: Taro.FC<any> = () => {
         }
 
         try {
-            const res = Taro.getStorageSync("imageCount");
-            if (res) {
-                setImgCount(Number(res))
-            } else {
-                setImgCount(0)
+            if (!router.params.sku_id) {
+                const res = Taro.getStorageSync("imageCount");
+                if (res) {
+                    setImgCount(Number(res))
+                } else {
+                    setImgCount(0)
+                }
             }
         }catch (e) {
             console.log("获取本地图片数出错：", e)
@@ -551,6 +553,7 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onBackHandle = () => {
+        templateStore.photoSizeParams = []
         Taro.removeStorage({
             key: `${userStore.id}_photo_${moment().date()}`
         })
