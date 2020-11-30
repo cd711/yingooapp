@@ -1,15 +1,16 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Button } from '@tarojs/components'
+import { View, Text, Button,ScrollView } from '@tarojs/components'
 import './setting.less'
 import IconFont from '../../components/iconfont';
 // / npx iconfont-taro
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import { AtNavBar} from 'taro-ui'
 import TipModal from '../../components/tipmodal/TipModal'
+import page from '../../utils/ext';
 
 @inject("userStore")
 @observer
+@page({wechatAutoLogin:true})
 export default class Setting extends Component<any,{
     tipModalShow:boolean;
 }> {
@@ -53,21 +54,20 @@ export default class Setting extends Component<any,{
 
         return (
             <View className='setting'>
-                <AtNavBar
-                    onClickLeftIcon={()=>{
-                        Taro.navigateBack();
-                    }}
-                    color='#121314'
-                    title='设置'
-                    border={false}
-                    fixed
-                    leftIconType={{
-                        value:'chevron-left',
-                        color:'#121314',
-                        size:24
-                    }}
-                />
-                <View className='slist' style={{paddingTop:60}}>
+                <View className='nav-bar'>
+                    <View className='left' onClick={() => {
+                        Taro.reLaunch({
+                            url:'/pages/me/me'
+                        });
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>{this.config.navigationBarTitleText}</Text>
+                    </View>
+                </View>
+                <ScrollView scrollY className='setting_page_scroll'>
+                <View className='slist'>
                     <Text className='title'>个人/账号</Text>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
@@ -130,6 +130,7 @@ export default class Setting extends Component<any,{
                     })
                 }}>退出登录</Button>
                 <View style={{paddingTop:54}}></View>
+                </ScrollView>
                 <TipModal isShow={tipModalShow} tip='是否退出当前账号？' onCancel={()=>{
                     this.setState({
                         tipModalShow:false

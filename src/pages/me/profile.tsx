@@ -27,7 +27,7 @@ export default class Profile extends Component<any,{
 }> {
 
     config: Config = {
-        navigationBarTitleText: '设置',
+        navigationBarTitleText: '个人信息',
         // backgroundColor:'#F5F6F9'
     }
 
@@ -152,19 +152,16 @@ export default class Profile extends Component<any,{
         const sex = userStore.sex
         return (
             <View className='profile'>
-                <AtNavBar
-                    onClickLeftIcon={()=>{
+                <View className='nav-bar'>
+                    <View className='left' onClick={() => {
                         Taro.navigateBack();
-                    }}
-                    color='#121314'
-                    title='个人信息'
-                    border={false}
-                    leftIconType={{
-                        value:'chevron-left',
-                        color:'#121314',
-                        size:24
-                    }}
-                />
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>{this.config.navigationBarTitleText}</Text>
+                    </View>
+                </View>
                 <View className='base-info'>
                     <UploadFile uploadType="image" extraType={1} onChange={this.uploadAvatar}>
                         <View className='item'>

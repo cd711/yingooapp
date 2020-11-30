@@ -152,17 +152,17 @@ export default class Login extends Component<{},{
                             <View className='ticket_list'>
                             {
                                 list.map((item)=>(
-                                    <View style={item.status ==2||item.status ==3?'filter: grayscale(100%);':''}>
+                                    <View style={item.status_tip.value ==2||item.status_tip.value ==3?'filter: grayscale(100%);':''}>
                                         <Ticket isNew={false} key={item.id} ticket={item.coupon} right={
                                             <View className='item_right'>
                                                 {
-                                                    item.status == 1?<Button className='use_button' onClick={()=>{
+                                                    item.status_tip.value == 1?<Button className='use_button' onClick={()=>{
                                                         if (item.coupon.use_url && item.coupon.use_url.length>0) {
                                                             Taro.reLaunch({
                                                                 url:item.coupon.use_url
                                                             });
                                                         }
-                                                    }}>使用</Button>:(item.status == 2?<Text className='used_txt'>已使用</Text>:item.status==3?<Image className='ticket_fuck' src={require("../../source/ticket_fuck.svg")}/>:null)
+                                                    }}>使用</Button>:(item.status_tip.value == 2?<Text className='used_txt'>已使用</Text>:item.status_tip.value==3?<Image className='ticket_fuck' src={require("../../source/ticket_fuck.svg")}/>:null)
                                                 }
                                             </View>
                                         }/>

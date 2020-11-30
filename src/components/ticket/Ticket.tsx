@@ -7,7 +7,7 @@ import Checkbox from '../checkbox/checkbox';
 import moment from "moment";
 
 const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
-
+    const [showDes,setShowDes] = useState(false)
     useEffect(() => {
         // console.log(ticket)
     }, [])
@@ -37,7 +37,13 @@ const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
                 <Text className='time'>
                     {`${moment.unix(ticket.use_start_time).format("YYYY-MM-DD")} - ${moment.unix(ticket.use_end_time).format("YYYY-MM-DD")}`}
                 </Text>
-                <View className='apply'>
+                <View className='apply' onClick={(e)=>{
+                    e.stopPropagation();
+                    // console.log(ticket.remark)
+                    if (ticket.description) {
+                        setShowDes(!showDes)
+                    }
+                }}>
                     <Text className='txt'>{ticket.desc}</Text>
                     <IconFont name='16_xiangxiazhankai' size={32} color='#9C9DA6' />
                 </View>
@@ -47,6 +53,11 @@ const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
             }
 
         </View>
+        {
+            showDes?<View className='remark_box'>
+                <Text className='ticket_remark'>{ticket.description}</Text>
+            </View>:null
+        }
     </View>
 }
 export default Ticket;
