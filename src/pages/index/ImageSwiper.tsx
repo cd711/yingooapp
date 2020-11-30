@@ -1,8 +1,7 @@
 import Taro, {useState} from "@tarojs/taro";
 import {View, Text, Image, Swiper, SwiperItem, Button} from "@tarojs/components";
 import "./index.less";
-import {ossUrl} from "../../utils/common";
-import RGBAster from "rgbaster";
+import {ossUrl, RGBAster} from "../../utils/common";
 
 interface ImageSwiperProps {
     item: any;
@@ -19,9 +18,12 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
     const getCurrentSwiperColor = (index) => {
         setCurrent(index)
         const img = item.clist[index].thumb_image;
-        RGBAster(ossUrl(img, 0), {
-            ignore: [ 'rgb(255,255,255)', 'rgb(0,0,0)' ],
-            scale: 0.6
+        RGBAster({
+            src: ossUrl(img, 0),
+            options: {
+                ignore: [ 'rgb(255,255,255)', 'rgb(0,0,0)' ],
+                scale: 0.6
+            }
         }).then(res => {
             const cArr = res.slice(1, 10);
             const currentColor = cArr[2].color;
