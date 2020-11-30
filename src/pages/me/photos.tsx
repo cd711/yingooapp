@@ -130,7 +130,7 @@ export default class Photos extends Component<PhotosProps,{
     }
 
     imageSelect = (id: any, url, attr) => {
-        const {editSelect} = this.props;
+        const {editSelect, count} = this.props;
 
         if (editSelect) {
             const editSelectImgs = this.state.editSelectImgs;
@@ -142,7 +142,12 @@ export default class Photos extends Component<PhotosProps,{
                 editSelectImgIds.splice(idx, 1);
                 editSelectAttr.splice(idx, 1)
             } else {
+                if (count > 0 && editSelectImgs.length === count) {
+                    Taro.showToast({title: `只能选择${count}张`, icon: "none"})
+                    return;
+                }
                 if (editSelectImgIds.length >= 100) {
+                    Taro.showToast({title: `最多选择100张`, icon: "none"})
                     return;
                 }
                 editSelectImgs.push(url);
@@ -319,7 +324,7 @@ export default class Photos extends Component<PhotosProps,{
 
 
     render() {
-        const {editSelect, onClose} = this.props;
+        const {editSelect, onClose, count} = this.props;
         const { navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened, editSelectImgs, editSelectImgIds} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片","视频"];
@@ -431,8 +436,8 @@ export default class Photos extends Component<PhotosProps,{
                             ? <View className="photo_edit_selector_container">
                                 <View className="select_head">
                                     <View className="left">
-                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材</Text>
-                                        {/*<Text className="ext">长按素材拖动排序</Text>*/}
+                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材{count > 0 ? `，需选择${count}张` : null}</Text>
+                                        {/*<Text className="ext">长按拖动排序</Text>*/}
                                     </View>
                                     <View className="right">
                                         <View className="submit" onClick={this.submitEditSelect}>
