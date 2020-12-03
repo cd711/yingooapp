@@ -42,7 +42,7 @@ class App extends Component {
             'pages/login/setnew',
             'pages/login/mobile',
             'pages/login/find',
-            'pages/editor/shell',
+            // 'pages/editor/shell',
             'pages/editor/printedit',
             // 'pages/editor/photos',
             // 'pages/editor/mousepad',
