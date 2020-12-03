@@ -986,7 +986,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         setStyleAlign(fontAttribute.align[num].key);
         updateDocFont({align: styleAlign})
     }
-    // @ts-ignore
+
     return (
         <View className="change_image_container">
             <View className="change_main">
@@ -1210,31 +1210,30 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         console.log("自增结果：", obj)
         currentData.current = {...obj}
     }
-    if (type == 0) {
-        return <View className='tools' style={t == 0 ? {padding: 0} : {padding: "0 13%"} }>
-                    <View className='btn' onClick={() => setType(1)}>
-                        <IconFont name='24_bianjiqi_chongyin' size={48}/>
-                        <Text className='txt'>添加</Text>
-                    </View>
-                    <View onClick={onChangeTemplate} className='btn'>
-                        <IconFont name='24_bianjiqi_moban' size={48}/>
-                        <Text className='txt'>模板</Text>
-                    </View>
-                </View>;
-    }
-    if (type == 1) {
-        return <View className="photo_picker_container photo_picker_animate" style={{
-            width: deviceInfo.windowWidth,
-            height: deviceInfo.windowHeight,
-            padding: 0
-        }}>
-            <Photos editSelect
-                    onClose={cancelMode}
-                    onPhotoSelect={onPhotoSelect}
-            />
-        </View>;
-    }
-    return null;
+
+    return type === 0
+        ? <View className='tools' style={0 == 0 ? {padding: 0} : {padding: "0 13%"} }>
+            <View className='btn' onClick={() => setType(1)}>
+                <IconFont name='24_bianjiqi_chongyin' size={48}/>
+                <Text className='txt'>添加</Text>
+            </View>
+            <View onClick={onChangeTemplate} className='btn'>
+                <IconFont name='24_bianjiqi_moban' size={48}/>
+                <Text className='txt'>模板</Text>
+            </View>
+        </View>
+        : type === 1
+            ? <View className="photo_picker_container photo_picker_animate" style={{
+                width: deviceInfo.windowWidth,
+                height: deviceInfo.windowHeight,
+                padding: 0
+            }}>
+                <Photos editSelect
+                        onClose={cancelMode}
+                        onPhotoSelect={onPhotoSelect}
+                />
+            </View>
+            : <View />
 }
 
 interface PrintEditState {
@@ -1634,78 +1633,74 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         this.store.tool = 5;
         this.store.isEdit = true;
     }
+
     switchRender = (tool) => {
+        let ele = <View />
         if (tool == 0) {
-            return <ToolBar0 parent={this} />;
-        }
-        if (tool == 1) {
-            return <View key={s+""} className='tools'>
-                            <View className='btn' onClick={this.changeImage}>
-                                <IconFont name='24_bianjiqi_chongyin' size={48}/>
-                                <Text className='txt'>换图</Text>
-                            </View>
-                            <View className='btn' onClick={this.onFilpY}>
-                                <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48}/>
-                                <Text className='txt'>水平</Text>
-                            </View>
-                            <View className='btn' onClick={this.onFilpX}>
-                                <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48}/>
-                                <Text className='txt'>垂直</Text>
-                            </View>
-                            <View className='btn' onClick={this.onChangeAlpha}>
-                                <View className='icon'>
-                                    <Image className="icon_img" src={require("../../source/trans.png")}/>
-                                </View>
-                                <Text className='txt'>透明度</Text>
-                            </View>
-                            {/*<View className='btn'>*/}
-                            {/*    <View className='icon'>*/}
-                            {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                            {/*    </View>*/}
-                            {/*    <Text className='txt'>删除</Text>*/}
-                            {/*</View>*/}
-                        </View>
-        }
-        if (tool==2) {
-            return <View key={s+""} className='tools'>
-            <View className='btn' onClick={this.changeTxt}>
-                <IconFont name='24_bianjiqi_huantu' size={48}/>
-                <Text className='txt'>编辑</Text>
+            ele = <ToolBar0 parent={this} />;
+        } else if (tool == 1) {
+            ele = <View className='tools'>
+                <View className='btn' onClick={this.changeImage}>
+                    <IconFont name='24_bianjiqi_chongyin' size={48}/>
+                    <Text className='txt'>换图</Text>
+                </View>
+                <View className='btn' onClick={this.onFilpY}>
+                    <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48}/>
+                    <Text className='txt'>水平</Text>
+                </View>
+                <View className='btn' onClick={this.onFilpX}>
+                    <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48}/>
+                    <Text className='txt'>垂直</Text>
+                </View>
+                <View className='btn' onClick={this.onChangeAlpha}>
+                    <View className='icon'>
+                        <Image className="icon_img" src={require("../../source/trans.png")}/>
+                    </View>
+                    <Text className='txt'>透明度</Text>
+                </View>
+                {/*<View className='btn'>*/}
+                {/*    <View className='icon'>*/}
+                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
+                {/*    </View>*/}
+                {/*    <Text className='txt'>删除</Text>*/}
+                {/*</View>*/}
             </View>
-            <View className='btn' onClick={this.selectFont}>
-                <IconFont name='24_bianjiqi_ziti' size={48}/>
-                <Text className='txt'>字体</Text>
+        } else if (tool==2) {
+            ele = <View className='tools'>
+                <View className='btn' onClick={this.changeTxt}>
+                    <IconFont name='24_bianjiqi_huantu' size={48}/>
+                    <Text className='txt'>编辑</Text>
+                </View>
+                <View className='btn' onClick={this.selectFont}>
+                    <IconFont name='24_bianjiqi_ziti' size={48}/>
+                    <Text className='txt'>字体</Text>
+                </View>
+                <View className='btn' onClick={this.changeFontStyle}>
+                    <IconFont name='24_bianjiqi_yangshi' size={48}/>
+                    <Text className='txt'>样式</Text>
+                </View>
+                {/*<View className='btn'>*/}
+                {/*    <View className='icon'>*/}
+                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
+                {/*    </View>*/}
+                {/*    <Text className='txt'>删除</Text>*/}
+                {/*</View>*/}
             </View>
-            <View className='btn' onClick={this.changeFontStyle}>
-                <IconFont name='24_bianjiqi_yangshi' size={48}/>
-                <Text className='txt'>样式</Text>
-            </View>
-            {/*<View className='btn'>*/}
-            {/*    <View className='icon'>*/}
-            {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-            {/*    </View>*/}
-            {/*    <Text className='txt'>删除</Text>*/}
-            {/*</View>*/}
-        </View>            
+        } else if (tool == 4) {
+            ele = <ChangeImage
+                onClose={this.cancelEdit}
+                onOk={this.onOk}
+            />
+        } else if (tool == 5) {
+            ele = <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
+        } else if (tool == 6) {
+            ele = <ChangeText onClose={this.cancelEdit} data={this.state.textInfo} onOk={this.onOk} />
+        } else if (tool == 7) {
+            ele = <SelectFont onClose={this.cancelEdit} onOk={this.onOk} />
+        } else if (tool == 8) {
+            ele = <ChangeFontStyle onClose={this.cancelEdit} onOk={this.onOk} />
         }
-        if (tool == 4) {
-            return <ChangeImage
-            onClose={this.cancelEdit}
-            onOk={this.onOk}
-        />        
-        }
-        if (tool == 5) {
-            return <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
-        }
-        if (tool == 6) {
-            return <ChangeText onClose={this.cancelEdit} data={this.state.textInfo} onOk={this.onOk} />
-        }
-        if (tool == 7) {
-            return <SelectFont onClose={this.cancelEdit} onOk={this.onOk} />
-        }
-        if (tool == 8) {
-            return <ChangeFontStyle onClose={this.cancelEdit} onOk={this.onOk} />
-        }
+        return ele
     }
     render() {
         const {loadingTemplate, size } = this.state;
@@ -1720,14 +1715,20 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.102:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`}/>
-                {loadingTemplate ?
-                    <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
+                <iframe className="editor_frame"
+                        src={
+                            process.env.NODE_ENV == 'production'
+                            ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
+                            :`http://192.168.0.102:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
+                        }
+                />
+                {loadingTemplate
+                    ? <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
+                    : null}
             </View>
             {
                 this.switchRender(tool)
             }
-
         </View>
     }
 }
