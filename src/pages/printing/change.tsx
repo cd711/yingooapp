@@ -191,6 +191,7 @@ const PrintChange: Taro.FC<any> = () => {
         for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
             if (paramsObj.current.sku == item.id) {
                 console.log("超级判读：" ,item)
+                Taro.setStorageSync("pictureSize", item.value)
                 pix = item.value;
                 break;
             }
