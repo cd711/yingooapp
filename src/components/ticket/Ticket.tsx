@@ -3,7 +3,7 @@ import Taro, { useEffect,useState } from '@tarojs/taro'
 import { View, Text,Image } from '@tarojs/components'
 import './Ticket.less';
 import IconFont from '../iconfont';
-import Checkbox from '../checkbox/checkbox';
+import Checkboxs from '../checkbox/checkbox';
 import moment from "moment";
 
 const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
@@ -49,7 +49,7 @@ const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
                 </View>
             </View>
             {
-                right?right:<Checkbox className='checkbox' isChecked={isSelected} />
+                right?right:<Checkboxs className='checkbox' isChecked={isSelected} />
             }
 
         </View>

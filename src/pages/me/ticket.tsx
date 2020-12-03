@@ -140,7 +140,7 @@ export default class Login extends Component<{},{
                                         switchTabActive:index
                                     });
                                     window.history.replaceState(null,this.config.navigationBarTitleText,`/pages/me/ticket?tab=${index}`);
-                                }} key={index}>
+                                }} key={index+""}>
                                     <Text className='txt'>{item}</Text>
                                     {switchTabActive==index?<Image src={require("../../source/switchBottom.png")} className='img' />:null}
                                 </View>
@@ -153,7 +153,7 @@ export default class Login extends Component<{},{
                             {
                                 list.map((item)=>(
                                     <View style={item.status_tip.value ==2||item.status_tip.value ==3?'filter: grayscale(100%);':''}>
-                                        <Ticket isNew={false} key={item.id} ticket={item.coupon} right={
+                                        {/* <Ticket isNew={false} key={item.id} ticket={item.coupon} right={
                                             <View className='item_right'>
                                                 {
                                                     item.status_tip.value == 1?<Button className='use_button' onClick={()=>{
@@ -162,10 +162,16 @@ export default class Login extends Component<{},{
                                                                 url:item.coupon.use_url
                                                             });
                                                         }
-                                                    }}>使用</Button>:(item.status_tip.value == 2?<Text className='used_txt'>已使用</Text>:item.status_tip.value==3?<Image className='ticket_fuck' src={require("../../source/ticket_fuck.svg")}/>:null)
+                                                    }}>使用</Button>:null
+                                                }
+                                                {
+                                                    item.status_tip.value == 2?<Text className='used_txt'>已使用</Text>:null
+                                                }
+                                                {
+                                                    item.status_tip.value==3?<Image className='ticket_fuck' src={require("../../source/ticket_fuck.svg")}/>:null
                                                 }
                                             </View>
-                                        }/>
+                                        }/> */}
                                     </View>
                                 ))
                             }

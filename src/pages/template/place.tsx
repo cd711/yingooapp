@@ -107,7 +107,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow, onClose, onButtonClose, 
                             indicatorDots>
                             {
                                 imgs && imgs.map((item, index) => (
-                                    <SwiperItem className='swiper-item' key={index}>
+                                    <SwiperItem className='swiper-item' key={index+""}>
                                         <Image src={item} mode='aspectFill' className='pre-image'/>
                                     </SwiperItem>
                                 ))

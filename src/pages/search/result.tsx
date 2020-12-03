@@ -103,7 +103,7 @@ const SearchResult:Taro.FC<any> = () => {
                 <View className="search_item_container">
                     {
                         list.map((value, index) => (
-                            <View className="search_item_wrap" key={index} style={{
+                            <View className="search_item_wrap" key={index+""} style={{
                                 width: window.screen.width / 2
                             }}>
                                 <View className="search_item"

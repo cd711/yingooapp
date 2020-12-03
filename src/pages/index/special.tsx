@@ -136,7 +136,7 @@ const Special: Taro.FC<any> = () => {
                     <View className="special_scroll_main">
                         {
                             list.map((value, index) => (
-                                <View className="special_item_wrap" key={index} onClick={() => viewDetail(value)}>
+                                <View className="special_item_wrap" key={index+""} onClick={() => viewDetail(value)}>
                                     <View className="special_item">
                                         <Image src={ossUrl(value.thumb_image, 1)} className="special_item_img" mode="aspectFill" />
                                     </View>

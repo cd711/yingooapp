@@ -344,7 +344,7 @@ export default class Photos extends Component<PhotosProps,{
                         <View className='nav-switch'>
                             {
                                 tabs.map((item,index)=>(
-                                    <View className={navSwitchActive==index?'item active':'item'} key={index} onClick={() => this.changeType(index)}>
+                                    <View className={navSwitchActive==index?'item active':'item'} key={index+""} onClick={() => this.changeType(index)}>
                                         <Text className='txt'>{item}</Text>
                                     </View>
                                 ))
@@ -406,8 +406,8 @@ export default class Photos extends Component<PhotosProps,{
                                         </View>
                                         {
                                             list.map((item, idx) => {
-                                                return <View className="list_item" key={idx}>
-                                                    <View className="img_item" key={idx} onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
+                                                return <View className="list_item" key={idx+""}>
+                                                    <View className="img_item" key={idx+""} onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
                                                         <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
                                                     </View>
                                                     {editSelect && editSelectImgIds.indexOf(item.id) > -1
@@ -449,7 +449,7 @@ export default class Photos extends Component<PhotosProps,{
                                     <View className="select_items">
                                         {
                                             editSelectImgs.map((value, index) => (
-                                                <View className="select_items_wrap" key={index}>
+                                                <View className="select_items_wrap" key={index+""}>
                                                     <View className="clear" onClick={() => this.delEditSelectImg(index)}>
                                                         <IconFont name="16_qingkong" size={32} />
                                                     </View>

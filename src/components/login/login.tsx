@@ -102,5 +102,9 @@ const Login: Taro.FC<LoginProps> = props => {
 //         </View>
 //     )
 // }
-
+Login.config = {
+    usingComponents: {
+      iconfont: '../iconfont/index.weapp',
+    },
+};
 export default Login

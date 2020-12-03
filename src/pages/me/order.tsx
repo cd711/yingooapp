@@ -221,7 +221,7 @@ export default class Order extends Component<any,{
                                     switchTabActive:index
                                 });
                                 window.history.replaceState(null,null,`/pages/me/order?tab=${index}`);
-                            }} key={index}>
+                            }} key={index+""}>
                                 <Text className='txt'>{item}</Text>
                                 {switchTabActive==index?<Image src={require("../../source/switchBottom.png")} className='img' />:null}
                             </View>

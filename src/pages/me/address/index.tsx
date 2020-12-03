@@ -5,7 +5,7 @@ import IconFont from '../../../components/iconfont';
 import { api } from '../../../utils/net';
 import {templateStore} from '../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-import Checkbox from '../../../components/checkbox/checkbox'
+import Checkboxs from '../../../components/checkbox/checkbox'
 
 @inject("templateStore")
 @observer
@@ -126,7 +126,7 @@ export default class Address extends Component<any,{
                             <View className='item' key={item.id}>
                                 <View className='left-part' onClick={this.switchChecked.bind(this,item,index)}>
                                     {
-                                        t === 'select' ? <Checkbox isChecked={item.isChecked} disabled />:null
+                                        t === 'select' ? <Checkboxs isChecked={item.isChecked} disabled />:null
                                     }
                                     <View className='left'>
                                         <View className='info'>

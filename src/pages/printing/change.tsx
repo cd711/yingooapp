@@ -571,7 +571,7 @@ const PrintChange: Taro.FC<any> = () => {
                 <View className="printing_change_main">
                     {
                         photos.map((value, index) => (
-                            <View className="print_change_item_wrap" key={index}
+                            <View className="print_change_item_wrap" key={index+""}
                                   style={{
                                       width: deviceInfo.windowWidth / 2
                                   }}>

@@ -82,7 +82,7 @@ const Search:Taro.FC<any> = () => {
                 <View className="search_scroll_container">
                     {
                         searchList.map((value, index) => (
-                            <View className="search_type_item" key={index}>
+                            <View className="search_type_item" key={index+""}>
                                 <View className="more">
                                     <Text className="tit">{value.name}</Text>
                                     <Text className="more_txt"
@@ -94,7 +94,7 @@ const Search:Taro.FC<any> = () => {
                                     <View className="scroll_view_x">
                                         {
                                             value.list.map((item, childIdx) => (
-                                                <View className="search_item_wrap" key={childIdx}>
+                                                <View className="search_item_wrap" key={childIdx+""}>
                                                     <View className="search_item circle" onClick={() => onItemClick(item)}>
                                                         <Image src={item.thumb_image} className="search_item_img" mode="aspectFill" />
                                                     </View>

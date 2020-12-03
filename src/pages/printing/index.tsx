@@ -156,7 +156,7 @@ const Index: Taro.FC<any> = () => {
                 <View className="printing_main">
                     {
                         sizeItem.map((item, index) => (
-                            <View className="printing_item" key={index} onClick={() => selectSize(item.id)}>
+                            <View className="printing_item" key={index+""} onClick={() => selectSize(item.id)}>
                                 <View className="left">
                                     <Image src={require("../../source/print.png")} className="icon"/>
                                     <View className="info">

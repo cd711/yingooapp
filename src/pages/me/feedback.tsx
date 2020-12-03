@@ -64,10 +64,11 @@ const Feedback: Taro.FC<any> = (_) => {
                 <View className="feedback_selector">
                     {
                         feedBackArr.map((value, index) => (
-                            <View className="feedback_item_wrap" key={index}>
+                            <View className="feedback_item_wrap" key={index+""}>
                                 <View className={`feedback_item ${Number(formData.reason) === index ? "active" : ""}`}
                                       onClick={() => setFormData(prev => ({...prev, reason: index}))}
                                 >
+                                    {/* @ts-ignore */}
                                     <IconFont name={value.icon} size={48} color={Number(formData.reason) === index ? "#fff" : "#999"}/>
                                     <Text className="txt">{value.name}</Text>
                                 </View>
@@ -87,7 +88,7 @@ const Feedback: Taro.FC<any> = (_) => {
                         <View className="feedback_imgs">
                             {
                                 formData.imgs.map((value, index) => (
-                                    <View className="imgs_item_wrap" key={index}>
+                                    <View className="imgs_item_wrap" key={index+""}>
                                         <View className="img_item" style={getWidth()}>
                                             <Image src={value}
                                                    className="img"

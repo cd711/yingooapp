@@ -81,7 +81,7 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
                     <View className='indicatorDots'>
                         {
                             item.clist.map((_, index) => (
-                                <View className={index == current ? 'dot active' : 'dot'} key={index} />
+                                <View className={index == current ? 'dot active' : 'dot'} key={index+""} />
                             ))
                         }
                     </View>

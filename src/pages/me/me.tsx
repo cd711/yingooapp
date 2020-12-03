@@ -434,7 +434,7 @@ export default class Me extends Component<any, MeProps> {
                                 ? <View className='content'>
                                     {
                                         works.map((value, index) => (
-                                            <View className='item' key={index}>
+                                            <View className='item' key={index+""}>
                                                 <View className='dates'>
                                                     <View className='day'>
                                                         <View className='circle'>
@@ -477,7 +477,7 @@ export default class Me extends Component<any, MeProps> {
                                 : <View className="collection_container">
                                     {
                                         collectionList.map((value: CollectiongProps, index) => (
-                                            <View className="collection_item" key={index}>
+                                            <View className="collection_item" key={index+""}>
                                                 <View className="collection_pic"
                                                     style={{
                                                         width: window.screen.width / 2 - 15,

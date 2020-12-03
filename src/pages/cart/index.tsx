@@ -2,7 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input,Image,ScrollView, Button } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
-import Checkbox from '../../components/checkbox/checkbox';
+import Checkboxs from '../../components/checkbox/checkbox';
 import Counter from '../../components/counter/counter';
 import {ossUrl} from '../../utils/common';
 import { api } from '../../utils/net';
@@ -133,7 +133,7 @@ export default class Cart extends Component<{},{
                         {
                             list.map((item,index)=>(
                                 <View className='item' key={item.id} onClick={this.onItemClick.bind(this,list,index)}>
-                                    <Checkbox isChecked={item.checked} className='left' disabled/>
+                                    <Checkboxs isChecked={item.checked} className='left' disabled/>
                                     <View className='right'>
                                         <View className='pre-image'>
                                             <Image src={ossUrl(item.tpl.thumb_image,0)} className='img' mode='aspectFill'/>
@@ -170,7 +170,7 @@ export default class Cart extends Component<{},{
                 </ScrollView>
                 <View className='bottom'>
                     <View className="all" onClick={this.onAllSelect.bind(this,list,allSelected)}>
-                        <Checkbox isChecked={allSelected} disabled/>
+                        <Checkboxs isChecked={allSelected} disabled/>
                         <Text className='txt'>全选</Text>
                     </View>
                     {

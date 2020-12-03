@@ -131,7 +131,7 @@ class Index extends Component<any, IndexState> {
                     const itemLen = item.clist.length;
                     if (itemLen === 1) {
                         ele = (
-                            <View className='temp-warp' key={index}>
+                            <View className='temp-warp' key={index+""}>
                                 <View className='masks'>
                                     <View className='title'>
                                         <Text className='txt'>{item.title}</Text>
@@ -147,10 +147,10 @@ class Index extends Component<any, IndexState> {
                             </View>
                         )
                     } else if (itemLen > 1 && itemLen < 6) {
-                        ele = <ImageSwiper key={index} item={item} onItemClick={current => this.onItemClick(current, index)} />
+                        ele = <ImageSwiper key={index+""} item={item} onItemClick={current => this.onItemClick(current, index)} />
                     } else {
                         ele = (
-                            <View className='temp-warp' key={index}>
+                            <View className='temp-warp' key={index+""}>
                                 <View className='title'>
                                     <Text className='txt'>{item.title}</Text>
                                     {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
@@ -180,7 +180,7 @@ class Index extends Component<any, IndexState> {
                 ele = <Fragment>
                     {
                         item.clist.map((product, prodIndex) => {
-                            return product.info.jump_url && <View className='product-item' key={prodIndex}>
+                            return product.info.jump_url && <View className='product-item' key={prodIndex+""}>
                                 <Image src={ossUrl(product.thumb_image, 1)} className='image' mode='aspectFill'/>
                                 <View className='bottom'>
                                     <View className='left'>

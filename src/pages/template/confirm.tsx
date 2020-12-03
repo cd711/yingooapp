@@ -377,7 +377,26 @@ export default class Confirm extends Component<any, {
             })
         }, 2000);
     }
-
+    onGoodsItemClick = (item,usedTickets) => {
+        let discounts = item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id));
+        if (discounts == 0) {
+            return;
+        }
+        const ticketId = item.use_coupon ? item.use_coupon.id : 0
+        discounts = discounts.map((item) => {
+            item["checked"] = false;
+            if (ticketId == item.id) {
+                item["checked"] = true;
+            }
+            return item;
+        })
+        this.setState({
+            showTickedModal: true,
+            tickets: discounts,
+            currentTicketOrderId: item.pre_order_id,
+            currentOrderTicketId: ticketId
+        })
+    }
     render() {
         const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn,payStatus} = this.state;
         const {address} = templateStore;
@@ -467,26 +486,7 @@ export default class Confirm extends Component<any, {
                                         <Text className='num'>{item.products_price}</Text>
                                     </View>
                                 </View>
-                                <View className='goods-item' onClick={() => {
-                                    let discounts = item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id));
-                                    if (discounts == 0) {
-                                        return;
-                                    }
-                                    const ticketId = item.use_coupon ? item.use_coupon.id : 0
-                                    discounts = discounts.map((item) => {
-                                        item["checked"] = false;
-                                        if (ticketId == item.id) {
-                                            item["checked"] = true;
-                                        }
-                                        return item;
-                                    })
-                                    this.setState({
-                                        showTickedModal: true,
-                                        tickets: discounts,
-                                        currentTicketOrderId: item.pre_order_id,
-                                        currentOrderTicketId: ticketId
-                                    })
-                                }}>
+                                <View className='goods-item' onClick={() => this.onGoodsItemClick(item,usedTickets)}>
                                     <Text className='title'>优惠券</Text>
                                     {
                                         item.use_coupon
@@ -570,7 +570,7 @@ export default class Confirm extends Component<any, {
                                 <View className='yhlist'>
                                     {
                                         tickets.map((value: any, index) => (
-                                            <Ticket key={index}
+                                            <Ticket key={index+""}
                                                     isSelected={value.checked}
                                                     ticket={value.coupon}
                                                     onChange={() => this.onSelectTicket(tickets, value.id)}/>

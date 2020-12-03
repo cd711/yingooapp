@@ -151,7 +151,7 @@ const Popover: Taro.FC<PopoverProps> = (props) => {
                 <View className="popover_body" id={`popoverBody${roundom}`}>
                     {
                         popoverItem.map((value, index) => (
-                            <View className="popover_body_item" key={index} onClick={() => onItemClick(value)}>
+                            <View className="popover_body_item" key={index+""} onClick={() => onItemClick(value)}>
                                 {
                                     value.customRender ? value.customRender : <Text className="txt">{value.title}</Text>
                                 }

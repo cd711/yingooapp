@@ -4,7 +4,7 @@ import { View, Text,Button } from '@tarojs/components'
 import './PayWayModal.less';
 import FloatModal from '../floatModal/FloatModal';
 import IconFont from '../iconfont';
-import Checkbox from '../checkbox/checkbox';
+import Checkboxs from '../checkbox/checkbox';
 import { api } from '../../utils/net';
 import wx from 'weixin-js-sdk'
 import {is_weixin,jsApiList} from '../../utils/common';
@@ -234,7 +234,7 @@ const PayWayModal: Taro.FC<{
                                     return it;
                                 });
                                 setWays(w)
-                            }} key={index} />
+                            }} key={index+""} />
                         ))
                     }
                 </View>
@@ -258,7 +258,7 @@ const PayWay: Taro.FC<any> = ({isCheck,icon,name,onPress}) => {
                 <IconFont name={icon} size={64} />
                 <Text className='txt'>{name}</Text>
             </View>
-            <Checkbox isChecked={isSelect} disabled />
+            <Checkboxs isChecked={isSelect} disabled />
         </View>
 }
 export default PayWayModal;
