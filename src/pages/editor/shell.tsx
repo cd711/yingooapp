@@ -995,7 +995,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         setStyleAlign(fontAttribute.align[num].key);
         updateDocFont({align: styleAlign})
     }
-    // @ts-ignore
+
     return (
         <View className="change_image_container">
             <View className="change_main">
@@ -1151,15 +1151,12 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
                     }
                 }
 
-
                 Taro.setStorage({
                     key: "phone_brand", data: {
                         time: Date.now(),
                         list: list
                     }
                 });
-
-
         }
     }) as any, [type, parent.defaultModel])
 
@@ -1291,67 +1288,70 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
         // setBrand(currentModel.brandIndex);
         // setTempCurrentModel(currentModel);
     }
-    if (type == 0) {
-        return <View className='tools' style='padding: 0 13%'>
-                    <View className='btn' onClick={() => setType(1)}>
-                        <IconFont name='24_bianjiqi_jixing' size={48}/>
-                        <Text className='txt'>机型</Text>
-                    </View>
-                    <View onClick={() => setType(2)} className='btn'>
-                        <IconFont name='24_bianjiqi_moban' size={48}/>
-                        <Text className='txt'>模板</Text>
-                    </View>
-                </View>;
-    }
-    if (type == 1) {
-        return <Fragment>
-        <View className='tools'/>
-        <View className='mask'/>
-        <View className='switch-brank'>
-            <View className='brand'>
-                <ScrollView className='brand cate_list' scrollX>
-                    <View className='warp'>
-                        {
-                            brandList.length > 0 ? brandList.map((item: any, idx) => (
-                                <View className={idx == brandIndex ? 'item active' : 'item'} key={item.id}
-                                      onClick={() => setBrand(idx)}>
-                                    <Text className='text'>{item.name}</Text>
-                                    {idx == brandIndex ? <Image className='icon'
-                                                                src={require("../../source/switchBottom.png")}/> : null}
-                                </View>
-                            )) : <AtActivityIndicator size={64} mode='center'/>
-                        }
-                    </View>
-                </ScrollView>
-            </View>
-            <ScrollView className='list' scrollY>
-                {series ? series.map((ses) => {
-                        return <View key={`mod-${ses.id}`}>
-                            <Text className='head'>{ses.name}系列</Text>
-                            <View className='phone'>
-                                {ses.models.map((mod) => {
-                                    return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}
-                                                 className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>
-                                        <Text>{mod.name}</Text>
-                                    </View>
-                                })}
+
+    const _renderTypeView = () => {
+        let ele = <View />
+        if (type == 0) {
+            ele = <View className='tools' style='padding: 0 13%'>
+                <View className='btn' onClick={() => setType(1)}>
+                    <IconFont name='24_bianjiqi_jixing' size={48}/>
+                    <Text className='txt'>机型</Text>
+                </View>
+                <View onClick={() => setType(2)} className='btn'>
+                    <IconFont name='24_bianjiqi_moban' size={48}/>
+                    <Text className='txt'>模板</Text>
+                </View>
+            </View>;
+        } else if (type == 1) {
+            ele = <Fragment>
+                <View className='tools'/>
+                <View className='mask'/>
+                <View className='switch-brank'>
+                    <View className='brand'>
+                        <ScrollView className='brand cate_list' scrollX>
+                            <View className='warp'>
+                                {
+                                    brandList.length > 0 ? brandList.map((item: any, idx) => (
+                                        <View className={idx == brandIndex ? 'item active' : 'item'} key={item.id}
+                                              onClick={() => setBrand(idx)}>
+                                            <Text className='text'>{item.name}</Text>
+                                            {idx == brandIndex ? <Image className='icon'
+                                                                        src={require("../../source/switchBottom.png")}/> : null}
+                                        </View>
+                                    )) : <AtActivityIndicator size={64} mode='center'/>
+                                }
                             </View>
-                        </View>
-                    }
-                ) : <AtActivityIndicator className="phoneLoading" size={64}/>}
-            </ScrollView>
-            <View className='optBar'>
-                <View onClick={cancelMode} className="icon"><IconFont name='24_guanbi' size={48}/></View>
-                <Text className='txt'>机型</Text>
-                <View onClick={selectPhone} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
-            </View>
-        </View>
-    </Fragment>;
+                        </ScrollView>
+                    </View>
+                    <ScrollView className='list' scrollY>
+                        {series ? series.map((ses) => {
+                                return <View key={`mod-${ses.id}`}>
+                                    <Text className='head'>{ses.name}系列</Text>
+                                    <View className='phone'>
+                                        {ses.models.map((mod) => {
+                                            return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}
+                                                         className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>
+                                                <Text>{mod.name}</Text>
+                                            </View>
+                                        })}
+                                    </View>
+                                </View>
+                            }
+                        ) : <AtActivityIndicator className="phoneLoading" size={64}/>}
+                    </ScrollView>
+                    <View className='optBar'>
+                        <View onClick={cancelMode} className="icon"><IconFont name='24_guanbi' size={48}/></View>
+                        <Text className='txt'>机型</Text>
+                        <View onClick={selectPhone} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
+                    </View>
+                </View>
+            </Fragment>;
+        } else if (type == 2) {
+            ele = <Template parent={parent} onClose={() => setType(0)} onOk={() => setType(0)} />;
+        }
+        return ele
     }
-    if (type == 2) {
-        return <Template parent={parent} onClose={() => setType(0)} onOk={() => setType(0)} />;
-    }
-    return null;
+    return _renderTypeView()
 }
 
 @observer
@@ -1668,7 +1668,7 @@ export default class Shell extends Component<{}, {
             {/*    </View>*/}
             {/*    <Text className='txt'>删除</Text>*/}
             {/*</View>*/}
-        </View>            
+        </View>
         }
         if (tool ==2) {
             return <View className='tools'>
@@ -1690,13 +1690,13 @@ export default class Shell extends Component<{}, {
             {/*    </View>*/}
             {/*    <Text className='txt'>删除</Text>*/}
             {/*</View>*/}
-        </View>            
+        </View>
         }
         if (tool ==4) {
             return <ChangeImage
             onClose={this.cancelEdit}
             onOk={this.onOk}
-        />            
+        />
         }
         if (tool ==5) {
             return <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
