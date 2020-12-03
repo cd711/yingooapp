@@ -1363,17 +1363,34 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     }
 
+    getLocalPictureSize = () => {
+        return new Promise<string>((resolve, reject) => {
+            try {
+                const res = Taro.getStorageSync("pictureSize");
+                console.log("本地的相框尺寸：", res)
+                if (res && res.indexOf("*") > -1) {
+                    resolve(res)
+                } else {
+                    resolve("")
+                }
+            }catch (e) {
+                reject()
+            }
+        })
+    }
+
     onLoadEmpty = async (_?: number) => {
         const routerParams = this.$router.params;
         try {
             const res = await api("editor.tpl/index", {cid: routerParams.tplid, num: templateStore.editorPhotos.length});
+            const pictureSize = await this.getLocalPictureSize();
 
             const proId = routerParams.proid || null;
 
             if (routerParams.init && routerParams.init == "t") {
                 const id = proId ? proId : res.list[0].id;
                 console.log("开始初始化图片：", id, templateStore.editorPhotos.map(v => v.url))
-                await callEditor("setDoc", id, templateStore.editorPhotos.map(v => v.url))
+                await callEditor("setDoc", id, templateStore.editorPhotos.map(v => v.url), pictureSize)
             } else {
                 let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
 
@@ -1391,7 +1408,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                     imgArr = [img]
                 }
 
-                await callEditor("setDoc", data, imgArr)
+                await callEditor("setDoc", data, imgArr, pictureSize)
             }
 
         }catch (e) {
