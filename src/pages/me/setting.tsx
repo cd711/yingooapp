@@ -13,6 +13,7 @@ import page from '../../utils/ext';
 @page({wechatAutoLogin:true})
 export default class Setting extends Component<any,{
     tipModalShow:boolean;
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -23,11 +24,19 @@ export default class Setting extends Component<any,{
     constructor(props){
         super(props);
         this.state = {
-
-            tipModalShow:false
+            tipModalShow:false,
+            centerPartyHeight:500
         }
     }
-
+    componentDidMount(){
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                this.setState({
+                    centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height
+                });
+            }).exec();
+        }
+    }
     loginOut = () => {
         try{
             Taro.removeStorageSync("TaroInfoKey");
@@ -40,8 +49,11 @@ export default class Setting extends Component<any,{
                 Taro.hideLoading()
             }, 1500)
             setTimeout(() => {
-                window.location.href = "/pages/index/index"
-                // Taro.reLaunch({url: "/pages/index/index"});
+                if(process.env.TARO_ENV === 'h5'){
+                    window.location.href = "/pages/index/index"
+                } else {
+                    Taro.reLaunch({url: "/pages/index/index"});
+                }
             }, 1501)
         }catch (e) {
             console.log(e)
@@ -49,16 +61,22 @@ export default class Setting extends Component<any,{
     }
 
     render() {
-        const {tipModalShow} = this.state;
+        const {tipModalShow,centerPartyHeight} = this.state;
         // const {id,nickname} = userStore;
 
         return (
             <View className='setting'>
-                <View className='nav-bar'>
+                <View className='nav-bar' style={process.env.TARO_ENV === 'h5'?"":`padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
                     <View className='left' onClick={() => {
-                        Taro.reLaunch({
-                            url:'/pages/me/me'
-                        });
+                        if(process.env.TARO_ENV === 'h5'){
+                            Taro.reLaunch({
+                                url:'/pages/me/me'
+                            });
+                        } else {
+                            Taro.switchTab({
+                                url:'/pages/me/me'
+                            });
+                        }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
@@ -66,7 +84,7 @@ export default class Setting extends Component<any,{
                         <Text className='title'>{this.config.navigationBarTitleText}</Text>
                     </View>
                 </View>
-                <ScrollView scrollY className='setting_page_scroll'>
+                <ScrollView scrollY className='setting_page_scroll' style={process.env.TARO_ENV === 'h5'?"":`height:${centerPartyHeight}px`}>
                 <View className='slist'>
                     <Text className='title'>个人/账号</Text>
                     <View className='item' onClick={()=>{
