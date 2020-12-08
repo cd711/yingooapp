@@ -2,6 +2,7 @@ import "./index.less";
 import Taro, {Component} from '@tarojs/taro';
 import {View, Text} from "@tarojs/components";
 import BoundingClientRectCallbackResult = Taro.NodesRef.BoundingClientRectCallbackResult;
+import IconFont from "../iconfont";
 
 
 // 此组件未兼容react-native
@@ -13,6 +14,7 @@ export interface PopoverItemClickProps {
 export interface PopoverItemProps {
     title: string | null,
     value?: string | number,
+    icon?: {[key: string]: any},
     customRender?: JSX.Element,
     onClick?: (data: PopoverItemClickProps) => void
 }
@@ -24,7 +26,13 @@ interface PopoverProps {
     value?: any;  // 关联值，作为列表渲染时可把要关联的值填入
 }
 
-export default class Popover extends Component<PopoverProps, any> {
+interface PopoverState {
+    offset: any;
+    visible: boolean;
+    roundom: number;
+    onlyBottom: boolean
+}
+export default class Popover extends Component<PopoverProps, PopoverState> {
 
     static defaultProps = {
         popoverItem: [],
@@ -48,7 +56,7 @@ export default class Popover extends Component<PopoverProps, any> {
 
     async getPopoverBodyRect(): Promise<BoundingClientRectCallbackResult> {
         return new Promise<BoundingClientRectCallbackResult>((resolve, _) => {
-            Taro.createSelectorQuery().select(`#popoverBody${this.state.roundom}`).boundingClientRect(rect => {
+            Taro.createSelectorQuery().in(this.$scope).select(`#popoverBody${this.state.roundom}`).boundingClientRect(rect => {
                 resolve({...rect})
             }).exec()
         })
@@ -56,7 +64,7 @@ export default class Popover extends Component<PopoverProps, any> {
 
     async getPopoverContentRect(): Promise<BoundingClientRectCallbackResult> {
         return new Promise<BoundingClientRectCallbackResult>((resolve, _) => {
-            Taro.createSelectorQuery().select(`#childrenView${this.state.roundom}`).boundingClientRect(rect => {
+            Taro.createSelectorQuery().in(this.$scope).select(`#childrenView${this.state.roundom}`).boundingClientRect(rect => {
                 resolve({...rect})
             }).exec()
         })
@@ -73,7 +81,8 @@ export default class Popover extends Component<PopoverProps, any> {
     }
 
     _onChange = async () => {
-        const {offsetBottom, visible} = this.state;
+        const {offsetBottom} = this.props;
+        const {visible} = this.state;
         try {
             const win = Taro.getSystemInfoSync();
             const {top, left, right, height} = await this.getPopoverContentRect();
@@ -115,7 +124,12 @@ export default class Popover extends Component<PopoverProps, any> {
                 this.setState({onlyBottom: false})
             }
 
-            this.setState({offset: temp, visible: !visible})
+            let obj = {};
+            for (const k in temp) {
+                obj[k] = `${temp[k]}px`
+            }
+
+            this.setState({offset: obj, visible: !visible})
             this.changeOverflow(!visible)
 
         }catch (e) {
@@ -142,18 +156,18 @@ export default class Popover extends Component<PopoverProps, any> {
         const {className, children, popoverItem} = this.props;
         const {visible, roundom, offset, onlyBottom} = this.state;
         return (
-            <View className={`popover_container ${className}`}>
+            <View className={`popover_container ${className || ""}`}>
                 {visible ? <View className="popover_mask" onClick={this._onClose} /> : null}
                 <View className="children_view" onClick={this._onChange} id={`childrenView${roundom}`}>
                     {children}
                 </View>
                 <View className="popover_content"
-                      style={visible ? {...offset} : {top: -100000, left: -100000}}
+                      style={visible ? {...offset} : {top: "-3000px", left: "-3000px"}}
                 >
                     <View className='triangle'
                           style={onlyBottom
                               ? {top: "94%", transform: "rotate(222deg)"}
-                              : {top: -5, transform: "rotate(45deg)"}
+                              : {top: "-5px", transform: "rotate(45deg)"}
                           }
                     />
                     <View className="popover_body" id={`popoverBody${roundom}`}>
@@ -161,7 +175,12 @@ export default class Popover extends Component<PopoverProps, any> {
                             popoverItem.map((value, index) => (
                                 <View className="popover_body_item" key={index+""} onClick={() => this.onItemClick(value)}>
                                     {
-                                        value.customRender ? value.customRender : <Text className="txt">{value.title}</Text>
+                                        value.customRender
+                                            ? value.customRender
+                                            : <View className="popover_body_item_ctx">
+                                                {value.icon ? <IconFont {...value.icon} className="popover_body_item_ctx_icon" /> : null}
+                                                <Text className="txt">{value.title}</Text>
+                                            </View>
                                     }
                                 </View>
                             ))

@@ -57,7 +57,7 @@ class App extends Component {
             // 'pages/me/refund',
             // 'pages/me/address/index',
             // 'pages/me/address/editor',
-            // 'pages/me/photos',
+            'pages/me/photos',
             'pages/me/ticket',
             // 'pages/printing/index',
             // 'pages/printing/change',

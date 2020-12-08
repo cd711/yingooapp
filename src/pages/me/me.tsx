@@ -6,14 +6,34 @@ import {userStore} from "../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../components/empty";
 import {api} from '../../utils/net';
-import {getImageSize, ListModel, notNull, ossUrl} from '../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl} from '../../utils/common';
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import moment from "moment";
-import Fragment from '../../components/Fragment';
-import Popover from "../../components/popover";
+import Popover, {PopoverItemClickProps} from "../../components/popover";
+import {AtModal} from "taro-ui";
 
 const switchBottom = require("../../source/switchBottom.png");
 
+interface CollectiongProps {
+    id: number,
+    name: string,
+    subtitle?: string,
+    thumb_image: string,
+    model: string,
+    relation_id: number,
+    user_id: number,
+    admin_id: number,
+    topid: number,
+    favorite_time: number,
+}
+interface WorksProps {
+    id: number,
+    name: string,
+    thumbnail: string,
+    create_time: number,
+    order_sn?: any,
+    attr: {width: number, height: number}
+}
 interface MultiData {
     [key: number]: ListModel
 }
@@ -25,7 +45,8 @@ interface MeState {
     data: MultiData;
     loadStatus: LoadMoreEnum;
     works: Array<any>;
-    collectionList: Array<any>;
+    collectionList: Array<CollectiongProps>;
+    isOpened: boolean
 }
 
 @inject("userStore")
@@ -47,6 +68,7 @@ export default class Me extends Component<any, MeState> {
             data: null,
             works: [],
             collectionList: [],
+            isOpened: false
         }
     }
 
@@ -137,31 +159,10 @@ export default class Me extends Component<any, MeState> {
         }
     }
 
-    onTabItem = (item) => {
-        console.log(item)
-    }
-
     componentDidMount() {
         if (userStore.id) {
             this.getWorksList({start: 0})
         }
-        // this.setState({
-        //     loadStatus: LoadMoreEnum.loading
-        // })
-        // api("editor.user_tpl/index", {
-        //     start: 0,
-        //     size: 15
-        // }).then((res) => {
-        //     console.log(res);
-        //     this.setState({
-        //         data: {
-        //             0: res
-        //         },
-        //         loadStatus: res.list.length == res.total ? LoadMoreEnum.noMore : LoadMoreEnum.more
-        //     })
-        // }).catch((e) => {
-        //     console.log(e);
-        // });
     }
 
     // 监听滚动
@@ -252,88 +253,140 @@ export default class Me extends Component<any, MeState> {
         }
     }
 
-    private popItems: Array<any> = [
-        // {
-        //     title: "保存到相册",
-        //     value: 1,
-        //     onClick: this.downloadImage,
-        //     customRender: <View className='sub-menu'>
-        //         <View className='list'>
-        //             <View className='item'>
-        //                 <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
-        //                 <Text className='item-text'>保存到相册</Text>
-        //             </View>
-        //         </View>
-        //     </View>
-        // },
-        // {
-        //     title: "分享",
-        //     value: 2,
-        //     customRender: <View className='sub-menu'>
-        //         <View className='list'>
-        //             <View className='item'>
-        //                 <IconFont name='24_fenxiang' size={40} color='#121314' />
-        //                 <Text className='item-text'>分享</Text>
-        //             </View>
-        //         </View>
-        //     </View>
-        // },
-        // {
-        //     title: "删除",
-        //     value: 3,
-        //     onClick: () => {},
-        //     customRender: <View className='sub-menu'>
-        //         <View className='list'>
-        //             <View className='item'>
-        //                 <IconFont name='24_shanchu' size={40} color='#FF4966' />
-        //                 <Text className='item-text' style={{color: "#FF4966"}}>删除</Text>
-        //             </View>
-        //         </View>
-        //     </View>
-        // },
-    ]
+    private deleteId: any = null;
+    confirmDelete = async (data: PopoverItemClickProps) => {
+        console.log(2222, data.corrValue)
+        if (data.corrValue) {
+            this.deleteId = data.corrValue.id
+            this.setState({isOpened: true})
+        }
+    }
+
+    deleteWork = async () => {
+        if (!this.deleteId) {
+            return
+        }
+        Taro.showLoading({title: "请稍后"});
+        try{
+            await api("editor.user_tpl/del", {id: this.deleteId});
+            const works = this.state.works;
+            const idx = works.findIndex(v => Number(v.id) === Number(this.deleteId));
+            if (idx > -1) {
+                works.splice(idx, 1);
+                this.setState({works})
+            }
+            Taro.showToast({title: "删除成功", icon: "success"});
+            this.deleteId = null;
+            this.setState({isOpened: false});
+            this.total--;
+        }catch (e) {
+            console.log("删除失败：", e)
+        }
+        Taro.hideLoading()
+    }
+
+    downloadImage = async (data: PopoverItemClickProps) => {
+        if (data.corrValue) {
+            Taro.downloadFile({
+                url: data.corrValue.thumbnail,
+                success: _ => {
+                    Taro.showToast({title: "保存成功"})
+                },
+                fail: _ => {
+                    Taro.showToast({title: "保存失败"})
+                }
+            })
+        }
+    }
+
+    // 跳转预览页
+    previewOrder = (item: WorksProps) => {
+        console.log(item.id)
+        Taro.navigateTo({
+            url: `/pages/template/preview?workid=${item.id}`
+        })
+    }
+
+    jumpTo = (path: string) => {
+        Taro.navigateTo({url: path})
+    }
+
+    private popItemsWeapp = [
+        {
+            title: "分享",
+            value: 2,
+            icon: {
+                name: "24_fenxiang",
+                size: 40,
+                color: "#121314"
+            },
+        },
+        {
+            title: "删除",
+            value: 3,
+            icon: {
+                name: "24_shanchu",
+                size: 40,
+                color: "#FF4966"
+            },
+            onClick: this.confirmDelete,
+        }
+    ];
 
     render() {
-        const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, data, loadStatus, works, collectionList} = this.state;
+        const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;
         const {id, nickname, avatar} = userStore;
-        // const wlist = data && data[switchActive] && data[switchActive].list && switchActive == 0 && data[switchActive].list.length > 0 ? data[switchActive].list : [];
-        const wlist = switchActive == 0 ? works : collectionList;
-        // const total = data && data[switchActive] && data[switchActive].total > 0 ? data[switchActive].total : 0;
         return (
             <View className='me'>
+                {
+                    isOpened
+                        ? <AtModal
+                            className="modal_confirm_container"
+                            isOpened={isOpened}
+                            cancelText='取消'
+                            confirmText='删除'
+                            onCancel={() => this.setState({isOpened: false})}
+                            onConfirm={this.deleteWork}
+                            content='是否删除该作品?'
+                        />
+                        : null
+                }
                 <ScrollView scrollY onScroll={this.onMeScroll}
                             className="me_content_scroll"
                             enable-flex="true"
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}
                             onScrollToLower={this.lodeMore}
                 >
-                    <View className='topBox'
-                          style={process.env.TARO_ENV === 'h5' ? '' : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                    <View className='topBox' {...fixStatusBarHeight()}>
                         {
                             pageScrollShowTop ? <View className='top_weapp'></View> : null
                         }
                         <View className={process.env.TARO_ENV === 'h5' ? 'top' : 'top top_weapp'}
                               style={pageScrollShowTop ? `position: fixed;top:0;width:100%;background:#FFF;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;transition: 0.3s all ease-out;z-index:999` : ""}>
                             {
-                                process.env.TARO_ENV === 'h5' ? <View className='ops'>
-                                    <View className='cart'><IconFont name='24_gouwuche' size={48}
-                                                                     color='#121314'/></View>
-                                    <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314'/></View>
-                                    <View className='set' onClick={() => {
-                                        Taro.navigateTo({
-                                            url: '/pages/me/setting'
-                                        })
-                                    }}><IconFont name='24_shezhi' size={48} color='#121314'/></View>
-                                </View> : <View className='ops'>
-                                    <View className='set' onClick={() => {
-                                        Taro.navigateTo({
-                                            url: '/pages/me/setting'
-                                        })
-                                    }}><IconFont name='24_shezhi' size={48} color='#121314'/></View>
-                                    <View className='cart'><IconFont name='24_gouwuche' size={48}
-                                                                     color='#121314'/></View>
-                                    <View className='coupon'><IconFont name='24_youhuiquan' size={48} color='#121314'/></View>
-                                </View>
+                                process.env.TARO_ENV === 'h5'
+                                    ? <View className='ops'>
+                                        <View className='cart' onClick={() => this.jumpTo('/pages/cart/index')}>
+                                            <IconFont name='24_gouwuche' size={48} color='#121314'/>
+                                        </View>
+                                        <View className='coupon'  onClick={()=>this.jumpTo('/pages/me/ticket')}>
+                                            <IconFont name='24_youhuiquan' size={48} color='#121314'/>
+                                        </View>
+                                        <View className='set' onClick={() => this.jumpTo('/pages/me/setting')}>
+                                            <IconFont name='24_shezhi' size={48} color='#121314'/>
+                                        </View>
+                                    </View>
+                                    : <View className='ops'>
+                                        <View className='set' onClick={() => this.jumpTo('/pages/me/setting')}>
+                                            <IconFont name='24_shezhi' size={48} color='#121314'/>
+                                        </View>
+                                        <View className='cart' onClick={() => this.jumpTo('/pages/cart/index')}>
+                                            <IconFont name='24_gouwuche' size={48} color='#121314'/>
+                                        </View>
+                                        <View className='coupon' onClick={()=>this.jumpTo('/pages/me/ticket')}>
+                                            <IconFont name='24_youhuiquan' size={48} color='#121314'/>
+                                        </View>
+                                    </View>
                             }
 
                         </View>
@@ -355,41 +408,25 @@ export default class Me extends Component<any, MeState> {
                         <View className='orderWarp'>
                             <View className='myorall'>
                                 <Text className='myorder'>我的订单</Text>
-                                <View className='allorder' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order'
-                                    })
-                                }}>
+                                <View className='allorder' onClick={() => this.jumpTo('/pages/me/order')}>
                                     <Text>全部订单</Text>
                                     <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                                 </View>
                             </View>
                             <View className='orderstate'>
-                                <View className='oitem' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order?switch=1'
-                                    })
-                                }}>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=1')}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
-                                <View className='oitem' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order?switch=2'
-                                    })
-                                }}>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=2')}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => {
-                                    Taro.navigateTo({
-                                        url: '/pages/me/order?switch=3'
-                                    })
-                                }}>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=3')}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
-                                <View className='oitem'>
+                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=4')}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
                                 </View>
@@ -416,56 +453,128 @@ export default class Me extends Component<any, MeState> {
                             </View>
                             <Text className='total'>共{this.total}个</Text>
                         </View>
-                        <View className='content'>
-                            {
-                                wlist.length > 0 ? wlist.map((item) => (
-                                    <Fragment key={item.id}>
-                                        {
-                                            moment.unix(item.create_time).year() == moment().year() ? null :
-                                                <View className='years'>
-                                                    <Text className='text'>{moment.unix(item.create_time).year()}</Text>
-                                                </View>
-                                        }
-                                        <View className='item'>
-                                            <View className='dates'>
-                                                <View className='day'>
-                                                    <View className='circle'>
-                                                        <Text className='text'>{moment.unix(item.create_time).date()}</Text>
-                                                    </View>
-                                                </View>
-                                                <Text className='date'>{moment.unix(item.create_time).format("MM月DD日")}</Text>
-                                                <View className="more">
-                                                    <Popover popoverItem={[]} offsetBottom={30}>
-                                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
-                                                    </Popover>
-                                                </View>
-                                            </View>
-                                            <View className='box'>
-                                                <View className='cns'>
-                                                    <Text className='neir'>{item.name}</Text>
-                                                    <View className='docker'>
-                                                        {/* <Text className='nook'>已打印</Text> */}
-                                                        <Image src={ossUrl(item.thumbnail, 1)} className='pic'
-                                                               mode='widthFix' style='width:190px;height:100%'/>
-                                                    </View>
-
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </Fragment>
-
-                                )) : null
-                            }
-                        </View>
                         {
-                            (wlist.length == 0) && loadStatus != LoadMoreEnum.loading ? (switchActive == 0 ?
-                                <Empty button="我要创作" onClick={() => {
-                                    Taro.navigateTo({
-                                        url: "pages/template/index"
-                                    })
-                                }}/> : <View className="more_View">
-                                    <Empty content="暂无收藏"/>
-                                </View>) : <LoadMore status={loadStatus}/>
+                            switchActive === 0
+                                ? <View className='content'>
+                                    {
+                                        works.map((item, idx) => (
+                                            <View className='item' key={idx}>
+                                                {
+                                                    moment.unix(item.create_time).year() == moment().year() ? null :
+                                                        <View className='years'>
+                                                            <Text className='text'>{moment.unix(item.create_time).year()}</Text>
+                                                        </View>
+                                                }
+                                                <View className='dates'>
+                                                    <View className='day'>
+                                                        <View className='circle'>
+                                                            <Text className='text'>{moment.unix(item.create_time).date()}</Text>
+                                                        </View>
+                                                    </View>
+                                                    <Text className='date'>{moment.unix(item.create_time).format("MM月DD日")}</Text>
+                                                    <View className="more">
+                                                        <Popover popoverItem={process.env.TARO_ENV === "h5" ? [
+                                                            // {
+                                                            //     title: "保存到相册",
+                                                            //     value: 1,
+                                                            //     onClick: this.downloadImage,
+                                                            //     customRender: <View className='sub-menu'>
+                                                            //         <View className='list'>
+                                                            //             <View className='item'>
+                                                            //                 <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
+                                                            //                 <Text className='item-text'>保存到相册</Text>
+                                                            //             </View>
+                                                            //         </View>
+                                                            //     </View>
+                                                            // },
+                                                            {
+                                                                title: "分享",
+                                                                value: 2,
+                                                                customRender: <View className='sub-menu'>
+                                                                    <View className='list'>
+                                                                        <View className='item'>
+                                                                            <IconFont name='24_fenxiang' size={40} color='#121314' />
+                                                                            <Text className='item-text'>分享</Text>
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+                                                            },
+                                                            {
+                                                                title: "删除",
+                                                                value: 3,
+                                                                onClick: this.confirmDelete,
+                                                                customRender: <View className='sub-menu'>
+                                                                    <View className='list'>
+                                                                        <View className='item'>
+                                                                            <IconFont name='24_shanchu' size={40} color='#FF4966' />
+                                                                            <Text className='item-text' style={{color: "#FF4966"}}>删除</Text>
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+                                                            },
+                                                        ] : this.popItemsWeapp}
+                                                                 value={item}
+                                                                 offsetBottom={30}>
+                                                            <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
+                                                        </Popover>
+                                                    </View>
+                                                </View>
+                                                <View className='box' onClick={() => this.previewOrder(item)}>
+                                                    <View className='cns'>
+                                                        <Text className='neir'>{item.name}</Text>
+                                                        <View className='docker'>
+                                                            {item.order_sn ? <Text className='nook'>已打印</Text> : null}
+                                                            <Image src={ossUrl(item.thumbnail, 1)} className='pic'
+                                                                   mode="widthFix"
+                                                                   style={{width: item.attr.width + "px"}} />
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        ))
+                                    }
+                                    {
+                                        works.length === 0
+                                            ? <Empty button="我要创作" onClick={() => {
+                                                Taro.navigateTo({
+                                                    url: "pages/template/index"
+                                                })
+                                            }}/>
+                                            : <View className="more_View">
+                                                <LoadMore status={loadStatus} />
+                                            </View>
+                                    }
+                                </View>
+                                : <View className="collection_container">
+                                    {
+                                        collectionList.map((value: CollectiongProps, index) => (
+                                            <View className="collection_item" key={index+""}>
+                                                <View className="collection_pic"
+                                                      style={{
+                                                          width: deviceInfo.screenWidth / 2 - 15 + "px",
+                                                          height: deviceInfo.screenWidth / 2 - 15 + "px",
+                                                      }}
+                                                >
+                                                    <Image src={ossUrl(value.thumb_image, 1)} mode="aspectFill"
+                                                           style={{
+                                                               width: deviceInfo.screenWidth / 2 - 15 + "px",
+                                                               height: deviceInfo.screenWidth / 2 - 15 + "px",
+                                                           }}
+                                                    />
+                                                </View>
+                                            </View>
+                                        ))
+                                    }
+                                    {
+                                        collectionList.length === 0
+                                            ? <View className="more_View">
+                                                <Empty content="暂无收藏"/>
+                                            </View>
+                                            : <View className="more_View">
+                                                <LoadMore status={loadStatus} />
+                                            </View>
+                                    }
+                                </View>
                         }
                     </View>
                 </ScrollView>

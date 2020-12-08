@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {ossUrl, deviceInfo} from "../../utils/common";
+import {ossUrl, deviceInfo, fixStatusBarHeight} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
@@ -330,7 +330,7 @@ export default class Photos extends Component<PhotosProps,{
         const tabs = ["图片","视频"];
         return (
             <View className='photos'>
-                <View className='nav-bar'>
+                <View className='nav-bar' {...fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
                         if (editSelect) {
                             onClose && onClose()

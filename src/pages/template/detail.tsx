@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
 // import moment from 'moment';
-import {ossUrl} from '../../utils/common'
+import {deviceInfo, fixStatusBarHeight, ossUrl} from '../../utils/common'
 
 import page from '../../utils/ext';
 
@@ -159,7 +159,7 @@ export default class Detail extends Component<{},{
         return (
             <View className='detail' >
                 {/* <View style={`background:red;height:${Taro.getSystemInfoSync().windowHeight-Taro.getSystemInfoSync().statusBarHeight}px;`}></View> */}
-                <View className='nav-bar' style={process.env.TARO_ENV === 'h5'?"":`padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                <View className='nav-bar' {...fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (process.env.TARO_ENV === 'h5') {
                             window.location.href = '/pages/template/index';
