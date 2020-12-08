@@ -113,7 +113,7 @@ export default class Me extends Component<any, {
         const total = data && data[switchActive] && data[switchActive].total > 0 ? data[switchActive].total : 0;
         return (
             <View className='me'>
-                <ScrollView scrollY onScroll={(e) => this.onMeScroll(e)}
+                <ScrollView scrollY onScroll={this.onMeScroll}
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}>
                     <View className='topBox'
                           style={process.env.TARO_ENV === 'h5' ? '' : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
