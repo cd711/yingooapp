@@ -4,7 +4,7 @@
   "description": "映果商城",
   "appid": "wx917e699bf3473296",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "es6": false,
     "postcss": false,
     "minified": false

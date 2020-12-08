@@ -289,30 +289,30 @@ export default class Photos extends Component<PhotosProps,{
     }
 
     private popoverItem: PopoverItemProps[] = [
-        {
-            title: " 时间从远到近排序",
-            value: JSON.stringify({sort: "createtime", order: "asc"}),
-            onClick: this.changeSort,
-            customRender: <View className="sort_item"><Text className="txt">时间从远到近排序</Text></View>
-        },
-        {
-            title: "时间从近到远排序",
-            value: JSON.stringify({sort: "createtime", order: "desc"}),
-            onClick: this.changeSort,
-            customRender: <View className="sort_item"><Text className="txt">时间从近到远排序</Text></View>
-        },
-        {
-            title: "从大到小降序",
-            value: JSON.stringify({sort: "filesize", order: "desc"}),
-            onClick: this.changeSort,
-            customRender: <View className="sort_item"><Text className="txt">从大到小降序</Text></View>
-        },
-        {
-            title: "从小到大升序",
-            value: JSON.stringify({sort: "filesize", order: "asc"}),
-            onClick: this.changeSort,
-            customRender: <View className="sort_item"><Text className="txt">从小到大升序</Text></View>
-        }
+        // {
+        //     title: " 时间从远到近排序",
+        //     value: JSON.stringify({sort: "createtime", order: "asc"}),
+        //     onClick: this.changeSort,
+        //     customRender: <View className="sort_item"><Text className="txt">时间从远到近排序</Text></View>
+        // },
+        // {
+        //     title: "时间从近到远排序",
+        //     value: JSON.stringify({sort: "createtime", order: "desc"}),
+        //     onClick: this.changeSort,
+        //     customRender: <View className="sort_item"><Text className="txt">时间从近到远排序</Text></View>
+        // },
+        // {
+        //     title: "从大到小降序",
+        //     value: JSON.stringify({sort: "filesize", order: "desc"}),
+        //     onClick: this.changeSort,
+        //     customRender: <View className="sort_item"><Text className="txt">从大到小降序</Text></View>
+        // },
+        // {
+        //     title: "从小到大升序",
+        //     value: JSON.stringify({sort: "filesize", order: "asc"}),
+        //     onClick: this.changeSort,
+        //     customRender: <View className="sort_item"><Text className="txt">从小到大升序</Text></View>
+        // }
     ]
 
     getScrollHeight = () => {

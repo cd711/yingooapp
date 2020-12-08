@@ -22,7 +22,7 @@ export default class Aboutus extends Component<any, any> {
     render(): React.ReactNode {
         const {visible} = this.state;
         return (
-            <View className="about_us_container" style={{height: window.screen.availHeight}}>
+            <View className="about_us_container" style={process.env.TARO_ENV === 'h5'?{height: window.screen.availHeight}:{flex:1}}>
                 <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
                     color='#121314' title="关于映果" border fixed
                     leftIconType={{value:'chevron-left', color:'#121314', size:24}}

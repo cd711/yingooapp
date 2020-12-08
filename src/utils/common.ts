@@ -40,8 +40,11 @@ export function getImageSize(containerW: number, imgW: number, imgH: number) {
 }
 
 export function is_weixin() { //判断是否是微信
-    const ua = navigator.userAgent.toLowerCase();
-    return ua.indexOf('micromessenger') != -1;
+    if (process.env.TARO_ENV === 'h5') {
+        const ua = navigator.userAgent.toLowerCase();
+        return ua.indexOf('micromessenger') != -1;       
+    }
+    return false;
 }
 
 export interface ListModel {
@@ -263,7 +266,8 @@ interface RGBAsterParams {
     // 配置参数
     options?: {[key: string]: any},
     // 仅微信小程序使用此参数
-    canvasId?: string
+    canvasId?: string,
+    parentThis?:any
 }
 /**
  * 获取图片主色调，已兼容小程序、web
@@ -288,7 +292,8 @@ export function RGBAster (params:RGBAsterParams = {src: ""}) {
             }).catch(e => {
                 reject(e)
             })
-        } else if (Taro.getEnv() === ENV_TYPE.WEAPP) {
+        } 
+        if (Taro.getEnv() === ENV_TYPE.WEAPP) {
             if (!opt.canvasId) {
                 reject("未设置canvasId")
             } else {
@@ -298,7 +303,7 @@ export function RGBAster (params:RGBAsterParams = {src: ""}) {
                     success: res => {
                         resolve(res)
                     }
-                })
+                },params.parentThis)
             }
         }
     })

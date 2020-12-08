@@ -138,7 +138,7 @@ export default class Popover extends Component<PopoverProps, any> {
         this._onClose();
     }
 
-    render(): React.ReactNode {
+    render() {
         const {className, children, popoverItem} = this.props;
         const {visible, roundom, offset, onlyBottom} = this.state;
         return (

@@ -1,6 +1,6 @@
 import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text} from "@tarojs/components";
-import IconFont from "../iconfont";
+// import IconFont from "../iconfont";
 import "./login.less"
 import {is_weixin} from "../../utils/common";
 
@@ -47,7 +47,7 @@ const Login: Taro.FC<LoginProps> = props => {
             <View className={`login_model_main ${visible ? "animtion_login_model" : ""}`}>
                 <View className="head">
                     <Text className="h2">登录后体验全面功能</Text>
-                    <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={40} /></View>
+                    {/* <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={40} /></View> */}
                 </View>
                 <View className="login_btn">
                     <View className="btn_lo" onClick={onOk}>
@@ -58,7 +58,7 @@ const Login: Taro.FC<LoginProps> = props => {
                 <View className="other_login_way">
                     {
                         is_weixin()?null:<View className="item" onClick={() => onThirdPartyAuth("qq")}>
-                            <IconFont name="24_QQ-Color" size={48}/><Text className="name">QQ登录</Text>
+                            {/* <IconFont name="24_QQ-Color" size={48}/><Text className="name">QQ登录</Text> */}
                         </View>
                     }
                     {
@@ -69,7 +69,7 @@ const Login: Taro.FC<LoginProps> = props => {
                                 const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent(window.location.href)}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
                                 window.location.href = url;
                             }}>
-                                <IconFont name="24_weixin-Color" size={48}/><Text className="name">微信登录</Text>
+                                {/* <IconFont name="24_weixin-Color" size={48}/><Text className="name">微信登录</Text> */}
                             </View>
                             : null
                     }
@@ -102,9 +102,5 @@ const Login: Taro.FC<LoginProps> = props => {
 //         </View>
 //     )
 // }
-Login.config = {
-    usingComponents: {
-      iconfont: '../iconfont/index.weapp',
-    },
-};
+
 export default Login

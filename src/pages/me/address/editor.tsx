@@ -9,7 +9,7 @@ import TipModal from '../../../components/tipmodal/TipModal'
 import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../store/user';
 import {templateStore} from '../../../store/template';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 interface CityModal {
     province:any,
@@ -323,7 +323,7 @@ export default class Editor extends Component<any,{
             api('app.address/del',{id}).then(()=>{
                 Taro.hideLoading();
                 userStore.getUserInfo();
-                if (!lodash.isEmpty(templateStore.address)) {
+                if (!isEmpty(templateStore.address)) {
                     templateStore.address = null;
                 }
                 setTimeout(() => {

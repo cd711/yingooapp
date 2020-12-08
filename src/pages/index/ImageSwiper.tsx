@@ -1,18 +1,19 @@
 import Taro, {useState} from "@tarojs/taro";
-import {View, Text, Image, Swiper, SwiperItem, Button} from "@tarojs/components";
-import "./index.less";
+import {View, Text, Image, Swiper, SwiperItem, Button,Canvas} from "@tarojs/components";
+import "./ImageSwiper.less";
 import {ossUrl, RGBAster} from "../../utils/common";
 
 interface ImageSwiperProps {
     item: any;
+    parent:any;
     onItemClick?: (current: any) => void;
 }
 const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
-    const {item, onItemClick} = props;
+    const {item, onItemClick,parent} = props;
 
     const [current, setCurrent] = useState<number>(0);
-    const [color, setColor] = useState<string>("transparent");
+    const [color, setColor] = useState<string>("#FFF");
     const [fontColor, setFontColor] = useState<string>("#000")
 
     const getCurrentSwiperColor = (index) => {
@@ -20,6 +21,8 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
         const img = item.clist[index].thumb_image;
         RGBAster({
             src: ossUrl(img, 0),
+            canvasId:"img-canvas",
+            parentThis:parent,
             options: {
                 ignore: [ 'rgb(255,255,255)', 'rgb(0,0,0)' ],
                 scale: 0.6
@@ -58,19 +61,25 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
     return (
         <View className='temp-warp' style={{background: color}}>
-            <View style='background:rgba(0, 0, 0, 0.03);' className='masks'>
+            {/* <Canvas canvasId="img-canvas" type="2d"></Canvas> */}
+            <View style={process.env.TARO_ENV === 'h5'?'background:rgba(0, 0, 0, 0.03);':''} className='masks'>
                 <View className='title'>
                     <Text className='txt' style={{color: fontColor}}>{item.title}</Text>
-                    {item.subtitle ? <Text className='sub-title' style={{color: fontColor}}>{item.subtitle}</Text> : null}
+                    {item && item.subtitle ? <Text className='sub-title' style={{color: fontColor}}>{item.subtitle}</Text> : null}
                 </View>
                 <View className='swiper-back'>
-                    <Swiper className='temp-swiper' vertical autoplay={true} circular={false} indicatorDots={false}
+                    <Swiper className='temp-swiper' vertical autoplay={false} circular={false} indicatorDots={false}
                             onChange={({detail: {current}}) => {
-                                getCurrentSwiperColor(current)
+                                if (process.env.TARO_ENV === 'h5') {
+                                    getCurrentSwiperColor(current)
+                                }
+                                if (process.env.TARO_ENV === 'weapp') {
+                                    setCurrent(current)
+                                }
                             }}
                     >
                         {
-                            item.clist.map((child, cIdx) => (
+                            item && item.clist.map((child, cIdx) => (
                                 <SwiperItem key={`child_${cIdx}`} onClick={onClick}>
                                     <Image src={ossUrl(child.thumb_image, 1)} className='photo' mode='aspectFill'/>
                                 </SwiperItem>
@@ -80,7 +89,7 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
                     <View className='indicatorDots'>
                         {
-                            item.clist.map((_, index) => (
+                            item && item.clist.map((_, index) => (
                                 <View className={index == current ? 'dot active' : 'dot'} key={index+""} />
                             ))
                         }

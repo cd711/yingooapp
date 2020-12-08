@@ -146,7 +146,7 @@ export default class Template extends Component<any,{
                                     if (l_rect.width>0) {
                                         this.setState({
                                             topsHeight:t_rect.height,
-                                            otherHeight:vres.height-t_rect.height-50,
+                                            otherHeight:process.env.TARO_ENV === 'h5'?vres.height-t_rect.height-50:vres.height-t_rect.height,
                                             mainRightWidth:ww-l_rect.width
                                         });
                                         setTimeout(() => {
@@ -301,14 +301,19 @@ export default class Template extends Component<any,{
         });
     }
     render() {
-        const {switchActive,cates,topsHeight,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,loadStatus,colHeight} = this.state;
+        const {switchActive,cates,otherHeight,switchTagActive,tagData,mainRightWidth,showAllCates,loadStatus,colHeight} = this.state;
         const tags = cates && cates[switchActive]?cates[switchActive].tags:[];
         const tplid = cates && cates[switchActive] && cates[switchActive].tpl_category_id?cates[switchActive].tpl_category_id:0;
         const tagid = tags && tags[switchTagActive] && tags[switchTagActive].id?tags[switchTagActive].id:0;
         const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length>0?tagData[`${tplid}-${tagid}`].list:[];
         const tpl_type=cates && cates[switchActive] && cates[switchActive].tpl_type?cates[switchActive].tpl_type:"";
 
-        const searchBox = <View className='top-search'>
+        const searchBox = process.env.TARO_ENV === 'h5'?<View className='top-search'>
+            <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
+                <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
+                <Text className='placeholders'>搜索海量模板</Text>
+            </View>
+        </View>:<View className='top-search-weapp'>
             <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                 <IconFont name='20_sousuo' size={40} color='#9C9DA6' />
                 <Text className='placeholders'>搜索海量模板</Text>
@@ -316,9 +321,9 @@ export default class Template extends Component<any,{
         </View>
         return (
             <View className='template'>
-                <View className='t_tops'>
+                <View className='t_tops' style={`padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;background: #FFF;`}>
                     {
-                        showAllCates?<View className='all-category-warp'>
+                        showAllCates?<View className='all-category-warp' style={process.env.TARO_ENV === 'h5'?"":`top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
                             {searchBox}
                             <View className='all-category'>
                                 <View className='title-box'>
@@ -366,7 +371,7 @@ export default class Template extends Component<any,{
                     </View>
                 </View>
 
-                <View className='main' style={`top:${topsHeight}px;height:${otherHeight}px;`}>
+                <View className='main' style={`height:${otherHeight}px;`}>
                     <View className='left-menu' id="template_left_menu" style={`height:${otherHeight}px;background:#FFF`}>
                         <ScrollView scrollY className='left-scroll' style={`height:${otherHeight}px;background:#FFF`}>
                             {
@@ -387,9 +392,11 @@ export default class Template extends Component<any,{
                             }
                         </ScrollView>
                     </View>
-                    <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;padding-top:${Taro.pxTransform(32)}`} onScrollToLower={this.onScrollToLower}>
+                    <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;`} onScrollToLower={this.onScrollToLower}>
                         {/* min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px */}
-                        <View className='warp' style={`width:${mainRightWidth}px;box-sizing:border-box;position: relative;min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px`}>
+                        <View style={`width:${mainRightWidth}px;height:${Taro.pxTransform(32)};`}></View>
+                        <View className='warp' style={`width:${mainRightWidth}px;box-sizing:border-box;position: relative;min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px;`}>
+
                             {
                                 tpl_type == "photo" && loadStatus != LoadMoreEnum.loading && tagList.length>0?<View className='print-box' style={`width:${(mainRightWidth-(14*3))/2}px;height:${(mainRightWidth-(14*3))/2}px;position: absolute;top:0;left:14px`} onClick={()=>{
                                     // @ts-ignore

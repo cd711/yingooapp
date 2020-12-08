@@ -38,6 +38,12 @@ const config = {
   defineConstants: {
   },
   mini: {
+    webpackChain(chain, webpack) {
+      chain.plugin('analyzer').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin, []);
+      //使用ContextReplacementPlugin将moment.locale当中除了zh-cn的语言包,其余都剔除掉
+      chain.plugin('contextReplace').use(new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /zh-cn/), []);
+      chain.optimization.sideEffects(false);
+    },
     postcss: {
       autoprefixer: {
         enable: true,
