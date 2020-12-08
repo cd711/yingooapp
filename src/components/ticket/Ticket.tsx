@@ -35,7 +35,7 @@ const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,right}) => {
             <View className='right-part'>
                 <Text className='name'>{ticket.name}</Text>
                 <Text className='time'>
-                    {`${moment.unix(ticket.use_start_time).format("YYYY-MM-DD")} - ${moment.unix(ticket.use_end_time).format("YYYY-MM-DD")}`}
+                    {ticket && ticket.use_start_time?`${moment.unix(ticket.use_start_time).format("YYYY-MM-DD")} - ${moment.unix(ticket.use_end_time).format("YYYY-MM-DD")}`:""}
                 </Text>
                 <View className='apply' onClick={(e)=>{
                     e.stopPropagation();

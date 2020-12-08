@@ -5,7 +5,7 @@ import {AtFloatLayout} from "taro-ui"
 import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
 import Fragment from '../../components/Fragment'
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PlaceOrder: Taro.FC<any> = ({data, isShow, onClose, onButtonClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
@@ -68,7 +68,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow, onClose, onButtonClose, 
     }
     useEffect(() => {
 
-        if (!lodash.isEmpty(data)) {
+        if (!isEmpty(data)) {
             data.attrItems && setTags(data.attrItems);
             const prices = data.skus.map((item) => {
                 return item.price;

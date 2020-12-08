@@ -3,7 +3,7 @@ import { View, Text,Image,Button,ScrollView } from '@tarojs/components'
 import './orderdetail.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { ossUrl } from '../../utils/common';
 import moment from "moment";
 import PayWayModal from '../../components/payway/PayWayModal';
@@ -243,7 +243,7 @@ export default class OrderDetail extends Component<{},{
         const afterState = data.after_sale_status_tip?data.after_sale_status_tip.value:0;
         let status = data.state_tip?data.state_tip.text:"";
         status = afterState!=0?data.after_sale_status_tip.text:status;
-        const plist = lodash.isEmpty(data.products)?[]:data.products;
+        const plist = isEmpty(data.products)?[]:data.products;
         return (
             <View className='order-detail'>
                 {/* style={`background: ${navBarChange?"#FF4966":"#FFF"}`} */}

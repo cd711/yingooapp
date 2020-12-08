@@ -3,7 +3,8 @@ import Taro, { useRef, useState } from '@tarojs/taro'
 import { View } from '@tarojs/components';
 
 import './popmenu.less';
-import lodash from 'lodash';
+
+import isEqual from 'lodash/isEqual'
 // @ts-ignore
 
 
@@ -67,7 +68,8 @@ export function TaroPopover(props: TaroPopoverComponentProps) {
         const trangleHeight = 12;
         let self = popover.current;
         //@ts-ignore
-        if (self.last && lodash.isEqual(e,self.last) && state.visible) {
+        
+        if (self.last && isEqual(e,self.last) && state.visible) {
             setShowMask(false)
             setState({ ...state, visible: false })
         } else {

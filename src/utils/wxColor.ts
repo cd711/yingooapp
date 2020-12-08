@@ -44,18 +44,16 @@ export const wxColors = {
      * @canvasId canvas ID
      * @opts {success: 成功回调, width: 宽, height: 高}
      */
-    colors: function (imagePath, canvasId, opts) {
+    colors: function (imagePath, canvasId, opts,parentThis) {
         this.canvasId = canvasId;
         this.imagePath = imagePath;
         this.options = opts;
 
         const width = opts.width || 150, height = opts.height || 100;
-        const ctx = wx.createCanvasContext(canvasId);
+        const ctx = wx.createCanvasContext(canvasId,parentThis);
         ctx.drawImage(imagePath, 0, 0, width, height);
         ctx.draw();
-
-        setTimeout(function () {
-            const u = this;
+        setTimeout(()=>{
             wx.canvasGetImageData({
                 canvasId: canvasId,
                 x: 0,
@@ -69,11 +67,11 @@ export const wxColors = {
                     console.log(res.data.length) // res.width * res.height * 4
                     u.calculate(res.data, opts);
                 },
-                fail() {
-                    console.log("fail");
+                fail(e) {
+                    console.log("fail",e);
                 }
-            })
-        }.bind(this), 50);
+            },parentThis)
+        }, 50);
     },
 
     calculate: function (data, opts) {

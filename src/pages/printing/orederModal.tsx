@@ -4,7 +4,7 @@ import "../template/place.less"
 import {AtFloatLayout} from "taro-ui"
 import IconFont from '../../components/iconfont'
 import Fragment from '../../components/Fragment'
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuChange, onNowBuy}) => {
 
@@ -89,7 +89,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
 
     useEffect(() => {
 
-        if (!lodash.isEmpty(data)) {
+        if (!isEmpty(data)) {
             data.attrItems && setTags(data.attrItems);
             const prices = data.skus.map((item) => {
                 return item.price;

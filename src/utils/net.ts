@@ -50,6 +50,7 @@ export function getUserInfo() {
 
 export function getToken(): string {
     const now = new Date().getTime() / 1000;
+
     if (!accessToken) {
         accessToken = Taro.getStorageSync("token") as any;
     }

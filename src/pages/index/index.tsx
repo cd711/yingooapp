@@ -12,7 +12,8 @@ import page from "../../utils/ext";
 
 
 interface IndexState {
-    data: any
+    data: any,
+    centerPartyHeight:number
 }
 
 
@@ -31,7 +32,8 @@ class Index extends Component<any, IndexState> {
     constructor(props) {
         super(props);
         this.state = {
-            data: []
+            data: [],
+            centerPartyHeight:500
         }
     }
 
@@ -63,6 +65,15 @@ class Index extends Component<any, IndexState> {
     }
 
     componentDidMount() {
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                Taro.createSelectorQuery().select(".top-search").boundingClientRect((top_rect)=>{
+                    this.setState({
+                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-top_rect.height
+                    });
+                }).exec();
+            }).exec();
+        }
         this.getIndexList()
     }
 
@@ -121,119 +132,113 @@ class Index extends Component<any, IndexState> {
         }
     }
 
-    renderTemplateItem = (item, index) => {
-        let ele = null;
-
-        if (item.clist instanceof Array) {
-            // 商品模板
-            if (item.model === "tpl_product") {
-                if (item.clist.length > 0) {
-                    const itemLen = item.clist.length;
-                    if (itemLen === 1) {
-                        ele = (
-                            <View className='temp-warp' key={index+""}>
-                                <View className='masks'>
-                                    <View className='title'>
-                                        <Text className='txt'>{item.title}</Text>
-                                        {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
-                                    </View>
-                                    <View className='swiper-back' onClick={() => this.onItemClick(item.clist[0], index)}>
-                                        <View className='temp-swiper'>
-                                            <Image src={ossUrl(item.clist[0].thumb_image, 1)} className='photo' mode='aspectFill'/>
-                                        </View>
-                                    </View>
-                                    <Button className='now-design-btn' onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
-                                </View>
-                            </View>
-                        )
-                    } else if (itemLen > 1 && itemLen < 6) {
-                        ele = <ImageSwiper key={index+""} item={item} onItemClick={current => this.onItemClick(current, index)} />
-                    } else {
-                        ele = (
-                            <View className='temp-warp' key={index+""}>
-                                <View className='title'>
-                                    <Text className='txt'>{item.title}</Text>
-                                    {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
-                                </View>
-                                <View className='grid'>
-                                    {
-                                        item.clist.slice(1, 7).map((child, cIdx) => (
-                                            <View className='photo-warp' key={`tel_${cIdx}`} onClick={() => this.onItemClick(child, index)}>
-                                                <Image src={ossUrl(child.thumb_image, 1)} className='photo' mode='aspectFill'/>
-                                            </View>
-                                        ))
-                                    }
-                                </View>
-                                {
-                                    item.clist.length > 6
-                                        ? <View className='seemore' onClick={() => this.viewMoreSpecial(item)}>
-                                            <Text className='txt'>查看更多</Text>
-                                            <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
-                                        </View>
-                                        : null
-                                }
-                            </View>
-                        )
-                    }
-                }
-            } else if (item.model === "product") {  // 商品
-                ele = <Fragment>
-                    {
-                        item.clist.map((product, prodIndex) => {
-                            return product.info.jump_url && <View className='product-item' key={prodIndex+""}>
-                                <Image src={ossUrl(product.thumb_image, 1)} className='image' mode='aspectFill'/>
-                                <View className='bottom'>
-                                    <View className='left'>
-                                        <Text className='title'>{product.title || " "}</Text>
-                                        {product.subtitle ? <Text className='subtitle'>{product.subtitle}</Text> : null}
-                                    </View>
-                                    <View className='right-btn' onClick={() => this.onCustomized(product, index)}>
-                                        <Text className='txt'>我要定制</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        })
-                    }
-                </Fragment>
-            } else if (item.model === "coupon") {
-                ele = <Fragment>
-                    {
-                        item.clist.map((coupon, cIndex) => (
-                            <View className="index_coupon_main" key={`${index}_${cIndex}`} onClick={() => this.receiveCoupon(coupon)}>
-                                <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" />
-                                <View className="receive_btn">
-                                    <View className="anim_btn_receive">
-                                        <Text className="txt">立即领取</Text>
-                                        <View className="icon">
-                                            <IconFont name="16_xiayiye" color="#fff" size={32} />
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        ))
-                    }
-                </Fragment>
-            }
-        }
-
-        return ele
-    }
-
-
     render() {
-        const {data} = this.state;
+        const {data,centerPartyHeight} = this.state;
         return (
             <View className='index'>
+                {
+                    process.env.TARO_ENV === 'h5'?null:<View className='nav-bar' style={`padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                        <View className='center'>
+                            <Text className='title'>{this.config.navigationBarTitleText}</Text>
+                        </View>
+                    </View>
+                }
                 <View className='top-search'>
                     <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                         <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
                         <Text className='placeholders'>搜索海量模板</Text>
                     </View>
                 </View>
-                <ScrollView scrollY style={{height: deviceInfo.windowHeight - 102}} onScrollToLower={this.loadMore}>
+                <ScrollView scrollY style={process.env.TARO_ENV === 'h5'?{height: deviceInfo.windowHeight - 102}:`height:${centerPartyHeight}px`} onScrollToLower={this.loadMore}>
                     <View className='inde_page_container'>
                         {
-                            data.map((value, index) => this.renderTemplateItem(value, index))
+                            data.map((item, index) => {
+                                let list = item.clist;
+                                if (item.model === "tpl_product") {
+                                    list = item.clist.length > 6 ? item.clist.slice(1, 7) : item.clist
+                                }
+                                return <Fragment>
+                                    {
+                                        item.model === "product" ? item.clist.map((product, prodIndex) => {
+                                            return product.info.jump_url && <View className='product-item' key={prodIndex+""}>
+                                                <Image src={ossUrl(product.thumb_image, 1)} className='image' mode='aspectFill'/>
+                                                <View className='bottom'>
+                                                    <View className='left'>
+                                                        <Text className='title'>{product.title || " "}</Text>
+                                                        {product.subtitle ? <Text className='subtitle'>{product.subtitle}</Text> : null}
+                                                    </View>
+                                                    <View className='right-btn' onClick={() => this.onCustomized(product, index)}>
+                                                        <Text className='txt'>我要定制</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        }):null
+                                    }
+                                    {
+                                        item.model === "tpl_product"?<Fragment>
+                                            {
+                                                item.clist.length == 1 ? <View className='temp-warp' key={index+""}>
+                                                    <View className='masks'>
+                                                        <View className='title'>
+                                                            <Text className='txt'>{item.title}</Text>
+                                                            {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
+                                                        </View>
+                                                        <View className='swiper-back' onClick={() => this.onItemClick(item.clist[0], index)}>
+                                                            <View className='temp-swiper'>
+                                                                <Image src={ossUrl(item.clist[0].thumb_image, 1)} className='photo' mode='aspectFill'/>
+                                                            </View>
+                                                        </View>
+                                                        <Button className='now-design-btn' onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
+                                                    </View>
+                                                </View>:null
+                                            }
+                                            {
+                                                item.clist.length > 1 && item.clist.length < 6 ?<ImageSwiper key={index+""} item={item} parent={this.$scope} onItemClick={current => this.onItemClick(current, index)} />:null
+                                            }
+                                            {
+                                                item.clist.length > 6 ? <View className='temp-warp' key={index+""}>
+                                                    <View className='title'>
+                                                        <Text className='txt'>{item.title}</Text>
+                                                        {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
+                                                    </View>
+                                                    <View className='grid'>
+                                                        {
+                                                            list.map((child, cIdx) => {
+                                                                return <View className='photo-warp' key={`tel_${cIdx}`} onClick={() => this.onItemClick(child, index)}>
+                                                                    <Image src={ossUrl(child.thumb_image, 1)} className='photo' mode='aspectFill'/>
+                                                                </View>
+                                                            })
+                                                        }
+                                                    </View>
+                                                    {
+                                                        item.clist.length > 6
+                                                            ? <View className='seemore' onClick={() => this.viewMoreSpecial(item)}>
+                                                                <Text className='txt'>查看更多</Text>
+                                                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                                            </View>
+                                                            : null
+                                                    }
+                                                </View>:null
+                                            }
+                                        </Fragment>:null
+                                    }
+                                    {
+                                        item.model === "coupon"? item.clist.map((coupon, cIndex) => (
+                                            <View className="index_coupon_main" key={`${index}_${cIndex}`} onClick={() => this.receiveCoupon(coupon)}>
+                                                <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" />
+                                                <View className="receive_btn">
+                                                    <View className="anim_btn_receive">
+                                                        <Text className="txt">立即领取</Text>
+                                                        <View className="icon">
+                                                            <IconFont name="16_xiayiye" color="#fff" size={32} />
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        )):null
+                                    }
+                                </Fragment>
+                            })
                         }
                     </View>
                 </ScrollView>

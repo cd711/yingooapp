@@ -4,7 +4,7 @@ import './preview.less';
 import IconFont from '../../components/iconfont';
 import { api, getToken } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { PlaceOrder } from './place';
 import {userStore} from "../../store/user";
 import page from '../../utils/ext';
@@ -314,7 +314,7 @@ export default class Preview extends Component<any, {
                     })
                 }} onAddCart={()=>{
                     const {buyTotal,sku,workId,modalId} = this.state;
-                    if (!lodash.isEmpty(sku) && Number(sku.id)>0) {
+                    if (!isEmpty(sku) && Number(sku.id)>0) {
                         Taro.showLoading({title:"加载中"})
                         api("app.cart/add",{
                             sku_id:sku.id,
@@ -345,7 +345,7 @@ export default class Preview extends Component<any, {
                     }
                 }} onNowBuy={()=>{
                     const {buyTotal,sku,workId,modalId} = this.state;
-                    if (!lodash.isEmpty(sku) && Number(sku.id)>0) {
+                    if (!isEmpty(sku) && Number(sku.id)>0) {
                         Taro.navigateTo({
                             url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
                         })

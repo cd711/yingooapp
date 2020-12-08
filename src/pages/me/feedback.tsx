@@ -34,8 +34,8 @@ const Feedback: Taro.FC<any> = (_) => {
 
     function getWidth() {
         return {
-            width: window.screen.width / 4 - 15,
-            height: window.screen.width / 4 - 15,
+            width: process.env.TARO_ENV === 'h5'?window.screen.width / 4 - 15:Taro.getSystemInfoSync().screenWidth/4-15,
+            height: process.env.TARO_ENV === 'h5'?window.screen.width / 4 - 15:Taro.getSystemInfoSync().screenWidth/4-15,
         }
     }
 

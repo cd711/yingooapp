@@ -6,7 +6,7 @@ import {api} from '../../utils/net'
 import {templateStore} from '../../store/template';
 import {userStore} from '../../store/user';
 import {inject, observer} from '@tarojs/mobx';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import Counter from '../../components/counter/counter';
 import FloatModal from '../../components/floatModal/FloatModal';
 import Ticket from '../../components/ticket/Ticket';
@@ -114,7 +114,7 @@ export default class Confirm extends Component<any, {
                     cart_ids: Base64.decode(cartIds)
                 }
             }
-            if (!lodash.isEmpty(userStore.address)) {
+            if (!isEmpty(userStore.address)) {
                 templateStore.address = userStore.address;
                 data["address_id"] = userStore.address.id;
             }
@@ -146,13 +146,13 @@ export default class Confirm extends Component<any, {
 
     componentDidShow() {
         const {data: {address}} = this.state;
-        if (!lodash.isEmpty(address) && !lodash.isEmpty(templateStore.address)) {
+        if (!isEmpty(address) && !isEmpty(templateStore.address)) {
             if (address.id == templateStore.address.id) {
                 return;
             }
         }
         const { orderid } = this.$router.params;
-        if (!lodash.isEmpty(templateStore.address) && orderid) {
+        if (!isEmpty(templateStore.address) && orderid) {
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/address", {
                 prepay_id: orderid,
