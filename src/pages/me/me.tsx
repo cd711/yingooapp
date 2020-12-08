@@ -6,7 +6,7 @@ import {userStore} from "../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../components/empty";
 import {api} from '../../utils/net';
-import {deviceInfo, getImageSize, ListModel, notNull, ossUrl} from '../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl} from '../../utils/common';
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import moment from "moment";
 import Popover, {PopoverItemClickProps} from "../../components/popover";
@@ -357,8 +357,7 @@ export default class Me extends Component<any, MeState> {
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}
                             onScrollToLower={this.lodeMore}
                 >
-                    <View className='topBox'
-                          style={process.env.TARO_ENV === 'h5' ? '' : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                    <View className='topBox' {...fixStatusBarHeight()}>
                         {
                             pageScrollShowTop ? <View className='top_weapp'></View> : null
                         }
