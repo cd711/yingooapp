@@ -54,7 +54,7 @@ export default class Me extends Component<any, {
         })
         api("editor.user_tpl/index?token=a235dfdd-f21c-47b9-adea-8553d79aba67", {
             start: 0,
-            size: 5
+            size: 15
         }).then((res) => {
             console.log(res);
             this.setState({
@@ -95,7 +95,7 @@ export default class Me extends Component<any, {
                 pageScrollShowTop: false
             });
         }
-        if (scrollTop > 245) {
+        if (scrollTop > 255) {
             this.setState({
                 switchBarFixed: true
             })
