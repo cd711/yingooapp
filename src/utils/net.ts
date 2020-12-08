@@ -1,8 +1,8 @@
 import Taro from '@tarojs/taro';
-import { Base64 } from 'js-base64';
+import {Base64} from 'js-base64';
 import {userStore} from "../store/user";
 import Modal from "../components/UITopProvider/modal";
-
+import ENV_TYPE = Taro.ENV_TYPE;
 
 
 export const options: {
@@ -68,11 +68,13 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
             ...params
         };
         params = params || {};
+
+        const tempT = Taro.getEnv() === ENV_TYPE.WEAPP ? "?token=53aab3f2-de07-4fb1-99bc-270f10fd7d6f" : "?token=5dc8ca96-744a-4885-8222-c620920afccc"
         // console.log(params);
-        let url = options.apiUrl + name;
-        if (getToken()) {
-          url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
-        }
+        let url = options.apiUrl + name + tempT;
+        // if (getToken()) {
+        //   url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
+        // }
         // console.log(url);
         // const pl: string[] = [];
         // for (let key in params) {

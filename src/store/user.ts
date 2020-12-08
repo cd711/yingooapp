@@ -1,8 +1,6 @@
 import { observable, action } from 'mobx'
 import { setUserInfo,api } from '../utils/net'
 import { is_weixin } from "../utils/common";
-import Taro from '@tarojs/taro'
-import { Base64 } from "js-base64";
 
 const sexList = {
     0: '保密',
@@ -12,7 +10,7 @@ const sexList = {
 }
 export class UserStore {
     @observable
-    public id = null;
+    public id = 11;
     @observable
     public mobile:string = "";
     @observable
@@ -81,7 +79,7 @@ export class UserStore {
             if (is_weixin()) {
 
             } else {
-                
+
             }
         })
     }
