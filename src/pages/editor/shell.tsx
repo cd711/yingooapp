@@ -1724,7 +1724,7 @@ export default class Shell extends Component<{}, {
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.102:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`} />
+                <iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`:`http://192.168.0.123:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`} />
                 {loadingTemplate ?
                     <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
             </View>

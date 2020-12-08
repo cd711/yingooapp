@@ -1484,11 +1484,11 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
     }
 
-    onSelected = (item?: { id: any, type: "img" | "text" | "container" }) => {
+    onSelected = (item?: { id: any, type: "img" | "text" | "container", userEditable: number}) => {
         if (this.store.isEdit) {
             return;
         }
-        if (!item) {
+        if (!item || (item && !notNull(item.userEditable) && item.userEditable === 0)) {
             this.store.tool = 0;
             return;
         }
@@ -1719,7 +1719,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                         src={
                             process.env.NODE_ENV == 'production'
                             ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
-                            :`http://192.168.0.102:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
+                            :`http://192.168.0.123:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
                         }
                 />
                 {loadingTemplate
