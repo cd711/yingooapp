@@ -115,7 +115,10 @@ export const jsApiList = [
     'chooseWXPay',
 ];
 
-export const deviceInfo = Taro.getSystemInfoSync();
+export const deviceInfo = {
+    ...Taro.getSystemInfoSync(),
+    env: process.env.TARO_ENV
+};
 
 
 /**
