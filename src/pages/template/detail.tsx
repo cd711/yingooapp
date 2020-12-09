@@ -4,8 +4,7 @@ import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
-// import moment from 'moment';
-import {deviceInfo, fixStatusBarHeight, ossUrl} from '../../utils/common'
+import {fixStatusBarHeight, ossUrl} from '../../utils/common'
 
 import page from '../../utils/ext';
 
@@ -159,7 +158,7 @@ export default class Detail extends Component<{},{
         return (
             <View className='detail' >
                 {/* <View style={`background:red;height:${Taro.getSystemInfoSync().windowHeight-Taro.getSystemInfoSync().statusBarHeight}px;`}></View> */}
-                <View className='nav-bar' {...fixStatusBarHeight()}>
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (process.env.TARO_ENV === 'h5') {
                             window.location.href = '/pages/template/index';
@@ -175,7 +174,7 @@ export default class Detail extends Component<{},{
                         <Text className='title'>{`ID:${currentItem.id}`}</Text>
                     </View>
                 </View>
-                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={({detail:{scrollTop}})=>{
+                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={()=>{
                     this.setState({
                         scrollTop:-1
                     })
