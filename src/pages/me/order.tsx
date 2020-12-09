@@ -9,7 +9,7 @@ import { observer, inject } from '@tarojs/mobx'
 import { api } from '../../utils/net';
 import { ListModel, ossUrl } from '../../utils/common';
 
-import PayWayModal from '../../components/payway/PayWayModal';
+// import PayWayModal from '../../components/payway/PayWayModal';
 import page from '../../utils/ext';
 import copy from 'copy-to-clipboard';
 import TipModal from '../../components/tipmodal/TipModal';
@@ -344,7 +344,7 @@ export default class Order extends Component<any,{
 
                 </View>
                 </ScrollView>
-                <PayWayModal 
+                {/* <PayWayModal 
                     isShow={showPayWayModal} 
                     totalPrice={parseFloat(order_price+"")>0?parseFloat(order_price+"").toFixed(2):"0.00"} 
                     order_sn={order_sn}
@@ -361,7 +361,7 @@ export default class Order extends Component<any,{
                     this.cancelId = 0;
                 }} onOK={()=>{
                     this.handleCancel();
-                }} />
+                }} /> */}
             </View>
         )
     }
