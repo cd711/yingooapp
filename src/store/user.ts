@@ -10,7 +10,7 @@ const sexList = {
 }
 export class UserStore {
     @observable
-    public id = 11;
+    public id = 0;
     @observable
     public mobile:string = "";
     @observable
