@@ -322,6 +322,7 @@ export default class Photos extends Component<PhotosProps,{
         return editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45
     }
 
+    private menu = Taro.getMenuButtonBoundingClientRect();
 
     render() {
         const {editSelect, onClose, count} = this.props;
@@ -330,7 +331,7 @@ export default class Photos extends Component<PhotosProps,{
         const tabs = ["图片","视频"];
         return (
             <View className='photos'>
-                <View className='nav-bar' {...fixStatusBarHeight()}>
+                <View className='photos_nav_bar' style={`padding-top: ${this.menu.height + 20}px`}>
                     <View className='left' onClick={()=>{
                         if (editSelect) {
                             onClose && onClose()

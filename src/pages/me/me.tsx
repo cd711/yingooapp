@@ -336,6 +336,9 @@ export default class Me extends Component<any, MeState> {
     render() {
         const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;
         const {id, nickname, avatar} = userStore;
+        const aa = fixStatusBarHeight()
+        console.log("aaaa：", aa)
+
         return (
             <View className='me'>
                 {
@@ -357,7 +360,7 @@ export default class Me extends Component<any, MeState> {
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}
                             onScrollToLower={this.lodeMore}
                 >
-                    <View className='topBox' {...fixStatusBarHeight()}>
+                    <View className='topBox'>
                         {
                             pageScrollShowTop ? <View className='top_weapp'></View> : null
                         }
