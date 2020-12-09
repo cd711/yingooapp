@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {ossUrl, deviceInfo, fixStatusBarHeight} from "../../utils/common";
+import {ossUrl, deviceInfo} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
@@ -220,6 +220,7 @@ export default class Photos extends Component<PhotosProps,{
     loadMore = () => {
         const {navSwitchActive, imageList, videoList, sortActive} = this.state;
         const len = navSwitchActive === 0 ? imageList.length : videoList.length;
+        console.log(len, this.total)
         if (this.total === len) {
             this.setState({loadStatus: "noMore"})
             return
@@ -289,6 +290,26 @@ export default class Photos extends Component<PhotosProps,{
     }
 
     private popoverItem: PopoverItemProps[] = [
+        {
+            title: "时间从远到近排序",
+            value: JSON.stringify({sort: "createtime", order: "asc"}),
+            onClick: this.changeSort,
+        },
+        {
+            title: "时间从近到远排序",
+            value: JSON.stringify({sort: "createtime", order: "desc"}),
+            onClick: this.changeSort,
+        },
+        {
+            title: "从大到小降序",
+            value: JSON.stringify({sort: "filesize", order: "desc"}),
+            onClick: this.changeSort,
+        },
+        {
+            title: "从小到大升序",
+            value: JSON.stringify({sort: "filesize", order: "asc"}),
+            onClick: this.changeSort,
+        },
         // {
         //     title: " 时间从远到近排序",
         //     value: JSON.stringify({sort: "createtime", order: "asc"}),
@@ -319,9 +340,9 @@ export default class Photos extends Component<PhotosProps,{
         const {editSelect} = this.props;
         const {editSelectImgIds, imageList, videoList,navSwitchActive} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
-        return editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45
+        const h = editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
+        return deviceInfo.env === "h5" ? h : h - deviceInfo.statusBarHeight
     }
-
 
     render() {
         const {editSelect, onClose, count} = this.props;
@@ -330,7 +351,11 @@ export default class Photos extends Component<PhotosProps,{
         const tabs = ["图片","视频"];
         return (
             <View className='photos'>
-                <View className='nav-bar' {...fixStatusBarHeight()}>
+                <View className='photos_nav_bar' style={
+                    deviceInfo.env === "weapp"
+                        ? `padding-top: ${deviceInfo.statusBarHeight}px;height: 64px`
+                        : ""
+                }>
                     <View className='left' onClick={()=>{
                         if (editSelect) {
                             onClose && onClose()
@@ -352,7 +377,7 @@ export default class Photos extends Component<PhotosProps,{
                         </View>
                     </View>
                     {
-                        list.length > 0
+                        list.length > 0 && deviceInfo.env === "h5"
                             ? editSelect
                                 ? <View className="right">
                                     <Popover popoverItem={this.popoverItem}>
@@ -362,12 +387,12 @@ export default class Photos extends Component<PhotosProps,{
                                 : <View className="right" onClick={() => this.onEdit(!isEdit)}>
                                     <Text>{isEdit ? "完成" : "编辑"}</Text>
                                 </View>
-                            : null
+                            : <View className="right"/>
                     }
                 </View>
                 <View className='container'>
                     <ScrollView className='list_scrollview'
-                                style={{height: this.getScrollHeight()}}
+                                style={{height: this.getScrollHeight() + "px"}}
                                 scrollY
                                 scrollWithAnimation
                                 ref={r => this.scrollView = r}
@@ -388,12 +413,28 @@ export default class Photos extends Component<PhotosProps,{
                                 </View>
                                 : <View className="list_container">
                                     {!editSelect
-                                        ? <View className="list_filter">
-                                            <Text className="tit">排序</Text>
-                                            <Popover popoverItem={this.popoverItem}>
-                                                <View><IconFont size={48} name="24_tupianpaixu"/></View>
-                                            </Popover>
-                                        </View>
+                                        ? deviceInfo.env === "weapp"
+                                            ? <View className="list_filter">
+                                                <Text className="tit" onClick={() => this.onEdit(!isEdit)}>{isEdit ? "完成" : "管理"}</Text>
+                                                {
+                                                    isEdit
+                                                        ? <View className="weapp_list_filter_act">
+                                                            <Text onClick={() => this.onEdit(!isEdit)}>取消</Text>
+                                                        </View>
+                                                        : <Popover popoverItem={this.popoverItem}>
+                                                            <View className="weapp_list_filter_act">
+                                                                <Text className="txt">排序</Text>
+                                                                <IconFont size={48} name="24_tupianpaixu"/>
+                                                            </View>
+                                                        </Popover>
+                                                }
+                                            </View>
+                                            : <View className="list_filter">
+                                                <Text className="tit">排序</Text>
+                                                <Popover popoverItem={this.popoverItem}>
+                                                    <View><IconFont size={48} name="24_tupianpaixu"/></View>
+                                                </Popover>
+                                            </View>
                                         : null}
                                     <View className="list_main">
                                         <View className="list_item">
@@ -402,13 +443,17 @@ export default class Photos extends Component<PhotosProps,{
                                                 type="card"
                                                 count={9}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
+                                                style={"width: 248rpx"}
                                                 onChange={this.uploadFile}/>
                                         </View>
                                         {
                                             list.map((item, idx) => {
                                                 return <View className="list_item" key={idx+""}>
-                                                    <View className="img_item" key={idx+""} onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
-                                                        <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)} mode="aspectFill" className="img"/>
+                                                    <View className="img_item" key={idx+""}
+                                                          onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
+                                                        <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)}
+                                                               mode="aspectFill"
+                                                               className="img"/>
                                                     </View>
                                                     {editSelect && editSelectImgIds.indexOf(item.id) > -1
                                                         ? <View className="edit_select_index" onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
