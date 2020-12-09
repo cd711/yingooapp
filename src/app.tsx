@@ -49,7 +49,7 @@ class App extends Component {
             'pages/me/setting',
             // 'pages/me/profile',
             // 'pages/me/acount',
-            // 'pages/me/order',
+            'pages/me/order',
             // 'pages/me/privacy',
             // 'pages/me/aboutus',
             // 'pages/me/feedback',

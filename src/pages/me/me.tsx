@@ -357,7 +357,7 @@ export default class Me extends Component<any, MeState> {
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}
                             onScrollToLower={this.lodeMore}
                 >
-                    <View className='topBox' {...fixStatusBarHeight()}>
+                    <View className='topBox' style={fixStatusBarHeight()}>
                         {
                             pageScrollShowTop ? <View className='top_weapp'></View> : null
                         }
@@ -391,6 +391,7 @@ export default class Me extends Component<any, MeState> {
 
                         </View>
                         <View className='baseInfo' onClick={() => {
+                            console.log(id);
                             if (id > 0) {
                                 return;
                             }
@@ -458,7 +459,7 @@ export default class Me extends Component<any, MeState> {
                                 ? <View className='content'>
                                     {
                                         works.map((item, idx) => (
-                                            <View className='item' key={idx}>
+                                            <View className='item' key={item.id}>
                                                 {
                                                     moment.unix(item.create_time).year() == moment().year() ? null :
                                                         <View className='years'>
