@@ -311,10 +311,13 @@ export function RGBAster (params:RGBAsterParams = {src: ""}) {
 
 export function fixStatusBarHeight() {
     const env = process.env.TARO_ENV;
-    if (env !== "h5") {
-        return {
-            "padding-top": deviceInfo.statusBarHeight + "px"
-        }
+    // if (env !== "h5") {
+    //     return {
+    //         "padding-top": deviceInfo.statusBarHeight + "px"
+    //     }
+    // }
+
+    return {
+        "padding-top": env !== "h5" ? deviceInfo.statusBarHeight + "px" : ""
     }
-    return {}
 }
