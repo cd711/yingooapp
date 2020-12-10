@@ -1,78 +1,49 @@
-import Taro, {Component, useEffect, useState} from '@tarojs/taro';
-import {Image, ScrollView, Text, View} from '@tarojs/components';
+import Taro, {useEffect, useState} from "@tarojs/taro";
+import {api} from "../../../utils/net";
+import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../../utils/common";
+import {Image, ScrollView, Text, View} from "@tarojs/components";
+import LoadMore from "../../../components/listMore/loadMore";
+import IconFont from "../../../components/iconfont";
+import {userStore} from "../../../store/user";
+import UploadFile from "../../../components/Upload/Upload";
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
-import './editor.less';
-import './shell.less';
-import {api, getToken} from '../../utils/net';
-import IconFont from '../../components/iconfont';
-import {observable} from 'mobx';
-import {observer} from '@tarojs/mobx';
-import UploadFile from "../../components/Upload/Upload";
-import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal, urlDeCode} from "../../utils/common";
-import {userStore} from "../../store/user";
-import Photos from "../me/photos";
-import {templateStore} from "../../store/template";
-import moment from "moment";
-
-let editorProxy: WindowProxy | null | undefined;
-
-export const sendMessage: { (type: string, data: any): void } = (type, data) => {
-    editorProxy && editorProxy.postMessage({from: "parent", type: type, data: data}, "*");
-}
-
-let rpcId = 0;
-const rpcList = {}
-
-function callEditor(name, ...args) {
-    return new Promise((resolve, reject) => {
-        rpcId++;
-        const id = rpcId;
-        rpcList[id] = [resolve, reject];
-        sendMessage("_req", {
-            id: rpcId,
-            fun: name,
-            args: args
-        });
-    });
-}
-
-
-class Store {
-    @observable
-    tool = 0;
-
-
-    @observable
-    isEdit = false;
-}
-
+import Shell, {callEditor, sendMessage} from "../shell";
 
 interface BaseProps {
     onClose: () => void,
     onOk?: () => void,
 }
 
+interface BrandType {
+    id: any;
+    name: string;
+    models?: BrandType[];
+    phoneshell: any;
+    brandIndex?: number;
+}
+
 // 换模板
-export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
+export const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => void}> = ({onClose, onOk}) => {
 
     const router = Taro.useRouter();
 
     const prodList = Taro.useRef([]);
-
     const [typeList, setTypeList] = useState([]);
     const [active, setActive] = useState(0);
     const [templateList, setTemplateList] = useState([]);
     const [selected, setSelected] = useState(null);
     const defaultDoc = Taro.useRef(null);
-    let total: number = 0;
+    const total = Taro.useRef(0)
+    const [status, setStatus] = useState<'more' | 'loading' | 'noMore'>("more");
+    const [page, setPage] = useState(1);
 
     // 获取列表
     async function getListOfCategory(params: {tagId?: number | string, page?: number, size?: number, loadMore?: boolean} = {}) {
 
         const opt = {
-            cid: router.params.cid || 41,
+            cid: router.params.cid,
             tagId: params.tagId || "",
-            page: params.page || 0,
+            page: params.page || 1,
             size: params.size || 15,
             loadMore: params.loadMore || false
         }
@@ -83,13 +54,15 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
                 page: opt.page,
                 size: opt.size
             });
-            total = Number(res.total);
+            total.current = Number(res.total);
             let list = [];
             if (opt.loadMore) {
                 list = [...templateList, ...res.list]
             } else {
                 list = [...res.list]
             }
+
+            setStatus(list.length == res.total ? "noMore" : "more")
             setTemplateList([...list])
         }catch (e) {
             console.log("根据ID获取模板列表出错：", e)
@@ -101,7 +74,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
     async function resetTemplate() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
+                await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -121,18 +94,18 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
 
     useEffect(() => {
 
-        api("app.product/cate", {cid: router.params.cid}).then(res => {
+        api("app.product/cate").then(res => {
             prodList.current = res;
 
             // 获取标签分类
             let arr = [];
             for (const item of res) {
-                if (Number(item.tpl_category_id) === Number("41")) {
+                if (Number(item.tpl_category_id) === Number(router.params.cid)) {
                     arr = item.tags;
                     break;
                 }
             }
-            getListOfCategory({tagId: arr[0].id, page: 0})
+            getListOfCategory({tagId: arr[0].id, page: 1})
             setTypeList([...arr])
         }).catch(e => {
             console.log("获取商品分类出错：", e)
@@ -145,7 +118,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
         setActive(idx);
         getListOfCategory({
             tagId: typeList[idx].id,
-            page: 0
+            page: 1
         })
     }
 
@@ -162,11 +135,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
         Taro.showLoading({title: "正在为您设置..."})
         try {
             const res = await api("editor.tpl/one", {id: item.id});
-            console.log("修改前：",res)
-            const temp = {...res};
-            temp.pages[0].thumbnail = "";
-            console.log("修改后：", temp)
-            await callEditor("setDoc", temp, templateStore.editorPhotos.map(v => v.url))
+            await callEditor("setDoc", res)
         }catch (e) {
             console.log("设置DOC出错：", e)
         }
@@ -175,16 +144,19 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
 
     const loadMore = () => {
         console.log("加载更多")
-        if (total === templateList.length || total <= 15) {
+
+        const pagtion = getNextPage(page, pageTotal(total.current, 15));
+
+        if (total.current === templateList.length || total.current <= 15) {
             return
         }
-        if (templateList.length < total) {
-            getListOfCategory({
-                tagId: typeList[active].id,
-                page: templateList.length,
-                loadMore: true
-            })
-        }
+        setPage(pagtion.page)
+        setStatus("loading")
+        getListOfCategory({
+            tagId: typeList[active].id,
+            page: pagtion.page,
+            loadMore: true
+        })
     }
 
     const onCancel = () => {
@@ -204,7 +176,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
                         <View className="type_item" key={index+""} onClick={() => changeType(index)}>
                             <Text className={`txt ${active === index ? "active" : ""}`}>{value.name}</Text>
                             {active === index ?
-                                <Image src={require("../../source/switchBottom.png")} className="filter_bar_img"/>
+                                <Image src={require("../../../source/switchBottom.png")} className="filter_bar_img"/>
                                 : null}
                         </View>
                     ))}
@@ -215,7 +187,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
             <View className="template_list">
                 {templateList.map((value, index) => (
                     <View className="template_item" key={index+""} onClick={() => onSelect(value)}
-                          // style={{width: window.screen.width / 4 - 8, height: (window.screen.width / 4 - 8) + (window.screen.width / 4 - 4) * 0.62}}
+                        // style={{width: window.screen.width / 4 - 8, height: (window.screen.width / 4 - 8) + (window.screen.width / 4 - 4) * 0.62}}
                     >
                         <Image src={value.thumbnail} mode="aspectFill" className="temp_img" />
                         {
@@ -228,6 +200,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
                     </View>
                 ))}
             </View>
+            {templateList.length > 0 ? <LoadMore status={status} /> : null}
         </ScrollView>
         <View className='optBar'>
             <View onClick={onCancel} className="icon"><IconFont name='24_guanbi' size={48}/></View>
@@ -243,7 +216,7 @@ interface ChangeImageProps {
 }
 
 // 换图、换颜色
-const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
+export const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
 
     const {onClose, onOk} = props;
 
@@ -367,7 +340,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
+                await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -505,7 +478,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                     <View className="filter_bar_item" key={index+""} onClick={() => changeType(index)}>
                         <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>
                         {active === index ?
-                            <Image src={require("../../source/switchBottom.png")} className="filter_bar_img"/> : null}
+                            <Image src={require("../../../source/switchBottom.png")} className="filter_bar_img"/> : null}
                     </View>
                 ))}
             </View>
@@ -563,13 +536,13 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                                     <View className="colors_items">
                                         {
                                             colors.map((value, index) => (
-                                                    <View className="color_wrap" key={index+""}>
-                                                        <View className="color_item"
-                                                              style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
-                                                              onClick={() => onSelectColor(value.key)}>
-                                                            <View className="color" style={{background: value.color}} />
-                                                        </View>
+                                                <View className="color_wrap" key={index+""}>
+                                                    <View className="color_item"
+                                                          style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
+                                                          onClick={() => onSelectColor(value.key)}>
+                                                        <View className="color" style={{background: value.color}} />
                                                     </View>
+                                                </View>
                                             ))
                                         }
                                     </View>
@@ -593,7 +566,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
 interface ChangeTextProps {
     data?: any
 }
-const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
+export const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
 
     const {onClose, onOk, data} = props;
 
@@ -620,7 +593,7 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
+                await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -673,10 +646,9 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
 }
 
 // 选择字体
-const SelectFont: Taro.FC<BaseProps> = props => {
+export const SelectFont: Taro.FC<BaseProps> = props => {
 
     const {onClose, onOk} = props;
-
 
     const defaultDoc = Taro.useRef(null);
     const [fontList, setFontList] = useState([]);
@@ -723,7 +695,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
+                await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -781,26 +753,26 @@ const SelectFont: Taro.FC<BaseProps> = props => {
                 <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
                     <View className="font_change_list_main">
                         {
-                           fontList.map((value, index) => (
-                               <View className="font_change_item" key={index+""} onClick={() => onSelectFont(value)}>
-                                   <View className="left">
+                            fontList.map((value, index) => (
+                                <View className="font_change_item" key={index+""} onClick={() => onSelectFont(value)}>
+                                    <View className="left">
                                         <Image src={value.thumbnail} className="font_img"
                                                mode="aspectFit"
                                                style={{
                                                    width: window.screen.availWidth * 0.75 - 32
                                                }}
                                         />
-                                   </View>
-                                   <View className="right">
+                                    </View>
+                                    <View className="right">
                                         <View className="dowload">
                                             <IconFont name={fontSelected === Number(value.id) ? "22_yixuanzhong" : "20_congyunduanxiazai"}
                                                       size={40}
-                                                      // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
+                                                // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
                                             />
                                         </View>
-                                   </View>
-                               </View>
-                           ))
+                                    </View>
+                                </View>
+                            ))
                         }
                     </View>
                 </ScrollView>
@@ -816,7 +788,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
 }
 
 // 设置样式
-const ChangeFontStyle: Taro.FC<BaseProps> = props => {
+export const ChangeFontStyle: Taro.FC<BaseProps> = props => {
 
     const {onClose, onOk} = props;
     const colors = [
@@ -868,7 +840,6 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         ]
     }
 
-
     const defaultDoc = Taro.useRef(null);
     const activeStyle = Taro.useRef(0);
     const alignActive = Taro.useRef(0);
@@ -890,7 +861,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
     async function resetImage() {
         try {
             if (defaultDoc.current) {
-                await callEditor("setDoc", defaultDoc.current, templateStore.editorPhotos.map(v => v.url));
+                await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
             console.log("重置出错：", e)
@@ -1039,7 +1010,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
 }
 
 // 透明度
-const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
+export const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
 
     const {onClose, onOk} = props;
 
@@ -1081,7 +1052,7 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     return <View className="change_image_container">
         <View className="change_main" style={{height: "auto"}}>
             <View className="alpha_bar">
-                <View className="icon"><Image src={require("../../source/trans.png")} className="img"/></View>
+                <View className="icon"><Image src={require("../../../source/trans.png")} className="img"/></View>
                 <View className="bar"><AtSlider value={alpha} min={0} max={100} step={1} onChanging={onChange}/></View>
                 <View className="count"><Text>{alpha}</Text></View>
             </View>
@@ -1095,640 +1066,247 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     </View>
 }
 
-const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
-
-    const router = parent.$router;
+export const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
     const [type, setType] = useState(0);
-    const [templateList, setTemplateList] = useState<any[]>([]);
-    const currentData = Taro.useRef({
-        total: 0,
-        curr: 0
-    })
+    const [brandList, setBrandList] = useState<BrandType[]>([]);
+    const [brandIndex, setBrand] = useState<number>(0);
+    const [series, setSeries] = useState<BrandType[]>([]);
 
-    async function renderTemplateDoc(id) {
-        // // 获取模板详情并向DOC更新
-        Taro.showLoading({title: "正在为您设置..."})
-        try {
-            const res = await api("editor.tpl/one", {id});
-            console.log("修改前：",res)
-            const temp = {...res};
-            // temp.pages[0].thumbnail = "";
-            console.log("修改后：", temp)
-            await callEditor("setDoc", temp, templateStore.editorPhotos.map(v => v.url))
-        }catch (e) {
-            console.log("设置DOC出错：", e)
+
+    const [tempCurrentModel, setTempCurrentModel] = useState<any>(parent.defaultModel as any);
+
+    useEffect((async () => {
+        if (!parent.defaultModel) {
+            return;
         }
-        Taro.hideLoading()
+        setTempCurrentModel(parent.defaultModel);
+        switch (type) {
+            case 1:
+                let list = null;
+                try {
+                    //@ts-ignore
+                    const res = Taro.getStorageSync("phone_brand");
+                    if (res && res.time + 15 * 86400000 > Date.now()) {
+                        list = res.list;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+                if (!list) {
+                    try {
+                        list = await api("/editor.phone_shell/phonebrand");
+                    } catch (e) {
+                        console.warn(e);
+                    }
+                }
+                if (!list) {
+                    return;
+                }
+
+                setBrandList(list);
+
+                for (let i = 0; i < list.length; i ++) {
+                    if (list[i].id == tempCurrentModel.brand.id) {
+                        setBrand(i);
+                        break;
+                    }
+                }
+
+                Taro.setStorage({
+                    key: "phone_brand", data: {
+                        time: Date.now(),
+                        list: list
+                    }
+                });
+        }
+    }) as any, [type, parent.defaultModel])
+
+    //系列
+    useEffect((async () => {
+        if (!brandList || brandList.length == 0) {
+            return;
+        }
+        setSeries(null);
+        let list = null;
+
+        try {
+            //@ts-ignore
+            const res = brandList[brandIndex] ? Taro.getStorageSync("phone_series_" + brandList[brandIndex].id) : null;
+            if (res && res.time + 3 * 86400000 > Date.now()) {
+                list = res.list;
+            }
+        } catch (e) {
+
+            console.error(e);
+        }
+        if (!list) {
+            try {
+                list = await api("/editor.phone_shell/series", {
+                    id: brandList[brandIndex].id
+                });
+                console.log(list);
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+        if (!list) {
+            return;
+        }
+        setSeries(list);
+
+        Taro.setStorage({
+            key: "phone_series_" + brandList[brandIndex].id, data: {
+                time: Date.now(),
+                list: list
+            }
+        });
+    }) as any, [brandList, brandIndex]);
+
+    function getFirstTemplateDoc() {
+        return new Promise(async (resolve, reject) => {
+            api("app.product/cate").then(res => {
+
+                // 获取标签分类
+                let arr = [];
+                for (const item of res) {
+                    if (item.tpl_category_id == parent.$router.params.cid) {
+                        arr = item.tags;
+                        break;
+                    }
+                }
+                if (arr.length > 0) {
+                    api("editor.tpl/index", {
+                        cid: parent.$router.params.cid,
+                        tag_id: arr[0].id,
+                        page: 0,
+                        size: 5
+                    }).then(tplData => {
+                        if (tplData.list[0]) {
+                            api("editor.tpl/one", {id: tplData.list[0].id}).then(doc => {
+                                resolve(doc)
+                            }).catch(e => {
+                                reject(e)
+                            })
+                        } else {
+                            resolve(null)
+                        }
+                    }).catch(e => {
+                        reject(e)
+                    })
+                } else {
+                    resolve(null)
+                }
+
+            }).catch(e => {
+                console.log("获取商品分类出错：", e)
+            })
+        })
     }
 
-    function getTemplateForPhotoNum(params: { cid?: string | number, num?: number } = {}) {
-        return new Promise<any>(async (resolve, reject) => {
-            const opt = {
-                cid: params.cid || router.params.tplid,
-                num: params.num || 1,
+    async function setDefaultDoc(){
+        try {
+            const res = await getFirstTemplateDoc();
+            if (res) {
+                await callEditor("setDoc", res)
             }
-            try {
-                const res = await api("editor.tpl/index", {
-                    cid: opt.cid,
-                    num: opt.num,
-                    page: 1,
-                    size: 20
-                });
-                currentData.current = {...currentData.current, total: res.total};
-                resolve(res.list || [])
-            }catch (e) {
-                reject(e)
-            }
-        })
+        } catch (e) {
+            console.log("初始化出错：", e)
+        }
     }
 
     useEffect(() => {
-        getTemplateForPhotoNum({num: templateStore.editorPhotos.length}).then(res => {
-            setTemplateList([...res])
-        })
+        setTimeout(() => {
+            if (!notNull(parent.$router.params.allowinit) && parent.$router.params.allowinit === "t") {
+                setDefaultDoc()
+            }
+        }, 1500)
     }, [])
+
+
+    const selectPhone = () => {
+        setType(0);
+
+        const mod = {
+            id: tempCurrentModel.id,
+            name: tempCurrentModel.name,
+            mask: tempCurrentModel.phoneshell ? tempCurrentModel.phoneshell.image : "",
+            brank: {
+                name: brandList[brandIndex].name,
+                id: brandList[brandIndex].id,
+            },
+            series: tempCurrentModel.series
+        };
+
+        if (mod.mask) {
+            sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
+        }
+        parent.defaultModel = mod;
+        Taro.setStorage({key: "phone_model", data: mod});
+    };
 
     const cancelMode = () => {
         setType(0);
-    }
-
-    // 从图集选图后
-    const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
-        setType(0);
-        if (data.ids.length + templateStore.editorPhotos.length > Number(router.params.tplmax)) {
-            Taro.showToast({
-                title: `最多选择${router.params.tplmax}张图片`,
-                icon: "none"
-            })
-            return
-        }
-        try {
-
-            currentData.current = {...currentData.current, curr: 0}
-
-            let arr = [...templateStore.editorPhotos];
-
-            data.ids.forEach((value, index) => {
-                const idx = arr.findIndex(v => v.id == value);
-                if (idx === -1) {
-                    arr.push({
-                        id: value,
-                        url: data.imgs[index]
-                    })
-                }
-            })
-
-            templateStore.editorPhotos = arr;
-
-            getTemplateForPhotoNum({num: arr.length}).then(res => {
-
-                setTemplateList([...res]);
-                const cur = res[currentData.current.curr];
-                if (cur) {
-                    renderTemplateDoc(cur.id)
-                } else {
-                    console.log(`没有查询到对应图片数量（${arr.length}）的模板`, res)
-                }
-            })
-
-        }catch (e) {
-            console.log("选图出错：", e)
-        }
-    }
-
-    const onChangeTemplate = () => {
-        const obj = {...currentData.current};
-        obj.curr += 1;
-        if (obj.curr > obj.total) {
-            obj.curr = 0
-        }
-        const curr = templateList[obj.curr];
-        if (curr) {
-            renderTemplateDoc(curr.id)
-        }
-        console.log("自增结果：", obj)
-        currentData.current = {...obj}
+        // setBrand(currentModel.brandIndex);
+        // setTempCurrentModel(currentModel);
     }
 
     return type === 0
-        ? <View className='tools' style={0 == 0 ? {padding: 0} : {padding: "0 13%"} }>
+        ? <View className='tools' style='padding: 0 13%'>
             <View className='btn' onClick={() => setType(1)}>
-                <IconFont name='24_bianjiqi_chongyin' size={48}/>
-                <Text className='txt'>添加</Text>
+                <IconFont name='24_bianjiqi_jixing' size={48}/>
+                <Text className='txt'>机型</Text>
             </View>
-            <View onClick={onChangeTemplate} className='btn'>
+            <View onClick={() => setType(2)} className='btn'>
                 <IconFont name='24_bianjiqi_moban' size={48}/>
                 <Text className='txt'>模板</Text>
             </View>
         </View>
         : type === 1
-            ? <View className="photo_picker_container photo_picker_animate" style={{
-                width: deviceInfo.windowWidth,
-                height: deviceInfo.windowHeight,
-                padding: 0
-            }}>
-                <Photos editSelect
-                        onClose={cancelMode}
-                        onPhotoSelect={onPhotoSelect}
-                />
-            </View>
-            : <View />
-}
-
-interface PrintEditState {
-    size?: { width: string | number; height: string | number };
-    data?: number;
-    loadingTemplate?: boolean;
-    textInfo: any
-}
-@observer
-export default class PrintEdit extends Component<any, PrintEditState> {
-
-    public store = new Store();
-
-    private tplId: any = 0;
-    private docId: any = 0;
-
-    constructor(p) {
-        super(p);
-        // console.log(this.$router.params);
-        this.tplId = this.$router.params['tpl_id'] || 0;
-        this.docId = this.$router.params['id'] || 0;
-
-        this.state = {
-            loadingTemplate: true,
-            textInfo: null
-        };
-    }
-
-    public editorProxy: WindowProxy | null | undefined;
-
-    getLocalEditPhotos = () => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const res = Taro.getStorageSync(`${moment().date()}_${userStore.id}_editPhotos`);
-                console.log("本地可编辑的图片：", res)
-                if (res) {
-                    resolve(res)
-                } else {
-                    if (templateStore.editorPhotos.length > 0) {
-                        resolve([...templateStore.editorPhotos])
-                    } else {
-                        reject(null)
-                    }
-                }
-            }catch (e) {
-                if (templateStore.editorPhotos.length > 0) {
-                    resolve(templateStore.editorPhotos)
-                } else {
-                    reject(null)
-                }
-            }
-        })
-    }
-
-    async componentDidMount() {
-        const routerParams = this.$router.params;
-
-        this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
-        editorProxy = this.editorProxy;
-        window.addEventListener("message", this.onMsg);
-
-        if (routerParams.init && routerParams.init == "t") {
-            try {
-                const arr: any = await this.getLocalEditPhotos();
-                templateStore.editorPhotos = [...arr];
-            }catch (e) {
-                templateStore.editorPhotos = [{id: "", url: ""}]
-            }
-            return
-        }
-
-        const {img}: any = urlDeCode(this.$router.params);
-        templateStore.editorPhotos = [{id: "", url: img}];
-
-        // 再次编辑时使用存储的图片数据
-        if (routerParams.local && routerParams.local == "t") {
-            try {
-                const res = Taro.getStorageSync(`${userStore.id}_originalData`);
-                if (res) {
-                    templateStore.editorPhotos = [...res]
-                }
-            }catch (e) {
-                console.log("获取存储的图片旧数据出错：", e)
-            }
-        }
-    }
-
-
-    componentWillUnmount() {
-        editorProxy = null;
-        window.removeEventListener("message", this.onMsg);
-    }
-
-    getPhotoParams = () => {
-        // 解析参数
-        let params: any = {};
-
-        try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
-            if (res) {
-                params = JSON.parse(res)
-            } else {
-                if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                    params = templateStore.photoSizeParams
-                } else {
-                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-                }
-            }
-        } catch (e) {
-            if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                params = templateStore.photoSizeParams
-            } else {
-                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-            }
-        }
-
-        return params
-    }
-
-    onLoad = async (_?: number) => {
-
-    }
-
-    getLocalPictureSize = () => {
-        return new Promise<string>((resolve, reject) => {
-            try {
-                const res = Taro.getStorageSync("pictureSize");
-                console.log("本地的相框尺寸：", res)
-                if (res && res.indexOf("*") > -1) {
-                    resolve(res)
-                } else {
-                    resolve("")
-                }
-            }catch (e) {
-                reject()
-            }
-        })
-    }
-
-    onLoadEmpty = async (_?: number) => {
-        const routerParams = this.$router.params;
-        try {
-            const res = await api("editor.tpl/index", {cid: routerParams.tplid, num: templateStore.editorPhotos.length});
-            const pictureSize = await this.getLocalPictureSize();
-
-            const proId = routerParams.proid || null;
-
-            if (routerParams.init && routerParams.init == "t") {
-                const id = proId ? proId : res.list[0].id;
-                console.log("开始初始化图片：", id, templateStore.editorPhotos.map(v => v.url))
-                await callEditor("setDoc", id, templateStore.editorPhotos.map(v => v.url), pictureSize)
-            } else {
-                let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
-
-                const localParams = this.getPhotoParams();
-                const current = localParams.path[Number(routerParams.idx)];
-                let imgArr = [];
-                const {img}: any = urlDeCode(routerParams);
-                if (current && current.edited && current.edited == true && !notNull(current.doc)) {
-                    console.log("已编辑过的模板")
-                    data = current.doc;
-                    imgArr = templateStore.editorPhotos.map(v => v.url)
-                } else {
-                    console.log("没有编辑过的模板")
-
-                    imgArr = [img]
-                }
-
-                await callEditor("setDoc", data, imgArr, pictureSize)
-            }
-
-        }catch (e) {
-            console.log("初始化失败：", e)
-        }
-    }
-
-    _res = (data) => {
-        const {id, res, err} = data.data;
-        if (rpcList[id]) {
-            const rpc = rpcList[id];
-            delete rpcList[id];
-
-            if (err) {
-                rpc[1](err);
-            } else {
-                rpc[0](res);
-            }
-        }
-    }
-
-    onMsg: { (e: MessageEvent): void } = async ({data}) => {
-        console.log("msg", data);
-        if (!data) {
-            return;
-        }
-        if (data.from == "editor") {
-            switch (data.type) {
-                case "_req":
-                    const {id, fun, args} = data.data;
-
-                    if (this[`rpc_${fun}`]) {
-                        try {
-                            const res = await this[`rpc_${fun}`](...args)
-                            sendMessage("_res", {
-                                id,
-                                res
-                            });
-                        } catch (err) {
-                            sendMessage("_res", {
-                                id,
-                                err
-                            });
-                        }
-                    } else {
-                        sendMessage("_res", {
-                            id,
-                            err: "func not found"
-                        });
-                    }
-                    return;
-
-                case "_res":
-                    this._res(data);
-                    return;
-
-                case "onLoadEmpty":
-                    this.setState({
-                        loadingTemplate: false
-                    });
-                    this.onLoadEmpty(data.data);
-                    break;
-
-                case "onload":
-                    this.setState({
-                        loadingTemplate: false
-                    });
-                    this.onLoad(data.data);
-                    break;
-
-                case "mainSize":
-                    // this.setEditorSize(data.data);
-                    break;
-
-                case "selected":
-                    this.onSelected(data.data);
-                    break;
-            }
-        }
-    }
-
-    onSelected = (item?: { id: any, type: "img" | "text" | "container", userEditable: number}) => {
-        if (this.store.isEdit) {
-            return;
-        }
-        if (!item || (item && !notNull(item.userEditable) && item.userEditable === 0)) {
-            this.store.tool = 0;
-            return;
-        }
-        switch (item.type) {
-            case "img":
-            case "container":
-                this.store.tool = 1;
-                break;
-            case "text":
-                this.store.tool = 2;
-                this.setState({textInfo: item})
-                break;
-        }
-    }
-
-    back = () => {
-        if (Taro.getCurrentPages().length > 1) {
-            Taro.navigateBack();
-        } else {
-            if (process.env.TARO_ENV == "h5") {
-                window.location.href = "/";
-            } else {
-                Taro.reLaunch({url: "/pages/index"});
-            }
-        }
-    }
-
-    next = async () => {
-
-        Taro.showLoading({
-            title: "合成中..."
-        })
-        try {
-            const doc: any = await callEditor("getDoc");
-            console.log(doc)
-
-            const res = await api("editor.upload/preview", {
-                content: {
-                    type: "page",
-                    data: {...doc},
-                },
-                key: `photo_${userStore.id}_1`
-            }, true);
-
-            const img = res.cdnUrl;
-
-            const localParams = this.getPhotoParams();
-
-            const temp = {...localParams}
-
-            let obj: any = {
-                url: img,
-                attr: `${doc.width}*${doc.height}`,
-                edited: true,
-                doc,
-                originalData: templateStore.editorPhotos
-            };
-
-
-
-            console.log("本地数据：", localParams)
-
-            if (temp.path[Number(this.$router.params.idx)]) {
-                temp.path[Number(this.$router.params.idx)] = obj;
-            } else {
-                temp.path.push(obj)
-            }
-
-            console.log("更新后的params：", temp);
-
-            try {
-                Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp));
-                templateStore.photoSizeParams = temp
-            } catch (e) {
-                console.log("本地存储出错：将存入store", e)
-                templateStore.photoSizeParams = temp
-            }
-            Taro.hideLoading()
-            Taro.navigateBack()
-
-        }catch (e) {
-            console.log("生成预览图出错：", e)
-            Taro.hideLoading()
-            Taro.showToast({
-                title: "生成预览图出错",
-                icon: "none"
-            })
-        }
-        Taro.hideLoading()
-    }
-
-    changeImage = () => {
-        this.store.tool = 4;
-        this.store.isEdit = true;
-    }
-
-    onOk = () => {
-        this.store.tool = 0;
-        this.store.isEdit = false
-    }
-
-    cancelEdit = () => {
-        this.store.tool = 0;
-        this.store.isEdit = false;
-        this.setState({textInfo: null})
-    }
-
-    changeTxt = () => {
-        this.store.tool = 6;
-        this.store.isEdit = true;
-    }
-
-    selectFont = () => {
-        this.store.tool = 7;
-        this.store.isEdit = true;
-    }
-
-    changeFontStyle = () => {
-        this.store.tool = 8;
-        this.store.isEdit = true;
-    }
-
-    // 水平翻转
-    onFilpY = async () => {
-        try {
-            await callEditor("flipH");
-        } catch (e) {
-        }
-    }
-
-    // 垂直翻转
-    onFilpX = async () => {
-        try {
-            await callEditor("flipV")
-        } catch (e) {
-
-        }
-    }
-
-    onChangeAlpha = () => {
-        // alpha
-        this.store.tool = 5;
-        this.store.isEdit = true;
-    }
-
-    switchRender = (tool) => {
-        let ele = <View />
-        if (tool == 0) {
-            ele = <ToolBar0 parent={this} />;
-        } else if (tool == 1) {
-            ele = <View className='tools'>
-                <View className='btn' onClick={this.changeImage}>
-                    <IconFont name='24_bianjiqi_chongyin' size={48}/>
-                    <Text className='txt'>换图</Text>
-                </View>
-                <View className='btn' onClick={this.onFilpY}>
-                    <IconFont name='24_bianjiqi_shuipingfanzhuan' size={48}/>
-                    <Text className='txt'>水平</Text>
-                </View>
-                <View className='btn' onClick={this.onFilpX}>
-                    <IconFont name='24_bianjiqi_chuizhifanzhuan' size={48}/>
-                    <Text className='txt'>垂直</Text>
-                </View>
-                <View className='btn' onClick={this.onChangeAlpha}>
-                    <View className='icon'>
-                        <Image className="icon_img" src={require("../../source/trans.png")}/>
+            ? <View>
+                <View className='tools'/>
+                <View className='mask'/>
+                <View className='switch-brank'>
+                    <View className='brand'>
+                        <ScrollView className='brand cate_list' scrollX>
+                            <View className='warp'>
+                                {
+                                    brandList.length > 0 ? brandList.map((item: any, idx) => (
+                                        <View className={idx == brandIndex ? 'item active' : 'item'} key={item.id}
+                                              onClick={() => setBrand(idx)}>
+                                            <Text className='text'>{item.name}</Text>
+                                            {idx == brandIndex ? <Image className='icon'
+                                                                        src={require("../../../source/switchBottom.png")}/> : null}
+                                        </View>
+                                    )) : <AtActivityIndicator size={64} mode='center'/>
+                                }
+                            </View>
+                        </ScrollView>
                     </View>
-                    <Text className='txt'>透明度</Text>
+                    <ScrollView className='list' scrollY>
+                        {series ? series.map((ses) => {
+                                return <View key={`mod-${ses.id}`}>
+                                    <Text className='head'>{ses.name}系列</Text>
+                                    <View className='phone'>
+                                        {ses.models.map((mod) => {
+                                            return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}
+                                                         className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>
+                                                <Text>{mod.name}</Text>
+                                            </View>
+                                        })}
+                                    </View>
+                                </View>
+                            }
+                        ) : <AtActivityIndicator className="phoneLoading" size={64}/>}
+                    </ScrollView>
+                    <View className='optBar'>
+                        <View onClick={cancelMode} className="icon"><IconFont name='24_guanbi' size={48}/></View>
+                        <Text className='txt'>机型</Text>
+                        <View onClick={selectPhone} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
+                    </View>
                 </View>
-                {/*<View className='btn'>*/}
-                {/*    <View className='icon'>*/}
-                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                {/*    </View>*/}
-                {/*    <Text className='txt'>删除</Text>*/}
-                {/*</View>*/}
             </View>
-        } else if (tool==2) {
-            ele = <View className='tools'>
-                <View className='btn' onClick={this.changeTxt}>
-                    <IconFont name='24_bianjiqi_huantu' size={48}/>
-                    <Text className='txt'>编辑</Text>
-                </View>
-                <View className='btn' onClick={this.selectFont}>
-                    <IconFont name='24_bianjiqi_ziti' size={48}/>
-                    <Text className='txt'>字体</Text>
-                </View>
-                <View className='btn' onClick={this.changeFontStyle}>
-                    <IconFont name='24_bianjiqi_yangshi' size={48}/>
-                    <Text className='txt'>样式</Text>
-                </View>
-                {/*<View className='btn'>*/}
-                {/*    <View className='icon'>*/}
-                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                {/*    </View>*/}
-                {/*    <Text className='txt'>删除</Text>*/}
-                {/*</View>*/}
-            </View>
-        } else if (tool == 4) {
-            ele = <ChangeImage
-                onClose={this.cancelEdit}
-                onOk={this.onOk}
-            />
-        } else if (tool == 5) {
-            ele = <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
-        } else if (tool == 6) {
-            ele = <ChangeText onClose={this.cancelEdit} data={this.state.textInfo} onOk={this.onOk} />
-        } else if (tool == 7) {
-            ele = <SelectFont onClose={this.cancelEdit} onOk={this.onOk} />
-        } else if (tool == 8) {
-            ele = <ChangeFontStyle onClose={this.cancelEdit} onOk={this.onOk} />
-        }
-        return ele
-    }
-    render() {
-        const {loadingTemplate, size } = this.state;
-        const {tool} = this.store;
-
-        return <View className='editor-page'>
-            <View className='header'>
-                <View onClick={this.back}>
-                    <IconFont name='24_shangyiye' color='#000' size={48}/>
-                </View>
-                <View onClick={this.next} className='right'>完成</View>
-            </View>
-            <View className="editor" style={size ? {height: size.height} : undefined}>
-                {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame"
-                        src={
-                            process.env.NODE_ENV == 'production'
-                            ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                            :`http://192.168.0.123:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                        }
-                />
-                {loadingTemplate
-                    ? <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
-                    : null}
-            </View>
-            {
-                this.switchRender(tool)
-            }
-        </View>
-    }
+            : type === 2
+                ? <View />
+                : <View />
 }

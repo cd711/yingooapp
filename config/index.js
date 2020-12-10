@@ -1,3 +1,5 @@
+import path from "path";
+
 const config = {
   projectName: 'yingooShop',
   date: '2020-10-19',
@@ -74,6 +76,11 @@ const config = {
           generateScopedName: '[name]__[local]___[hash:base64:5]'
         }
       }
+    },
+    compile: {
+        exclude: [
+            path.resolve(__dirname, '..', 'src/pages/editor/shell.js')
+        ]
     }
   },
   h5: {

@@ -4,7 +4,7 @@ import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
-import {fixStatusBarHeight, ossUrl} from '../../utils/common'
+import {fixStatusBarHeight, jumpToEditor, notNull, ossUrl} from '../../utils/common'
 
 import page from '../../utils/ext';
 
@@ -131,9 +131,13 @@ export default class Detail extends Component<{},{
             return
         }
         const {currentItem} = this.state;
-        Taro.navigateTo({
-            url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
-        });
+        jumpToEditor({
+            tpl_id: currentItem.id,
+            cid: currentItem.category_id
+        })
+        // Taro.navigateTo({
+        //     url:`/pages/editor/shell?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
+        // });
     }
 
     collectedProd = async () => {
@@ -158,7 +162,7 @@ export default class Detail extends Component<{},{
         return (
             <View className='detail' >
                 {/* <View style={`background:red;height:${Taro.getSystemInfoSync().windowHeight-Taro.getSystemInfoSync().statusBarHeight}px;`}></View> */}
-                <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='nav-bar' style={fixStatusBarHeight() as any}>
                     <View className='left' onClick={() => {
                         if (process.env.TARO_ENV === 'h5') {
                             window.location.href = '/pages/template/index';
@@ -171,7 +175,7 @@ export default class Detail extends Component<{},{
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
                     <View className='center'>
-                        <Text className='title'>{`ID:${currentItem.id}`}</Text>
+                        {!notNull(currentItem.id) ? <Text className='title'>{`ID:${currentItem.id}`}</Text> : null}
                     </View>
                 </View>
                 <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={()=>{

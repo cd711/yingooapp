@@ -324,3 +324,11 @@ export function fixStatusBarHeight() {
         "padding-top": env !== "h5" ? deviceInfo.statusBarHeight + "px" : ""
     }
 }
+
+
+export function jumpToEditor(params: {[key: string] : any} = {}) {
+    const paramsStr = getURLParamsStr(urlEncode(params));
+    Taro.navigateTo({
+        url: deviceInfo.env === "h5" ? `/pages/editor/shell?${paramsStr}` : `/pages/editor/wxshell?${paramsStr}`
+    })
+}

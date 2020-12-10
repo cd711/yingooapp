@@ -3,7 +3,6 @@ import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
 import {userStore} from './store/user'
 import {templateStore} from './store/template'
-import 'taro-ui/dist/style/index.scss'
 import './app.less'
 import { options,getUserInfo } from './utils/net';
 import config from './config';
@@ -42,7 +41,8 @@ class App extends Component {
             // 'pages/login/setnew',
             // 'pages/login/mobile',
             // 'pages/login/find',
-            // 'pages/editor/shell',
+            'pages/editor/shell',
+            "pages/editor/wxshell",
             // 'pages/editor/printedit',
             // 'pages/login/acount',
             // 'pages/login/sms',
