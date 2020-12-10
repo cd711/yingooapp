@@ -7,11 +7,12 @@ import { observer, inject } from '@tarojs/mobx';
 // import moment from 'moment';
 import {deviceInfo, fixStatusBarHeight, ossUrl} from '../../utils/common'
 
-import page from '../../utils/ext';
+import LoginModal from '../../components/login/loginModal';
+import { userStore } from '../../store/user';
 
-@inject("templateStore")
+@inject("templateStore","userStore")
 @observer
-@page({wechatAutoLogin:true})
+
 export default class Detail extends Component<{},{
     isLike:boolean;
     likeList:Array<any>;
@@ -43,7 +44,6 @@ export default class Detail extends Component<{},{
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".bottom_bar").boundingClientRect((bottom_rect)=>{
-                    console.log(Taro.getSystemInfoSync().windowHeight,Taro.getSystemInfoSync().statusBarHeight,nav_rect.height,bottom_rect.height);
                     this.setState({
                         centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-bottom_rect.height
                     });
@@ -127,14 +127,14 @@ export default class Detail extends Component<{},{
     // }
 
     onEditor = () => {
-        // @ts-ignore
-        if (!this.showLoginModal()) {
-            return
+        if (userStore.isLogin) {
+            const {currentItem} = this.state;
+            Taro.navigateTo({
+                url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
+            });
+        }else{
+            userStore.showLoginModal = true;
         }
-        const {currentItem} = this.state;
-        Taro.navigateTo({
-            url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
-        });
     }
 
     collectedProd = async () => {
@@ -156,10 +156,11 @@ export default class Detail extends Component<{},{
 
     render() {
         const { isLike,likeList,currentItem, scrollTop,centerPartyHeight } = this.state;
+        // @ts-ignore
         return (
             <View className='detail' >
-                {/* <View style={`background:red;height:${Taro.getSystemInfoSync().windowHeight-Taro.getSystemInfoSync().statusBarHeight}px;`}></View> */}
-                <View className='nav-bar' {...fixStatusBarHeight()}>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (process.env.TARO_ENV === 'h5') {
                             window.location.href = '/pages/template/index';
@@ -175,6 +176,7 @@ export default class Detail extends Component<{},{
                         <Text className='title'>{`ID:${currentItem.id}`}</Text>
                     </View>
                 </View>
+                <LoginModal />
                 <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={({detail:{scrollTop}})=>{
                     this.setState({
                         scrollTop:-1
