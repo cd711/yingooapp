@@ -462,7 +462,7 @@ export default class Me extends Component<any, MeState> {
                             switchActive === 0
                                 ? <View className='content'>
                                     {
-                                        works.map((item, idx) => (
+                                        works.map((item) => (
                                             <View className='item' key={item.id}>
                                                 {
                                                     moment.unix(item.create_time).year() == moment().year() ? null :

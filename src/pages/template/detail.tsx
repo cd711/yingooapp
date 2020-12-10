@@ -4,8 +4,7 @@ import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
-// import moment from 'moment';
-import {deviceInfo, fixStatusBarHeight, ossUrl} from '../../utils/common'
+import {fixStatusBarHeight, jumpToEditor, notNull, ossUrl} from '../../utils/common'
 
 import LoginModal from '../../components/login/loginModal';
 import { userStore } from '../../store/user';
@@ -173,7 +172,7 @@ export default class Detail extends Component<{},{
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
                     <View className='center'>
-                        <Text className='title'>{`ID:${currentItem.id}`}</Text>
+                        {!notNull(currentItem.id) ? <Text className='title'>{`ID:${currentItem.id}`}</Text> : null}
                     </View>
                 </View>
                 <LoginModal />
