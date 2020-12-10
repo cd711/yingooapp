@@ -7,7 +7,7 @@ import {userStore} from "../../store/user";
 import {templateStore} from "../../store/template";
 import { observer, inject } from '@tarojs/mobx'
 import { api } from '../../utils/net';
-import { ListModel, ossUrl } from '../../utils/common';
+import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl } from '../../utils/common';
 
 // import PayWayModal from '../../components/payway/PayWayModal';
 import page from '../../utils/ext';
@@ -28,6 +28,7 @@ export default class Order extends Component<any,{
     order_sn:string;
     orderId:number;
     showCancelModal:boolean;
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -49,11 +50,20 @@ export default class Order extends Component<any,{
             order_price:"0.00",
             order_sn:"",
             orderId:0,
-            showCancelModal:false
+            showCancelModal:false,
+            centerPartyHeight:500
         }
     }
     componentDidMount(){
-        console.log(userStore.nickname);
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react)=>{
+                    this.setState({
+                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-status_react.height
+                    });
+                }).exec();
+            }).exec();
+        }
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
         templateStore.address = null;
@@ -196,16 +206,23 @@ export default class Order extends Component<any,{
         }, 1500);
     }
     render() {
-        const {switchTabActive,data,showPayWayModal,order_price,order_sn,showCancelModal} = this.state;
+        const {switchTabActive,data,showPayWayModal,order_price,order_sn,showCancelModal,centerPartyHeight} = this.state;
         const list = data && data.list && data.list.length>0 ? data.list:[];
+        // 
         return (
             <View className='order'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
-                        // Taro.navigateBack();
-                        Taro.reLaunch({
-                            url:"/pages/me/me"
-                        })
+                        if (deviceInfo.env == 'h5') {
+                            Taro.reLaunch({
+                                url:"/pages/me/me"
+                            })
+                        }else{
+                            Taro.switchTab({
+                                url:"/pages/me/me"
+                            })                            
+                        }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
@@ -228,7 +245,7 @@ export default class Order extends Component<any,{
                         ))
                     }
                 </View>
-                <ScrollView scrollY className='order_list_page_scroll'>
+                <ScrollView scrollY className='order_list_page_scroll' style={deviceInfo.env === 'h5'?"":`height:${centerPartyHeight}px`}>
                 <View className='container'>
                     {
                         list.length == 0 ? <View className='empty'>

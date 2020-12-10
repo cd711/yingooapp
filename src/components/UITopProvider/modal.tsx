@@ -2,7 +2,7 @@ import "./index.less";
 import Taro, {Component} from "@tarojs/taro";
 import {View} from "@tarojs/components";
 import {UITop} from "./index";
-import Login from "../login/login";
+import Logins from "../login/login";
 
 
 // 此modal仅为一个基础容器，无实际内容、作用，弹出的内容需要自己实现
@@ -34,7 +34,7 @@ export default class Modal extends Component<ModalOptions & {
     }
     static showLogin(showClose:boolean,onClose:()=>void,onOk:()=>void):any {
         const key = Modal.show(
-            <Login 
+            <Logins 
                 showClose={showClose} 
                 onClose={() =>{
                     UITop.remove(key)

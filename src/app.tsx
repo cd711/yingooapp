@@ -3,9 +3,11 @@ import { Provider } from '@tarojs/mobx'
 import Index from './pages/index'
 import {userStore} from './store/user'
 import {templateStore} from './store/template'
+import 'taro-ui/dist/style/index.scss'
 import './app.less'
 import { options,getUserInfo } from './utils/net';
 import config from './config';
+import Xm from './utils/xm'
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -40,12 +42,12 @@ class App extends Component {
             // 'pages/login/set',
             // 'pages/login/setnew',
             // 'pages/login/mobile',
-            // 'pages/login/find',
+            'pages/login/find',
             'pages/editor/shell',
             "pages/editor/wxshell",
             // 'pages/editor/printedit',
-            // 'pages/login/acount',
-            // 'pages/login/sms',
+            'pages/login/acount',
+            'pages/login/sms',
             'pages/me/setting',
             // 'pages/me/profile',
             // 'pages/me/acount',
@@ -104,15 +106,46 @@ class App extends Component {
     }
 
     componentDidMount() {
-        console.log("app");
-
-        if (userStore.id<=0) {
+        const params = this.$router.params;
+        if (!userStore.isLogin) {
             const info = getUserInfo();
             if (info) {
                 userStore.setInfo(info);
             }
         }
-
+        const {code,state} = params;
+        if (process.env.TARO_ENV === 'h5' && code && code.length>5 && state == "login" && !userStore.isLogin) {
+            Taro.showLoading({title:"登录中..."});
+            let exportUrl = window.location.href.split("?")[0] + (Object.keys(params).length > 0 ? "?" : "");
+            Object.keys(params).map((key) => {
+                if (key != "code" && key != "state") {
+                    exportUrl += key + '=' + params[key] + '&';
+                }
+            })
+            exportUrl = exportUrl[exportUrl.length - 1] === '&' ? exportUrl.substring(0, exportUrl.length - 1) : exportUrl;
+            window.history.replaceState(null, null, exportUrl)
+            Xm.login({
+                code
+            }).then(()=>{
+                setTimeout(() => {
+                    Taro.hideLoading();
+                    Taro.showToast({
+                        title:"登录成功",
+                        icon:'none',
+                        duration:1500
+                    });
+                }, 1200);
+            }).catch((e)=>{
+                setTimeout(() => {
+                    Taro.hideLoading();
+                    Taro.showToast({
+                        title:e,
+                        icon:'none',
+                        duration:1500
+                    });
+                }, 1500);
+            })
+        }
     }
 
 

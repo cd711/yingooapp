@@ -8,6 +8,7 @@ import { api } from '../../utils/net'
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import IconFont from '../../components/iconfont'
+import { deviceInfo } from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -124,6 +125,15 @@ export default class Login extends Component<{},{
                             <Text className='ftexts'>忘记密码</Text>
                         </View>
                         <Button className={loginBtnAtive?'loginbtn loginbtnActive':'loginbtn'} onClick={this.onLogin}>登录</Button>
+                        {
+                            deviceInfo.env!="h5"?<View className='pwlogin' onClick={()=>{
+                                Taro.redirectTo({
+                                    url:'/pages/login/index'
+                                })
+                            }}>
+                                <Text className='txt'>验证码登录</Text>
+                            </View>:null
+                        }
                     </View>
                 </View>
                 <LoginFooter />

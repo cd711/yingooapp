@@ -1,4 +1,4 @@
-import Taro, {Component} from "@tarojs/taro";
+import Taro, {Component,Config} from "@tarojs/taro";
 import {View} from "@tarojs/components";
 import './index.less'
 
@@ -7,27 +7,18 @@ let count = 0;
 // eslint-disable-next-line import/no-mutable-exports
 export let UITop: UITopProvider = null;
 
-export default class UITopProvider extends Component<any, any> {
+export class UITopProvider extends Component<{}, any> {
 
     state = {
         ele: {}
     };
-
+    config: Config = {
+        
+    }
     constructor(p) {
         super(p);
         UITop = this;
     }
-
-    render() {
-        const keys = Object.keys(this.state.ele);
-        return <View id="UITopProvider" className="provider_main">
-            {keys.map((id)=> {
-                const item = this.state.ele[id];
-                return <View key={`top_${item.id}`} className="base_container">{item.ele}</View>;
-            })}
-        </View>;
-    }
-
     public show(ele: JSX.Element): number {
         const list = this.state.ele;
         count ++;
@@ -51,4 +42,13 @@ export default class UITopProvider extends Component<any, any> {
         }
     }
 
+    render() {
+        const keys = Object.keys(this.state.ele);
+        return <View id="UITopProvider" className="provider_main">
+            {keys.map((id)=> {
+                const item = this.state.ele[id];
+                return <View key={`top_${item.id}`} className="base_container">{item.ele}</View>;
+            })}
+        </View>;
+    }
 }

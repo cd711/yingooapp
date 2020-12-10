@@ -11,6 +11,7 @@ import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import moment from "moment";
 import Popover, {PopoverItemClickProps} from "../../components/popover";
 import {AtModal} from "taro-ui";
+import LoginModal from "../../components/login/loginModal";
 
 const switchBottom = require("../../source/switchBottom.png");
 
@@ -182,7 +183,6 @@ export default class Me extends Component<any, MeState> {
                             }
                         });
                     }
-
                 }).exec()
             }
         } else {
@@ -308,7 +308,12 @@ export default class Me extends Component<any, MeState> {
     }
 
     jumpTo = (path: string) => {
-        Taro.navigateTo({url: path})
+        if (userStore.isLogin) {
+            userStore.showLoginModal = false;
+            Taro.navigateTo({url: path})
+        } else {
+            userStore.showLoginModal = true;
+        }
     }
 
     private popItemsWeapp = [
@@ -332,10 +337,10 @@ export default class Me extends Component<any, MeState> {
             onClick: this.confirmDelete,
         }
     ];
-
+    // @ts-ignore
     render() {
         const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;
-        const {id, nickname, avatar} = userStore;
+        const {nickname, avatar,isLogin} = userStore;
         return (
             <View className='me'>
                 {
@@ -351,12 +356,14 @@ export default class Me extends Component<any, MeState> {
                         />
                         : null
                 }
+                <LoginModal />
                 <ScrollView scrollY onScroll={this.onMeScroll}
                             className="me_content_scroll"
                             enable-flex="true"
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}
                             onScrollToLower={this.lodeMore}
                 >
+                    {/* @ts-ignore */}
                     <View className='topBox' style={fixStatusBarHeight()}>
                         {
                             pageScrollShowTop ? <View className='top_weapp'></View> : null
@@ -391,13 +398,10 @@ export default class Me extends Component<any, MeState> {
 
                         </View>
                         <View className='baseInfo' onClick={() => {
-                            console.log(id);
-                            if (id > 0) {
+                            if (isLogin) {
                                 return;
                             }
-                            Taro.redirectTo({
-                                url: '/pages/login/index'
-                            })
+                            userStore.showLoginModal = true;
                         }}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../source/defaultAvatar.png')}
@@ -537,8 +541,8 @@ export default class Me extends Component<any, MeState> {
                                     {
                                         works.length === 0
                                             ? <Empty button="我要创作" onClick={() => {
-                                                Taro.navigateTo({
-                                                    url: "pages/template/index"
+                                                Taro.switchTab({
+                                                    url: "/pages/template/index"
                                                 })
                                             }}/>
                                             : <View className="more_View">
@@ -579,6 +583,7 @@ export default class Me extends Component<any, MeState> {
                         }
                     </View>
                 </ScrollView>
+                
             </View>
         )
     }

@@ -5,12 +5,14 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
+import { deviceInfo, fixStatusBarHeight } from '../../utils/common';
 
 @inject("userStore")
 @observer
 export default class SMS extends Component<any,{
     smsCode:string;
-    time:number
+    time:number;
+    inputFocus:boolean
 }> {
     config: Config = {
         navigationBarTitleText: '验证码'
@@ -22,12 +24,23 @@ export default class SMS extends Component<any,{
 
         this.state = {
             smsCode:"",
-            time:0
+            time:0,
+            inputFocus:true
         }
     }
     componentDidMount(){
-
-        this.input.inputRef.focus();
+        
+        // setTimeout(()=>{
+        //     console.log(this.input);
+        //     
+        // },500)
+        if (deviceInfo.env == "h5") {
+            this.input.inputRef.focus();
+        }else {
+            this.setState({
+                inputFocus:true
+            })
+        }
         this.sendCode();
     }
     sendCode = () => {
@@ -108,7 +121,7 @@ export default class SMS extends Component<any,{
 
     }
     onCodeInput = ({detail:{value}})=>{
-        console.log(value)
+        // console.log(value)
         this.setState({
             smsCode:value
         });
@@ -116,15 +129,19 @@ export default class SMS extends Component<any,{
             this.mobileLogin(value);
         }
     }
+    // @ts-ignore
     render(){
         const {mobile} = this.$router.params;
-        const {smsCode,time} = this.state;
+        const {smsCode,time,inputFocus} = this.state;
         const list = [0, 1, 2, 3, 4, 5];
         return <View className='sms'>
-            <View className='back' onClick={()=>{
-                Taro.navigateBack();
-            }}>
-                <IconFont name='24_shangyiye' size={48} color='#121314' />
+            {/* @ts-ignore */}
+            <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='back' onClick={()=>{
+                    Taro.navigateBack();
+                }}>
+                    <IconFont name='24_shangyiye' size={48} color='#121314' />
+                </View>
             </View>
             <View className='box'>
                 <Text className='title'>输入短信验证码</Text>
@@ -134,11 +151,28 @@ export default class SMS extends Component<any,{
                 </View>
                 <View className='inputBox' onClick={()=>{
                     // document.querySelector(".smscode").focus()
-                    this.input.inputRef.focus();
+                    if (deviceInfo.env == "h5") {
+                        this.input.inputRef.focus();
+                        return;
+                    }
+                    this.setState({
+                        inputFocus:true
+                    })
                 }}>
-                    <Input type='number' placeholder='' className='smscode' maxLength={6} onInput={this.onCodeInput} value={smsCode} onBlur={(e)=>{
-                        //@ts-ignore
-                        e.target.focus();
+                    <Input type='number' placeholder='' focus={inputFocus} className='smscode' maxLength={6} onInput={this.onCodeInput} value={smsCode} onBlur={(e)=>{
+                        if (deviceInfo.env == "h5") {
+                            //@ts-ignore
+                            e.target.focus();
+                            return;
+                        }
+                        this.setState({
+                            inputFocus:false
+                        })
+                        setTimeout(()=>{
+                            this.setState({
+                                inputFocus:true
+                            })
+                        },500)
                     }} ref={(node)=>{
                         this.input = node;
                     }} />

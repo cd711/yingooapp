@@ -10,9 +10,9 @@
     justify-content: center;
     box-sizing: border-box;
     flex-direction: column;
-    z-index: 3000;
-    transition: all .15s ease-in-out;
-    opacity: 0;
+    z-index: 30000;
+    visibility: hidden;
+    transition: visibility .15ms ease-in;
     .model_main{
         width: 590px;
         height: 728px;
@@ -34,15 +34,14 @@
             position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
             right: 0;
+            bottom: 0;
             z-index: 3000;
             .h2{
                 font-size: 36px;
                 color: #121314;
                 margin-bottom: 24px;
                 display: block;
-                font-family: "PingFangSC-Medium", "PingFang SC", "Microsoft Sans Serif";
             }
             .txt {
                 color: #9C9DA6;
@@ -74,7 +73,9 @@
     }
 }
 .animtion_un_login_model{
-    opacity: 1;
+
+    visibility: visible;
+    transition: all .2s ease-out;
 }
 
 .un_login_model{
@@ -86,11 +87,11 @@
         border-radius: 32px 32px 0 0;
         box-sizing: border-box;
         width: 100%;
+        padding-bottom: 100px;
         padding-bottom: constant(safe-area-inset-bottom);
         padding-bottom: env(safe-area-inset-bottom);
-        padding-bottom: 100px;
-        transition: all .15s ease-in-out;
-        margin-bottom: -10000px;
+        
+        margin-bottom: -1000px;
         .head{
             box-sizing: border-box;
             position: relative;
@@ -120,19 +121,30 @@
             margin: 32px 0;
             box-sizing: border-box;
             text-align: center;
-            .btn_lo{
-                width: 570px;
-                height: 100px;
-                background: #FFC700;
+            &>button{
+                width: 558px;
+                height: 96px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 border-radius: 48px;
-                box-shadow: 0 20px 34px -14px #FFC70050;
+                .icon{
+                    margin-right: 16px;
+                }
                 .txt{
                     color: #fff;
                     font-size: 36px;
                 }
+            }
+            .phone_btn_login{
+                background: #FFC700;
+                
+                box-shadow: 0 20px 34px -14px #FFC70050;
+
+            }
+            .weixin_btn_login{
+                background: #0AD78A;
+                box-shadow: 0px 20px 34px -14px rgba(10, 215, 138, 0.5);
             }
         }
         .oth{
@@ -195,5 +207,6 @@
     }
     .animtion_login_model{
         margin-bottom: 0;
+        transition: margin-bottom .4s ease-in-out;
     }
 }
