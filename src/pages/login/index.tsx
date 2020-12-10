@@ -4,8 +4,9 @@ import './index.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import LoginFooter from './footer'
-// import { api } from 'src/utils/net';
-// import { api } from '../../utils/net'
+import { deviceInfo } from '../../utils/common';
+
+
 
 export default class Login extends Component<any,{
     codeBtnActive:boolean;
@@ -13,10 +14,11 @@ export default class Login extends Component<any,{
     inputActive:boolean;
     textActive:boolean;
     inputValue:string;
+    inputFocus:boolean
 }> {
 
     config: Config = {
-        navigationBarTitleText: '首页'
+        navigationBarTitleText: '登录'
     }
     private inputRef: { inputRef: { focus: () => void; }; };
     constructor(props: any){
@@ -26,10 +28,12 @@ export default class Login extends Component<any,{
             showMobileClear:false,
             inputValue:"",
             inputActive:false,
-            textActive:false
+            textActive:false,
+            inputFocus:false
         }
     }
     componentDidMount(){
+
     }
 
     onMobileInput = ({detail:{value}}) => {
@@ -67,9 +71,14 @@ export default class Login extends Component<any,{
             inputValue:"",
             showMobileClear:false,
             codeBtnActive:false,
-            textActive:false
+            textActive:false,
+            inputFocus:true
         });
-        this.inputRef.inputRef.focus();
+        
+        if (deviceInfo.env == "h5") {
+            this.inputRef.inputRef.focus();
+        }
+        
     }
     sendSMS = () => {
         const { codeBtnActive,inputValue } = this.state;
@@ -77,19 +86,10 @@ export default class Login extends Component<any,{
             Taro.navigateTo({
                 url:`/pages/login/sms?mobile=${inputValue}&status=l`
             })
-            // Taro.showLoading({title:"正在发送..."});
-            // api("sms/send",{
-            //     mobile:"13340631853",
-            //     event:"login"
-            // }).then(()=>{
-            //     Taro.hideLoading();
-
-            // })
         }
     }
     render() {
-        console.log("render")
-        const { codeBtnActive,showMobileClear,inputValue,inputActive,textActive } = this.state;
+        const { codeBtnActive,showMobileClear,inputValue,inputActive,textActive,inputFocus } = this.state;
         return (
             <View className='login'>
                 <HeaderTop rightText='账号登录' url='/pages/login/acount' />
@@ -99,10 +99,13 @@ export default class Login extends Component<any,{
                         <Text className='ttext'>欢迎来到映果定制</Text>
                     </View>
                     <View className='acount'>
-                        <Input type='number' placeholder='请输入手机号' style={`font-size:${Taro.pxTransform(textActive?36:28)}`} className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
+                        <Input type='number' placeholder='请输入手机号' focus={inputFocus} style={`font-size:${Taro.pxTransform(textActive?36:28)}`} className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
                             this.setState({inputActive:true})
                         }} onBlur={()=>{
-                            this.setState({inputActive:false})
+                            this.setState({
+                                inputActive:false,
+                                inputFocus:false
+                            })
                             if (inputValue.length<=0) {
                                 this.setState({textActive:false})
                             }
@@ -115,6 +118,15 @@ export default class Login extends Component<any,{
                     <View className={codeBtnActive?'getcode codeActive':'getcode'} onClick={this.sendSMS}>
                         <Text className='gtext'>获取验证码</Text>
                     </View>
+                    {
+                        deviceInfo.env!="h5"?<View className='pwlogin' onClick={()=>{
+                            Taro.navigateTo({
+                                url:'/pages/login/acount'
+                            })
+                        }}>
+                            <Text className='txt'>密码登录</Text>
+                        </View>:null
+                    }
                 </View>
                 <LoginFooter />
             </View>

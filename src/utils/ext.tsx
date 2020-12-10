@@ -1,10 +1,10 @@
 import Taro from "@tarojs/taro";
 import {View} from '@tarojs/components';
 import {userStore} from "../store/user";
-import UITopProvider, {UITop} from "../components/UITopProvider";
-import Modal from "../components/UITopProvider/modal";
-import Login from "../components/login/login";
-import {is_weixin} from "./common";
+// import {UITopProvider, UITop} from "../components/UITopProvider";
+// import Modal from "../components/UITopProvider/modal";
+// import Logins from "../components/login/login";
+import {is_weixin,notNull} from "./common";
 import {api} from "./net";
 
 const page = (option?: {
@@ -14,7 +14,7 @@ const page = (option?: {
     return function (obj: { prototype: any; }) {
         const clazz = obj.prototype
         const mount = clazz.componentWillMount;
-        const render = clazz.render;
+        // const render = clazz.render;
         clazz.checkLogin = function () {
             const {code} = this.$router.params;
             if (process.env.TARO_ENV === 'h5') {
@@ -52,11 +52,7 @@ const page = (option?: {
                         })
                     }
                     if (option.wechatAutoLogin) {
-                        if (code == undefined || code == null || !code) {
-                            // @ts-ignore
-                            const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent(option.redirectUrl)}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
-                            window.location.href = url;
-                        }
+
                     }
                 }
             }
@@ -74,33 +70,19 @@ const page = (option?: {
 
 
         clazz.showLoginModal = function () {
-
-            if (userStore.id == null) {
-                const key = Modal.show(
-                    <Login onClose={() => UITop.remove(key)}
-                           onOk={() => {
-                               UITop.remove(key);
-                               window.location.replace(`/pages/login/index`);
-                           }} showClose={true} />)
+            if (userStore.isLogin) {
+                // const key = Modal.show(
+                //     <Logins onClose={() => UITop.remove(key)}
+                //            onOk={() => {
+                //                UITop.remove(key);
+                //                window.location.replace(`/pages/login/index`);
+                //            }} showClose={true} />)
                 return false
             }
             return true
         }
 
-        clazz.render = function () {
-            return <View className='ext-page' style={{
-                display: "flex",
-                flexDirection: "column",
-                position: "fixed",
-                width: "100%",
-                height: "100%"
-            }}>
-                <UITopProvider/>
-                {
-                    render && render.apply(this, arguments)
-                }
-            </View>
-        }
+
     }
 }
 export default page;

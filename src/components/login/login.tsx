@@ -1,77 +1,120 @@
-import Taro, {useState, useEffect} from "@tarojs/taro";
-import {View, Text} from "@tarojs/components";
-// import IconFont from "../iconfont";
+import Taro, {useState, useEffect, onCompassChange} from "@tarojs/taro";
+import {View, Text, Button} from "@tarojs/components";
+import IconFont from "../iconfont";
 import "./login.less"
-import {is_weixin} from "../../utils/common";
+import {is_weixin,deviceInfo} from "../../utils/common";
+import Xm from "../../utils/xm";
 
 interface LoginProps {
-    onClose?: () => void;
-    onOk?: () => void;
+    isShow:boolean;
+    onClose?: (isShow:boolean) => void;
     // 第三方登录点击
     onThirdPartyAuth?: (type: string) => void;
     showClose?: boolean;
-    loginTxt?: string
 }
-const Login: Taro.FC<LoginProps> = props => {
+const Logins: Taro.FC<LoginProps> = (props) => {
 
-    const {onOk, onClose, onThirdPartyAuth,
-        loginTxt = "手机号登录"
-    } = props;
-
+    const { isShow,onClose, onThirdPartyAuth } = props;
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        Taro.hideTabBar()
-        setVisible(true)
-    }, [])
+        if (visible) {
+            Taro.hideTabBar();
+        } else {
+            Taro.showTabBar();
+            onClose && onClose(visible)
+        }
+    }, [visible])
 
-    const didClose = () => {
-        onClose && onClose();
-        Taro.showTabBar()
-    }
+    useEffect(()=>{
+        if (visible != isShow) {
+            setVisible(isShow)
+        }
+    },[isShow])
 
     const privacyView = type => {
-        didClose()
+        setVisible(false)
         Taro.navigateTo({url: `/pages/me/privacy?pageType=${type}`})
     }
 
     const _onClose = () => {
-        setVisible(false)
-        setTimeout(() => {
-            didClose()
-        }, 200)
+        setVisible(false);
+        Taro.showTabBar();
     }
-
+    const onPhone = () =>{
+        _onClose();
+        setTimeout(()=>{
+            Taro.navigateTo({
+                url:'/pages/login/index'
+            })
+        },200)
+    }
+    const onWeiXin = () => {
+        _onClose();
+        const uri = window.location.href;
+        Xm.login({
+            redirectUrl:uri
+        })
+    }
+    const onWeapp = ({detail:{userInfo}}) => {
+        _onClose();
+        Taro.showLoading({title:"正在登录..."})
+        Xm.login({
+            userInfo:JSON.stringify(userInfo)
+       }).then(()=>{
+           Taro.hideLoading();
+           Taro.showToast({
+               title:"登录成功",
+               icon:'none',
+               duration:1500
+           });
+       }).catch((e)=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                icon:'none',
+                duration:1500
+            });
+       })
+    }
     return (
         <View className={`un_login_model ${visible ? "animtion_un_login_model" : ""}`}>
             <View className={`login_model_main ${visible ? "animtion_login_model" : ""}`}>
                 <View className="head">
                     <Text className="h2">登录后体验全面功能</Text>
-                    {/* <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={40} /></View> */}
+                    <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={40} /></View>
                 </View>
                 <View className="login_btn">
-                    <View className="btn_lo" onClick={onOk}>
-                        <Text className="txt">{loginTxt}</Text>
-                    </View>
+                    {
+                        deviceInfo.env=="h5" && !is_weixin() ?<Button className="phone_btn_login" onClick={onPhone}>
+                            <Text className="txt">手机号登录</Text>
+                        </Button>:null
+                    }
+                    {
+                        deviceInfo.env=="weapp"?<Button className="weixin_btn_login" openType="getUserInfo" onGetUserInfo={onWeapp}>
+                            <View className='icon'><IconFont name='24_weixin' color="#FFF" size={64} /></View>
+                            <Text className="txt">微信一键登录</Text>
+                        </Button>:null
+                    }
+                    {
+                        is_weixin() && deviceInfo.env=="h5" ?<Button className="weixin_btn_login" onClick={onWeiXin}>
+                            <View className='icon'><IconFont name='24_weixin' color="#FFF" size={64} /></View>
+                            <Text className="txt">微信一键登录</Text>
+                        </Button>:null
+                    }
                 </View>
                 <View className="oth"><Text className="exp">其他方式</Text></View>
                 <View className="other_login_way">
                     {
-                        is_weixin()?null:<View className="item" onClick={() => onThirdPartyAuth("qq")}>
-                            {/* <IconFont name="24_QQ-Color" size={48}/><Text className="name">QQ登录</Text> */}
+                        (deviceInfo.env=="weapp"||is_weixin() && deviceInfo.env=="h5")?<View className="item" onClick={onPhone}>
+                            <IconFont name="24_shouji" size={48}/><Text className="name">手机登录</Text>
                         </View>
+                        : null
                     }
                     {
-                        is_weixin()
-                            ? <View className="item" onClick={() => {
-                                onThirdPartyAuth && onThirdPartyAuth("wechat");
-                                // @ts-ignore
-                                const url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${common_config.wxappid}&redirect_uri=${encodeURIComponent(window.location.href)}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`;
-                                window.location.href = url;
-                            }}>
-                                {/* <IconFont name="24_weixin-Color" size={48}/><Text className="name">微信登录</Text> */}
-                            </View>
-                            : null
+                        !is_weixin()&& deviceInfo.env=="h5"?<View className="item" onClick={() => onThirdPartyAuth("qq")}>
+                            <IconFont name="24_QQ-Color" size={48}/><Text className="name">QQ登录</Text>
+                        </View>:null
                     }
                 </View>
                 <View className="priv_item">
@@ -82,25 +125,4 @@ const Login: Taro.FC<LoginProps> = props => {
     )
 }
 
-// const Login: Taro.FC<LoginProps> = props => {
-//
-//     const {onOk, onClose,
-//         showClose = true
-//     } = props;
-//
-//     return (
-//         <View className="un_login_model">
-//             <View className="model_main">
-//                 <Image src={require("../../source/login.png")} className="login_bg" />
-//                 <View className="model_info_main">
-//                     <Text className="h2">您还未登录</Text>
-//                     <Text className="txt">请先登录/注册再进行此操作</Text>
-//                     <View className="btn" onClick={onOk}><Text className="lo_txt">登录</Text></View>
-//                 </View>
-//             </View>
-//             {showClose ? <View className="close" onClick={onClose}><IconFont name="16_qingkong" size={72} /></View> : null}
-//         </View>
-//     )
-// }
-
-export default Login
+export default Logins

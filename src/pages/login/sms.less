@@ -2,13 +2,19 @@
     background: #FFF;
 }
 .sms{
-    .back{
-        width: 48px;
-        height: 48px;
-        padding-top: 44px;
-        padding-left: 32px;
+    .nav-bar{
+        padding-top: 40px;
         margin-bottom: 120px;
+        height: 88px;
+        display: flex;
+        align-items: center;
+        .back{
+            width: 48px;
+            height: 48px;
+            padding-left: 32px;
+        }
     }
+
     .box{
         padding:0 64px;
         .title{
@@ -31,9 +37,10 @@
             position: relative;
             height: 92px;
             .smscode{
-                color: #FFF;
                 height: 92px;
                 caret-color:transparent;
+                background: transparent;
+                color: transparent;
             }
             .inputrow{
                 display: flex;
@@ -96,6 +103,7 @@
                     background: #FF4966;
                     box-shadow: 0px 16px 32px -8px rgba(255, 74, 101, 0.4);
                     border-radius: 16px;
+                    transition: all 0.3s ease-in;
                 }
             }
         }

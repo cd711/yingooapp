@@ -10,7 +10,7 @@ const sexList = {
 }
 export class UserStore {
     @observable
-    public id = 0;
+    public id = null;
     @observable
     public mobile:string = "";
     @observable
@@ -27,11 +27,17 @@ export class UserStore {
     public birthday: string = "";
     @observable
     public set_pwd:boolean = false;
+    @observable
+    public showLoginModal:boolean = false;
 
     public get sex() {
         const s = sexList[this.gender||0];
         return s || '保密';
     }
+    public get isLogin() {
+        return this.id != "" && this.id != null && this.id != 0
+    }
+    
     @action
     public setInfo(info){
         setUserInfo(info);

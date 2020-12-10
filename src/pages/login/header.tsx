@@ -3,14 +3,20 @@ import Taro, {  } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
-import { convertClassName, fixStatusBarHeight } from '../../utils/common';
+import { convertClassName, deviceInfo, fixStatusBarHeight } from '../../utils/common';
 
 const HeaderTop: Taro.FC<any> = ({rightText,url}) => {
-    return <View className={convertClassName("tops")} style={process.env.TARO_ENV === 'h5'?`padding-top:${Taro.pxTransform(40)}`:fixStatusBarHeight()}>
+    // @ts-ignore
+    return <View className={convertClassName("tops")} style={deviceInfo.env === 'h5'?`padding-top:${Taro.pxTransform(40)}`:fixStatusBarHeight()}>
         <View className={convertClassName('close')} onClick={()=>{
-            Taro.reLaunch({
-                url:'/pages/index/index'
-            });
+            if (Taro.getCurrentPages().length==1) {
+                Taro.reLaunch({
+                    url:'/pages/index/index'
+                });
+            }else{
+                Taro.navigateBack();
+            }
+
         }}>
             <IconFont name='24_guanbi' size={48} color='#121314' />
         </View>

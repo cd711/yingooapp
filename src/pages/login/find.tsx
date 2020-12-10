@@ -6,6 +6,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
+import { fixStatusBarHeight,deviceInfo } from '../../utils/common';
 // import page from '../../utils/ext';
 
 @inject("userStore")
@@ -16,7 +17,8 @@ export default class Set extends Component<any,{
     showMobileClear:boolean;
     inputActive:boolean
     inputValue:string;
-
+    textActive:boolean;
+    inputFocus:boolean
 }> {
     config: Config = {
         navigationBarTitleText: '设置密码'
@@ -29,7 +31,9 @@ export default class Set extends Component<any,{
             codeBtnActive:false,
             showMobileClear:false,
             inputValue:"",
-            inputActive:false
+            inputActive:false,
+            textActive:false,
+            inputFocus:false
         }
     }
     private inputRef: { inputRef: { focus: () => void; }; };
@@ -39,6 +43,11 @@ export default class Set extends Component<any,{
     }
     onMobileInput = ({detail:{value}}) => {
         const pattern = /(13\d|14[579]|15[^4\D]|17[^49\D]|18\d)\d{8}/g;
+        if (value.length<=0) {
+            this.setState({textActive:false})
+        }else{
+            this.setState({textActive:true})
+        }
         this.setState({
             inputValue:value
         })
@@ -67,9 +76,13 @@ export default class Set extends Component<any,{
             inputValue:"",
             showMobileClear:false,
             codeBtnActive:false,
-            inputActive:false
+            inputActive:false,
+            textActive:false,
+            inputFocus:true
         });
-        this.inputRef.inputRef.focus();
+        if (deviceInfo.env == "h5") {
+            this.inputRef.inputRef.focus();
+        }
     }
     sendSMS = () => {
         const { codeBtnActive,inputValue } = this.state;
@@ -77,35 +90,37 @@ export default class Set extends Component<any,{
             Taro.navigateTo({
                 url:`/pages/login/sms?mobile=${inputValue}&status=f`
             })
-            // Taro.showLoading({title:"正在发送..."});
-            // api("sms/send",{
-            //     mobile:"13340631853",
-            //     event:"login"
-            // }).then(()=>{
-            //     Taro.hideLoading();
 
-            // })
         }
     }
     render(){
-        const { codeBtnActive,showMobileClear,inputValue,inputActive } = this.state;
+        const { codeBtnActive,showMobileClear,inputValue,inputActive,textActive,inputFocus } = this.state;
+        // @ts-ignore
         return <View className='login find_page'>
-            <View className='back' onClick={()=>{
-                Taro.navigateBack();
-            }}>
-                <IconFont name='24_shangyiye' size={48} color='#121314' />
+            {/* @ts-ignore */}
+            <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='back' onClick={()=>{
+                    Taro.navigateBack();
+                }}>
+                    <IconFont name='24_shangyiye' size={48} color='#121314' />
+                </View>
             </View>
+
             <View className='container'>
                 <View className='title'>
                     <Text className='ttext'>Hi,</Text>
                     <Text className='ttext'>输入原手机号，找回密码</Text>
                 </View>
                 <View className='acount'>
-                        <Input type='number' placeholder='请输入手机号' className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
+                        <Input type='number' placeholder='请输入手机号' focus={inputFocus} style={`font-size:${Taro.pxTransform(textActive?36:28)}`} className={inputActive?'acount-input acount-input-active':"acount-input"} maxLength={11} onInput={this.onMobileInput} onFocus={()=>{
                             this.setState({inputActive:true})
                         }} onBlur={()=>{
+                            this.setState({
+                                inputActive:false,
+                                inputFocus:false
+                            })
                             if (inputValue.length<=0) {
-                                this.setState({inputActive:false})
+                                this.setState({textActive:false})
                             }
                         }} ref={(node)=>{this.inputRef = node}} value={inputValue} />
                         {/* <Text className='forget'>忘记密码</Text> */}
