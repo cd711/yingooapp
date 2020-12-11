@@ -6,7 +6,7 @@ import LoadMore from "../../../components/listMore/loadMore";
 import IconFont from "../../../components/iconfont";
 import {userStore} from "../../../store/user";
 import UploadFile from "../../../components/Upload/Upload";
-import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
+import {AtActivityIndicator,} from "taro-ui";
 import Shell, {callEditor, sendMessage} from "../shell";
 
 interface BaseProps {
@@ -169,44 +169,44 @@ export const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docI
     }
 
     return <View className='switch-template'>
-        <View className='brand'>
-            <ScrollView className='type_list_view' scrollX>
-                <View className='warp brand_fixed_wrap'>
-                    {typeList.map((value, index) => (
-                        <View className="type_item" key={index+""} onClick={() => changeType(index)}>
-                            <Text className={`txt ${active === index ? "active" : ""}`}>{value.name}</Text>
-                            {active === index ?
-                                <Image src={require("../../../source/switchBottom.png")} className="filter_bar_img"/>
-                                : null}
-                        </View>
-                    ))}
-                </View>
-            </ScrollView>
-        </View>
-        <ScrollView className='template_lice_container' scrollY onScrollToLower={loadMore}>
-            <View className="template_list">
-                {templateList.map((value, index) => (
-                    <View className="template_item" key={index+""} onClick={() => onSelect(value)}
-                        // style={{width: window.screen.width / 4 - 8, height: (window.screen.width / 4 - 8) + (window.screen.width / 4 - 4) * 0.62}}
-                    >
-                        <Image src={value.thumbnail} mode="aspectFill" className="temp_img" />
-                        {
-                            !notNull(selected) && selected === Number(value.id)
-                                ? <View className="active_view" onClick={() => onSelect(value)}>
-                                    <Text className="text">应用中</Text>
-                                </View>
-                                : null
-                        }
-                    </View>
-                ))}
-            </View>
-            {templateList.length > 0 ? <LoadMore status={status} /> : null}
-        </ScrollView>
-        <View className='optBar'>
-            <View onClick={onCancel} className="icon"><IconFont name='24_guanbi' size={48}/></View>
-            <Text className='txt'>模板</Text>
-            <View onClick={_onOk} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
-        </View>
+        {/*<View className='brand'>*/}
+        {/*    <ScrollView className='type_list_view' scrollX>*/}
+        {/*        <View className='warp brand_fixed_wrap'>*/}
+        {/*            {typeList.map((value, index) => (*/}
+        {/*                <View className="type_item" key={index+""} onClick={() => changeType(index)}>*/}
+        {/*                    <Text className={`txt ${active === index ? "active" : ""}`}>{value.name}</Text>*/}
+        {/*                    {active === index ?*/}
+        {/*                        <Image src={require("../../../source/switchBottom.png")} className="filter_bar_img"/>*/}
+        {/*                        : null}*/}
+        {/*                </View>*/}
+        {/*            ))}*/}
+        {/*        </View>*/}
+        {/*    </ScrollView>*/}
+        {/*</View>*/}
+        {/*<ScrollView className='template_lice_container' scrollY onScrollToLower={loadMore}>*/}
+        {/*    <View className="template_list">*/}
+        {/*        {templateList.map((value, index) => (*/}
+        {/*            <View className="template_item" key={index+""} onClick={() => onSelect(value)}*/}
+        {/*                // style={{width: window.screen.width / 4 - 8, height: (window.screen.width / 4 - 8) + (window.screen.width / 4 - 4) * 0.62}}*/}
+        {/*            >*/}
+        {/*                <Image src={value.thumbnail} mode="aspectFill" className="temp_img" />*/}
+        {/*                {*/}
+        {/*                    !notNull(selected) && selected === Number(value.id)*/}
+        {/*                        ? <View className="active_view" onClick={() => onSelect(value)}>*/}
+        {/*                            <Text className="text">应用中</Text>*/}
+        {/*                        </View>*/}
+        {/*                        : null*/}
+        {/*                }*/}
+        {/*            </View>*/}
+        {/*        ))}*/}
+        {/*    </View>*/}
+        {/*    {templateList.length > 0 ? <LoadMore status={status} /> : <View />}*/}
+        {/*</ScrollView>*/}
+        {/*<View className='optBar'>*/}
+        {/*    <View onClick={onCancel} className="icon"><IconFont name='24_guanbi' size={48}/></View>*/}
+        {/*    <Text className='txt'>模板</Text>*/}
+        {/*    <View onClick={_onOk} className='icon'><IconFont name='24_gouxuan' size={48}/></View>*/}
+        {/*</View>*/}
     </View>;
 };
 
@@ -472,93 +472,93 @@ export const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     return <View className="change_image_container">
-        <View className="change_main">
-            <View className="filter_bar">
-                {bars.map((value, index) => (
-                    <View className="filter_bar_item" key={index+""} onClick={() => changeType(index)}>
-                        <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>
-                        {active === index ?
-                            <Image src={require("../../../source/switchBottom.png")} className="filter_bar_img"/> : null}
-                    </View>
-                ))}
-            </View>
-            <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
-                <View className="list_main">
-                    {active === 0
-                        ? <View className="list_item">
-                            <UploadFile
-                                extraType={0}
-                                type="card"
-                                uploadType="image"
-                                onChange={uploadFile}/>
-                        </View>
-                        : null}
-                    {
-                        active !== 2 && list.map((item, idx) => {
-                            return <View className="list_item" key={idx+""}>
-                                <View className="img_item" key={idx+""} onClick={() => onSelect(item, idx)}>
-                                    <Image src={getSrc(item)} mode="aspectFill" className="img"/>
-                                </View>
-                                {
-                                    !notNull(selected) && selected === idx
-                                        ? <View className="selected" onClick={() => onSelect(item, idx)}><Text
-                                            className="tit">应用中</Text></View>
-                                        : null
-                                }
-                            </View>
-                        })
-                    }
-                    {
-                        active === 2
-                            ? <View className="color_selector_main">
-                                {
-                                    historyColor.length > 0
-                                        ? <View className="color_selector_item">
-                                            <Text className="tit">使用过的</Text>
-                                            <View className="colors_items">
-                                                {
-                                                    historyColor.map((value, index) => (
-                                                        <View className="color_wrap" key={index+""}>
-                                                            <View className="color_item"
-                                                                  style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
-                                                                  onClick={() => onSelectColor(value.key)}>
-                                                                <View className="color" style={{background: value.color}} />
-                                                            </View>
-                                                        </View>
-                                                    ))
-                                                }
-                                            </View>
-                                        </View>
-                                        : null
-                                }
-                                <View className="color_selector_item">
-                                    <Text className="tit">默认颜色</Text>
-                                    <View className="colors_items">
-                                        {
-                                            colors.map((value, index) => (
-                                                <View className="color_wrap" key={index+""}>
-                                                    <View className="color_item"
-                                                          style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
-                                                          onClick={() => onSelectColor(value.key)}>
-                                                        <View className="color" style={{background: value.color}} />
-                                                    </View>
-                                                </View>
-                                            ))
-                                        }
-                                    </View>
-                                </View>
-                            </View>
-                            : null
-                    }
-                </View>
-            </ScrollView>
-            <View className='optBar'>
-                <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48}/></View>
-                <Text className='txt'>换图</Text>
-                <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
-            </View>
-        </View>
-        <View className="mask"/>
+        {/*<View className="change_main">*/}
+        {/*    <View className="filter_bar">*/}
+        {/*        {bars.map((value, index) => (*/}
+        {/*            <View className="filter_bar_item" key={index+""} onClick={() => changeType(index)}>*/}
+        {/*                <Text className={`name ${index === active ? "active" : ""}`}>{value}</Text>*/}
+        {/*                {active === index ?*/}
+        {/*                    <Image src={require("../../../source/switchBottom.png")} className="filter_bar_img"/> : null}*/}
+        {/*            </View>*/}
+        {/*        ))}*/}
+        {/*    </View>*/}
+        {/*    <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>*/}
+        {/*        <View className="list_main">*/}
+        {/*            {active === 0*/}
+        {/*                ? <View className="list_item">*/}
+        {/*                    <UploadFile*/}
+        {/*                        extraType={0}*/}
+        {/*                        type="card"*/}
+        {/*                        uploadType="image"*/}
+        {/*                        onChange={uploadFile}/>*/}
+        {/*                </View>*/}
+        {/*                : <View />}*/}
+        {/*            {*/}
+        {/*                active !== 2 && list.map((item, idx) => {*/}
+        {/*                    return <View className="list_item" key={idx+""}>*/}
+        {/*                        <View className="img_item" key={idx+""} onClick={() => onSelect(item, idx)}>*/}
+        {/*                            <Image src={getSrc(item)} mode="aspectFill" className="img"/>*/}
+        {/*                        </View>*/}
+        {/*                        {*/}
+        {/*                            !notNull(selected) && selected === idx*/}
+        {/*                                ? <View className="selected" onClick={() => onSelect(item, idx)}><Text*/}
+        {/*                                    className="tit">应用中</Text></View>*/}
+        {/*                                : null*/}
+        {/*                        }*/}
+        {/*                    </View>*/}
+        {/*                })*/}
+        {/*            }*/}
+        {/*            {*/}
+        {/*                active === 2*/}
+        {/*                    ? <View className="color_selector_main">*/}
+        {/*                        {*/}
+        {/*                            historyColor.length > 0*/}
+        {/*                                ? <View className="color_selector_item">*/}
+        {/*                                    <Text className="tit">使用过的</Text>*/}
+        {/*                                    <View className="colors_items">*/}
+        {/*                                        {*/}
+        {/*                                            historyColor.map((value, index) => (*/}
+        {/*                                                <View className="color_wrap" key={index+""}>*/}
+        {/*                                                    <View className="color_item"*/}
+        {/*                                                          style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}*/}
+        {/*                                                          onClick={() => onSelectColor(value.key)}>*/}
+        {/*                                                        <View className="color" style={{background: value.color}} />*/}
+        {/*                                                    </View>*/}
+        {/*                                                </View>*/}
+        {/*                                            ))*/}
+        {/*                                        }*/}
+        {/*                                    </View>*/}
+        {/*                                </View>*/}
+        {/*                                : null*/}
+        {/*                        }*/}
+        {/*                        <View className="color_selector_item">*/}
+        {/*                            <Text className="tit">默认颜色</Text>*/}
+        {/*                            <View className="colors_items">*/}
+        {/*                                {*/}
+        {/*                                    colors.map((value, index) => (*/}
+        {/*                                        <View className="color_wrap" key={index+""}>*/}
+        {/*                                            <View className="color_item"*/}
+        {/*                                                  style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}*/}
+        {/*                                                  onClick={() => onSelectColor(value.key)}>*/}
+        {/*                                                <View className="color" style={{background: value.color}} />*/}
+        {/*                                            </View>*/}
+        {/*                                        </View>*/}
+        {/*                                    ))*/}
+        {/*                                }*/}
+        {/*                            </View>*/}
+        {/*                        </View>*/}
+        {/*                    </View>*/}
+        {/*                    : null*/}
+        {/*            }*/}
+        {/*        </View>*/}
+        {/*    </ScrollView>*/}
+        {/*    <View className='optBar'>*/}
+        {/*        <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48}/></View>*/}
+        {/*        <Text className='txt'>换图</Text>*/}
+        {/*        <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>*/}
+        {/*    </View>*/}
+        {/*</View>*/}
+        {/*<View className="mask"/>*/}
     </View>
 }
 
@@ -634,13 +634,13 @@ export const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
 
     return (
         <View className="template_change_text_container">
-            <View className="act_bar">
-                <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={48} color="#fff"/></View>
-                <View className="submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>
-            </View>
-            <View className="input">
-                <AtInput name="txt" value={txt} className="input_act" onChange={onTextChange} autoFocus focus />
-            </View>
+            {/*<View className="act_bar">*/}
+            {/*    <View className="close" onClick={_onClose}><IconFont name="24_guanbi" size={48} color="#fff"/></View>*/}
+            {/*    <View className="submit" onClick={_onOk}><IconFont name="24_gouxuan" size={48} color="#fff"/></View>*/}
+            {/*</View>*/}
+            {/*<View className="input">*/}
+            {/*    /!*<AtInput name="txt" value={txt} className="input_act" onChange={onTextChange} autoFocus focus />*!/*/}
+            {/*</View>*/}
         </View>
     )
 }
@@ -749,40 +749,40 @@ export const SelectFont: Taro.FC<BaseProps> = props => {
 
     return(
         <View className="change_image_container">
-            <View className="change_main">
-                <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
-                    <View className="font_change_list_main">
-                        {
-                            fontList.map((value, index) => (
-                                <View className="font_change_item" key={index+""} onClick={() => onSelectFont(value)}>
-                                    <View className="left">
-                                        <Image src={value.thumbnail} className="font_img"
-                                               mode="aspectFit"
-                                               style={{
-                                                   width: window.screen.availWidth * 0.75 - 32
-                                               }}
-                                        />
-                                    </View>
-                                    <View className="right">
-                                        <View className="dowload">
-                                            <IconFont name={fontSelected === Number(value.id) ? "22_yixuanzhong" : "20_congyunduanxiazai"}
-                                                      size={40}
-                                                // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
-                                            />
-                                        </View>
-                                    </View>
-                                </View>
-                            ))
-                        }
-                    </View>
-                </ScrollView>
-                <View className='optBar'>
-                    <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>
-                    <Text className='txt'>字体</Text>
-                    <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
-                </View>
-            </View>
-            <View className="mask"/>
+            {/*<View className="change_main">*/}
+            {/*    <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>*/}
+            {/*        <View className="font_change_list_main">*/}
+            {/*            {*/}
+            {/*                fontList.map((value, index) => (*/}
+            {/*                    <View className="font_change_item" key={index+""} onClick={() => onSelectFont(value)}>*/}
+            {/*                        <View className="left">*/}
+            {/*                            <Image src={value.thumbnail} className="font_img"*/}
+            {/*                                   mode="aspectFit"*/}
+            {/*                                   style={{*/}
+            {/*                                       width: window.screen.availWidth * 0.75 - 32*/}
+            {/*                                   }}*/}
+            {/*                            />*/}
+            {/*                        </View>*/}
+            {/*                        <View className="right">*/}
+            {/*                            <View className="dowload">*/}
+            {/*                                <IconFont name={fontSelected === Number(value.id) ? "22_yixuanzhong" : "20_congyunduanxiazai"}*/}
+            {/*                                          size={40}*/}
+            {/*                                    // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}*/}
+            {/*                                />*/}
+            {/*                            </View>*/}
+            {/*                        </View>*/}
+            {/*                    </View>*/}
+            {/*                ))*/}
+            {/*            }*/}
+            {/*        </View>*/}
+            {/*    </ScrollView>*/}
+            {/*    <View className='optBar'>*/}
+            {/*        <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>*/}
+            {/*        <Text className='txt'>字体</Text>*/}
+            {/*        <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>*/}
+            {/*    </View>*/}
+            {/*</View>*/}
+            {/*<View className="mask"/>*/}
         </View>
     )
 }
@@ -960,51 +960,49 @@ export const ChangeFontStyle: Taro.FC<BaseProps> = props => {
 
     return (
         <View className="change_image_container">
-            <View className="change_main">
-                <ScrollView className="list_container" scrollY style={{height: 280}}>
-                    <View className="font_change_style_container">
-                        <View className="change_item">
-                            <Text className="tit">样式和对齐</Text>
-                            <View className="change_item_ctx">
-                                <View className="style_item" onClick={onStyleClick}>
-                                    {/* @ts-ignore */}
-                                    <IconFont name={styleSelect.icon} size={48} />
-                                </View>
-                                <View className="border"/>
-                                <View className="style_item" onClick={onAlignClick}>
-                                    {/* @ts-ignore */}
-                                    <IconFont name={fontAttribute.align[alignActive.current].icon} size={48} />
-                                </View>
-                            </View>
-                        </View>
-                        <View className="change_item">
-                            <Text className="tit">颜色</Text>
-                            <View className="colors_items">
-                                {
-                                    styleSelect.colors.map((value, index) => (
-                                        <View className="color_wrap" key={index+""}>
-                                            <View className="color_item"
-                                                  onClick={() => onSelectColor(value)}
-                                                  style={{
-                                                      borderColor: value.checked ? "#FF4966" : "transparent"
-                                                  }}
-                                            >
-                                                <View className="color" style={{background: value.color}} />
-                                            </View>
-                                        </View>
-                                    ))
-                                }
-                            </View>
-                        </View>
-                    </View>
-                </ScrollView>
-                <View className='optBar'>
-                    <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>
-                    <Text className='txt'>样式</Text>
-                    <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>
-                </View>
-            </View>
-            <View className="mask"/>
+            {/*<View className="change_main">*/}
+            {/*    <ScrollView className="list_container" scrollY style={{height: 280}}>*/}
+            {/*        <View className="font_change_style_container">*/}
+            {/*            <View className="change_item">*/}
+            {/*                <Text className="tit">样式和对齐</Text>*/}
+            {/*                <View className="change_item_ctx">*/}
+            {/*                    <View className="style_item" onClick={onStyleClick}>*/}
+            {/*                        <IconFont name={styleSelect.icon} size={48} />*/}
+            {/*                    </View>*/}
+            {/*                    <View className="border"/>*/}
+            {/*                    <View className="style_item" onClick={onAlignClick}>*/}
+            {/*                        <IconFont name={fontAttribute.align[alignActive.current].icon} size={48} />*/}
+            {/*                    </View>*/}
+            {/*                </View>*/}
+            {/*            </View>*/}
+            {/*            <View className="change_item">*/}
+            {/*                <Text className="tit">颜色</Text>*/}
+            {/*                <View className="colors_items">*/}
+            {/*                    {*/}
+            {/*                        styleSelect.colors.map((value, index) => (*/}
+            {/*                            <View className="color_wrap" key={index+""}>*/}
+            {/*                                <View className="color_item"*/}
+            {/*                                      onClick={() => onSelectColor(value)}*/}
+            {/*                                      style={{*/}
+            {/*                                          borderColor: value.checked ? "#FF4966" : "transparent"*/}
+            {/*                                      }}*/}
+            {/*                                >*/}
+            {/*                                    <View className="color" style={{background: value.color}} />*/}
+            {/*                                </View>*/}
+            {/*                            </View>*/}
+            {/*                        ))*/}
+            {/*                    }*/}
+            {/*                </View>*/}
+            {/*            </View>*/}
+            {/*        </View>*/}
+            {/*    </ScrollView>*/}
+            {/*    <View className='optBar'>*/}
+            {/*        <View className="icon" onClick={_onClose}><IconFont name='24_guanbi' size={48}/></View>*/}
+            {/*        <Text className='txt'>样式</Text>*/}
+            {/*        <View className='icon' onClick={_onOk}><IconFont name='24_gouxuan' size={48}/></View>*/}
+            {/*    </View>*/}
+            {/*</View>*/}
+            {/*<View className="mask"/>*/}
         </View>
     )
 }
@@ -1050,19 +1048,19 @@ export const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     return <View className="change_image_container">
-        <View className="change_main" style={{height: "auto"}}>
-            <View className="alpha_bar">
-                <View className="icon"><Image src={require("../../../source/trans.png")} className="img"/></View>
-                <View className="bar"><AtSlider value={alpha} min={0} max={100} step={1} onChanging={onChange}/></View>
-                <View className="count"><Text>{alpha}</Text></View>
-            </View>
-            <View className='optBar'>
-                <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48}/></View>
-                <Text className='txt'>换图</Text>
-                <View className='icon' onClick={onOk}><IconFont name='24_gouxuan' size={48}/></View>
-            </View>
-        </View>
-        <View className="mask"/>
+        {/*<View className="change_main" style={{height: "auto"}}>*/}
+        {/*    <View className="alpha_bar">*/}
+        {/*        <View className="icon"><Image src={require("../../../source/trans.png")} className="img"/></View>*/}
+                {/*<View className="bar"><AtSlider value={alpha} min={0} max={100} step={1} onChanging={onChange}/></View>*/}
+        {/*        <View className="count"><Text>{alpha}</Text></View>*/}
+        {/*    </View>*/}
+        {/*    <View className='optBar'>*/}
+        {/*        <View className="icon" onClick={onCancel}><IconFont name='24_guanbi' size={48}/></View>*/}
+        {/*        <Text className='txt'>换图</Text>*/}
+        {/*        <View className='icon' onClick={onOk}><IconFont name='24_gouxuan' size={48}/></View>*/}
+        {/*    </View>*/}
+        {/*</View>*/}
+        {/*<View className="mask"/>*/}
     </View>
 }
 
@@ -1253,58 +1251,58 @@ export const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
     return type === 0
         ? <View className='tools' style='padding: 0 13%'>
-            <View className='btn' onClick={() => setType(1)}>
-                <IconFont name='24_bianjiqi_jixing' size={48}/>
-                <Text className='txt'>机型</Text>
-            </View>
-            <View onClick={() => setType(2)} className='btn'>
-                <IconFont name='24_bianjiqi_moban' size={48}/>
-                <Text className='txt'>模板</Text>
-            </View>
+            {/*<View className='btn' onClick={() => setType(1)}>*/}
+            {/*    <IconFont name='24_bianjiqi_jixing' size={48}/>*/}
+            {/*    <Text className='txt'>机型</Text>*/}
+            {/*</View>*/}
+            {/*<View onClick={() => setType(2)} className='btn'>*/}
+            {/*    <IconFont name='24_bianjiqi_moban' size={48}/>*/}
+            {/*    <Text className='txt'>模板</Text>*/}
+            {/*</View>*/}
         </View>
         : type === 1
             ? <View>
-                <View className='tools'/>
-                <View className='mask'/>
-                <View className='switch-brank'>
-                    <View className='brand'>
-                        <ScrollView className='brand cate_list' scrollX>
-                            <View className='warp'>
-                                {
-                                    brandList.length > 0 ? brandList.map((item: any, idx) => (
-                                        <View className={idx == brandIndex ? 'item active' : 'item'} key={item.id}
-                                              onClick={() => setBrand(idx)}>
-                                            <Text className='text'>{item.name}</Text>
-                                            {idx == brandIndex ? <Image className='icon'
-                                                                        src={require("../../../source/switchBottom.png")}/> : null}
-                                        </View>
-                                    )) : <AtActivityIndicator size={64} mode='center'/>
-                                }
-                            </View>
-                        </ScrollView>
-                    </View>
-                    <ScrollView className='list' scrollY>
-                        {series ? series.map((ses) => {
-                                return <View key={`mod-${ses.id}`}>
-                                    <Text className='head'>{ses.name}系列</Text>
-                                    <View className='phone'>
-                                        {ses.models.map((mod) => {
-                                            return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}
-                                                         className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>
-                                                <Text>{mod.name}</Text>
-                                            </View>
-                                        })}
-                                    </View>
-                                </View>
-                            }
-                        ) : <AtActivityIndicator className="phoneLoading" size={64}/>}
-                    </ScrollView>
-                    <View className='optBar'>
-                        <View onClick={cancelMode} className="icon"><IconFont name='24_guanbi' size={48}/></View>
-                        <Text className='txt'>机型</Text>
-                        <View onClick={selectPhone} className='icon'><IconFont name='24_gouxuan' size={48}/></View>
-                    </View>
-                </View>
+                {/*<View className='tools'/>*/}
+                {/*<View className='mask'/>*/}
+                {/*<View className='switch-brank'>*/}
+                {/*    <View className='brand'>*/}
+                {/*        <ScrollView className='brand cate_list' scrollX>*/}
+                {/*            <View className='warp'>*/}
+                {/*                {*/}
+                {/*                    brandList.length > 0 ? brandList.map((item: any, idx) => (*/}
+                {/*                        <View className={idx == brandIndex ? 'item active' : 'item'} key={item.id}*/}
+                {/*                              onClick={() => setBrand(idx)}>*/}
+                {/*                            <Text className='text'>{item.name}</Text>*/}
+                {/*                            {idx == brandIndex ? <Image className='icon'*/}
+                {/*                                                        src={require("../../../source/switchBottom.png")}/> : null}*/}
+                {/*                        </View>*/}
+                {/*                    )) : <AtActivityIndicator size={64} mode='center'/>*/}
+                {/*                }*/}
+                {/*            </View>*/}
+                {/*        </ScrollView>*/}
+                {/*    </View>*/}
+                {/*    <ScrollView className='list' scrollY>*/}
+                {/*        {series ? series.map((ses) => {*/}
+                {/*                return <View key={`mod-${ses.id}`}>*/}
+                {/*                    <Text className='head'>{ses.name}系列</Text>*/}
+                {/*                    <View className='phone'>*/}
+                {/*                        {ses.models.map((mod) => {*/}
+                {/*                            return <View onClick={() => setTempCurrentModel({...mod, series: {id: ses.id, name: ses.name}})} key={`mod-${mod.id}`}*/}
+                {/*                                         className={tempCurrentModel.id == mod.id ? 'item act' : "item"}>*/}
+                {/*                                <Text>{mod.name}</Text>*/}
+                {/*                            </View>*/}
+                {/*                        })}*/}
+                {/*                    </View>*/}
+                {/*                </View>*/}
+                {/*            }*/}
+                {/*        ) : <AtActivityIndicator className="phoneLoading" size={64}/>}*/}
+                {/*    </ScrollView>*/}
+                {/*    <View className='optBar'>*/}
+                {/*        <View onClick={cancelMode} className="icon"><IconFont name='24_guanbi' size={48}/></View>*/}
+                {/*        <Text className='txt'>机型</Text>*/}
+                {/*        <View onClick={selectPhone} className='icon'><IconFont name='24_gouxuan' size={48}/></View>*/}
+                {/*    </View>*/}
+                {/*</View>*/}
             </View>
             : type === 2
                 ? <View />

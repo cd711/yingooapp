@@ -67,9 +67,15 @@ const Search:Taro.FC<any> = () => {
         }
     }
 
+    const getHeight = () => {
+        return deviceInfo.env === "h5"
+            ? `${deviceInfo.windowHeight - 70}px`
+            : `${deviceInfo.windowHeight - 70 - deviceInfo.menu.bottom}px`
+    }
+
     return (
         <View className="search_index_container">
-            <View className="search_top_bar">
+            <View className="search_top_bar" style={`margin-top: ${deviceInfo.menu.bottom}px`}>
                 <View className="search_input">
                     <View className="icon">
                         <IconFont name="20_sousuo" size={40} color="#000" />
@@ -78,7 +84,7 @@ const Search:Taro.FC<any> = () => {
                 </View>
                 <Text className="cancel_search" onClick={onCancel}>取消</Text>
             </View>
-            <ScrollView scrollY style={{height: deviceInfo.windowHeight - 70}}>
+            <ScrollView scrollY style={{height: getHeight()}}>
                 <View className="search_scroll_container">
                     {
                         searchList.map((value, index) => (
@@ -90,7 +96,7 @@ const Search:Taro.FC<any> = () => {
                                         更多 <IconFont name="24_xiayiye" size={32} color="#9C9DA6" />
                                     </Text>
                                 </View>
-                                <ScrollView className="x_scroll_search_item" scrollX style={{width: window.screen.width}}>
+                                <ScrollView className="x_scroll_search_item" scrollX style={{width: deviceInfo.screenWidth + "px"}}>
                                     <View className="scroll_view_x">
                                         {
                                             value.list.map((item, childIdx) => (

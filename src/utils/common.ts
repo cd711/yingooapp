@@ -120,7 +120,8 @@ export const jsApiList = [
 
 export const deviceInfo = {
     ...Taro.getSystemInfoSync(),
-    env: process.env.TARO_ENV
+    env: process.env.TARO_ENV,
+    menu: Taro.getMenuButtonBoundingClientRect()
 };
 
 

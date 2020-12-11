@@ -4,7 +4,7 @@ import {View, Image, ScrollView} from "@tarojs/components";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
-import {getURLParamsStr, ossUrl, urlEncode} from "../../utils/common";
+import {deviceInfo, fixStatusBarHeight, getURLParamsStr, ossUrl, urlEncode} from "../../utils/common";
 
 const SearchResult:Taro.FC<any> = () => {
 
@@ -12,7 +12,6 @@ const SearchResult:Taro.FC<any> = () => {
     const total = Taro.useRef(0);
     const [status, setStatus] = useState<"more" | "noMore" | "loading">("more");
     const router = useRouter();
-    const screen = Taro.getSystemInfoSync();
 
     async function getList(data) {
         const opt = {
@@ -84,6 +83,12 @@ const SearchResult:Taro.FC<any> = () => {
         }
     }
 
+    const getHeight = () => {
+        return deviceInfo.env === "h5"
+            ? `${deviceInfo.windowHeight - 50}px`
+            : `${deviceInfo.windowHeight - 50 - deviceInfo.statusBarHeight}px`
+    }
+
     return (
         <View className="search_result_container">
             <AtNavBar
@@ -93,28 +98,29 @@ const SearchResult:Taro.FC<any> = () => {
                 color='#121314'
                 title={router.params.title ? decodeURI(router.params.title) : " "}
                 border
+                customStyle={fixStatusBarHeight()}
                 leftIconType={{
                     value:'chevron-left',
                     color:'#121314',
-                    size:24
+                    size: 24
                 }}
             />
-            <ScrollView scrollY style={{height: screen.windowHeight - 50}} onScrollToLower={loadMore} >
+            <ScrollView scrollY style={{height: getHeight()}} onScrollToLower={loadMore} >
                 <View className="search_item_container">
                     {
                         list.map((value, index) => (
                             <View className="search_item_wrap" key={index+""} style={{
-                                width: window.screen.width / 2
+                                width: deviceInfo.screenWidth / 2 + "px"
                             }}>
                                 <View className="search_item"
                                       onClick={() => onItemClick(value)}
                                       style={{
-                                          width: window.screen.width / 2 - 8,
+                                          width: deviceInfo.screenWidth / 2 - 8 + "px",
                                       }}
                                 >
                                     <Image className="search_img" src={ossUrl(value.thumb_image, 1)} mode="aspectFill"
                                            style={{
-                                               width: window.screen.width / 2 - 8,
+                                               width: deviceInfo.screenWidth / 2 - 8 + "px",
                                            }}
                                     />
                                 </View>
