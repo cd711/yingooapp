@@ -55,20 +55,24 @@ class App extends Component {
             'pages/me/privacy',
             'pages/me/aboutus',
             'pages/me/feedback',
+<<<<<<< HEAD
             'pages/me/orderdetail',
+=======
+            // 'pages/me/orderdetail',
+>>>>>>> cad78bce9123976e87f36f56f68176a9c9088da3
             // 'pages/me/refund',
             'pages/me/address/index',
             'pages/me/address/editor',
             'pages/me/photos',
             'pages/me/ticket',
-            // 'pages/printing/index',
-            // 'pages/printing/change',
+            'pages/printing/index',
+            'pages/printing/change',
             // 'pages/template/preview',
             // 'pages/template/confirm',
             // 'pages/template/success',
             // 'pages/cart/index',
-            // 'pages/search/index',
-            // 'pages/search/result',
+            'pages/search/index',
+            'pages/search/result',
         ],
         window: {
             navigationStyle: "custom",

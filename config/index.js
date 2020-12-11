@@ -79,7 +79,8 @@ const config = {
     },
     compile: {
         exclude: [
-            path.resolve(__dirname, '..', 'src/pages/editor/shell.js')
+            path.resolve(__dirname, '..', 'src/pages/editor/shell.js'),
+            path.resolve(__dirname, '..', 'src/pages/editor/eshell/shelltools.js'),
         ]
     }
   },

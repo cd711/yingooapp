@@ -4,6 +4,7 @@ import {AtModal, AtModalContent, AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
 import "./aboutus.less";
 import copy from "copy-to-clipboard";
+import {deviceInfo} from "../../utils/common";
 
 export default class Aboutus extends Component<any, any> {
 
@@ -22,9 +23,12 @@ export default class Aboutus extends Component<any, any> {
     render(): React.ReactNode {
         const {visible} = this.state;
         return (
-            <View className="about_us_container" style={process.env.TARO_ENV === 'h5'?{height: window.screen.availHeight}:{flex:1}}>
+            <View className="about_us_container" style={deviceInfo.env === 'h5'?{height: window.screen.availHeight}:{flex:1}}>
                 <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
                     color='#121314' title="关于映果" border fixed
+                      customStyle={{
+                          paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
+                      }}
                     leftIconType={{value:'chevron-left', color:'#121314', size:24}}
                 />
                 <View className="about_content">

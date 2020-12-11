@@ -1,5 +1,5 @@
-import {View, Image, Text, ScrollView} from "@tarojs/components";
-import { AtTextarea, AtInput, AtNavBar } from 'taro-ui'
+import {Image, ScrollView, Text, View} from "@tarojs/components";
+import {AtInput, AtNavBar, AtTextarea} from 'taro-ui'
 import Taro, {useState} from "@tarojs/taro";
 import IconFont from "../../components/iconfont";
 import UploadFile from "../../components/Upload/Upload";
@@ -34,8 +34,8 @@ const Feedback: Taro.FC<any> = (_) => {
 
     function getWidth() {
         return {
-            width: process.env.TARO_ENV === 'h5'?window.screen.width / 4 - 15:Taro.getSystemInfoSync().screenWidth/4-15,
-            height: process.env.TARO_ENV === 'h5'?window.screen.width / 4 - 15:Taro.getSystemInfoSync().screenWidth/4-15,
+            width: deviceInfo.env === 'h5' ? window.screen.width / 4 - 15 + "px" : deviceInfo.screenWidth / 4 - 15 + "px",
+            height: deviceInfo.env === 'h5' ? window.screen.width / 4 - 15 + "px" : deviceInfo.screenWidth / 4 - 15 + "px",
         }
     }
 
@@ -52,24 +52,34 @@ const Feedback: Taro.FC<any> = (_) => {
 
     }
 
+    function getHeight() {
+        return deviceInfo.env === "h5"
+            ? deviceInfo.windowHeight - 50 + "px"
+            : deviceInfo.windowHeight - 50 - deviceInfo.statusBarHeight + "px"
+    }
+
     return (
         <View className="feedback_container">
             <View className="top_bar">
                 <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
                           color='#121314' title="问题反馈" border
-                          leftIconType={{value:'chevron-left', color:'#121314', size:24}}
+                          customStyle={{
+                              paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
+                          }}
+                          leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
                 />
             </View>
-            <ScrollView scrollY style={{height: deviceInfo.windowHeight - 50}}>
+            <ScrollView scrollY style={{height: getHeight()}}>
                 <View className="feedback_selector">
                     {
                         feedBackArr.map((value, index) => (
-                            <View className="feedback_item_wrap" key={index+""}>
+                            <View className="feedback_item_wrap" key={index + ""}>
                                 <View className={`feedback_item ${Number(formData.reason) === index ? "active" : ""}`}
                                       onClick={() => setFormData(prev => ({...prev, reason: index}))}
                                 >
                                     {/* @ts-ignore */}
-                                    <IconFont name={value.icon} size={48} color={Number(formData.reason) === index ? "#fff" : "#999"}/>
+                                    <IconFont name={value.icon} size={48}
+                                              color={Number(formData.reason) === index ? "#fff" : "#999"}/>
                                     <Text className="txt">{value.name}</Text>
                                 </View>
                             </View>
@@ -88,7 +98,7 @@ const Feedback: Taro.FC<any> = (_) => {
                         <View className="feedback_imgs">
                             {
                                 formData.imgs.map((value, index) => (
-                                    <View className="imgs_item_wrap" key={index+""}>
+                                    <View className="imgs_item_wrap" key={index + ""}>
                                         <View className="img_item" style={getWidth()}>
                                             <Image src={value}
                                                    className="img"
@@ -97,16 +107,25 @@ const Feedback: Taro.FC<any> = (_) => {
                                             />
                                         </View>
                                         <View className="delete_btn" onClick={() => onDelete(value, index)}>
-                                            <IconFont name="16_qingkong" size={32} />
+                                            <IconFont name="16_qingkong" size={32}/>
                                         </View>
                                     </View>
                                 ))
                             }
                             <View className="imgs_item_wrap">
                                 <View className="img_item">
-                                    <UploadFile uploadType="image" extraType={1} className="upload_box" onChange={onUpload} style={getWidth()}>
-                                        <View className="upload_view" style={getWidth()}>
-                                            <IconFont name="24_jiahao" size={48} color="#999" />
+                                    <UploadFile uploadType="image" extraType={1} className="upload_box"
+                                                onChange={onUpload} style={getWidth()}>
+                                        <View className="upload_view" style={{
+                                            ...getWidth(),
+                                            borderRadius: "6px",
+                                            border: "1px dashed #eee",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            background: "#F5F6F9",
+                                        }}>
+                                            <IconFont name="24_jiahao" size={48} color="#999"/>
                                         </View>
                                     </UploadFile>
                                 </View>
@@ -118,7 +137,7 @@ const Feedback: Taro.FC<any> = (_) => {
                         <AtInput placeholder="请留下您的联系方式" className="account_number"
                                  name="tel"
                                  value={formData.tel}
-                                 onChange={(tel: any, _) => setFormData(prev => ({...prev, tel}))} />
+                                 onChange={(tel: any, _) => setFormData(prev => ({...prev, tel}))}/>
                     </View>
                     <View className="submit_view">
                         <View className={`submit ${!formData.remark ? "disable" : ""}`} onClick={onSubmit}>

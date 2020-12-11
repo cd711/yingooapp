@@ -2,7 +2,7 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image, ScrollView} from "@tarojs/components";
 import "./index.less";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, ossUrl} from "../../utils/common";
+import {cutString, deviceInfo, fixStatusBarHeight, ossUrl} from "../../utils/common";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
@@ -101,19 +101,27 @@ const Special: Taro.FC<any> = () => {
         })
     }
 
+    const getHeight = () => {
+        return deviceInfo.env === "h5"
+            ? deviceInfo.windowHeight + "px"
+            : deviceInfo.windowHeight + deviceInfo.menu.height + deviceInfo.statusBarHeight + "px"
+    }
+
     return (
         <View className="special_container">
             <ScrollView className="special_scroll"
                         scrollY
                         style={{
-                            height: deviceInfo.windowHeight,
+                            height: getHeight(),
+                            paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : ""
                         }}
                         onScroll={onScroll}
                         onScrollToLower={loadMore}
             >
-                <View className={`special_bar_ctx ${showBar ? "show_bar" : ""}`}>
+                <View className={`special_bar_ctx ${showBar ? "show_bar" : ""}`} style={fixStatusBarHeight()}>
                     <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
-                              color='#121314' title={info.name || " "} border
+                              className={deviceInfo.env === "weapp" ? "fix_weapp_special_tit" : ""}
+                              color='#121314' title={cutString(info.name, 6)} border
                               leftIconType={{value:'chevron-left', color:'#121314', size:24}}
                     />
                 </View>

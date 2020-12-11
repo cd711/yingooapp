@@ -120,7 +120,8 @@ export const jsApiList = [
 
 export const deviceInfo = {
     ...Taro.getSystemInfoSync(),
-    env: process.env.TARO_ENV
+    env: process.env.TARO_ENV,
+    menu: Taro.getMenuButtonBoundingClientRect()
 };
 
 
@@ -334,4 +335,13 @@ export function jumpToEditor(params: {[key: string] : any} = {}) {
     Taro.navigateTo({
         url: deviceInfo.env === "h5" ? `/pages/editor/shell?${paramsStr}` : `/pages/editor/wxshell?${paramsStr}`
     })
+}
+
+
+// 从0开始截断字符串
+export function cutString(str: string = "", len: number = 1, suffix: string = "...") {
+    if (notNull(str)) {
+        return ""
+    }
+    return `${str.substr(0, len)}${suffix}`;
 }
