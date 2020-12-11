@@ -176,7 +176,7 @@ export default class Detail extends Component<{},{
                     </View>
                 </View>
                 <LoginModal />
-                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={({detail:{scrollTop}})=>{
+                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={()=>{
                     this.setState({
                         scrollTop:-1
                     })
