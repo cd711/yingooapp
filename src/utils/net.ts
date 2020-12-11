@@ -87,6 +87,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
             }
         }).then((res: any) => {
             if(res.data.code == 401){
+                Taro.hideLoading();
                 Taro.removeStorage({key:'token'});
                 Taro.removeStorage({key:'TaroInfoKey'});
                 userStore.clear();
