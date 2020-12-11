@@ -146,14 +146,29 @@ const Index: Taro.FC<any> = () => {
         return `${parseInt(x.toString())}*${parseInt(y.toString())}mm`
     }
 
+    const getScrollHeight = () => {
+        return deviceInfo.env === "h5"
+            ? deviceInfo.windowHeight - 110 + "px"
+            : deviceInfo.windowHeight - 110 + deviceInfo.statusBarHeight + deviceInfo.menu.height + "px"
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
                       color='#121314' title="选择尺寸" border fixed
+                      customStyle={{
+                          paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
+                      }}
                       leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
             />
-            <ScrollView scrollY className="printing_scroll_container" style={{height: deviceInfo.windowHeight - 110}}>
-                <View className="printing_main">
+            <ScrollView scrollY className="printing_scroll_container" style={{height: getScrollHeight()}}>
+                <View className="printing_main"
+                      style={
+                          deviceInfo.env === "weapp"
+                              ? {paddingTop: deviceInfo.statusBarHeight + "px"}
+                              : null
+                      }
+                >
                     {
                         sizeItem.map((item, index) => (
                             <View className="printing_item" key={index+""} onClick={() => selectSize(item.id)}>
