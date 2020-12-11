@@ -9,6 +9,7 @@ import { AtNavBar,AtFloatLayout} from 'taro-ui'
 import { api,updateLocalUserInfo } from '../../utils/net';
 import moment from "moment";
 import UploadFile from "../../components/Upload/Upload";
+import { fixStatusBarHeight } from '../../utils/common';
 
 const sexList = [
     '保密',
@@ -152,7 +153,8 @@ export default class Profile extends Component<any,{
         const sex = userStore.sex
         return (
             <View className='profile'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         Taro.navigateBack();
                     }}>

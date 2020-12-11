@@ -5,12 +5,11 @@ import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
-import { observer, inject } from '@tarojs/mobx'
-import page from '../../utils/ext';
+import { observer, inject } from '@tarojs/mobx';
+import { fixStatusBarHeight } from '../../utils/common';
 
 @inject("userStore")
 @observer
-@page({wechatAutoLogin:true})
 export default class Set extends Component<any,{
     btnAtive:boolean;
     pwd:string;
@@ -91,10 +90,13 @@ export default class Set extends Component<any,{
     render(){
         const {btnAtive} = this.state;
         return <View className='set_page'>
-            <View className='back' onClick={()=>{
-                Taro.navigateBack();
-            }}>
-                <IconFont name='24_shangyiye' size={48} color='#121314' />
+            {/* @ts-ignore */}
+            <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='back' onClick={()=>{
+                    Taro.navigateBack();
+                }}>
+                    <IconFont name='24_shangyiye' size={48} color='#121314' />
+                </View>
             </View>
             <View className='container'>
                 <View className='tip'>

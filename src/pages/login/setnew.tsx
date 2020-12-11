@@ -4,6 +4,7 @@ import './index.less'
 import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
+import { fixStatusBarHeight } from '../../utils/common';
 
 export default class Set extends Component<any,{
     btnAtive:boolean;
@@ -27,6 +28,7 @@ export default class Set extends Component<any,{
         
 
     }
+    
     onSetPassword = () => {
         // 
         const {pwd,again} = this.state;
@@ -91,10 +93,13 @@ export default class Set extends Component<any,{
     render(){
         const {btnAtive} = this.state;
         return <View className='set_page'>
-            <View className='back' onClick={()=>{
-                Taro.navigateBack();
-            }}>
-                <IconFont name='24_shangyiye' size={48} color='#121314' />
+            {/* @ts-ignore */}
+            <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='back' onClick={()=>{
+                    Taro.navigateBack();
+                }}>
+                    <IconFont name='24_shangyiye' size={48} color='#121314' />
+                </View>
             </View>
             <View className='container'>
                 <View className='tip'>

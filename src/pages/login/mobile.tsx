@@ -6,11 +6,10 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import page from '../../utils/ext';
+import { fixStatusBarHeight } from '../../utils/common';
 
 @inject("userStore")
 @observer
-@page({wechatAutoLogin:true})
 export default class Mobile extends Component<{},{
     btnAtive:boolean;
     phoneActive:boolean;
@@ -198,12 +197,17 @@ export default class Mobile extends Component<{},{
     }
     render(){
         const {btnAtive,phoneActive,codeActive,time,check,phone,code} = this.state;
+        
         return <View className='set_page mobile_page'>
-            <View className='back' onClick={()=>{
-                Taro.navigateBack();
-            }}>
-                <IconFont name='24_shangyiye' size={48} color='#121314' />
+            {/* @ts-ignore */}
+            <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='back' onClick={()=>{
+                    Taro.navigateBack();
+                }}>
+                    <IconFont name='24_shangyiye' size={48} color='#121314' />
+                </View>
             </View>
+
             <View className='container'>
                 <View className='tip'>
                     <Text className='txt'>{check?'输入新手机号':'输入原手机号'}</Text>

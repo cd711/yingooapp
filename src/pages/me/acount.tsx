@@ -6,6 +6,7 @@ import IconFont from '../../components/iconfont';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../components/tipmodal/TipModal'
+import { fixStatusBarHeight } from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -30,10 +31,11 @@ export default class Setting extends Component<any,{
     render() {
         const {tipModalShow} = this.state;
         const {id,mobile,set_pwd} = userStore;
-        
+
         return (
             <View className='acounts'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         Taro.navigateBack();
                     }}>
@@ -52,7 +54,7 @@ export default class Setting extends Component<any,{
                         </View>
                     </View>
                     <View className='item' onClick={()=>{
-                        if (mobile.length==11) {
+                        if (mobile.length!=11) {
                             Taro.navigateTo({
                                 url:`/pages/login/mobile`
                             })
@@ -65,6 +67,14 @@ export default class Setting extends Component<any,{
                         </View>
                     </View>
                     <View className='item' onClick={()=>{
+                            if (mobile.length!=11) {
+                                Taro.showToast({
+                                    title:'请先绑定手机号码',
+                                    icon:'none',
+                                    duration:2000
+                                })
+                                return;
+                            }
                             if (set_pwd) {
                                 return;
                             }

@@ -40,6 +40,9 @@ export class UserStore {
     
     @action
     public setInfo(info){
+        if (info.birthday == null || info.birthday == "") {
+            info.birthday == ""
+        }
         setUserInfo(info);
         this.id = info.id;
         this.mobile = info.mobile;
@@ -48,6 +51,7 @@ export class UserStore {
         this.gender = info.gender;
         this.bio = info.bio;
         this.address = info.address;
+
         this.birthday = info.birthday;
         this.set_pwd = info.set_pwd>0?true:false;
     }

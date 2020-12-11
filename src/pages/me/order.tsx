@@ -237,7 +237,9 @@ export default class Order extends Component<any,{
                                 this.setState({
                                     switchTabActive:index
                                 });
-                                window.history.replaceState(null,null,`/pages/me/order?tab=${index}`);
+                                if (deviceInfo.env == 'h5') {
+                                    window.history.replaceState(null,null,`/pages/me/order?tab=${index}`);
+                                }
                             }} key={index+""}>
                                 <Text className='txt'>{item}</Text>
                                 {switchTabActive==index?<Image src={require("../../source/switchBottom.png")} className='img' />:null}
@@ -262,12 +264,16 @@ export default class Order extends Component<any,{
                                     <View className='order-num'>
                                         <Text className='txt'>订单编号：{item.order_sn}</Text>
                                         <View onClick={()=>{
-                                            copy(item.order_sn);
-                                            Taro.showToast({
-                                                title:"复制成功",
-                                                icon:'none',
-                                                duration:1000
-                                            })
+                                            if (deviceInfo.env == 'h5') {
+                                                copy(item.order_sn);
+                                                Taro.showToast({
+                                                    title:"复制成功",
+                                                    icon:'none',
+                                                    duration:1000
+                                                })
+                                            } else {
+                                                Taro.setClipboardData({data:item.order_sn})
+                                            }
                                         }}><IconFont name='20_fuzhi' size={40} color='#D7D7DA' /></View>
                                     </View>
                                     <Text className={`status ${item.state_tip.value==1?'pay':(item.state_tip.value==2||item.state_tip.value==3?'deliver':'complete')}`}>{item.after_sale_status_tip.value!=0?item.after_sale_status_tip.text:item.state_tip.text}</Text>

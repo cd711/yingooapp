@@ -4,7 +4,7 @@ import './orderdetail.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import isEmpty from 'lodash/isEmpty';
-import { ossUrl } from '../../utils/common';
+import { deviceInfo, fixStatusBarHeight, ossUrl } from '../../utils/common';
 import moment from "moment";
 import PayWayModal from '../../components/payway/PayWayModal';
 import { templateStore } from '../../store/template';
@@ -13,6 +13,7 @@ import page from '../../utils/ext';
 import { AtModal,AtModalContent } from "taro-ui"
 import copy from 'copy-to-clipboard';
 import TipModal from '../../components/tipmodal/TipModal';
+import Fragment from '../../components/Fragment';
 
 @inject("templateStore")
 @observer
@@ -25,7 +26,8 @@ export default class OrderDetail extends Component<{},{
     showPayWayModal:boolean,
     navBarChange:boolean,
     showServiceModal:boolean,
-    showCancelModal:boolean
+    showCancelModal:boolean,
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -42,10 +44,22 @@ export default class OrderDetail extends Component<{},{
             showPayWayModal:false,
             navBarChange:false,
             showServiceModal:false,
-            showCancelModal:false
+            showCancelModal:false,
+            centerPartyHeight:500
         }
     }
     componentDidMount(){
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                console.log(nav_rect)
+                Taro.createSelectorQuery().select(".ops").boundingClientRect((status_react)=>{
+                    console.log(status_react)
+                    this.setState({
+                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-status_react.height
+                    });
+                }).exec();
+            }).exec();
+        }
         templateStore.address = null;
         const {id} = this.$router.params;
         if (id) {
@@ -238,20 +252,26 @@ export default class OrderDetail extends Component<{},{
         })
     }
     render() {
-        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal,showCancelModal } = this.state;
+        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal,showCancelModal,centerPartyHeight } = this.state;
         const state = data.state_tip?data.state_tip.value:0;
         const afterState = data.after_sale_status_tip?data.after_sale_status_tip.value:0;
         let status = data.state_tip?data.state_tip.text:"";
         status = afterState!=0?data.after_sale_status_tip.text:status;
         const plist = isEmpty(data.products)?[]:data.products;
+        // @ts-ignore
         return (
             <View className='order-detail'>
                 {/* style={`background: ${navBarChange?"#FF4966":"#FFF"}`} */}
-                <View className={navBarChange?'nav-bar':(state==-1?'nav-bar bar-gray':'nav-bar bar-active')}>
+                {/* @ts-ignore */}
+                <View className={navBarChange?'nav-bar':(state==-1?'nav-bar bar-gray':'nav-bar bar-active')} style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
-                        Taro.navigateTo({
-                            url:"/pages/me/order?tab=0"
-                        })
+                        if (Taro.getCurrentPages().length==1) {
+                            Taro.navigateTo({
+                                url:"/pages/me/order?tab=0"
+                            })
+                        }else{
+                            Taro.navigateBack();
+                        }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color={navBarChange?'#121314':'#FFF'} />
                     </View>
@@ -262,7 +282,7 @@ export default class OrderDetail extends Component<{},{
                         <IconFont name='24_kefu' size={48} color={navBarChange?'#121314':'#FFF'} />
                     </View>
                 </View>
-                <ScrollView scrollY className='order_content_page' onScroll={this.onScroll}>
+                <ScrollView scrollY className='order_content_page' onScroll={this.onScroll} style={deviceInfo.env === 'h5'?"":`height:${centerPartyHeight}px`}>
                 <View className='container'>
                 <View className='top' style={`background:${state==-1?'#9C9DA6':'#FF4966'}`}>
                     <View className='status'>
@@ -374,8 +394,9 @@ export default class OrderDetail extends Component<{},{
                 <Text className='order-tips'>如收到商品出现质量、错发、漏发，可申请售后退款</Text>
                 </View>
                 </ScrollView>
-                {
-                    state == 1 && afterState == 0?<View className='ops'>
+                <View className='ops'>
+                    {
+                        state == 1 && afterState == 0?<Fragment>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
                         <Button className='red-border-btn' onClick={()=>{
                             Taro.navigateTo({
@@ -392,16 +413,17 @@ export default class OrderDetail extends Component<{},{
                                 showPayWayModal:true
                             })
                         }}>去支付</Button>
-                    </View>:state == 2 && afterState == 0?<View className='ops'>
+                        </Fragment>:state == 2 && afterState == 0?<Fragment>
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
 
-                    </View>:(state == 4 || state == -1)&& afterState == 0?<View className='ops'>
+                        </Fragment>:(state == 4 || state == -1)&& afterState == 0?<Fragment>
                         <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
-                    </View>:state == 3 && afterState == 0?<View className='ops'>
+                        </Fragment>:state == 3 && afterState == 0?<Fragment>
                         <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,data.id)}>确认收货</Button>
-                    </View>:null
-                }
-                <PayWayModal 
+                        </Fragment>:null
+                    }
+                </View>
+                {/* <PayWayModal 
                     isShow={showPayWayModal} 
                     totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"} 
                     order_sn={data.order_sn}
@@ -410,7 +432,7 @@ export default class OrderDetail extends Component<{},{
                         this.setState({
                             showPayWayModal:false
                         })
-                    }}/>
+                    }}/> */}
                     <AtModal isOpened={showServiceModal} onClose={()=>{
                             this.setState({
                                 showServiceModal:false
@@ -434,12 +456,16 @@ export default class OrderDetail extends Component<{},{
                                     <a href="mailto:18628087932@qq.com"><Text className='content'>18628087932@qq.com</Text></a>
                                 </View>
                                 <Button className='copy_wechat' onClick={()=>{
-                                    copy('13198561713');
-                                    Taro.showToast({
-                                        title:"复制成功",
-                                        icon:'none',
-                                        duration:1000
-                                    })
+                                    if (deviceInfo.env == 'h5') {
+                                        copy('13198561713');
+                                        Taro.showToast({
+                                            title:"复制成功",
+                                            icon:'none',
+                                            duration:1000
+                                        })
+                                    } else {
+                                        Taro.setClipboardData({data:'13198561713'})
+                                    }
                                 }}>复制微信号</Button>
                             </View>
                         </AtModalContent>
