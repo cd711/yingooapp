@@ -55,11 +55,7 @@ class App extends Component {
             'pages/me/privacy',
             'pages/me/aboutus',
             'pages/me/feedback',
-<<<<<<< HEAD
             'pages/me/orderdetail',
-=======
-            // 'pages/me/orderdetail',
->>>>>>> cad78bce9123976e87f36f56f68176a9c9088da3
             // 'pages/me/refund',
             'pages/me/address/index',
             'pages/me/address/editor',
