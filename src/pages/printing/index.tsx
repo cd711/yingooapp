@@ -84,10 +84,35 @@ const Index: Taro.FC<any> = () => {
         })
     }
 
+    Taro.useDidShow(() => {
+        console.log(JSON.parse(JSON.stringify(templateStore.printWxPhotoData)))
+        if (templateStore.printWxPhotoData.ids.length > 0) {
+            setPhotoPickerVisible(false);
+            templateStore.printStatus = false;
+            const path = [];
+            const data = templateStore.printWxPhotoData;
+            for (let i = 0; i < data.ids.length; i++) {
+                path.push({
+                    id: data.ids[i],
+                    url: data.imgs[i],
+                    attr: data.attrs[i],
+                    edited: false,
+                    doc: ""
+                })
+            }
+
+            setTimeout(() => {
+                renderParams(path)
+            }, 300)
+        }
+    })
+
+
     const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
         console.log("返回的结果：", data)
 
-        setPhotoPickerVisible(false)
+        setPhotoPickerVisible(false);
+        templateStore.printStatus = false;
         const path = [];
         for (let i = 0; i < data.ids.length; i++) {
             path.push({
@@ -123,10 +148,17 @@ const Index: Taro.FC<any> = () => {
             return
         }
 
-        setPhotoPickerVisible(true);
-        setTimeout(() => {
-            setAnimating(true)
-        }, 50)
+        if (deviceInfo.env === "h5") {
+            setPhotoPickerVisible(true);
+            templateStore.printStatus = true;
+            setTimeout(() => {
+                setAnimating(true)
+            }, 50)
+        } else {
+            Taro.navigateTo({
+                url: `/pages/me/photos?edit=t`
+            })
+        }
     }
 
     const closeSelectPhoto = () => {
@@ -161,7 +193,7 @@ const Index: Taro.FC<any> = () => {
                       }}
                       leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
             />
-            <ScrollView scrollY className="printing_scroll_container" style={{height: getScrollHeight()}}>
+            <ScrollView scrollY className="printing_scroll_container" enableFlex={true} style={{height: getScrollHeight()}}>
                 <View className="printing_main"
                       style={
                           deviceInfo.env === "weapp"
@@ -199,10 +231,15 @@ const Index: Taro.FC<any> = () => {
             {
                 photoVisible
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
-                        <Photos editSelect
+                        <Photos editSelect={photoVisible}
                                 onClose={closeSelectPhoto}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
+                                extraProps={{
+                                    editSelect: true,
+                                    onClose: closeSelectPhoto,
+                                    onPhotoSelect: onPhotoSelect
+                                }}
                         />
                     </View>
                     : null

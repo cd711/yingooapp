@@ -35,6 +35,11 @@ export class TemplateStore {
     @observable
     public editorPhotos: { id: string | number, url: string }[] = [];
 
+    @observable
+    public printStatus: boolean = false;
+
+    @observable
+    public printWxPhotoData: {ids: [], imgs: [], attrs: []} = {ids: [], imgs: [], attrs: []}
 }
 
 

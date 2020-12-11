@@ -39,6 +39,9 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     useEffect(() => {
+        if (deviceInfo.env !== "h5") {
+            return
+        }
         window.addEventListener("popstate", backPressHandle);
 
         return () => {
@@ -509,10 +512,16 @@ const PrintChange: Taro.FC<any> = () => {
             })
             return
         }
-        setPhotoPickerVisible(true);
-        setTimeout(() => {
-            setAnimating(true)
-        }, 50)
+        if (deviceInfo.env === "h5") {
+            setPhotoPickerVisible(true);
+            setTimeout(() => {
+                setAnimating(true)
+            }, 50)
+        } else {
+            Taro.navigateTo({
+                url: `/pages/me/photos?edit=t&c=${imgCount}&l=t`
+            })
+        }
     }
 
     const closeSelectPhoto = () => {
@@ -561,23 +570,38 @@ const PrintChange: Taro.FC<any> = () => {
         Taro.navigateBack()
     }
 
+    const getScrollHeight = () => {
+        return deviceInfo.env === "h5"
+            ? deviceInfo.windowHeight - 110 + "px"
+            : deviceInfo.windowHeight - 110 + deviceInfo.statusBarHeight + deviceInfo.menu.height + "px"
+    }
+
     return (
         <View className="printing_container">
             <AtNavBar onClickLeftIcon={onBackHandle}
+                      customStyle={{
+                          paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
+                      }}
                       color='#121314' title="照片冲印列表" border fixed
                       leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
             />
-            <ScrollView scrollY className="printing_scroll_container" style={{height: deviceInfo.windowHeight - 110}}>
-                <View className="printing_change_main">
+            <ScrollView scrollY enableFlex={true} className="printing_scroll_container" style={{height: getScrollHeight()}}>
+                <View className="printing_change_main"
+                      style={
+                          deviceInfo.env === "weapp"
+                              ? {paddingTop: deviceInfo.statusBarHeight + "px"}
+                              : null
+                      }
+                >
                     {
                         photos.map((value, index) => (
                             <View className="print_change_item_wrap" key={index+""}
                                   style={{
-                                      width: deviceInfo.windowWidth / 2
+                                      width: deviceInfo.windowWidth / 2 + "px"
                                   }}>
                                 <View className="print_change_item"
                                       style={{
-                                          width: deviceInfo.windowWidth / 2 - 26
+                                          width: deviceInfo.windowWidth / 2 - 26 + "px"
                                       }}
                                 >
                                     <View className="print_change_del" onClick={() => onDeleteImg(index)}>
@@ -639,6 +663,12 @@ const PrintChange: Taro.FC<any> = () => {
                                 count={imgCount}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
+                                extraProps={{
+                                    editSelect: true,
+                                    onClose: closeSelectPhoto,
+                                    count: imgCount,
+                                    onPhotoSelect: onPhotoSelect
+                                }}
                         />
                     </View>
                     : null
