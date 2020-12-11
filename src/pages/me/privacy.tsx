@@ -3,6 +3,7 @@ import Taro, {Component, Config} from "@tarojs/taro";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import "./privacy.less";
+import {deviceInfo} from "../../utils/common";
 
 interface PrivacyState{
     privacyTxt: string
@@ -43,6 +44,9 @@ export default class Privacy extends Component<any, PrivacyState> {
                     title={`${this.$router.params.pageType === "privacy" ? "隐私政策" : "用户协议"}`}
                     border
                     fixed
+                    customStyle={{
+                        paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
+                    }}
                     leftIconType={{
                         value:'chevron-left',
                         color:'#121314',
