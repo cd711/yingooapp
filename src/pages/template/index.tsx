@@ -5,7 +5,6 @@ import IconFont from '../../components/iconfont'
 import {api} from '../../utils/net'
 import {inject, observer} from '@tarojs/mobx'
 import {deviceInfo, getURLParamsStr, ossUrl, urlEncode} from '../../utils/common'
-import page from "../../utils/ext";
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import LoginModal from "../../components/login/loginModal";
 import {userStore} from "../../store/user";
@@ -23,9 +22,7 @@ interface TagList {
 
 @inject("templateStore")
 @observer
-@page({
-    wechatAutoLogin: false
-})
+
 export default class Template extends Component<any, {
     switchActive: number;
     cates: Array<any>;
@@ -59,7 +56,6 @@ export default class Template extends Component<any, {
     }
 
     componentDidMount() {
-
         if (process.env.TARO_ENV === 'h5') {
             if (window.location.href.indexOf("template") == -1) {
                 return;
@@ -155,6 +151,7 @@ export default class Template extends Component<any, {
                                             mainRightWidth: ww - l_rect.width
                                         });
                                         setTimeout(() => {
+                                            // @ts-ignore
                                             resolve();
                                         }, 100);
                                     }

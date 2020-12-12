@@ -30,9 +30,13 @@ export default class Address extends Component<any,{
 
     componentDidShow(){
         if (!userStore.isLogin) {
-            Taro.switchTab({
-                url:'/pages/index/index'
-            })
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
         }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{

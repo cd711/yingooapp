@@ -5,7 +5,7 @@ import { api } from '../../utils/net'
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import IconFont from '../../components/iconfont'
-import page from '../../utils/ext';
+// import page from '../../utils/ext';
 import { fixStatusBarHeight, ListModel,deviceInfo } from '../../utils/common';
 import Ticket from '../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
@@ -14,7 +14,7 @@ const tabs = ["全部","未使用","已使用","已失效"];
 
 @inject("userStore")
 @observer
-@page({wechatAutoLogin:true})
+// @page({wechatAutoLogin:true})
 export default class Login extends Component<{},{
     data:ListModel,
     switchTabActive:number,
@@ -43,6 +43,15 @@ export default class Login extends Component<{},{
 
 
     componentDidMount(){
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react)=>{

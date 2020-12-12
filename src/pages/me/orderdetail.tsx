@@ -9,15 +9,14 @@ import moment from "moment";
 import PayWayModal from '../../components/payway/PayWayModal';
 import { templateStore } from '../../store/template';
 import { observer, inject } from '@tarojs/mobx';
-import page from '../../utils/ext';
 import { AtModal,AtModalContent } from "taro-ui"
 import copy from 'copy-to-clipboard';
 import TipModal from '../../components/tipmodal/TipModal';
 import Fragment from '../../components/Fragment';
+import { userStore } from '../../store/user';
 
 @inject("templateStore")
 @observer
-@page({wechatAutoLogin:true})
 export default class OrderDetail extends Component<{},{
     data:any,
     hours:string,
@@ -49,6 +48,15 @@ export default class OrderDetail extends Component<{},{
         }
     }
     componentDidMount(){
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 console.log(nav_rect)
@@ -423,7 +431,7 @@ export default class OrderDetail extends Component<{},{
                         </Fragment>:null
                     }
                 </View>
-                {/* <PayWayModal 
+                <PayWayModal 
                     isShow={showPayWayModal} 
                     totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"} 
                     order_sn={data.order_sn}
@@ -432,7 +440,7 @@ export default class OrderDetail extends Component<{},{
                         this.setState({
                             showPayWayModal:false
                         })
-                    }}/> */}
+                    }}/>
                     <AtModal isOpened={showServiceModal} onClose={()=>{
                             this.setState({
                                 showServiceModal:false

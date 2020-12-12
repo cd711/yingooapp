@@ -11,6 +11,7 @@ import { Base64 } from 'js-base64';
 import { AtSwipeAction } from "taro-ui"
 import './index.less'
 import TipModal from '../../components/tipmodal/TipModal';
+import { userStore } from '../../store/user';
 
 export default class Cart extends Component<{},{
     source:any;
@@ -38,7 +39,15 @@ export default class Cart extends Component<{},{
     }
 
     componentDidMount(){
-
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
         const {manage} = this.$router.params;
         if(manage){
             this.setState({

@@ -38,7 +38,15 @@ export default class Set extends Component<any,{
     }
     private inputRef: { inputRef: { focus: () => void; }; };
     componentDidMount(){
-        
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
 
     }
     onMobileInput = ({detail:{value}}) => {

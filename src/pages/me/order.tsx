@@ -10,7 +10,6 @@ import { api } from '../../utils/net';
 import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl } from '../../utils/common';
 
 import PayWayModal from '../../components/payway/PayWayModal';
-import page from '../../utils/ext';
 import copy from 'copy-to-clipboard';
 import TipModal from '../../components/tipmodal/TipModal';
 
@@ -19,7 +18,6 @@ const tabs = ["全部","待付款","待发货","待收货","已完成"];
 
 @inject("userStore","templateStore")
 @observer
-@page({wechatAutoLogin:true})
 export default class Order extends Component<any,{
     switchTabActive:number;
     data:ListModel;
@@ -55,6 +53,15 @@ export default class Order extends Component<any,{
         }
     }
     componentDidMount(){
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react)=>{

@@ -43,12 +43,14 @@ export default class Xm {
     private static weappLogin(params:LoginParams,resolve,reject){
         if (!notNull(params.userInfo)) {
             Taro.login().then((res)=>{
+                console.log(res);
                 this.thirdLoginApi({
                     platform: "wxapp",
                     code: res.code,
                     data: params.userInfo
                 },resolve,reject);
             }).catch((e)=>{
+                console.log(e);
                 reject(e);
             });
         }
