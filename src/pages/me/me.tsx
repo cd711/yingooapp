@@ -161,7 +161,7 @@ export default class Me extends Component<any, MeState> {
     }
 
     componentDidMount() {
-        if (userStore.id) {
+        if (userStore.isLogin) {
             this.getWorksList({start: 0})
         }
     }
