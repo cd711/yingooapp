@@ -652,9 +652,7 @@ const PrintChange: Taro.FC<any> = () => {
                 })
                 return
             }
-            jumpToPrintEditor({
-                key: key.current
-            })
+            jumpToPrintEditor(obj)
         } else {
             Taro.navigateTo({
                 url: `/pages/editor/printedit?${str}`

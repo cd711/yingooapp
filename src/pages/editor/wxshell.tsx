@@ -34,7 +34,6 @@ export default class Shell extends Component<{}, {
     public store = new Store();
 
     private tplId: any = 0;
-    private docId: any = 0;
 
     constructor(p) {
         super(p);

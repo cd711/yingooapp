@@ -15,6 +15,7 @@ import {templateStore} from "../../store/template";
 import moment from "moment";
 import config from "../../config";
 import {PhotoParams} from "../../modal/modal";
+import wx from 'weixin-js-sdk'
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -1213,9 +1214,17 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         currentData.current = {...obj}
     }
 
+    const addPhotos = () => {
+        if (parent.hiddenBar) {
+
+        } else {
+            setType(1)
+        }
+    }
+
     return type === 0
         ? <View className='tools' style={0 == 0 ? {padding: 0} : {padding: "0 13%"} }>
-            <View className='btn' onClick={() => setType(1)}>
+            <View className='btn' onClick={addPhotos}>
                 <IconFont name='24_bianjiqi_chongyin' size={48}/>
                 <Text className='txt'>添加</Text>
             </View>
@@ -1265,6 +1274,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     public editorProxy: WindowProxy | null | undefined;
+    public hiddenBar: boolean = false;
     public userKey: string = "";
 
     getLocalEditPhotos = () => {
@@ -1361,6 +1371,10 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             }catch (e) {
                 console.log("获取存储的图片旧数据出错：", e)
             }
+        }
+
+        if (!notNull(routerParams.hidden) && routerParams.hidden === "t") {
+            this.hiddenBar = true;
         }
     }
 
@@ -1639,7 +1653,12 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 templateStore.photoSizeParams = temp
             }
             Taro.hideLoading()
-            Taro.navigateBack()
+            if (this.hiddenBar) {
+                // 小程序返回上一页
+                wx.miniProgram.navigateBack()
+            } else {
+                Taro.navigateBack()
+            }
 
         }catch (e) {
             console.log("生成预览图出错：", e)
@@ -1764,10 +1783,18 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         const {tool} = this.store;
 
         return <View className='editor-page'>
-            <View className='header'>
-                <View onClick={this.back}>
-                    <IconFont name='24_shangyiye' color='#000' size={48}/>
-                </View>
+            <View className='header'
+                  style={{
+                      justifyContent: this.hiddenBar ? "flex-end" : "space-between"
+                  }}
+            >
+                {
+                    !this.hiddenBar
+                        ?  <View onClick={this.back}>
+                            <IconFont name='24_shangyiye' color='#000' size={48}/>
+                        </View>
+                        : null
+                }
                 <View onClick={this.next} className='right'>完成</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>

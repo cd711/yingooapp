@@ -5,6 +5,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../config";
+import {getURLParamsStr, urlEncode} from "../../utils/common";
 
 
 class Store {
@@ -28,12 +29,12 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     public store = new Store();
 
     private tplId: any = 0;
+    private routerParams = this.$router.params;
 
     constructor(p) {
         super(p);
 
-        this.tplId = this.$router.params['tpl_id'] || 0;
-        this.docId = this.$router.params['id'] || 0;
+        this.tplId = this.routerParams['tpl_id'] || 0;
 
         this.state = {
             textInfo: null
@@ -55,9 +56,16 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             Taro.showToast({title: "页面丢了，请重试", icon: "none"})
             return
         }
+        const str = getURLParamsStr(urlEncode({
+            ...this.routerParams,
+            tpl_id: this.tplId,
+            cid: this.routerParams.cid,
+            hidden: "t",
+            key: this.routerParams.key
+        }))
         return process.env.NODE_ENV == 'production'
-            ? `/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t`
-            : `http://${config.h5Url}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&key=${key}`
+            ? `/editor/printedit?${str}`
+            : `http://${config.h5Url}/editor/printedit?${str}`
     }
 
     render() {

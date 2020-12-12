@@ -1605,14 +1605,7 @@ export default class Shell extends Component<{}, {
             const doc = await callEditor("getDoc");
             const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
             wx.miniProgram.navigateTo({
-
                 url: `/pages/template/preview?workid=${res.id}`,
-                success: res => {
-
-                },
-                fail: aa => {
-
-                }
             })
         }catch (e) {
             console.log("点击下一步出错：", e)

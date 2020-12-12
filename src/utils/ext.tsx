@@ -1,10 +1,6 @@
 import Taro from "@tarojs/taro";
-import {View} from '@tarojs/components';
 import {userStore} from "../store/user";
-// import {UITopProvider, UITop} from "../components/UITopProvider";
-// import Modal from "../components/UITopProvider/modal";
-// import Logins from "../components/login/login";
-import {is_weixin,notNull} from "./common";
+import {is_weixin} from "./common";
 import {api} from "./net";
 
 const page = (option?: {
