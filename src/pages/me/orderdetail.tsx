@@ -431,7 +431,7 @@ export default class OrderDetail extends Component<{},{
                         </Fragment>:null
                     }
                 </View>
-                {/* <PayWayModal 
+                <PayWayModal 
                     isShow={showPayWayModal} 
                     totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"} 
                     order_sn={data.order_sn}
@@ -440,7 +440,7 @@ export default class OrderDetail extends Component<{},{
                         this.setState({
                             showPayWayModal:false
                         })
-                    }}/> */}
+                    }}/>
                     <AtModal isOpened={showServiceModal} onClose={()=>{
                             this.setState({
                                 showServiceModal:false
