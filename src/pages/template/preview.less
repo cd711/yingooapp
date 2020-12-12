@@ -1,4 +1,4 @@
-.taro_page{
+.taro_page,page{
     background: #F5F6F9;
 }
 .preview{
@@ -7,6 +7,8 @@
     justify-content: space-between;
     height: 100%;
     z-index: 1;
+    position: fixed;
+    width: 100%;
     .nav-bar{
         display: flex;
         align-items: center;
@@ -15,7 +17,7 @@
         // position: fixed;
         // z-index: 10;
         width: 100%;
-        box-sizing: border-box;
+        // box-sizing: border-box;
         background: #FFF;
         position: relative;
         .left{
@@ -88,6 +90,9 @@
             font-size: 32px;
             font-weight: 500;
             color: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     }
 }

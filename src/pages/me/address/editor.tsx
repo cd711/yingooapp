@@ -10,6 +10,7 @@ import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../store/user';
 import {templateStore} from '../../../store/template';
 import isEmpty from 'lodash/isEmpty';
+import { fixStatusBarHeight } from '../../../utils/common';
 
 interface CityModal {
     province:any,
@@ -50,6 +51,11 @@ export default class Editor extends Component<any,{
     }
 
     componentDidMount() {
+        if (!userStore.isLogin) {
+            Taro.switchTab({
+                url:'/pages/index/index'
+            })
+        }
         this.getRegion()
         
     }
@@ -354,8 +360,8 @@ export default class Editor extends Component<any,{
         const {id} = this.$router.params;
         return (
             <View className='editor'>
-
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
                         Taro.navigateBack();
                     }}>

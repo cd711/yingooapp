@@ -40,7 +40,7 @@ class App extends Component {
             'pages/template/detail',
             'pages/login/index',
             'pages/login/set',
-            // 'pages/login/setnew',
+            'pages/login/setnew',
             'pages/login/mobile',
             'pages/login/find',
             // 'pages/editor/shell',
@@ -63,10 +63,10 @@ class App extends Component {
             'pages/me/ticket',
             'pages/printing/index',
             'pages/printing/change',
-            // 'pages/template/preview',
-            // 'pages/template/confirm',
-            // 'pages/template/success',
-            // 'pages/cart/index',
+            'pages/template/preview',
+            'pages/template/confirm',
+            'pages/template/success',
+            'pages/cart/index',
             'pages/search/index',
             'pages/search/result',
         ],
@@ -75,12 +75,12 @@ class App extends Component {
             backgroundTextStyle: 'light',
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: 'WeChat',
-            navigationBarTextStyle: 'black'
+            navigationBarTextStyle: 'white'
         },
         tabBar: {
             color: '#9C9DA6',
             selectedColor: '#FF4966',
-            backgroundColor: 'white',
+            backgroundColor: '#ffffff',
             borderStyle: "white",
             list: [
                 {

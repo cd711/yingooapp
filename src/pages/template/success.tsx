@@ -8,6 +8,7 @@ import SuccessIcon from '../../components/icon/SuccessIcon';
 import WarmIcon from '../../components/icon/WarmIcon';
 import { api } from '../../utils/net';
 import { Base64 } from 'js-base64';
+import { deviceInfo, fixStatusBarHeight } from '../../utils/common';
 // interface LikeData{
 //     list:Array<any>,
 //     size:number,
@@ -37,17 +38,22 @@ export default class Success extends Component<{},{
 
     componentDidMount() {
         console.log();
-        const url = window.location.href;
-        window.history.pushState(null,null,'/pages/me/me');
-        window.history.pushState(null,null,'/pages/me/order?tab=0');
-        window.history.pushState(null,'支付结果',url);
+        
+        if (deviceInfo.env == 'h5') {
+            const url = window.location.href;
+            window.history.pushState(null,null,'/pages/me/me');
+            window.history.pushState(null,null,'/pages/me/order?tab=0');
+            window.history.pushState(null,'支付结果',url);
+        }
         // Taro.showLoading({title:"查询订单状态"});
         const {pay_order_sn,status} = this.$router.params;
-        if (status) {
+        if (status && pay_order_sn) {
             const s = Base64.decode(status);
             if (s && s.length && s.length>0) {
                 const t = s.split("-");
                 if (t.length == 2) {
+                    Taro.showLoading({title:'加载中...'})
+                    this.getOrderStatus(pay_order_sn);
                     this.setState({
                         state:true
                     })
@@ -103,9 +109,11 @@ export default class Success extends Component<{},{
     render() {
         const { way,price,state } = this.state;
         const {pay_order_sn,status} = this.$router.params;
+        // @ts-ignore
         return (
             <View className='success'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
                         Taro.navigateTo({
                             url:'/pages/me/order?tab=1'

@@ -1,14 +1,15 @@
 import Taro, {useEffect, useState} from '@tarojs/taro'
 import {Button, Image, ScrollView, Swiper, SwiperItem, Text, View} from '@tarojs/components'
-import './place.less'
 import {AtFloatLayout} from "taro-ui"
+import './place.less'
+
 import IconFont from '../../components/iconfont'
 import Counter from '../../components/counter/counter'
 import Fragment from '../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, isShow, onClose, onButtonClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButtonClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
     const [itemActive, setItemActive] = useState([])
     const [tags, setTags] = useState([]);
     const [price, setPrice] = useState("0");
@@ -96,79 +97,85 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow, onClose, onButtonClose, 
         }
     }, [isShow])
     return <View className='placeOrder'>
-        <AtFloatLayout isOpened={isShow}>
-            <View className='float-container'>
-                <View className='swiper-images-warp'>
-                    {
-                        imgs && imgs.length > 0 ? <Swiper
-                            indicatorColor='#000000'
-                            indicatorActiveColor='#FF4966'
-                            circular
-                            indicatorDots>
+        <View className={isShow?'float-layout float-layout--active':'float-layout'}>
+            <View className='float-layout__overlay'></View>
+            <View className='float-layout__container'>
+                <View className='float-container'>
+                    <View className='swiper-images-warp'>
+                        {
+                            imgs && imgs.length > 0 ? <Swiper
+                                indicatorColor='#000000'
+                                indicatorActiveColor='#FF4966'
+                                circular
+                                indicatorDots>
+                                {
+                                    imgs && imgs.map((item, index) => (
+                                        <SwiperItem className='swiper-item' key={index+""}>
+                                            <Image src={item} mode='aspectFill' className='pre-image'/>
+                                        </SwiperItem>
+                                    ))
+                                }
+                            </Swiper> : null
+                        }
+
+                        <View className='close' onClick={onButtonClose}>
+                            <IconFont name='32_guanbi' size={64} color='#333'/>
+                        </View>
+                    </View>
+                    <View className='info-part'>
+                        <Text className='name'>{data.title}</Text>
+                        <View className='price'>
+                            <View className='folding'>
+                                <Text className='sym'>¥</Text>
+                                <Text className='n'>{price}</Text>
+                            </View>
                             {
-                                imgs && imgs.map((item, index) => (
-                                    <SwiperItem className='swiper-item' key={index+""}>
-                                        <Image src={item} mode='aspectFill' className='pre-image'/>
-                                    </SwiperItem>
+                                marketPriceShow ? <Text className='actual'>￥{marketPrice}</Text> : null
+                            }
+
+                        </View>
+                    </View>
+                    <ScrollView scrollY className='scroll'>
+                        <View className='param-part'>
+                            {
+                                data && data.attrGroup && data.attrGroup.map((item, index) => (
+                                    <View className='param' key={item.id}>
+                                        <Text className='title'>{item.name}</Text>
+                                        <View className='params'>
+                                            {
+                                                tags && tags[index] && tags[index].map((tag) => (
+                                                    <Fragment key={tag.id}>
+                                                        <View
+                                                            className={itemActive[index] == tag.id ? 'item active' : tag.over ? 'item over' : 'item'}
+                                                            onClick={() => {
+                                                                if (!tag.over) {
+                                                                    onItemSelect(index, item.id, tag.id)
+                                                                }
+                                                            }}>
+                                                            <Text className='txt'>{tag.name}</Text>
+                                                        </View>
+                                                    </Fragment>
+                                                ))
+                                            }
+                                        </View>
+                                    </View>
                                 ))
                             }
-                        </Swiper> : null
-                    }
-
-                    <View className='close' onClick={onButtonClose}>
-                        <IconFont name='32_guanbi' size={64} color='#333'/>
-                    </View>
-                </View>
-                <View className='info-part'>
-                    <Text className='name'>{data.title}</Text>
-                    <View className='price'>
-                        <View className='folding'>
-                            <Text className='sym'>¥</Text>
-                            <Text className='n'>{price}</Text>
                         </View>
-                        {
-                            marketPriceShow ? <Text className='actual'>￥{marketPrice}</Text> : null
-                        }
-
+                    </ScrollView>
+                    <View className='buy-number'>
+                        <Text className='title'>购买数量</Text>
+                        <Counter num={1} onCounterChange={onBuyNumberChange}/>
                     </View>
-                </View>
-                <ScrollView scrollY className='scroll'>
-                    <View className='param-part'>
-                        {
-                            data && data.attrGroup && data.attrGroup.map((item, index) => (
-                                <View className='param' key={item.id}>
-                                    <Text className='title'>{item.name}</Text>
-                                    <View className='params'>
-                                        {
-                                            tags && tags[index] && tags[index].map((tag) => (
-                                                <Fragment key={tag.id}>
-                                                    <View
-                                                        className={itemActive[index] == tag.id ? 'item active' : tag.over ? 'item over' : 'item'}
-                                                        onClick={() => {
-                                                            if (!tag.over) {
-                                                                onItemSelect(index, item.id, tag.id)
-                                                            }
-                                                        }}>
-                                                        <Text className='txt'>{tag.name}</Text>
-                                                    </View>
-                                                </Fragment>
-                                            ))
-                                        }
-                                    </View>
-                                </View>
-                            ))
-                        }
+                    <View className='ops'>
+                        <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
+                        <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
                     </View>
-                </ScrollView>
-                <View className='buy-number'>
-                    <Text className='title'>购买数量</Text>
-                    <Counter num={1} onCounterChange={onBuyNumberChange}/>
-                </View>
-                <View className='ops'>
-                    <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
-                    <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
                 </View>
             </View>
-        </AtFloatLayout>
+        </View>
+        {/* <AtFloatLayout isOpened={isShow}>
+
+        </AtFloatLayout> */}
     </View>
 }

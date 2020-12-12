@@ -4,7 +4,7 @@ import { View, Text,Button } from '@tarojs/components'
 import './TipModal.less'
 
 
-const TipModal: Taro.FC<any> = ({isShow,tip,onCancel,onOK,cancelText,okText}) => {
+const TipModal: Taro.FC<any> = ({isShow = false,tip,onCancel,onOK,cancelText,okText}) => {
 
     return <View className={isShow?'TipModal TipModal_active':'TipModal'}>
         <View className='TipModal__overlay'></View>

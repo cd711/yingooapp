@@ -1,14 +1,16 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input,Image,ScrollView, Button } from '@tarojs/components'
-import './index.less'
 import IconFont from '../../components/iconfont';
 import Checkboxs from '../../components/checkbox/checkbox';
 import Counter from '../../components/counter/counter';
-import {ossUrl} from '../../utils/common';
+import {ossUrl,fixStatusBarHeight, deviceInfo} from '../../utils/common';
 import { api } from '../../utils/net';
 import CartLeftIcon from '../../components/icon/CartLeftIcon';
 import CartRightIcon from '../../components/icon/CartRightIcon';
 import { Base64 } from 'js-base64';
+import { AtSwipeAction } from "taro-ui"
+import './index.less'
+import TipModal from '../../components/tipmodal/TipModal';
 
 export default class Cart extends Component<{},{
     source:any;
@@ -16,12 +18,13 @@ export default class Cart extends Component<{},{
     total:number;
     isManage:boolean;
     selectIds:Array<any>;
+    showDelTipModal:boolean;
 }> {
 
     config: Config = {
         navigationBarTitleText: '购物车'
     }
-
+    private tipModalOkCallBack:()=>void = undefined;
     constructor(props){
         super(props);
         this.state = {
@@ -29,7 +32,8 @@ export default class Cart extends Component<{},{
             allSelected:false,
             total:0,
             isManage:false,
-            selectIds:[]
+            selectIds:[],
+            showDelTipModal:false
         }
     }
 
@@ -51,6 +55,7 @@ export default class Cart extends Component<{},{
             if (res) {
                 res.list = res.list.map((item)=>{
                     item["checked"] = false;
+                    item["opened"] = false;
                     return item;
                 })
                 this.setState({
@@ -64,7 +69,7 @@ export default class Cart extends Component<{},{
     onItemClick = (list,index) => {
         list[index]["checked"] = !list[index]["checked"];
         const {source} = this.state;
-        source.list = list; 
+        source.list = list;
         this.calcTotal(list);
         this.setState({
             source
@@ -99,13 +104,55 @@ export default class Cart extends Component<{},{
             selectIds:tempIds
         });
     }
-
+    onDelItem = (list:Array<any>,index) => {
+        this.tipModalOkCallBack = ()=>{
+            this.setState({
+                showDelTipModal:false
+            })
+            Taro.showLoading({title:"删除中..."})
+            const item = list[index];
+            const { source } = this.state;
+            api("app.cart/delete",{
+                ids:item.id
+            }).then(()=>{
+                Taro.hideLoading();
+                source.list = list.filter(obj=>obj.id!=item.id);
+                this.calcTotal(source.list)
+                this.setState({
+                    source,
+                    selectIds:[]
+                })
+            }).catch(()=>{
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:"删除失败，请稍后再试",
+                    icon:'none',
+                    duration:2000
+                })
+            })
+        }
+        this.setState({
+            showDelTipModal:true
+        })
+    }
     render() {
-        const { source,allSelected,total,isManage,selectIds } = this.state;
+        const { source,allSelected,total,selectIds,showDelTipModal } = this.state;
         const list = source && source.list && source.list.length>0?source.list:[];
+        const delOption = [{
+            text: '删除',
+            style: {
+                width: Taro.pxTransform(120),
+                height: Taro.pxTransform(224),
+                background: "#FF4966",
+                display:"flex",
+                "justify-content": "center",
+                padding: 0,
+            }
+        }];
         return (
             <View className='cart'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         Taro.navigateBack();
                     }}>
@@ -114,55 +161,66 @@ export default class Cart extends Component<{},{
                     <View className='center'>
                         <Text className='title'>购物车</Text>
                     </View>
-                    <View className='right' onClick={()=>{
-                        let url = "/pages/cart/index"
-                        if (!isManage) {
-                            url = "/pages/cart/index?manage=1"
-                        } 
-                        window.history.replaceState(null,null,url)
-                        this.setState({
-                            isManage:!isManage
-                        })
-                        
-                    }}>
-                        <Text className='txt'>{isManage?'完成':'管理'}</Text>
-                    </View>
                 </View>
                 <ScrollView scrollY className='center'>
                     <View className='list'>
                         {
                             list.map((item,index)=>(
-                                <View className='item' key={item.id} onClick={this.onItemClick.bind(this,list,index)}>
-                                    <Checkboxs isChecked={item.checked} className='left' disabled/>
-                                    <View className='right'>
-                                        <View className='pre-image'>
-                                            <Image src={ossUrl(item.tpl.thumb_image,0)} className='img' mode='aspectFill'/>
-                                            <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
-                                        </View>
-                                        <View className='party'>
-                                            <View className='name'>
-                                                <Text className='txt'>{item.product.title}</Text>
-                                            </View>
-                                            <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
-                                            <View className='np'>
-                                                <View className='price'>
-                                                    <Text className='l'>¥</Text>
-                                                    <Text className='n'>{(parseFloat(item.sku.price)*parseFloat(item.quantity)).toFixed(2)}</Text>
+                                <View className='item' key={item.id}>
+                                    <AtSwipeAction options={delOption} autoClose onClick={()=>this.onDelItem(list,index)} isOpened={item.opened} onOpened={()=>{
+                                        source.list = list.map((iterator)=>{
+                                            if (iterator.id == item.id) {
+                                                iterator.opened = true;
+                                            } else {
+                                                iterator.opened = false;
+                                            }
+                                            return iterator;
+                                        });
+                                        this.setState({
+                                            source
+                                        });
+                                    }} onClosed={()=>{
+                                        source.list = list.map((iterator)=>{
+                                            iterator.opened = false
+                                            return iterator;
+                                        });
+                                        this.setState({
+                                            source
+                                        });
+                                    }}>
+                                        <View className='item_container' onClick={this.onItemClick.bind(this,list,index)}>
+                                            <Checkboxs isChecked={item.checked} className='left' disabled/>
+                                            <View className='right'>
+                                                <View className='pre-image'>
+                                                    <Image src={ossUrl(item.tpl.thumb_image,0)} className='img' mode='aspectFill'/>
+                                                    <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                                                 </View>
-                                                {
-                                                    isManage?<Text className='total'>x{item.quantity}</Text>:<Counter num={item.quantity} onButtonClick={(num)=>{
-                                                        list[index]["quantity"] = num;
-                                                        const {source} = this.state;
-                                                        source.list = list; 
-                                                        this.calcTotal(list);
-                                                        this.setState({
-                                                            source
-                                                        })
-                                                    }}/>
-                                                }
+                                                <View className='party'>
+                                                    <View className='name'>
+                                                        <Text className='txt'>{item.product.title}</Text>
+                                                    </View>
+                                                    <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
+                                                    <View className='np'>
+                                                        <View className='price'>
+                                                            <Text className='l'>¥</Text>
+                                                            <Text className='n'>{(parseFloat(item.sku.price)*parseFloat(item.quantity)).toFixed(2)}</Text>
+                                                        </View>
+                                                        {
+                                                            item.opened?<Text className='total'>x{item.quantity}</Text>:<Counter num={item.quantity} onButtonClick={(num)=>{
+                                                                list[index]["quantity"] = num;
+                                                                const {source} = this.state;
+                                                                source.list = list; 
+                                                                this.calcTotal(list);
+                                                                this.setState({
+                                                                    source
+                                                                })
+                                                            }}/>
+                                                        }
+                                                    </View>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
+                                    </AtSwipeAction>
                                 </View>
                             ))
                         }
@@ -173,55 +231,34 @@ export default class Cart extends Component<{},{
                         <Checkboxs isChecked={allSelected} disabled/>
                         <Text className='txt'>全选</Text>
                     </View>
-                    {
-                        isManage?<Button className='remove-cart-btn' onClick={()=>{
-                            if (selectIds.length>0) {
-                                Taro.showLoading({title:"删除中"})
-                                api("app.cart/delete",{
-                                    ids:selectIds.join(',')
-                                }).then(()=>{
-                                    Taro.hideLoading();
-                                    source.list = list.filter(obj=>!selectIds.some(obj1=>obj1==obj.id));
-                                    this.setState({
-                                        source,
-                                        selectIds:[]
-                                    })
-                                }).catch(()=>{
-                                    Taro.hideLoading();
-                                    Taro.showToast({
-                                        title:"删除失败，请稍后再试",
-                                        icon:'none',
-                                        duration:2000
-                                    })
-                                })
-                            }
-                        }}>移除购物车</Button>:<View className='ops'>
-                            <View className='left'>
-                                <CartLeftIcon width={366} height={88}/>
-                                <View className='total'>
-                                    <Text className='name'>合计：</Text>
-                                    <View className='price'>
-                                        <Text className='syn'>¥</Text>
-                                        <Text className='num'>{total.toFixed(2)}</Text>
-                                    </View>
+                    <View className='ops'>
+                        <View className='left'>
+                            <CartLeftIcon width={366} height={88}/>
+                            <View className='total'>
+                                <Text className='name'>合计：</Text>
+                                <View className='price'>
+                                    <Text className='syn'>¥</Text>
+                                    <Text className='num'>{total.toFixed(2)}</Text>
                                 </View>
                             </View>
-                            <View className='right' onClick={()=>{
-                                if (total>0) {
-                                    // /pages/template/confirm?skuid=379&total=1&tplid=166&model=343
-                                    const cartIds = selectIds.join(',');
-                                    Taro.navigateTo({
-                                        url:`/pages/template/confirm?cartIds=${Base64.encode(cartIds,true)}`
-                                    })
-                                }
-                            }}>
-                                <CartRightIcon width={220} height={88} linght={total>0}/>
-                                <Text className='txt'>结算</Text>
-                            </View>
                         </View>
-                    }
-                    
+                        <View className='right' onClick={()=>{
+                            if (total>0) {
+                                // /pages/template/confirm?skuid=379&total=1&tplid=166&model=343
+                                const cartIds = selectIds.join(',');
+                                Taro.navigateTo({
+                                    url:`/pages/template/confirm?cartIds=${Base64.encode(cartIds,true)}`
+                                })
+                            }
+                        }}>
+                            <CartRightIcon width={220} height={88} linght={total>0}/>
+                            <Text className='txt'>结算</Text>
+                        </View>
+                    </View>
                 </View>
+                <TipModal isShow={showDelTipModal} tip="是否删除？" cancelText="取消" okText="确定" onCancel={()=>{
+                    this.setState({showDelTipModal:false})
+                }} onOK={this.tipModalOkCallBack} />
             </View>
         )
     }

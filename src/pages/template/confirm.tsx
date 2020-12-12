@@ -11,7 +11,7 @@ import Counter from '../../components/counter/counter';
 import FloatModal from '../../components/floatModal/FloatModal';
 import Ticket from '../../components/ticket/Ticket';
 import Fragment from '../../components/Fragment';
-import {notNull, ossUrl, urlDeCode} from '../../utils/common';
+import {deviceInfo, fixStatusBarHeight, notNull, ossUrl, urlDeCode} from '../../utils/common';
 import {Base64} from 'js-base64';
 import PayWayModal from '../../components/payway/PayWayModal';
 import moment from "moment";
@@ -128,7 +128,9 @@ export default class Confirm extends Component<any, {
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/add", data).then((res) => {
                 Taro.hideLoading();
-                window.history.replaceState(null, null, `/pages/template/confirm?orderid=${res.prepay_id}`);
+                if (deviceInfo.env == 'h5') {
+                    window.history.replaceState(null, null, `/pages/template/confirm?orderid=${res.prepay_id}`);
+                }
                 this.filterUsedTicket(res.orders);
                 this.setState({
                     data: res
@@ -181,11 +183,13 @@ export default class Confirm extends Component<any, {
             Taro.hideLoading();
             this.filterUsedTicket(res.orders);
             templateStore.address = res.address;
+            console.log(res);
             this.setState({
                 data: res,
                 // showPayWayModal:isInfo?false:true
             });
         }).catch(e => {
+
             Taro.hideLoading();
             setTimeout(() => {
                 window.history.replaceState(null, null, '/pages/me/me');
@@ -355,7 +359,7 @@ export default class Confirm extends Component<any, {
         switch (res.code) {
             case 1:
                 title = '支付成功';
-                url = `/pages/template/success?way=${res.way}&price=${res.total}`;
+                url = deviceInfo.env=='h5'?`/pages/template/success?way=${res.way}&price=${res.total}`:`/pages/template/success?status=${Base64.encodeURI(res.data+"-"+"0")}&pay_order_sn=${res.data}`;
                 break;
             case 2:
                 url = '/pages/me/order?tab=1';
@@ -400,9 +404,11 @@ export default class Confirm extends Component<any, {
     render() {
         const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn,payStatus} = this.state;
         const {address} = templateStore;
+        // @ts-ignore
         return (
             <View className='confirm'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         Taro.navigateBack();
                     }}>
@@ -443,7 +449,7 @@ export default class Confirm extends Component<any, {
 
                     {
                         data.orders && data.orders.map((item) => (
-                            <Fragment key={item.pre_order_id}>
+                            <View key={item.pre_order_id}>
                                 <View className='goods-info'>
                                     <View className='title'>
                                         <Text className='txt'>商品信息</Text>
@@ -536,7 +542,7 @@ export default class Confirm extends Component<any, {
                                             className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "00.00"}</Text>
                                     </View>
                                 </View>
-                            </Fragment>
+                            </View>
                         ))
                     }
                 </ScrollView>
@@ -595,8 +601,10 @@ export default class Confirm extends Component<any, {
                             this.setState({
                                 showPayWayModal: false
                             });
-                            window.history.replaceState(null, null, '/pages/me/me');
-                            Taro.navigateTo({
+                            if (deviceInfo.env == 'h5') {
+                                window.history.replaceState(null, null, '/pages/me/me');
+                            }
+                            Taro.redirectTo({
                                 url: '/pages/me/order?tab=1'
                             })
                         }}/>

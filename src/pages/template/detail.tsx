@@ -4,7 +4,7 @@ import './detail.less';
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
-import {fixStatusBarHeight, jumpToEditor, notNull, ossUrl} from '../../utils/common'
+import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl} from '../../utils/common'
 
 import LoginModal from '../../components/login/loginModal';
 import { userStore } from '../../store/user';
@@ -176,9 +176,9 @@ export default class Detail extends Component<{},{
                     </View>
                 </View>
                 <LoginModal />
-                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={()=>{
+                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={({detail:{scrollTop}})=>{
                     this.setState({
-                        scrollTop:-1
+                        scrollTop:deviceInfo.env=="weapp"?-1:scrollTop
                     })
                 }} style={process.env.TARO_ENV === 'h5'?"":`height:${centerPartyHeight}px`}>
                     <View className='shell_thumb' style={`height:${Taro.pxTransform(472/(795/1635))}`}>
