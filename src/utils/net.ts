@@ -1,16 +1,18 @@
 import Taro from '@tarojs/taro';
 import {Base64} from 'js-base64';
 import {userStore} from "../store/user";
-// import Modal from "../components/UITopProvider/modal";
-import ENV_TYPE = Taro.ENV_TYPE;
 
 
 export const options: {
     apiUrl: string;
-    sourceUrl:string
+    sourceUrl:string;
+    editorUrl: string;
+    h5Url: string;
 } = {
     apiUrl: '',
-    sourceUrl:''
+    sourceUrl:'',
+    editorUrl: "",
+    h5Url: ""
 }
 let accessToken;
 

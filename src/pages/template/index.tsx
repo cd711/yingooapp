@@ -4,7 +4,7 @@ import './index.less'
 import IconFont from '../../components/iconfont'
 import {api} from '../../utils/net'
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, ossUrl} from '../../utils/common'
+import {deviceInfo, getURLParamsStr, ossUrl, urlEncode} from '../../utils/common'
 import page from "../../utils/ext";
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 import LoginModal from "../../components/login/loginModal";
@@ -282,16 +282,19 @@ export default class Template extends Component<any, {
             });
         }
         if (tpl_type == "photo") {
-            // @ts-ignore
-            if (!this.showLoginModal()) {
-                return
-            }
             Taro.setStorage({
                 key: "imageCount",
                 data: item.image_num
             })
+            const str = getURLParamsStr(urlEncode({
+                id: 34,
+                imgid: item.id,
+                img: item.thumb_image,
+                attr: item.attr.width + "*" + item.attr.height,
+                status: "t"
+            }))
             Taro.navigateTo({
-                url: `/pages/printing/index?id=34&imgid=${item.id}&img=${item.thumb_image}&attr=${item.attr.width + "*" + item.attr.height}&status=t`
+                url: `/pages/printing/index?${str}`
             });
         }
     }
@@ -450,7 +453,6 @@ export default class Template extends Component<any, {
                             }
                             {
                                 tagList.map((item) => {
-
                                     return <View className='pic-box'
                                                  style={`width:${item.width}px;height:${item.height}px;position: absolute;top:${item.top}px;left:${item.left}px`}
                                                  onClick={() => this.onTagItemClick(item, cates[switchActive].tpl_category_id, tpl_type)}

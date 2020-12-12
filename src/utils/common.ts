@@ -2,6 +2,8 @@ import Taro from "@tarojs/taro";
 import Rgbaster from "rgbaster";
 import {wxColors} from "./wxColor";
 import ENV_TYPE = Taro.ENV_TYPE;
+import {userStore} from "../store/user";
+import moment from "moment";
 
 export function ossUrl(url: string, type: number) {
     if (!url) {
@@ -118,10 +120,10 @@ export const jsApiList = [
     'chooseWXPay',
 ];
 
-export const deviceInfo = {
+export const deviceInfo: any = {
     ...Taro.getSystemInfoSync(),
     env: process.env.TARO_ENV,
-    menu: Taro.getMenuButtonBoundingClientRect()
+    menu: process.env.TARO_ENV !== "h5" ? Taro.getMenuButtonBoundingClientRect() : {}
 };
 
 
@@ -336,6 +338,12 @@ export function jumpToEditor(params: {[key: string] : any} = {}) {
         url: deviceInfo.env === "h5" ? `/pages/editor/shell?${paramsStr}` : `/pages/editor/wxshell?${paramsStr}`
     })
 }
+export function jumpToPrintEditor(params: {[key: string] : any} = {}) {
+    const paramsStr = getURLParamsStr(urlEncode(params));
+    Taro.navigateTo({
+        url: deviceInfo.env === "h5" ? `/pages/editor/printedit?${paramsStr}` : `/pages/editor/wxprintedit?${paramsStr}`
+    })
+}
 
 
 // 从0开始截断字符串
@@ -344,4 +352,9 @@ export function cutString(str: string = "", len: number = 1, suffix: string = ".
         return ""
     }
     return `${str.substr(0, len)}${suffix}`;
+}
+
+
+export function getUserKey() {
+    return `${userStore.id}_key_${moment().date()}`
 }

@@ -16,6 +16,8 @@ import Xm from './utils/xm'
 // }
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
+options.editorUrl = config.editorUrl;
+options.h5Url = config.h5Url;
 
 const store = {
     userStore,
@@ -31,45 +33,95 @@ class App extends Component {
      * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
      * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
      */
+
+    constructor(props) {
+        super(props);
+
+    }
+
     config: Config = {
-        pages: [
-            'pages/index/index',
-            'pages/index/special',
-            'pages/me/me',
-            'pages/template/index',
-            'pages/template/detail',
-            'pages/login/index',
-            'pages/login/set',
-            // 'pages/login/setnew',
-            'pages/login/mobile',
-            'pages/login/find',
-            // 'pages/editor/shell',
-            // "pages/editor/wxshell",
-            // 'pages/editor/printedit',
-            'pages/login/acount',
-            'pages/login/sms',
-            'pages/me/setting',
-            'pages/me/profile',
-            'pages/me/acount',
-            'pages/me/order',
-            'pages/me/privacy',
-            'pages/me/aboutus',
-            'pages/me/feedback',
-            'pages/me/orderdetail',
-            // 'pages/me/refund',
-            'pages/me/address/index',
-            'pages/me/address/editor',
-            'pages/me/photos',
-            'pages/me/ticket',
-            'pages/printing/index',
-            'pages/printing/change',
-            // 'pages/template/preview',
-            // 'pages/template/confirm',
-            // 'pages/template/success',
-            // 'pages/cart/index',
-            'pages/search/index',
-            'pages/search/result',
-        ],
+        pages: preval`
+            module.exports=(function() {
+              if (process.env.TARO_ENV === 'h5') {
+                return [
+                  'pages/index/index',
+                    'pages/index/special',
+                    'pages/me/me',
+                    'pages/template/index',
+                    'pages/template/detail',
+                    'pages/login/index',
+                    'pages/login/set',
+                    // 'pages/login/setnew',
+                    'pages/login/mobile',
+                    'pages/login/find',
+                    'pages/login/acount',
+                    'pages/login/sms',
+                    'pages/me/setting',
+                    'pages/me/profile',
+                    'pages/me/acount',
+                    'pages/me/order',
+                    'pages/me/privacy',
+                    'pages/me/aboutus',
+                    'pages/me/feedback',
+                    'pages/me/orderdetail',
+                    // 'pages/me/refund',
+                    'pages/me/address/index',
+                    'pages/me/address/editor',
+                    'pages/me/photos',
+                    'pages/me/ticket',
+                    'pages/printing/index',
+                    'pages/printing/change',
+                    'pages/template/preview',
+                    // 'pages/template/confirm',
+                    // 'pages/template/success',
+                    // 'pages/cart/index',
+                    'pages/search/index',
+                    'pages/search/result',
+                    'pages/editor/shell',
+                    'pages/editor/printedit',
+                ]
+              }
+              if (process.env.TARO_ENV === 'weapp') {
+                return [
+                  'pages/index/index',
+                    'pages/index/special',
+                    'pages/me/me',
+                    'pages/template/index',
+                    'pages/template/detail',
+                    'pages/login/index',
+                    'pages/login/set',
+                    // 'pages/login/setnew',
+                    'pages/login/mobile',
+                    'pages/login/find',
+                    'pages/login/acount',
+                    'pages/login/sms',
+                    'pages/me/setting',
+                    'pages/me/profile',
+                    'pages/me/acount',
+                    'pages/me/order',
+                    'pages/me/privacy',
+                    'pages/me/aboutus',
+                    'pages/me/feedback',
+                    'pages/me/orderdetail',
+                    // 'pages/me/refund',
+                    'pages/me/address/index',
+                    'pages/me/address/editor',
+                    'pages/me/photos',
+                    'pages/me/ticket',
+                    'pages/printing/index',
+                    'pages/printing/change',
+                    'pages/template/preview',
+                    // 'pages/template/confirm',
+                    // 'pages/template/success',
+                    // 'pages/cart/index',
+                    'pages/search/index',
+                    'pages/search/result',
+                    'pages/editor/wxshell',
+                    'pages/editor/wxprintedit',
+                ]
+              }
+            })()
+        `,
         window: {
             navigationStyle: "custom",
             backgroundTextStyle: 'light',
@@ -106,6 +158,7 @@ class App extends Component {
     }
 
     componentDidMount() {
+
         const params = this.$router.params;
         if (!userStore.isLogin) {
             const info = getUserInfo();

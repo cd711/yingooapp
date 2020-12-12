@@ -69,7 +69,8 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
             }
         }
 
-        sku = sku.sort((a, b) => a - b)
+        sku = sku.sort((a, b) => a - b);
+        console.log(sku)
         if (sku.length == data.attrGroup.length) {
 
             const sk = sku.join(",");
@@ -169,7 +170,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                     </View>
                 </ScrollView>
                 <View className='ops'>
-                    <View className="submit" onClick={onSubmit}>
+                    <View className="plac_submit" onClick={onSubmit}>
                         <Text className="txt">立即购买</Text>
                     </View>
                 </View>

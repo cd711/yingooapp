@@ -128,9 +128,10 @@ export default class Detail extends Component<{},{
     onEditor = () => {
         if (userStore.isLogin) {
             const {currentItem} = this.state;
-            Taro.navigateTo({
-                url:`/pages/editor/index?tpl_id=${currentItem.id}&cid=${currentItem.category_id}`
-            });
+            jumpToEditor({
+                tpl_id: currentItem.id,
+                cid: currentItem.category_id
+            })
         }else{
             userStore.showLoginModal = true;
         }

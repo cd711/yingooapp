@@ -13,6 +13,8 @@ import {userStore} from "../../store/user";
 import Photos from "../me/photos";
 import {templateStore} from "../../store/template";
 import moment from "moment";
+import config from "../../config";
+import {PhotoParams} from "../../modal/modal";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -1263,33 +1265,75 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     public editorProxy: WindowProxy | null | undefined;
+    public userKey: string = "";
 
     getLocalEditPhotos = () => {
         return new Promise(async (resolve, reject) => {
             try {
-                const res = Taro.getStorageSync(`${moment().date()}_${userStore.id}_editPhotos`);
-                console.log("本地可编辑的图片：", res)
-                if (res) {
-                    resolve(res)
-                } else {
-                    if (templateStore.editorPhotos.length > 0) {
-                        resolve([...templateStore.editorPhotos])
-                    } else {
-                        reject(null)
-                    }
-                }
+                // const res = Taro.getStorageSync(`${moment().date()}_${userStore.id}_editPhotos`);
+                // console.log("本地可编辑的图片：", res)
+                // if (res) {
+                //     resolve(res)
+                // } else {
+                //     if (templateStore.editorPhotos.length > 0) {
+                //         resolve([...templateStore.editorPhotos])
+                //     } else {
+                //         reject(null)
+                //     }
+                // }
+
+                const res: PhotoParams = await this.getServerParams()
+                resolve(res.editPhotos)
             }catch (e) {
-                if (templateStore.editorPhotos.length > 0) {
-                    resolve(templateStore.editorPhotos)
-                } else {
-                    reject(null)
-                }
+                // if (templateStore.editorPhotos.length > 0) {
+                //     resolve(templateStore.editorPhotos)
+                // } else {
+                //     reject(null)
+                // }
+                reject(e)
+            }
+        })
+    }
+
+    async setActionParamsToServer(_key = "", data = new PhotoParams()) {
+        try {
+            const k = await api("app.order_temp/container", {
+                field_key: _key,
+                content: JSON.stringify(data)
+            });
+            templateStore.printKey = k;
+        } catch (e) {
+            console.log("初始化photoParams出错：", e)
+        }
+    }
+
+    getServerParams() {
+        return new Promise<PhotoParams>(async (resolve, reject) => {
+            try {
+                const res = await api("app.order_temp/pullContainer", {field_key: this.userKey});
+                resolve(JSON.parse(res))
+            }catch (e) {
+                reject(e)
+            }
+        })
+    }
+
+    updateServerParams(key = "", data = {}) {
+        return new Promise<PhotoParams>(async (resolve, reject) => {
+            try {
+                const serverP: {[key: string]: any} = await this.getServerParams();
+                const temp = new PhotoParams({...serverP, ...data});
+                await this.setActionParamsToServer(key, temp);
+                resolve(new PhotoParams(temp))
+            }catch (e) {
+                reject(e)
             }
         })
     }
 
     async componentDidMount() {
         const routerParams = this.$router.params;
+        this.userKey = routerParams.key;
 
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
@@ -1311,10 +1355,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         // 再次编辑时使用存储的图片数据
         if (routerParams.local && routerParams.local == "t") {
             try {
-                const res = Taro.getStorageSync(`${userStore.id}_originalData`);
-                if (res) {
-                    templateStore.editorPhotos = [...res]
-                }
+                // const res = Taro.getStorageSync(`${userStore.id}_originalData`);
+                const res = await this.getServerParams();
+                templateStore.editorPhotos = [...res.originalData]
             }catch (e) {
                 console.log("获取存储的图片旧数据出错：", e)
             }
@@ -1327,30 +1370,47 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         window.removeEventListener("message", this.onMsg);
     }
 
-    getPhotoParams = () => {
+    getPhotoParams = async () => {
+
+        return new Promise<any>(async (resolve, reject) => {
+            try {
+                const res = await this.getServerParams();
+                resolve(res.photo)
+            }catch (e) {
+                reject(e)
+            }
+        })
         // 解析参数
-        let params: any = {};
+        // let params: any = {};
+        //
+        // try {
+            // if (!routerParams.key) {
+            //     const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+            //     if (res) {
+            //         params = JSON.parse(res)
+            //     } else {
+            //         if (Object.keys(templateStore.photoSizeParams).length > 0) {
+            //             params = templateStore.photoSizeParams
+            //         } else {
+            //             Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+            //         }
+            //     }
+            // } else {
+            //     const reds = await api("app.order_temp/pullContainer", {field_key: params.key});
+            //     if (reds) {
+            //         params = JSON.parse(reds)
+            //     } else {
+            //         Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+            //     }
+            // }
 
-        try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
-            if (res) {
-                params = JSON.parse(res)
-            } else {
-                if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                    params = templateStore.photoSizeParams
-                } else {
-                    Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-                }
-            }
-        } catch (e) {
-            if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                params = templateStore.photoSizeParams
-            } else {
-                Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-            }
-        }
-
-        return params
+        //     params = await this.getServerParams();
+        //
+        // } catch (e) {
+        //     Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
+        // }
+        //
+        // return params
     }
 
     onLoad = async (_?: number) => {
@@ -1358,15 +1418,23 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     getLocalPictureSize = () => {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<string>(async (resolve, reject) => {
             try {
-                const res = Taro.getStorageSync("pictureSize");
-                console.log("本地的相框尺寸：", res)
-                if (res && res.indexOf("*") > -1) {
-                    resolve(res)
+                // const res = Taro.getStorageSync("pictureSize");
+                // console.log("本地的相框尺寸：", res)
+                // if (res && res.indexOf("*") > -1) {
+                //     resolve(res)
+                // } else {
+                //     resolve("")
+                // }
+
+                const res = await this.getServerParams();
+                if (res.pictureSize && res.pictureSize.indexOf("*") > -1) {
+                    resolve(res.pictureSize)
                 } else {
                     resolve("")
                 }
+
             }catch (e) {
                 reject()
             }
@@ -1388,7 +1456,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             } else {
                 let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
 
-                const localParams = this.getPhotoParams();
+                const localParams = await this.getPhotoParams();
                 const current = localParams.path[Number(routerParams.idx)];
                 let imgArr = [];
                 const {img}: any = urlDeCode(routerParams);
@@ -1535,9 +1603,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
             const img = res.cdnUrl;
 
-            const localParams = this.getPhotoParams();
+            const localParams = await this.getPhotoParams();
 
-            const temp = {...localParams}
+            const temp: any = {...localParams}
 
             let obj: any = {
                 url: img,
@@ -1560,8 +1628,12 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             console.log("更新后的params：", temp);
 
             try {
+
                 Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp));
                 templateStore.photoSizeParams = temp
+                await this.updateServerParams(this.userKey, {
+                    photo: temp
+                })
             } catch (e) {
                 console.log("本地存储出错：将存入store", e)
                 templateStore.photoSizeParams = temp
@@ -1628,8 +1700,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
     }
 
+    // alpha
     onChangeAlpha = () => {
-        // alpha
         this.store.tool = 5;
         this.store.isEdit = true;
     }
@@ -1658,12 +1730,6 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                     </View>
                     <Text className='txt'>透明度</Text>
                 </View>
-                {/*<View className='btn'>*/}
-                {/*    <View className='icon'>*/}
-                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                {/*    </View>*/}
-                {/*    <Text className='txt'>删除</Text>*/}
-                {/*</View>*/}
             </View>
         } else if (tool==2) {
             ele = <View className='tools'>
@@ -1679,18 +1745,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                     <IconFont name='24_bianjiqi_yangshi' size={48}/>
                     <Text className='txt'>样式</Text>
                 </View>
-                {/*<View className='btn'>*/}
-                {/*    <View className='icon'>*/}
-                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                {/*    </View>*/}
-                {/*    <Text className='txt'>删除</Text>*/}
-                {/*</View>*/}
             </View>
         } else if (tool == 4) {
-            ele = <ChangeImage
-                onClose={this.cancelEdit}
-                onOk={this.onOk}
-            />
+            ele = <ChangeImage onClose={this.cancelEdit} onOk={this.onOk}/>
         } else if (tool == 5) {
             ele = <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
         } else if (tool == 6) {
@@ -1719,7 +1776,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                         src={
                             process.env.NODE_ENV == 'production'
                             ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                            :`http://192.168.0.123:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
+                            :`http://${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
                         }
                 />
                 {loadingTemplate

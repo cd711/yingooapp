@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
-import {deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
+import {deviceInfo, getURLParamsStr, getUserKey, jumpToPrintEditor, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import OrderModal from "./orederModal";
 import {userStore} from "../../store/user";
@@ -11,12 +11,13 @@ import moment from "moment";
 import {templateStore} from "../../store/template";
 import Photos from "../me/photos";
 import ENV_TYPE = Taro.ENV_TYPE;
+import {PhotoParams} from "../../modal/modal";
 
 const PrintChange: Taro.FC<any> = () => {
 
     const router = Taro.useRouter();
 
-    const paramsObj = Taro.useRef<any>({});
+    const paramsObj = Taro.useRef<PhotoParams>(new PhotoParams());
     const printAttrItems = Taro.useRef<any>({});
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
@@ -28,7 +29,8 @@ const PrintChange: Taro.FC<any> = () => {
     const _imgstyle = Taro.useRef("");
     const sizeArr = Taro.useRef<any[]>([]);
     const allowInit = Taro.useRef(false);
-    const [imgCount, setImgCount] = useState<number>(0)
+    const [imgCount, setImgCount] = useState<number>(0);
+    const key = Taro.useRef("");
 
     const backPressHandle = () => {
         if (Taro.getEnv() === ENV_TYPE.WEB) {
@@ -90,10 +92,10 @@ const PrintChange: Taro.FC<any> = () => {
             sku: router.params.sku_id,
             id: router.params.id
         }
-        Taro.setStorage({
-            key: `${userStore.id}_photo_${moment().date()}`,
-            data: JSON.stringify(obj)
-        })
+        // Taro.setStorage({
+        //     key: `${userStore.id}_photo_${moment().date()}`,
+        //     data: JSON.stringify(obj)
+        // })
         return obj
     }
 
@@ -140,8 +142,46 @@ const PrintChange: Taro.FC<any> = () => {
         return path
     }
 
+    async function setActionParamsToServer(_key = "", data = new PhotoParams()) {
+        try {
+            const k = await api("app.order_temp/container", {
+                field_key: getUserKey(),
+                content: JSON.stringify(data)
+            });
+            key.current = k;
+            templateStore.printKey = k;
+        } catch (e) {
+            console.log("初始化photoParams出错：", e)
+        }
+    }
+
+    function getServerParams() {
+        return new Promise<PhotoParams>(async (resolve, reject) => {
+            try {
+                const res = await api("app.order_temp/pullContainer", {field_key: getUserKey()});
+                resolve(JSON.parse(res))
+            }catch (e) {
+                reject(e)
+            }
+        })
+    }
+
+    function updateServerParams(key = "", data = {}) {
+        return new Promise<PhotoParams>(async (resolve, reject) => {
+            try {
+                const serverP: {[key: string]: any} = await getServerParams();
+                const temp = new PhotoParams({...serverP, ...data});
+                await setActionParamsToServer(key, temp);
+                resolve(new PhotoParams(temp))
+            }catch (e) {
+                reject(e)
+            }
+        })
+    }
 
     Taro.useDidShow(async () => {
+
+        Taro.showLoading({title: "初始化中..."});
         // 读取本地存储print_attrItems
         try {
             const info = await getProductInfo();
@@ -166,39 +206,69 @@ const PrintChange: Taro.FC<any> = () => {
         }
 
         // 解析参数
+        // 默认进来，根据key值是第一次还是其他
+        // 第一次就先读本地再向服务器存储，之后就只是使用服务器的值
         let params: any = {};
 
-        try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
-            if (res) {
-                params = JSON.parse(res)
-            } else {
-                if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                    params = templateStore.photoSizeParams
-                } else {
-                    params = getRouterParams()
-                }
-            }
-        }catch (e) {
-            if (Object.keys(templateStore.photoSizeParams).length > 0) {
-                params = templateStore.photoSizeParams
-            } else {
-                params = getRouterParams()
-            }
+        if (notNull(key.current) && !notNull(templateStore.printKey)) {
+            key.current = templateStore.printKey;
         }
 
+        if (!notNull(key.current)) {
+            params = await getServerParams();
+        } else {
+            try {
+                const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+                if (res) {
+                    params = {
+                        photo: JSON.parse(res)
+                    }
+                } else {
+                    if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                        params = {
+                            photo: templateStore.photoSizeParams
+                        }
+                    } else {
+                        params = {
+                            photo: getRouterParams()
+                        }
+                    }
+                }
+            }catch (e) {
+                if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                    params = {
+                        photo: templateStore.photoSizeParams
+                    }
+                } else {
+                    params = {
+                        photo: getRouterParams()
+                    }
+                }
+            }
+
+        }
+
+
         console.log("读取的photo params：", params)
-        paramsObj.current = params || {};
+        paramsObj.current = new PhotoParams(params);
 
         let pix = "";
         for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
-            if (paramsObj.current.sku == item.id) {
+            if (paramsObj.current.photo.sku == item.id) {
                 console.log("超级判读：" ,item)
                 Taro.setStorageSync("pictureSize", item.value)
                 pix = item.value;
                 break;
             }
         }
+
+        // 存储一个新的服务器对象
+        // 包含选择的photo，选择的尺寸
+        setActionParamsToServer("", {
+            ...params,
+            pictureSize: pix,
+            attrItems: printAttrItems.current.attrItems
+        })
 
         console.log("尺寸参数：", pix)
         if (!notNull(pix)) {
@@ -211,10 +281,10 @@ const PrintChange: Taro.FC<any> = () => {
                 {key: "r", val: 0},
             ];
 
-            if (params.path.length === 0) {
+            if (params.photo.path.length === 0) {
                 selectPhoto()
             }
-            params.path = params.path.map((v) => {
+            params.photo.path = params.photo.path.map((v) => {
                 const allowRotate = checkHasRotate(v.attr);
                 let arr = [...tArr];
                 if (allowRotate) {
@@ -229,16 +299,16 @@ const PrintChange: Taro.FC<any> = () => {
                     readLocal: v.originalData && v.originalData.length > 0
                 }
             })
-            setPhotos([...params.path] || [])
+            setPhotos([...params.photo.path] || [])
         }
 
         console.log(router.params.status)
         // 从模板首页选择列表某一个的模板后才会触发
-        if (router.params.status && router.params.status === "t" && params.path.length === 0) {
+        if (router.params.status && router.params.status === "t" && params.photo.path.length === 0) {
             allowInit.current = true;
             selectPhoto()
         }
-
+        Taro.hideLoading()
     })
 
     const onReducer = (prevNum, idx) => {
@@ -282,7 +352,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     function setCount(_, id) {
         const arr = [];
-        arr.push(paramsObj.current.sku);
+        arr.push(paramsObj.current.photo.sku);
         arr.push(id);
 
         console.log("追加的skuID：", arr)
@@ -295,7 +365,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
         Taro.showLoading({title: "请稍后..."});
         try {
-            const res = await api("app.product/info", {id: paramsObj.current.id});
+            const res = await api("app.product/info", {id: paramsObj.current.photo.id});
             if (res.attrGroup && res.attrGroup instanceof Array) {
                 res.attrGroup = res.attrGroup.map(val => ({...val, disable: !notNull(val.special_show)}))
             }
@@ -308,23 +378,26 @@ const PrintChange: Taro.FC<any> = () => {
             console.log("总数量：", count)
             const idx = printAttrItems.current.numIdx || 1;
             console.log("数量的下标：", idx)
-
-            const len = printAttrItems.current.attrItems[idx].length
-            for (let i = 0; i < len; i++) {
-                const item = printAttrItems.current.attrItems[idx][i];
-                if (parseInt(item.value) > count) {
-                    let c = i - 1;
-                    if (c <= 0) {
-                        c = 0
-                    }
-                    setCount(res, printAttrItems.current.attrItems[idx][c].id)
-                    break;
-                } else {
-                    if (i === len - 1) {
-                        setCount(res, printAttrItems.current.attrItems[idx][len - 1].id)
+            if (printAttrItems.current.numIdx != -1) {
+                const len = printAttrItems.current.attrItems[idx].length
+                for (let i = 0; i < len; i++) {
+                    const item = printAttrItems.current.attrItems[idx][i];
+                    if (parseInt(item.value) > count) {
+                        let c = i - 1;
+                        if (c <= 0) {
+                            c = 0
+                        }
+                        setCount(res, printAttrItems.current.attrItems[idx][c].id)
                         break;
+                    } else {
+                        if (i === len - 1) {
+                            setCount(res, printAttrItems.current.attrItems[idx][len - 1].id)
+                            break;
+                        }
                     }
                 }
+            } else {
+                setSkus([paramsObj.current.photo.sku])
             }
 
 
@@ -350,7 +423,7 @@ const PrintChange: Taro.FC<any> = () => {
 
         let pix = "";
         for (const item of printAttrItems.current.attrItems[Number(printAttrItems.current.index)]) {
-            if (paramsObj.current.sku == item.id) {
+            if (paramsObj.current.photo.sku == item.id) {
                 pix = item.value;
                 break;
             }
@@ -411,7 +484,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }
 
-    const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
+    const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
 
         // 在模板首页选择列表某一个后才会触发
         if (allowInit.current) {
@@ -422,14 +495,13 @@ const PrintChange: Taro.FC<any> = () => {
                 tplid: router.params.cid,
                 status: "f",
                 tplmax: router.params.tplmax,
-                init: "t"
+                init: "t",
+                key: key.current
             };
 
             if (router.params.proid) {
                 obj = {...obj, proid: router.params.proid}
             }
-
-            const str = getURLParamsStr(urlEncode(obj))
 
             let photos = data.ids.map((value, index) => {
                 return {
@@ -440,14 +512,17 @@ const PrintChange: Taro.FC<any> = () => {
 
             templateStore.editorPhotos = [...photos];
             try {
-                Taro.setStorageSync(`${moment().date()}_${userStore.id}_editPhotos`, photos)
+                // Taro.setStorageSync(`${moment().date()}_${userStore.id}_editPhotos`, photos);
+                await updateServerParams(getUserKey(), {editPhotos: photos})
             } catch (e) {
                 console.log("向本地存储选择的相册错误：", e)
             }
 
-            Taro.navigateTo({
-                url: `/pages/editor/printedit?${str}`
-            })
+            // Taro.navigateTo({
+            //     url: `/pages/editor/printedit?${str}`
+            // })
+
+            jumpToPrintEditor(obj)
 
             return
         }
@@ -488,12 +563,20 @@ const PrintChange: Taro.FC<any> = () => {
             })
         }
 
-        Taro.setStorage({
-            key: `${userStore.id}_photo_${moment().date()}`,
-            data: JSON.stringify({
-                ...paramsObj.current,
+        // Taro.setStorage({
+        //     key: `${userStore.id}_photo_${moment().date()}`,
+        //     data: JSON.stringify({
+        //         ...paramsObj.current,
+        //         path: exArr
+        //     })
+        // })
+
+        await updateServerParams(getUserKey(), {
+            ...paramsObj.current,
+            photo: {
+                ...paramsObj.current.photo,
                 path: exArr
-            })
+            }
         })
 
         setPhotos([...exArr]);
@@ -531,16 +614,18 @@ const PrintChange: Taro.FC<any> = () => {
         }, 500)
     }
 
-    const onEditClick = (item ,index) => {
+    const onEditClick = async (item ,index) => {
 
         let obj: any = {
             idx: index,
             cid: router.params.id,
             tplid: router.params.cid,
+            key: key.current,
+            local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             tplmax: router.params.tplmax,
             img: item.url,
-            local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f"
+
         };
         if (router.params.proid) {
             obj = {...obj, proid: router.params.proid}
@@ -548,8 +633,10 @@ const PrintChange: Taro.FC<any> = () => {
 
         try {
             if (!notNull(item.readLocal) && item.readLocal === true) {
-                Taro.setStorageSync(`${userStore.id}_originalData`, item.originalData);
-                templateStore.editorPhotos = [...item.originalData]
+
+                await updateServerParams(key.current, {
+                    originalData: item.originalData
+                })
             }
         }catch (e) {
             console.log("向本地存储旧数据出错：", e)
@@ -557,9 +644,22 @@ const PrintChange: Taro.FC<any> = () => {
 
         const str = getURLParamsStr(urlEncode(obj))
 
-        Taro.navigateTo({
-            url: `/pages/editor/printedit?${str}`
-        })
+        if (deviceInfo.env === "weapp") {
+            if (notNull(key.current)) {
+                Taro.showToast({
+                    title: "系统错误，请稍后重试",
+                    icon: "none"
+                })
+                return
+            }
+            jumpToPrintEditor({
+                key: key.current
+            })
+        } else {
+            Taro.navigateTo({
+                url: `/pages/editor/printedit?${str}`
+            })
+        }
     }
 
     const onBackHandle = () => {

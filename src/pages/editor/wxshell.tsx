@@ -1,12 +1,11 @@
-import Taro, {Component} from '@tarojs/taro';
+import Taro, {Component, Config} from '@tarojs/taro';
 import {View, WebView} from '@tarojs/components';
 import {AtActivityIndicator} from "taro-ui";
 import './editor.less';
 import './shell.less';
-import {getToken} from '../../utils/net';
-import IconFont from '../../components/iconfont';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
+import config from "../../config";
 import {deviceInfo} from "../../utils/common";
 
 
@@ -27,6 +26,10 @@ export default class Shell extends Component<{}, {
     loadingTemplate?: boolean;
     textInfo: any
 }> {
+
+    config: Config = {
+        navigationBarTitleText: '编辑中',
+    }
 
     public store = new Store();
 
@@ -64,19 +67,9 @@ export default class Shell extends Component<{}, {
     }
 
     getUrl = () => {
-        if (process.env.NODE_ENV == 'production') {
-            if (deviceInfo.env === "h5") {
-                return `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-            } else {
-                return `/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}`
-            }
-        } else {
-            if (deviceInfo.env === "h5") {
-                return `http://192.168.0.123:8080/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-            } else {
-                return `http://192.168.0.123/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}`
-            }
-        }
+        return process.env.NODE_ENV == 'production'
+            ? `/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t`
+            : `http://${config.h5Url}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t`
     }
 
 
@@ -85,14 +78,17 @@ export default class Shell extends Component<{}, {
 
         return (
             <View className='editor-page'>
-                <View className='header'>
-                    <View onClick={this.back}>
-                        <IconFont name='24_shangyiye' color='#000' size={48}/>
-                    </View>
+                <View className='wx_editor-page_header'
+                      style={{
+                          marginTop: `${deviceInfo.menu.bottom}px`
+                      }}
+                >
                     <View onClick={this.next} className='right'>下一步</View>
                 </View>
                 <View className="editor" style={size ? {height: size.height} : undefined}>
-                    <WebView src={this.getUrl()}/>
+                    <WebView src={this.getUrl()} onLoad={(e) => {
+                        console.log("加载完成：", e)
+                    }} />
                     {loadingTemplate ?
                         <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
                 </View>

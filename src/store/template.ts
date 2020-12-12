@@ -39,7 +39,10 @@ export class TemplateStore {
     public printStatus: boolean = false;
 
     @observable
-    public printWxPhotoData: {ids: [], imgs: [], attrs: []} = {ids: [], imgs: [], attrs: []}
+    public printWxPhotoData: {ids: [], imgs: [], attrs: []} = {ids: [], imgs: [], attrs: []};
+
+    @observable
+    public printKey: string = "";
 }
 
 
