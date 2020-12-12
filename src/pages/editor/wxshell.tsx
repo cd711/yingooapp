@@ -7,6 +7,7 @@ import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../config";
 import {deviceInfo} from "../../utils/common";
+import {getToken} from "../../utils/net";
 
 
 class Store {
@@ -39,7 +40,6 @@ export default class Shell extends Component<{}, {
         super(p);
 
         this.tplId = this.$router.params['tpl_id'] || 0;
-        this.docId = this.$router.params['id'] || 0;
 
         this.state = {
             loadingTemplate: true,
@@ -67,8 +67,8 @@ export default class Shell extends Component<{}, {
 
     getUrl = () => {
         return process.env.NODE_ENV == 'production'
-            ? `/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t`
-            : `http://${config.h5Url}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t`
+            ? `/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
+            : `http://${config.h5Url}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
     }
 
 

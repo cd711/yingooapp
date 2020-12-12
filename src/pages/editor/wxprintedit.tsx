@@ -6,6 +6,7 @@ import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../config";
 import {getURLParamsStr, urlEncode} from "../../utils/common";
+import {getToken} from "../../utils/net";
 
 
 class Store {
@@ -56,7 +57,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             tpl_id: this.tplId,
             cid: this.routerParams.cid,
             hidden: "t",
-            key: this.routerParams.key
+            key: this.routerParams.key,
+            token: getToken()
         }))
         return process.env.NODE_ENV == 'production'
             ? `/pages/editor/printedit?${str}`

@@ -9,9 +9,9 @@ import OrderModal from "./orederModal";
 import {userStore} from "../../store/user";
 import moment from "moment";
 import {templateStore} from "../../store/template";
-import Photos from "../me/photos";
 import ENV_TYPE = Taro.ENV_TYPE;
 import {PhotoParams} from "../../modal/modal";
+import PhotosEle from "../../components/photos/photos";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -143,6 +143,7 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     async function setActionParamsToServer(_key = "", data = new PhotoParams()) {
+        console.log("key:", getUserKey())
         try {
             const k = await api("app.order_temp/container", {
                 field_key: getUserKey(),
@@ -595,16 +596,10 @@ const PrintChange: Taro.FC<any> = () => {
             })
             return
         }
-        if (deviceInfo.env === "h5") {
-            setPhotoPickerVisible(true);
-            setTimeout(() => {
-                setAnimating(true)
-            }, 50)
-        } else {
-            Taro.navigateTo({
-                url: `/pages/me/photos?edit=t&c=${imgCount}&l=t`
-            })
-        }
+        setPhotoPickerVisible(true);
+        setTimeout(() => {
+            setAnimating(true)
+        }, 50)
     }
 
     const closeSelectPhoto = () => {
@@ -624,6 +619,8 @@ const PrintChange: Taro.FC<any> = () => {
             local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             tplmax: router.params.tplmax,
+            img: item.url,
+
         };
         if (router.params.proid) {
             obj = {...obj, proid: router.params.proid}
@@ -640,7 +637,7 @@ const PrintChange: Taro.FC<any> = () => {
             console.log("向本地存储旧数据出错：", e)
         }
 
-        const str = getURLParamsStr(urlEncode({...obj, img: item.url}))
+        const str = getURLParamsStr(urlEncode(obj))
 
         if (deviceInfo.env === "weapp") {
             if (notNull(key.current)) {
@@ -754,17 +751,11 @@ const PrintChange: Taro.FC<any> = () => {
             {
                 photoVisible
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
-                        <Photos editSelect
+                        <PhotosEle editSelect
                                 onClose={closeSelectPhoto}
                                 count={imgCount}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
-                                extraProps={{
-                                    editSelect: true,
-                                    onClose: closeSelectPhoto,
-                                    count: imgCount,
-                                    onPhotoSelect: onPhotoSelect
-                                }}
                         />
                     </View>
                     : null

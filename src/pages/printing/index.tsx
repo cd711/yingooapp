@@ -5,10 +5,10 @@ import {AtNavBar} from "taro-ui";
 import IconFont from "../../components/iconfont";
 import {deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
-import Photos from "../me/photos";
 import {userStore} from "../../store/user";
 import moment from "moment";
 import {templateStore} from "../../store/template";
+import PhotosEle from "../../components/photos/photos";
 
 const Index: Taro.FC<any> = () => {
 
@@ -148,17 +148,11 @@ const Index: Taro.FC<any> = () => {
             return
         }
 
-        if (deviceInfo.env === "h5") {
-            setPhotoPickerVisible(true);
-            templateStore.printStatus = true;
-            setTimeout(() => {
-                setAnimating(true)
-            }, 50)
-        } else {
-            Taro.navigateTo({
-                url: `/pages/me/photos?edit=t`
-            })
-        }
+        setPhotoPickerVisible(true);
+        templateStore.printStatus = true;
+        setTimeout(() => {
+            setAnimating(true)
+        }, 50)
     }
 
     const closeSelectPhoto = () => {
@@ -231,15 +225,10 @@ const Index: Taro.FC<any> = () => {
             {
                 photoVisible
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
-                        <Photos editSelect={photoVisible}
+                        <PhotosEle editSelect={photoVisible}
                                 onClose={closeSelectPhoto}
                             // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
                                 onPhotoSelect={onPhotoSelect}
-                                extraProps={{
-                                    editSelect: true,
-                                    onClose: closeSelectPhoto,
-                                    onPhotoSelect: onPhotoSelect
-                                }}
                         />
                     </View>
                     : null

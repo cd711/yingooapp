@@ -1,4 +1,4 @@
-import Taro, {Component, useEffect, useState} from '@tarojs/taro';
+import Taro, {Component, Config, useEffect, useState} from '@tarojs/taro';
 import {Image, ScrollView, Text, View} from '@tarojs/components';
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
 import './editor.less';
@@ -1215,11 +1215,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     }
 
     const addPhotos = () => {
-        if (parent.hiddenBar) {
-
-        } else {
-            setType(1)
-        }
+        setType(1)
     }
 
     return type === 0
@@ -1261,6 +1257,10 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     private tplId: any = 0;
     private docId: any = 0;
 
+    config: Config = {
+        navigationBarTitleText: '编辑中',
+    }
+
     constructor(p) {
         super(p);
         // console.log(this.$router.params);
@@ -1280,26 +1280,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     getLocalEditPhotos = () => {
         return new Promise(async (resolve, reject) => {
             try {
-                // const res = Taro.getStorageSync(`${moment().date()}_${userStore.id}_editPhotos`);
-                // console.log("本地可编辑的图片：", res)
-                // if (res) {
-                //     resolve(res)
-                // } else {
-                //     if (templateStore.editorPhotos.length > 0) {
-                //         resolve([...templateStore.editorPhotos])
-                //     } else {
-                //         reject(null)
-                //     }
-                // }
-
                 const res: PhotoParams = await this.getServerParams()
                 resolve(res.editPhotos)
             }catch (e) {
-                // if (templateStore.editorPhotos.length > 0) {
-                //     resolve(templateStore.editorPhotos)
-                // } else {
-                //     reject(null)
-                // }
                 reject(e)
             }
         })
@@ -1345,8 +1328,13 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         const routerParams = this.$router.params;
         this.userKey = routerParams.key;
 
+        if (this.userKey) {
+            Taro.setStorageSync("token", routerParams.token);
+        }
+
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
+
         window.addEventListener("message", this.onMsg);
 
         if (routerParams.init && routerParams.init == "t") {
@@ -1385,46 +1373,14 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     getPhotoParams = async () => {
-
         return new Promise<any>(async (resolve, reject) => {
             try {
                 const res = await this.getServerParams();
                 resolve(res.photo)
             }catch (e) {
-                reject(e)
+                reject("getPhotoParams")
             }
         })
-        // 解析参数
-        // let params: any = {};
-        //
-        // try {
-            // if (!routerParams.key) {
-            //     const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
-            //     if (res) {
-            //         params = JSON.parse(res)
-            //     } else {
-            //         if (Object.keys(templateStore.photoSizeParams).length > 0) {
-            //             params = templateStore.photoSizeParams
-            //         } else {
-            //             Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-            //         }
-            //     }
-            // } else {
-            //     const reds = await api("app.order_temp/pullContainer", {field_key: params.key});
-            //     if (reds) {
-            //         params = JSON.parse(reds)
-            //     } else {
-            //         Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-            //     }
-            // }
-
-        //     params = await this.getServerParams();
-        //
-        // } catch (e) {
-        //     Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
-        // }
-        //
-        // return params
     }
 
     onLoad = async (_?: number) => {
@@ -1434,15 +1390,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     getLocalPictureSize = () => {
         return new Promise<string>(async (resolve, reject) => {
             try {
-                // const res = Taro.getStorageSync("pictureSize");
-                // console.log("本地的相框尺寸：", res)
-                // if (res && res.indexOf("*") > -1) {
-                //     resolve(res)
-                // } else {
-                //     resolve("")
-                // }
-
                 const res = await this.getServerParams();
+                console.log(res)
                 if (res.pictureSize && res.pictureSize.indexOf("*") > -1) {
                     resolve(res.pictureSize)
                 } else {
@@ -1450,21 +1399,22 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 }
 
             }catch (e) {
-                reject()
+                reject(e)
             }
         })
     }
 
     onLoadEmpty = async (_?: number) => {
-        alert(1)
         const routerParams = this.$router.params;
         try {
+
             const res = await api("editor.tpl/index", {cid: routerParams.tplid, num: templateStore.editorPhotos.length});
             const pictureSize = await this.getLocalPictureSize();
 
             const proId = routerParams.proid || null;
 
             if (routerParams.init && routerParams.init == "t") {
+
                 const id = proId ? proId : res.list[0].id;
                 console.log("开始初始化图片：", id, templateStore.editorPhotos.map(v => v.url))
                 await callEditor("setDoc", id, templateStore.editorPhotos.map(v => v.url), pictureSize)
@@ -1489,6 +1439,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             }
 
         }catch (e) {
+
             console.log("初始化失败：", e)
         }
     }
@@ -1509,6 +1460,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     onMsg: { (e: MessageEvent): void } = async ({data}) => {
         console.log("msg", data);
+
         if (!data) {
             return;
         }
@@ -1779,6 +1731,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
         return ele
     }
+
     render() {
         const {loadingTemplate, size } = this.state;
         const {tool} = this.store;

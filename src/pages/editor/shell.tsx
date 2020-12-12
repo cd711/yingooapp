@@ -1451,6 +1451,7 @@ export default class Shell extends Component<{}, {
         const router = this.$router.params;
         if (!notNull(router.hidden) && router.hidden === "t") {
             this.hiddenBar = true;
+            Taro.setStorageSync("token", router.token);
         }
 
     }
@@ -1627,6 +1628,7 @@ export default class Shell extends Component<{}, {
         });
         // await callEditor("saveDraft");
         const doc = await callEditor("getDoc");
+        const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
         Taro.setStorageSync("doc_draft", {
             tplId: this.tplId,
             docId: this.docId,
@@ -1634,7 +1636,7 @@ export default class Shell extends Component<{}, {
             doc: doc
         });
         Taro.hideLoading();
-        window.location.replace(`/pages/template/preview`);
+        window.location.replace(`/pages/template/preview?workid=${res.id}`);
     }
 
 
