@@ -244,6 +244,7 @@ export default class Preview extends Component<any, {
     onOrderIng = () => {
         const {workId} = this.state;
         const {id} = userStore;
+        this.initModalShow = true;
         if (!id) {
             this.setState({isOpened: true})
             return

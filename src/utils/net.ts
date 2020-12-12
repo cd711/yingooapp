@@ -8,11 +8,13 @@ export const options: {
     sourceUrl:string;
     editorUrl: string;
     h5Url: string;
+    weappUrl:string;
 } = {
     apiUrl: '',
     sourceUrl:'',
     editorUrl: "",
-    h5Url: ""
+    h5Url: "",
+    weappUrl:""
 }
 let accessToken;
 
