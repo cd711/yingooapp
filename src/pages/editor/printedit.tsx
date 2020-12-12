@@ -1329,7 +1329,14 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         this.userKey = routerParams.key;
 
         if (this.userKey) {
-            Taro.setStorageSync("token", routerParams.token);
+            const accessToken = {
+                token: routerParams.token,
+                expires: 9999999999.999
+            };
+            Taro.setStorage({
+                key: "token",
+                data: accessToken
+            });
         }
 
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;

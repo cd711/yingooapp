@@ -3,13 +3,13 @@ import {Image, ScrollView, Text, View} from '@tarojs/components';
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
 import './editor.less';
 import './shell.less';
-import {api, getToken} from '../../utils/net';
+import {api, getToken, setUserInfo} from '../../utils/net';
 import IconFont from '../../components/iconfont';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import Fragment from '../../components/Fragment';
 import UploadFile from "../../components/Upload/Upload";
-import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
+import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal} from "../../utils/common";
 import {userStore} from "../../store/user";
 import moment from "moment";
 import LoadMore from "../../components/listMore/loadMore";
@@ -1451,7 +1451,14 @@ export default class Shell extends Component<{}, {
         const router = this.$router.params;
         if (!notNull(router.hidden) && router.hidden === "t") {
             this.hiddenBar = true;
-            Taro.setStorageSync("token", router.token);
+            const accessToken = {
+                token: router.token,
+                expires: 9999999999.999
+            };
+            Taro.setStorage({
+                key: "token",
+                data: accessToken
+            });
         }
 
     }
@@ -1605,6 +1612,7 @@ export default class Shell extends Component<{}, {
 
             const doc = await callEditor("getDoc");
             const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
+            console.log(res)
             wx.miniProgram.navigateTo({
                 url: `/pages/template/preview?workid=${res.id}`,
             })
@@ -1619,7 +1627,7 @@ export default class Shell extends Component<{}, {
     next = async () => {
 
         if (this.hiddenBar) {
-            this.setState({showTip: true})
+            this.saveShellHandle()
             return
         }
 
@@ -1785,7 +1793,7 @@ export default class Shell extends Component<{}, {
             }
             <View className='header'
                   style={{
-                      justifyContent: this.hiddenBar ? "flex-end" : "space-between"
+                      justifyContent: this.hiddenBar ? "flex-end" : "space-between",
                   }}
             >
                 {
@@ -1795,11 +1803,14 @@ export default class Shell extends Component<{}, {
                         </View>
                         : null
                 }
-                <View onClick={this.next} className='right'>下一步</View>
+                <View onClick={this.next} className='right'>保存</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
                 {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame" src={this.getUrl()}/>
+                <iframe className="editor_frame" style={{
+                    // height: deviceInfo.windowHeight - deviceInfo.menu.bottom + 50 +"px",
+                    // marginTop: deviceInfo.windowHeight - deviceInfo.menu.bottom + 50 +"px",
+                }} src={this.getUrl()}/>
                 {loadingTemplate ?
                     <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
             </View>
