@@ -33,12 +33,6 @@ class App extends Component {
      * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
      * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
      */
-
-    constructor(props) {
-        super(props);
-
-    }
-
     config: Config = {
         pages: preval`
             module.exports=(function() {
@@ -51,7 +45,7 @@ class App extends Component {
                     'pages/template/detail',
                     'pages/login/index',
                     'pages/login/set',
-                    // 'pages/login/setnew',
+                    'pages/login/setnew',
                     'pages/login/mobile',
                     'pages/login/find',
                     'pages/login/acount',
@@ -72,9 +66,9 @@ class App extends Component {
                     'pages/printing/index',
                     'pages/printing/change',
                     'pages/template/preview',
-                    // 'pages/template/confirm',
-                    // 'pages/template/success',
-                    // 'pages/cart/index',
+                    'pages/template/confirm',
+                    'pages/template/success',
+                    'pages/cart/index',
                     'pages/search/index',
                     'pages/search/result',
                     'pages/editor/shell',
@@ -90,7 +84,7 @@ class App extends Component {
                     'pages/template/detail',
                     'pages/login/index',
                     'pages/login/set',
-                    // 'pages/login/setnew',
+                    'pages/login/setnew',
                     'pages/login/mobile',
                     'pages/login/find',
                     'pages/login/acount',
@@ -111,9 +105,9 @@ class App extends Component {
                     'pages/printing/index',
                     'pages/printing/change',
                     'pages/template/preview',
-                    // 'pages/template/confirm',
-                    // 'pages/template/success',
-                    // 'pages/cart/index',
+                    'pages/template/confirm',
+                    'pages/template/success',
+                    'pages/cart/index',
                     'pages/search/index',
                     'pages/search/result',
                     'pages/editor/wxshell',
@@ -127,12 +121,12 @@ class App extends Component {
             backgroundTextStyle: 'light',
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: 'WeChat',
-            navigationBarTextStyle: 'black'
+            navigationBarTextStyle: 'white'
         },
         tabBar: {
             color: '#9C9DA6',
             selectedColor: '#FF4966',
-            backgroundColor: 'white',
+            backgroundColor: '#ffffff',
             borderStyle: "white",
             list: [
                 {
@@ -158,7 +152,6 @@ class App extends Component {
     }
 
     componentDidMount() {
-
         const params = this.$router.params;
         if (!userStore.isLogin) {
             const info = getUserInfo();

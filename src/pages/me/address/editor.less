@@ -1,4 +1,4 @@
-.taro_page{
+.taro_page,page{
     background: #F5F6F9;
 }
 .editor{
@@ -8,7 +8,7 @@
         // justify-content: space-between;
         height: 88px;
         position: relative;
-        box-sizing: border-box;
+        // box-sizing: border-box;
         background: #FFF;
         .left{
             padding-left: 32px;
@@ -33,7 +33,8 @@
         .item{
             display: flex;
             align-items: center;
-
+            width: 100%;
+            box-sizing: border-box;
             padding: 30px 32px;
             background: #FFF;
             .name{
@@ -92,6 +93,7 @@
                 .at-textarea__textarea{
                     background: #F5F6F9;
                     font-size: 32px;
+                    width: 46vh;
                     height: 80px;
                 }
                 .at-textarea__counter{

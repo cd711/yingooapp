@@ -1,14 +1,13 @@
 
 import Taro, { useEffect,useState } from '@tarojs/taro'
 import { View, Text,Button } from '@tarojs/components'
-import './PayWayModal.less';
+
 import FloatModal from '../floatModal/FloatModal';
-import IconFont from '../iconfont';
-import Checkboxs from '../checkbox/checkbox';
 import { api } from '../../utils/net';
 import wx from 'weixin-js-sdk'
-import {is_weixin,jsApiList} from '../../utils/common';
-
+import {deviceInfo, is_weixin,jsApiList} from '../../utils/common';
+import PayWay from './PayWay';
+import './PayWayModal.less';
 
 const PayWayModal: Taro.FC<{
     isShow:boolean,
@@ -34,7 +33,7 @@ const PayWayModal: Taro.FC<{
             checked:false
         }
     ]
-    if (is_weixin()) {
+    if ((is_weixin() && deviceInfo.env == 'h5') ||deviceInfo.env == 'weapp') {
         payway = [
             {
                 icon:'32_weixinzhifu',
@@ -124,6 +123,7 @@ const PayWayModal: Taro.FC<{
                 // d["pay_method"] = 'mp';
                 setWXpayConfig(()=>{
                     const d = {
+                        platform: "wechat",
                         order_sn:orderSN,
                         pay_type:payWay,
                         pay_method:'mp'
@@ -215,6 +215,55 @@ const PayWayModal: Taro.FC<{
                 })
             }            
         }
+        
+        if (process.env.TARO_ENV === 'weapp') {
+            const d = {
+                platform: "wxapp",
+                order_sn:orderSN,
+                pay_type:payWay,
+                pay_method:'miniapp'
+            }
+            payOrder(d,(res)=>{
+                console.log(res);
+                Taro.requestPayment({
+                    timeStamp: res.payinfo.timeStamp,
+                    nonceStr: res.payinfo.nonceStr,
+                    package: res.payinfo.package,
+                    signType: res.payinfo.signType,
+                    paySign: res.payinfo.paySign,
+                }).then((result)=>{
+                    Taro.hideLoading();
+                    const d = {
+                        code:1,
+                        way:"wechat",
+                        total:totalPrice,
+                        data:orderSN
+                    }
+                    onResult && onResult(d);
+                }).catch((e)=>{
+                    Taro.hideLoading();
+                    const d = {
+                        code:0,
+                        data:e
+                    }
+                    onResult && onResult(d);
+                    console.log(e);
+                })
+
+                // setIsOpened(false)
+                // window.history.pushState(null,null,'/pages/me/order?tab=0');
+                // setTimeout(() => {
+                //     window.location.href = res.payinfo;
+                // }, 1000);
+            },(e)=>{
+                Taro.hideLoading();
+                const d = {
+                    code:0,
+                    data:e
+                }
+                onResult && onResult(d);
+            })
+        }
 
     }
     return <View className='paywaymodal'>
@@ -246,22 +295,5 @@ const PayWayModal: Taro.FC<{
         </FloatModal>
 </View>
 }
-const PayWay: Taro.FC<any> = ({isCheck,icon,name,onPress}) => {
-    const [isSelect,setIsSelect] = useState(false);
-    useEffect(()=>{
-        if (isCheck != isSelect) {
-            setIsSelect(isCheck);
-        }
-    },[isCheck])
-    return  <View className={isSelect?'xy_pay_way_item xy_pay_way_item_active':'xy_pay_way_item'} onClick={()=>{
-                setIsSelect(true);
-                onPress && onPress()
-            }}>
-            <View className='name'>
-                <IconFont name={icon} size={64} />
-                <Text className='txt'>{name}</Text>
-            </View>
-            <Checkboxs isChecked={isSelect} disabled />
-        </View>
-}
+
 export default PayWayModal;

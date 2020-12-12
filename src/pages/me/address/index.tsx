@@ -1,16 +1,19 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image, Button } from '@tarojs/components'
+import { View, Text,Image, Button,ScrollView } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../../components/iconfont';
 import { api } from '../../../utils/net';
 import {templateStore} from '../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 import Checkboxs from '../../../components/checkbox/checkbox'
+import { userStore } from '../../../store/user';
+import { deviceInfo, fixStatusBarHeight } from '../../../utils/common';
 
-@inject("templateStore")
+@inject("userStore","templateStore")
 @observer
 export default class Address extends Component<any,{
     addressList: Array<any>
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -20,11 +23,26 @@ export default class Address extends Component<any,{
     constructor(props){
         super(props);
         this.state = {
-            addressList:[]
+            addressList:[],
+            centerPartyHeight:500
         }
     }
 
     componentDidShow(){
+        if (!userStore.isLogin) {
+            Taro.switchTab({
+                url:'/pages/index/index'
+            })
+        }
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                Taro.createSelectorQuery().select(".address_bottom_bar").boundingClientRect((bottom_rect)=>{
+                    this.setState({
+                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-bottom_rect.height
+                    });
+                }).exec();
+            }).exec();
+        }
         console.log(this.$router.params)
         this.getList();
     }
@@ -46,7 +64,9 @@ export default class Address extends Component<any,{
             if (t && t=="select" && delId && res.length>0) {
                 res[0]["isChecked"] = true;
                 templateStore.address = res[0];
-                window.history.replaceState(null,null,`/pages/me/address/index?t=select&id=${res[0].id}`)
+                if (deviceInfo.env == 'h5') {
+                    window.history.replaceState(null,null,`/pages/me/address/index?t=select&id=${res[0].id}`)
+                }
             }
             this.setState({
                 addressList:res
@@ -81,45 +101,24 @@ export default class Address extends Component<any,{
     }
 
     render() {
-        const { addressList } = this.state;
+        const { addressList,centerPartyHeight } = this.state;
         const {t} = this.$router.params;
         // console.log(addressList)
+        // @ts-ignore
         return (
             <View className='address'>
-                {/* <AtNavBar
-                    onClickLeftIcon={()=>{
-                        Taro.navigateBack();
-                    }}
-                    color='#121314'
-                    title='我的收获地址'
-                    border={true}
-                    // fixed
-                    leftIconType={{
-                        value:'chevron-left',
-                        color:'#121314',
-                        size:24
-                    }}
-                /> */}
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
                         Taro.navigateBack();
-                    }}
-                    >
+                    }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
                     <View className='center'>
                         <Text className='title'>我的收货地址</Text>
                     </View>
-                    {
-                        addressList.length>0?<View className='right' onClick={()=>{
-                            Taro.navigateTo({
-                                url:'/pages/me/address/editor'
-                            })
-                        }}>
-                            <Text className='txt'>新增地址</Text>
-                        </View>:null
-                    }
                 </View>
+                <ScrollView scrollY className='address_page_scroll' style={process.env.TARO_ENV === 'h5'?"":`height:${centerPartyHeight}px`}>
                 <View className='alist'>
                     {
                         addressList.length>0?addressList.map((item,index)=>(
@@ -156,14 +155,23 @@ export default class Address extends Component<any,{
                         )):<View className='black'>
                             <Image src={require('../../../source/empty/noaddress.png')} className='img' />
                             <Text className='txt'>暂无收货地址</Text>
-                            <Button className='add-btn' onClick={()=>{
+                            {/* <Button className='add-btn' onClick={()=>{
                                 Taro.navigateTo({
                                     url:'/pages/me/address/editor'
                                 })
                             }}
-                            >新增地址</Button>
+                            >新增地址</Button> */}
                         </View>
                     }
+                </View>
+                </ScrollView>
+
+                <View className='address_bottom_bar'>
+                    <Button className='add-btn' onClick={()=>{
+                        Taro.navigateTo({
+                            url:'/pages/me/address/editor'
+                        })
+                    }}>新增收货地址</Button>
                 </View>
             </View>
         )

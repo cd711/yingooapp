@@ -7,7 +7,8 @@ import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
 import { PlaceOrder } from './place';
 import {userStore} from "../../store/user";
-import page from '../../utils/ext';
+import { deviceInfo,fixStatusBarHeight } from '../../utils/common';
+
 
 
 let editorProxy: WindowProxy | null | undefined;
@@ -36,7 +37,6 @@ function callEditor(name, ...args) {
 
 @inject("templateStore")
 @observer
-@page()
 export default class Preview extends Component<any, {
     placeOrderShow: boolean;
     workId:number;
@@ -52,7 +52,7 @@ export default class Preview extends Component<any, {
     config: Config = {
         navigationBarTitleText: '预览'
     }
-
+    private initModalShow = false
     constructor(props) {
         super(props);
         this.state = {
@@ -86,7 +86,10 @@ export default class Preview extends Component<any, {
             id
         }).then((res)=>{
             Taro.hideLoading();
-            window.history.replaceState(null,null,`/pages/template/preview?workid=${res.id}`);
+            this.initModalShow = true
+            if (deviceInfo.env == 'h5') {
+                window.history.replaceState(null,null,`/pages/template/preview?workid=${res.id}`);
+            }
             this.setState({
                 workInfo:res
             })
@@ -257,27 +260,22 @@ export default class Preview extends Component<any, {
     render() {
         const { placeOrderShow,workId,productInfo,workInfo} = this.state;
         const workid = workInfo && workInfo.id ? workInfo.id : workId;
+        // @ts-ignore
         return (
             <View className='preview'>
-                {/* {
-                    isOpened
-                        ? <AtModal
-                            className="modal_confirm_container"
-                            isOpened={isOpened}
-                            cancelText='取消'
-                            confirmText='前往登录'
-                            onCancel={() => this.setState({isOpened: false})}
-                            onConfirm={() => window.location.replace(`/pages/login/index`)}
-                            content='检测到您还未登录，请登录后操作!'
-                        />
-                        : null
-                } */}
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
+                        let uri = '/editor/shell';
                         if (workId) {
-                            window.location.replace(`/editor/shell?id=${workId}`);
+                            uri = `/editor/shell?id=${workId}`;
+                        }
+                        if (deviceInfo.env == 'h5') {
+                            window.location.replace(uri);
                         } else {
-                            window.location.replace('/editor/shell');
+                            Taro.navigateTo({
+                                url:uri
+                            })
                         }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
@@ -285,14 +283,14 @@ export default class Preview extends Component<any, {
                     <View className='center'>
                         <Text className='title'>预览</Text>
                     </View>
-                    <View className='right'>
+                    {/* <View className='right'>
                         <IconFont name='24_fenxiang' size={48} color='#121314' />
-                    </View>
+                    </View> */}
                 </View>
                 <View className='container'>
                     {/* eslint-disable-next-line react/forbid-elements */}
                     {
-                        workid?<Image src={workInfo.thumb_image} style={`width:225px;height: 458.664px;`} mode='aspectFill'/>:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%" />
+                        workid?<Image src={workInfo.thumb_image} style={`width:230px;height: 478.664px;`} />:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%" />
                     }
                 </View>
                 <View className='bottom'>
@@ -307,60 +305,67 @@ export default class Preview extends Component<any, {
                     }
                     <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
-                <PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
-                onBuyNumberChange={(n) => {
-                    this.setState({
-                        buyTotal:n
-                    })
-                }} onAddCart={()=>{
-                    const {buyTotal,sku,workId,modalId} = this.state;
-                    if (!isEmpty(sku) && Number(sku.id)>0) {
-                        Taro.showLoading({title:"加载中"})
-                        api("app.cart/add",{
-                            sku_id:sku.id,
-                            user_tpl_id:workId,
-                            phone_model_id:modalId,
-                            quantity:buyTotal
-                        }).then(()=>{
-                            Taro.hideLoading();
-                            Taro.showToast({
-                                title:"已成功添加到购物车!",
-                                icon:"success",
-                                duration:2000
+                {
+                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
+                    onBuyNumberChange={(n) => {
+                        this.setState({
+                            buyTotal:n
+                        })
+                    }} onAddCart={()=>{
+                        const {buyTotal,sku,workId,modalId} = this.state;
+                        if (!isEmpty(sku) && Number(sku.id)>0) {
+                            Taro.showLoading({title:"加载中"})
+                            api("app.cart/add",{
+                                sku_id:sku.id,
+                                user_tpl_id:workId,
+                                phone_model_id:modalId,
+                                quantity:buyTotal
+                            }).then(()=>{
+                                Taro.hideLoading();
+                                Taro.showToast({
+                                    title:"已添加到购物车!",
+                                    icon:"success",
+                                    duration:2000
+                                })
+                            }).catch((e)=>{
+                                Taro.hideLoading();
+                                Taro.showToast({
+                                    title:e,
+                                    icon:"none",
+                                    duration:2000
+                                })
                             })
-                        }).catch((e)=>{
-                            Taro.hideLoading();
+                        } else {
                             Taro.showToast({
-                                title:e,
+                                title:"请选择规格!",
                                 icon:"none",
                                 duration:2000
+                            });
+                        }
+                    }} onNowBuy={()=>{
+                        const {buyTotal,sku,workId,modalId} = this.state;
+                        if (!isEmpty(sku) && Number(sku.id)>0) {
+                            this.initModalShow = false;
+                            this.setState({
+                                placeOrderShow:false
                             })
+                            Taro.navigateTo({
+                                url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
+                            })
+                        } else {
+                            Taro.showToast({
+                                title:"请选择规格!",
+                                icon:"none",
+                                duration:2000
+                            });
+                        }
+                    }} onSkuChange={(sku)=>{
+                        this.setState({
+                            sku:sku
                         })
-                    } else {
-                        Taro.showToast({
-                            title:"请选择规格!",
-                            icon:"none",
-                            duration:2000
-                        });
-                    }
-                }} onNowBuy={()=>{
-                    const {buyTotal,sku,workId,modalId} = this.state;
-                    if (!isEmpty(sku) && Number(sku.id)>0) {
-                        Taro.navigateTo({
-                            url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
-                        })
-                    } else {
-                        Taro.showToast({
-                            title:"请选择规格!",
-                            icon:"none",
-                            duration:2000
-                        });
-                    }
-                }} onSkuChange={(sku)=>{
-                    this.setState({
-                        sku:sku
-                    })
-                }} />
+                    }} />:null
+                }
+                
             </View>
         )
     }

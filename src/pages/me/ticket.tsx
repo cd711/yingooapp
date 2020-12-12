@@ -6,7 +6,7 @@ import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import IconFont from '../../components/iconfont'
 import page from '../../utils/ext';
-import { ListModel } from '../../utils/common';
+import { fixStatusBarHeight, ListModel,deviceInfo } from '../../utils/common';
 import Ticket from '../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../components/listMore/loadMore";
 
@@ -19,7 +19,8 @@ export default class Login extends Component<{},{
     data:ListModel,
     switchTabActive:number,
     listLoading:boolean,
-    loadStatus:LoadMoreEnum
+    loadStatus:LoadMoreEnum,
+    centerPartyHeight:number
 }> {
     config: Config = {
         navigationBarTitleText: '优惠券'
@@ -35,12 +36,22 @@ export default class Login extends Component<{},{
             },
             switchTabActive:0,
             listLoading:false,
-            loadStatus:LoadMoreEnum.loading
+            loadStatus:LoadMoreEnum.loading,
+            centerPartyHeight:500
         }
     }
 
 
     componentDidMount(){
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react)=>{
+                    this.setState({
+                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-status_react.height
+                    });
+                }).exec();
+            }).exec();
+        }
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
         if(parseInt(tab)>=0){
@@ -115,13 +126,15 @@ export default class Login extends Component<{},{
         }
     }
     render() {
-        const {data,switchTabActive,listLoading,loadStatus} = this.state;
+        const {data,switchTabActive,listLoading,loadStatus,centerPartyHeight} = this.state;
         const list = data && data.list && data.list.length>0 ? data.list:[];
+        
         return (
             <View className='ticket_page'>
-                <View className='nav-bar'>
+                {/* @ts-ignore */}
+                <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
-                        Taro.reLaunch({
+                        Taro.switchTab({
                             url:'/pages/me/me'
                         });
                     }}>
@@ -139,7 +152,9 @@ export default class Login extends Component<{},{
                                     this.setState({
                                         switchTabActive:index
                                     });
-                                    window.history.replaceState(null,this.config.navigationBarTitleText,`/pages/me/ticket?tab=${index}`);
+                                    if (deviceInfo.env == "h5") {
+                                        window.history.replaceState(null,this.config.navigationBarTitleText,`/pages/me/ticket?tab=${index}`);
+                                    }
                                 }} key={index+""}>
                                     <Text className='txt'>{item}</Text>
                                     {switchTabActive==index?<Image src={require("../../source/switchBottom.png")} className='img' />:null}
@@ -148,12 +163,12 @@ export default class Login extends Component<{},{
                         }
                     </View>
                     {
-                        list.length>0?<ScrollView scrollY className='ticket_list_scroll' onScrollToLower={this.onLoadMore}>
+                        list.length>0?<ScrollView scrollY className='ticket_list_scroll' onScrollToLower={this.onLoadMore} style={deviceInfo.env === 'h5'?"":`height:${centerPartyHeight}px`}>
                             <View className='ticket_list'>
                             {
                                 list.map((item)=>(
                                     <View style={item.status_tip.value ==2||item.status_tip.value ==3?'filter: grayscale(100%);':''}>
-                                        {/* <Ticket isNew={false} key={item.id} ticket={item.coupon} right={
+                                        <Ticket isNew={false} key={item.id} ticket={item.coupon}>
                                             <View className='item_right'>
                                                 {
                                                     item.status_tip.value == 1?<Button className='use_button' onClick={()=>{
@@ -171,7 +186,7 @@ export default class Login extends Component<{},{
                                                     item.status_tip.value==3?<Image className='ticket_fuck' src={require("../../source/ticket_fuck.svg")}/>:null
                                                 }
                                             </View>
-                                        }/> */}
+                                        </Ticket>
                                     </View>
                                 ))
                             }
