@@ -624,8 +624,6 @@ const PrintChange: Taro.FC<any> = () => {
             local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             tplmax: router.params.tplmax,
-            img: item.url,
-
         };
         if (router.params.proid) {
             obj = {...obj, proid: router.params.proid}
@@ -642,7 +640,7 @@ const PrintChange: Taro.FC<any> = () => {
             console.log("向本地存储旧数据出错：", e)
         }
 
-        const str = getURLParamsStr(urlEncode(obj))
+        const str = getURLParamsStr(urlEncode({...obj, img: item.url}))
 
         if (deviceInfo.env === "weapp") {
             if (notNull(key.current)) {

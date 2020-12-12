@@ -51,11 +51,6 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
 
     getUrl = () => {
-        const key = this.$router.params.key || null;
-        if (!key) {
-            Taro.showToast({title: "页面丢了，请重试", icon: "none"})
-            return
-        }
         const str = getURLParamsStr(urlEncode({
             ...this.routerParams,
             tpl_id: this.tplId,
@@ -64,8 +59,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             key: this.routerParams.key
         }))
         return process.env.NODE_ENV == 'production'
-            ? `/editor/printedit?${str}`
-            : `http://${config.h5Url}/editor/printedit?${str}`
+            ? `/pages/editor/printedit?${str}`
+            : `http://${config.h5Url}/pages/editor/printedit?${str}`
     }
 
     render() {
