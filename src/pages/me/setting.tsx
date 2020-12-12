@@ -6,11 +6,11 @@ import IconFont from '../../components/iconfont';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../components/tipmodal/TipModal'
-import page from '../../utils/ext';
+import { deviceInfo } from '../../utils/common';
+
 
 @inject("userStore")
 @observer
-@page({wechatAutoLogin:true})
 export default class Setting extends Component<any,{
     tipModalShow:boolean;
     centerPartyHeight:number
@@ -29,6 +29,15 @@ export default class Setting extends Component<any,{
         }
     }
     componentDidMount(){
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 this.setState({

@@ -8,7 +8,8 @@ import {api} from "../../utils/net";
 import {deviceInfo, ossUrl} from "../../utils/common";
 import Fragment from "../../components/Fragment";
 import ImageSwiper from "./ImageSwiper";
-import page from "../../utils/ext";
+import { userStore } from '../../store/user'
+// import page from "../../utils/ext";
 
 
 interface IndexState {
@@ -19,9 +20,7 @@ interface IndexState {
 
 @inject("userStore")
 @observer
-@page({
-    wechatAutoLogin: true
-})
+
 class Index extends Component<any, IndexState> {
 
     config: Config = {
@@ -65,6 +64,15 @@ class Index extends Component<any, IndexState> {
     }
 
     componentDidMount() {
+        if (!userStore.isLogin) {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = "/pages/index/index";
+            } else {
+                Taro.switchTab({
+                    url:'/pages/index/index'
+                })
+            }
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".top-search").boundingClientRect((top_rect)=>{
