@@ -34,6 +34,7 @@ class App extends Component {
      * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
      */
     config: Config = {
+        // @ts-ignore
         pages: preval`
             module.exports=(function() {
               if (process.env.TARO_ENV === 'h5') {
@@ -121,7 +122,7 @@ class App extends Component {
             backgroundTextStyle: 'light',
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: 'WeChat',
-            navigationBarTextStyle: 'white'
+            navigationBarTextStyle: 'black'
         },
         tabBar: {
             color: '#9C9DA6',

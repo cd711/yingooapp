@@ -57,6 +57,14 @@ const Logins: Taro.FC<LoginProps> = (props) => {
         })
     }
     const onWeapp = ({detail:{userInfo}}) => {
+        if (!userInfo) {
+            Taro.showToast({
+                title:"允许授权方可登陆!",
+                icon:'none',
+                duration:1500
+            });
+            return;
+        }
         _onClose();
         Taro.showLoading({title:"正在登录..."})
         Xm.login({
