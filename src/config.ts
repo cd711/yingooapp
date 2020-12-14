@@ -3,10 +3,10 @@ const config = {
     // 静态资源地址
     sourceUrl:"",
     // 编辑器本地地址
-    editorUrl: "m.playbox.yingoo.com",
+    editorUrl: "https://m.playbox.yingoo.com",
     // 本地H5地址
-    h5Url: "m.playbox.yingoo.com",
-    weappUrl:"m.playbox.yingoo.com"
+    h5Url: "https://m.playbox.yingoo.com",
+    weappUrl:"m.playbox.yingoo.com",
 };
 
 export default config;

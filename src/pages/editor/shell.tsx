@@ -1777,8 +1777,8 @@ export default class Shell extends Component<{}, {
 
     getUrl = () => {
         return process.env.NODE_ENV == 'production'
-            ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
-            : `http://${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998}`
+            ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
+            : `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
     }
 
     render() {
