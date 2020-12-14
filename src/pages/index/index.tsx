@@ -64,15 +64,6 @@ class Index extends Component<any, IndexState> {
     }
 
     componentDidMount() {
-        if (!userStore.isLogin) {
-            if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/index/index";
-            } else {
-                Taro.switchTab({
-                    url:'/pages/index/index'
-                })
-            }
-        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".top-search").boundingClientRect((top_rect)=>{
