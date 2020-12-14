@@ -1,5 +1,5 @@
 import Taro, {useState} from "@tarojs/taro";
-import {View, Text, Image, Swiper, SwiperItem, Button,Canvas} from "@tarojs/components";
+import {View, Text, Image, Swiper, SwiperItem, Button} from "@tarojs/components";
 import "./ImageSwiper.less";
 import {ossUrl, RGBAster} from "../../utils/common";
 

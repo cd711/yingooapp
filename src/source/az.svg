@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>1丶图标/64/手机壳</title>
+    <defs>
+        <linearGradient x1="9.038781%" y1="7.41363475%" x2="89.5486453%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#7958FD" offset="0%"></stop>
+            <stop stop-color="#8E72FE" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-2" cx="32" cy="32" r="32"></circle>
+        <filter x="-7.0%" y="-7.0%" width="114.1%" height="114.1%" filterUnits="objectBoundingBox" id="filter-4">
+            <feGaussianBlur stdDeviation="4.5" in="SourceAlpha" result="shadowBlurInner1"></feGaussianBlur>
+            <feOffset dx="0" dy="0" in="shadowBlurInner1" result="shadowOffsetInner1"></feOffset>
+            <feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.0257867133 0" type="matrix" in="shadowInnerInner1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-5">
+            <stop stop-color="#FFFFFF" stop-opacity="0.5" offset="0%"></stop>
+            <stop stop-color="#000000" stop-opacity="0.5" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-6" x="14.5185185" y="15.2222222" width="34.962963" height="58.6666667" rx="5.62962963"></rect>
+    </defs>
+    <g id="1丶图标/64/手机壳" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="手机壳">
+            <mask id="mask-3" fill="white">
+                <use xlink:href="#path-2"></use>
+            </mask>
+            <g id="蒙版">
+                <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-2"></use>
+            </g>
+            <g id="矩形" mask="url(#mask-3)">
+                <use fill="#FFFFFF" xlink:href="#path-6"></use>
+                <use fill="url(#linearGradient-5)" xlink:href="#path-6"></use>
+            </g>
+            <rect id="矩形" fill="#4E4E57" mask="url(#mask-3)" x="17.4814815" y="24.7037037" width="29.037037" height="42.962963" rx="2.96296296"></rect>
+            <circle id="椭圆形" fill="#4E4E57" mask="url(#mask-3)" cx="28" cy="20.7037037" r="1.33333333"></circle>
+            <rect id="矩形" fill="#4E4E57" mask="url(#mask-3)" x="30.8148148" y="19.3703704" width="6.51851852" height="2.66666667" rx="1.33333333"></rect>
+        </g>
+    </g>
+</svg>
