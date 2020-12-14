@@ -18,6 +18,7 @@ options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
 options.editorUrl = config.editorUrl;
 options.h5Url = config.h5Url;
+options.weappUrl = config.weappUrl;
 
 const store = {
     userStore,

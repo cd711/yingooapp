@@ -12,6 +12,7 @@ import moment from "moment";
 import Popover, {PopoverItemClickProps} from "../../components/popover";
 import {AtModal} from "taro-ui";
 import LoginModal from "../../components/login/loginModal";
+import { observe } from 'mobx';
 
 const switchBottom = require("../../source/switchBottom.png");
 
@@ -161,6 +162,11 @@ export default class Me extends Component<any, MeState> {
     }
 
     componentDidMount() {
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue) {
+                this.getWorksList({start: 0})
+            }
+        })
         if (userStore.isLogin) {
             this.getWorksList({start: 0})
         }

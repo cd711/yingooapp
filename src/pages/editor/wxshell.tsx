@@ -67,7 +67,7 @@ export default class Shell extends Component<{}, {
 
     getUrl = () => {
         return process.env.NODE_ENV == 'production'
-            ? `/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
+            ? `https://${config.weappUrl}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
             : `http://${config.h5Url}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
     }
 

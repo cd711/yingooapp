@@ -107,7 +107,8 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButto
                                 indicatorColor='#000000'
                                 indicatorActiveColor='#FF4966'
                                 circular
-                                indicatorDots>
+                                indicatorDots
+                                style="height:440rpx;">
                                 {
                                     imgs && imgs.map((item, index) => (
                                         <SwiperItem className='swiper-item' key={index+""}>
