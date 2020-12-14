@@ -8,8 +8,6 @@ import {api} from "../../utils/net";
 import {deviceInfo, ossUrl} from "../../utils/common";
 import Fragment from "../../components/Fragment";
 import ImageSwiper from "./ImageSwiper";
-import { userStore } from '../../store/user'
-// import page from "../../utils/ext";
 
 
 interface IndexState {
