@@ -120,7 +120,7 @@ export const jsApiList = [
     'chooseWXPay',
 ];
 
-export const deviceInfo: any = {
+export const deviceInfo = {
     ...Taro.getSystemInfoSync(),
     env: process.env.TARO_ENV,
     menu: process.env.TARO_ENV !== "h5" ? Taro.getMenuButtonBoundingClientRect() : {}
