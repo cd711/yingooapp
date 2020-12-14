@@ -133,15 +133,27 @@ class App extends Component {
             list: [
                 {
                     pagePath: 'pages/index/index',
-                    text: '发现',
-                    iconPath: './source/tabbar/faxian.png',
-                    selectedIconPath: './source/tabbar/faxianActive.png'
+                    text: '首页',
+                    iconPath: './source/tabbar/home.png',
+                    selectedIconPath: './source/tabbar/homeActive.png'
                 },
                 {
-                    pagePath: 'pages/template/index',
-                    text: '模板',
-                    iconPath: './source/tabbar/muban.png',
-                    selectedIconPath: './source/tabbar/mubanActive.png'
+                    pagePath: 'pages/me/ticket',
+                    text: '优惠券',
+                    iconPath: './source/tabbar/ticket.png',
+                    selectedIconPath: './source/tabbar/ticketActive.png'
+                },
+                {
+                    pagePath: 'pages/cart/index',
+                    text: '购物车',
+                    iconPath: './source/tabbar/cart.png',
+                    selectedIconPath: './source/tabbar/cartActive.png'
+                },
+                {
+                    pagePath: 'pages/me/order',
+                    text: '订单',
+                    iconPath: './source/tabbar/order.png',
+                    selectedIconPath: './source/tabbar/orderActive.png'
                 },
                 {
                     pagePath: 'pages/me/me',

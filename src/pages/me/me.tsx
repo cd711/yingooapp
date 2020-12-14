@@ -178,7 +178,7 @@ export default class Me extends Component<any, MeState> {
         if (scrollTop > 5) {
             this.setState({pageScrollShowTop: true});
             if (this.scrollOnce == 0) {
-                Taro.createSelectorQuery().selectAll(".top").boundingClientRect((top_rect: any) => {
+                Taro.createSelectorQuery().selectAll(".me_top").boundingClientRect((top_rect: any) => {
                     this.scrollOnce += 1;
                     if (this.scrollOnce == 1) {
                         top_rect.forEach((l_rect) => {
@@ -369,46 +369,15 @@ export default class Me extends Component<any, MeState> {
                             style={`height:${Taro.getSystemInfoSync().windowHeight}px`}
                             onScrollToLower={this.lodeMore}
                 >
+                    <View className='me_bg'></View>
+                    <View className='me_top'
+                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: 1s opacity ease-out;` : `height:0;opacity: 0;transition: 1s opacity ease-in;`}>
+                                <Text className='me_txt'>我的</Text>
+                    </View>
                     {/* @ts-ignore */}
                     <View className='topBox' style={fixStatusBarHeight()}>
-                        {
-                            pageScrollShowTop ? <View className='top_weapp'></View> : null
-                        }
-                        <View className={process.env.TARO_ENV === 'h5' ? 'top' : 'top top_weapp'}
-                              style={pageScrollShowTop ? `position: fixed;top:0;width:100%;background:#FFF;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;transition: 0.3s all ease-out;z-index:999` : ""}>
-                            {
-                                process.env.TARO_ENV === 'h5'
-                                    ? <View className='ops'>
-                                        <View className='cart' onClick={() => this.jumpTo('/pages/cart/index')}>
-                                            <IconFont name='24_gouwuche' size={48} color='#121314'/>
-                                        </View>
-                                        <View className='coupon'  onClick={()=>this.jumpTo('/pages/me/ticket')}>
-                                            <IconFont name='24_youhuiquan' size={48} color='#121314'/>
-                                        </View>
-                                        <View className='set' onClick={() => this.jumpTo('/pages/me/setting')}>
-                                            <IconFont name='24_shezhi' size={48} color='#121314'/>
-                                        </View>
-                                    </View>
-                                    : <View className='ops'>
-                                        <View className='set' onClick={() => this.jumpTo('/pages/me/setting')}>
-                                            <IconFont name='24_shezhi' size={48} color='#121314'/>
-                                        </View>
-                                        <View className='cart' onClick={() => this.jumpTo('/pages/cart/index')}>
-                                            <IconFont name='24_gouwuche' size={48} color='#121314'/>
-                                        </View>
-                                        <View className='coupon' onClick={()=>this.jumpTo('/pages/me/ticket')}>
-                                            <IconFont name='24_youhuiquan' size={48} color='#121314'/>
-                                        </View>
-                                    </View>
-                            }
-
-                        </View>
-                        <View className='baseInfo' onClick={() => {
-                            if (isLogin) {
-                                return;
-                            }
-                            userStore.showLoginModal = true;
-                        }}>
+                        <View className='top_weapp'></View>
+                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/setting')}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../source/defaultAvatar.png')}
                                        className='avatarImg'/>
@@ -419,25 +388,25 @@ export default class Me extends Component<any, MeState> {
                         <View className='orderWarp'>
                             <View className='myorall'>
                                 <Text className='myorder'>我的订单</Text>
-                                <View className='allorder' onClick={() => this.jumpTo('/pages/me/order')}>
+                                <View className='allorder' onClick={() => Taro.switchTab({url:'/pages/me/order'})}>
                                     <Text>全部订单</Text>
                                     <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                                 </View>
                             </View>
                             <View className='orderstate'>
-                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=1')}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=1'})}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
-                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=2')}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=2'})}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=3')}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=3'})}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => this.jumpTo('/pages/me/order?tab=4')}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=4'})}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
                                 </View>

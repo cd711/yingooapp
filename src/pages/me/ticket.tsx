@@ -142,13 +142,13 @@ export default class Login extends Component<{},{
             <View className='ticket_page'>
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
-                    <View className='left' onClick={() => {
+                    {/* <View className='left' onClick={() => {
                         Taro.switchTab({
                             url:'/pages/me/me'
                         });
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
-                    </View>
+                    </View> */}
                     <View className='center'>
                         <Text className='title'>{this.config.navigationBarTitleText}</Text>
                     </View>

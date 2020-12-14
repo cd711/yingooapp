@@ -326,9 +326,7 @@ export function fixStatusBarHeight() {
     //     }
     // }
 
-    return {
-        "padding-top": env !== "h5" ? deviceInfo.statusBarHeight + "px" : ""
-    }
+    return `padding-top: ${env !== "h5" ? deviceInfo.statusBarHeight + "px" : ""}`
 }
 
 

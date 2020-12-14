@@ -220,7 +220,7 @@ export default class Order extends Component<any,{
             <View className='order'>
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
-                    <View className='left' onClick={() => {
+                    {/* <View className='left' onClick={() => {
                         if (deviceInfo.env == 'h5') {
                             Taro.reLaunch({
                                 url:"/pages/me/me"
@@ -232,7 +232,7 @@ export default class Order extends Component<any,{
                         }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
-                    </View>
+                    </View> */}
                     <View className='center'>
                         <Text className='title'>我的订单</Text>
                     </View>
