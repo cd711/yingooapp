@@ -306,7 +306,7 @@ class Index extends Component<any, IndexState> {
                                                         <Text className="txt">立即购买</Text>
                                                     </View>
                                                 </View>
-                                                : <View className="product_more_list_main">
+                                                : <View className="product_more_list_main" key={index + ""}>
                                                     <View className="title">{item.title || " "}</View>
                                                     <View className="sub_tit">{item.subtitle}</View>
                                                     <View className="product_more_list">
