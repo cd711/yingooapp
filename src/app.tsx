@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/mobx'
-import Index from './pages/index'
+import Index from './pages/tabbar/index'
 import {userStore} from './store/user'
 import {templateStore} from './store/template'
 import 'taro-ui/dist/style/index.scss'
@@ -27,6 +27,7 @@ const store = {
 
 class App extends Component {
 
+    // @ts-ignore
     /**
      * 指定config的类型声明为: Taro.Config
      *
@@ -35,89 +36,95 @@ class App extends Component {
      * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
      */
     config: Config = {
-        // @ts-ignore
-        pages: preval`
-            module.exports=(function() {
-              if (process.env.TARO_ENV === 'h5') {
-                return [
-                  'pages/index/index',
-                    'pages/index/special',
-                    'pages/me/me',
+        pages: [
+            'pages/tabbar/index/index',
+            'pages/tabbar/me/me',
+            'pages/tabbar/cart/index',
+            'pages/tabbar/coupon/ticket',
+            'pages/tabbar/order/order',
+
+            'pages/login/index',
+            'pages/login/set',
+            'pages/login/setnew',
+            'pages/login/mobile',
+            'pages/login/find',
+            'pages/login/acount',
+            'pages/login/sms',
+
+            'pages/search/index',
+            'pages/search/result',
+        ],
+        subPackages: [
+            {
+                root: "pages/home",
+                pages: [
+                    "pages/special"
+                ]
+            },
+            {
+                root: "pages/editor",
+                pages: preval`
+                    module.exports=(function() {
+                    const route = [
+                        'pages/printing/index',
+                        'pages/printing/change',
+                    ];
+                      if (process.env.TARO_ENV === 'h5') {
+                        return [
+                            ...route,
+                            'pages/shell',
+                            'pages/printedit',
+                        ]
+                      }
+                      if (process.env.TARO_ENV === 'weapp') {
+                        return [
+                            ...route,
+                            'pages/wxshell',
+                            'pages/wxprintedit',
+                        ]
+                      }
+                    })()
+                `,
+            },
+            // {
+            //     root: "pages/cart",
+            //     pages: [
+            //
+            //     ]
+            // },
+            // {
+            //     root: "pages/coupon",
+            //     pages: [
+            //
+            //     ]
+            // },
+            {
+                root: "pages/order",
+                pages: [
                     'pages/template/index',
                     'pages/template/detail',
-                    'pages/login/index',
-                    'pages/login/set',
-                    'pages/login/setnew',
-                    'pages/login/mobile',
-                    'pages/login/find',
-                    'pages/login/acount',
-                    'pages/login/sms',
+                    'pages/template/preview',
+                    'pages/template/confirm',
+                    'pages/template/success',
+                ]
+            },
+            {
+                root: "pages/me",
+                pages: [
                     'pages/me/setting',
                     'pages/me/profile',
                     'pages/me/acount',
-                    'pages/me/order',
                     'pages/me/privacy',
                     'pages/me/aboutus',
                     'pages/me/feedback',
                     'pages/me/orderdetail',
-                    // 'pages/me/refund',
                     'pages/me/address/index',
                     'pages/me/address/editor',
                     'pages/me/photos',
-                    'pages/me/ticket',
-                    'pages/printing/index',
-                    'pages/printing/change',
-                    'pages/template/preview',
-                    'pages/template/confirm',
-                    'pages/template/success',
-                    'pages/cart/index',
-                    'pages/search/index',
-                    'pages/search/result',
-                    'pages/editor/shell',
-                    'pages/editor/printedit',
-                ]
-              }
-              if (process.env.TARO_ENV === 'weapp') {
-                return [
-                  'pages/index/index',
-                    'pages/index/special',
-                    'pages/me/me',
-                    'pages/template/index',
-                    'pages/template/detail',
-                    'pages/login/index',
-                    'pages/login/set',
-                    'pages/login/setnew',
-                    'pages/login/mobile',
-                    'pages/login/find',
-                    'pages/login/acount',
-                    'pages/login/sms',
-                    'pages/me/setting',
-                    'pages/me/profile',
-                    'pages/me/acount',
-                    'pages/me/order',
-                    'pages/me/privacy',
-                    'pages/me/aboutus',
-                    'pages/me/feedback',
-                    'pages/me/orderdetail',
                     // 'pages/me/refund',
-                    'pages/me/address/index',
-                    'pages/me/address/editor',
-                    'pages/me/photos',
-                    'pages/me/ticket',
-                    'pages/printing/index',
-                    'pages/printing/change',
-                    'pages/template/preview',
-                    'pages/template/confirm',
-                    'pages/template/success',
-                    'pages/cart/index',
-                    'pages/search/index',
-                    'pages/search/result',
-                    'pages/editor/wxshell',
-                    'pages/editor/wxprintedit',
                 ]
-              }
-            })()
-        `,
+            },
+        ],
         window: {
             navigationStyle: "custom",
             backgroundTextStyle: 'light',
@@ -132,31 +139,31 @@ class App extends Component {
             borderStyle: "white",
             list: [
                 {
-                    pagePath: 'pages/index/index',
+                    pagePath: 'pages/tabbar/index/index',
                     text: '首页',
                     iconPath: './source/tabbar/home.png',
                     selectedIconPath: './source/tabbar/homeActive.png'
                 },
                 {
-                    pagePath: 'pages/me/ticket',
+                    pagePath: 'pages/tabbar/coupon/ticket',
                     text: '优惠券',
                     iconPath: './source/tabbar/ticket.png',
                     selectedIconPath: './source/tabbar/ticketActive.png'
                 },
                 {
-                    pagePath: 'pages/cart/index',
+                    pagePath: 'pages/tabbar/cart/index',
                     text: '购物车',
                     iconPath: './source/tabbar/cart.png',
                     selectedIconPath: './source/tabbar/cartActive.png'
                 },
                 {
-                    pagePath: 'pages/me/order',
+                    pagePath: 'pages/tabbar/order/order',
                     text: '订单',
                     iconPath: './source/tabbar/order.png',
                     selectedIconPath: './source/tabbar/orderActive.png'
                 },
                 {
-                    pagePath: 'pages/me/me',
+                    pagePath: 'pages/tabbar/me/me',
                     text: '我的',
                     iconPath: './source/tabbar/wode.png',
                     selectedIconPath: './source/tabbar/wodeActive.png'
