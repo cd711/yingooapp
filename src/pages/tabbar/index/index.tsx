@@ -137,6 +137,20 @@ class Index extends Component<any, IndexState> {
         }
     }
 
+    singleProdAndReceiveCoupon = async (prod, coupon) => {
+        console.log(prod)
+        if (!notNull(coupon) && Object.keys(coupon).length > 0) {
+            try {
+                await api("app.coupon/add", {id: coupon.id});
+            }catch (e) {
+                console.log("领取优惠券失败：", e)
+            }
+        }
+        Taro.navigateTo({
+            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.id}`
+        })
+    }
+
     jumpToDetail = item => {
         Taro.navigateTo({
             url: `/pages/order/pages/product/detail?id=${item.id}`
@@ -294,7 +308,8 @@ class Index extends Component<any, IndexState> {
                                                                         <Text className="txt">{list[0].coupon.use_end_time_text}</Text>
                                                                     </View>
                                                                     <View className="right">
-                                                                        <View className="get_btn">
+                                                                        <View className="get_btn"
+                                                                              onClick={() => this.singleProdAndReceiveCoupon(list[0], list[0].coupon)}>
                                                                             <Text className="txt">立即领取</Text>
                                                                         </View>
                                                                     </View>
@@ -302,7 +317,7 @@ class Index extends Component<any, IndexState> {
                                                             </View>
                                                             : null
                                                     }
-                                                    <View className="get_submit">
+                                                    <View className="get_submit" onClick={() => this.singleProdAndReceiveCoupon(list[0], list[0].coupon)}>
                                                         <Text className="txt">立即购买</Text>
                                                     </View>
                                                 </View>

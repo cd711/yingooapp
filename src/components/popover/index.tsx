@@ -124,7 +124,7 @@ export default class Popover extends Component<PopoverProps, PopoverState> {
                 this.setState({onlyBottom: false})
             }
 
-            let obj = {};
+            const obj = {};
             for (const k in temp) {
                 obj[k] = `${temp[k]}px`
             }
@@ -157,7 +157,7 @@ export default class Popover extends Component<PopoverProps, PopoverState> {
         const {visible, roundom, offset, onlyBottom} = this.state;
         return (
             <View className={`popover_container ${className || ""}`}>
-                {visible ? <View className="popover_mask" onClick={this._onClose} /> : null}
+                {visible ? <View className="popover_mask" onClick={this._onClose} onTouchMove={e => e.stopPropagation()} /> : null}
                 <View className="children_view" onClick={this._onChange} id={`childrenView${roundom}`}>
                     {children}
                 </View>
