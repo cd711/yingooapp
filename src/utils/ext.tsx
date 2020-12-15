@@ -43,7 +43,7 @@ const page = (option?: {
                         }).catch(() => {
                             Taro.hideLoading();
                             Taro.reLaunch({
-                                url: '/pages/index/index'
+                                url: '/pages/tabbar/index/index'
                             });
                         })
                     }

@@ -97,7 +97,7 @@ const Special: Taro.FC<any> = () => {
             return
         }
         Taro.navigateTo({
-            url: `/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
+            url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
         })
     }
 

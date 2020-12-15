@@ -10,7 +10,6 @@ import isEmpty from 'lodash/isEmpty';
 import Counter from '../../../../components/counter/counter';
 import FloatModal from '../../../../components/floatModal/FloatModal';
 import Ticket from '../../../../components/ticket/Ticket';
-import Fragment from '../../../../components/Fragment';
 import {deviceInfo, fixStatusBarHeight, notNull, ossUrl, urlDeCode} from '../../../../utils/common';
 import {Base64} from 'js-base64';
 import PayWayModal from '../../../../components/payway/PayWayModal';
@@ -62,7 +61,7 @@ export default class Confirm extends Component<any, {
         // console.log(this.$router.params)
         // skuid=375&total=1&tplid=55&model=0
         const {page, succ, skuid, total}: any = this.$router.params;
-        // /pages/template/confirm?skuid=379&total=1&tplid=166&model=343
+        // /pages/order/pages/template/confirm?skuid=379&total=1&tplid=166&model=343
 
         this.isPhoto = page && page === "photo";
 
@@ -129,7 +128,7 @@ export default class Confirm extends Component<any, {
             api("app.order_temp/add", data).then((res) => {
                 Taro.hideLoading();
                 if (deviceInfo.env == 'h5') {
-                    window.history.replaceState(null, null, `/pages/template/confirm?orderid=${res.prepay_id}`);
+                    window.history.replaceState(null, null, `/pages/order/pages/template/confirm?orderid=${res.prepay_id}`);
                 }
                 this.filterUsedTicket(res.orders);
                 this.setState({
@@ -192,9 +191,9 @@ export default class Confirm extends Component<any, {
 
             Taro.hideLoading();
             setTimeout(() => {
-                window.history.replaceState(null, null, '/pages/me/me');
+                window.history.replaceState(null, null, '/pages/tabbar/me/me');
                 Taro.navigateTo({
-                    url: '/pages/me/order?tab=1'
+                    url: '/pages/tabbar/order/order?tab=1'
                 })
             }, 2000);
             Taro.showToast({
@@ -236,7 +235,7 @@ export default class Confirm extends Component<any, {
             Taro.hideLoading();
             if (res.status > 0) {
                 Taro.navigateTo({
-                    url:`/pages/template/success?status=${Base64.encodeURI(res.order_sn+"-"+"0")}`
+                    url:`/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn+"-"+"0")}`
                 });
                 return;
             }
@@ -248,9 +247,9 @@ export default class Confirm extends Component<any, {
         }).catch((e) => {
             Taro.hideLoading();
             setTimeout(() => {
-                window.history.replaceState(null, null, '/pages/me/me');
+                window.history.replaceState(null, null, '/pages/tabbar/me/me');
                 Taro.navigateTo({
-                    url: '/pages/me/order?tab=1'
+                    url: '/pages/tabbar/order/order?tab=1'
                 })
             }, 2000);
             Taro.showToast({
@@ -298,7 +297,7 @@ export default class Confirm extends Component<any, {
                 Taro.hideLoading();
                 setTimeout(() => {
                     Taro.reLaunch({
-                        url: '/pages/index/index'
+                        url: '/pages/tabbar/index/index'
                     })
                 }, 2000);
                 Taro.showToast({
@@ -327,7 +326,7 @@ export default class Confirm extends Component<any, {
                 Taro.hideLoading();
                 setTimeout(() => {
                     Taro.reLaunch({
-                        url: '/pages/index/index'
+                        url: '/pages/tabbar/index/index'
                     })
                 }, 2000);
                 Taro.showToast({
@@ -355,14 +354,14 @@ export default class Confirm extends Component<any, {
             showPayWayModal:false,
         });
         let title = '';
-        let url = '/pages/me/order?tab=1';
+        let url = '/pages/tabbar/order/order?tab=1';
         switch (res.code) {
             case 1:
                 title = '支付成功';
-                url = deviceInfo.env=='h5'?`/pages/template/success?way=${res.way}&price=${res.total}`:`/pages/template/success?status=${Base64.encodeURI(res.data+"-"+"0")}&pay_order_sn=${res.data}`;
+                url = deviceInfo.env=='h5'?`/pages/order/pages/template/success?way=${res.way}&price=${res.total}`:`/pages/order/pages/template/success?status=${Base64.encodeURI(res.data+"-"+"0")}&pay_order_sn=${res.data}`;
                 break;
             case 2:
-                url = '/pages/me/order?tab=1';
+                url = '/pages/tabbar/order/order?tab=1';
                 break;
             default:
                 title = res.data;
@@ -402,7 +401,7 @@ export default class Confirm extends Component<any, {
         })
     }
     render() {
-        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn,payStatus} = this.state;
+        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn} = this.state;
         const {address} = templateStore;
         // @ts-ignore
         return (
@@ -422,7 +421,7 @@ export default class Confirm extends Component<any, {
                     {
                         address ? <View className='address-part-has' onClick={() => {
                             Taro.navigateTo({
-                                url: `/pages/me/address/index?t=select&id=${address.id}`
+                                url: `/pages/me/pages/me/address/index?t=select&id=${address.id}`
                             })
                         }}>
                             <Image src={require('../../../../source/addressBackground.png')} className='backimg'/>
@@ -439,7 +438,7 @@ export default class Confirm extends Component<any, {
                             </View>
                         </View> : <View className='address-part' onClick={() => {
                             Taro.navigateTo({
-                                url: '/pages/me/address/index?t=select'
+                                url: '/pages/me/pages/me/address/index?t=select'
                             })
                         }}>
                             <Text className='title'>选择收货地址</Text>
@@ -602,10 +601,10 @@ export default class Confirm extends Component<any, {
                                 showPayWayModal: false
                             });
                             if (deviceInfo.env == 'h5') {
-                                window.history.replaceState(null, null, '/pages/me/me');
+                                window.history.replaceState(null, null, '/pages/tabbar/me/me');
                             }
                             Taro.redirectTo({
-                                url: '/pages/me/order?tab=1'
+                                url: '/pages/tabbar/order/order?tab=1'
                             })
                         }}/>
             </View>

@@ -309,7 +309,7 @@ export default class Me extends Component<any, MeState> {
     previewOrder = (item: WorksProps) => {
         console.log(item.id)
         Taro.navigateTo({
-            url: `/pages/template/preview?workid=${item.id}`
+            url: `/pages/order/pages/template/preview?workid=${item.id}`
         })
     }
 
@@ -377,7 +377,7 @@ export default class Me extends Component<any, MeState> {
                     {/* @ts-ignore */}
                     <View className='topBox' style={fixStatusBarHeight()}>
                         <View className='top_weapp'/>
-                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/setting')}>
+                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../../source/defaultAvatar.png')}
                                        className='avatarImg'/>
@@ -388,25 +388,25 @@ export default class Me extends Component<any, MeState> {
                         <View className='orderWarp'>
                             <View className='myorall'>
                                 <Text className='myorder'>我的订单</Text>
-                                <View className='allorder' onClick={() => Taro.switchTab({url:'/pages/me/order'})}>
+                                <View className='allorder' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order'})}>
                                     <Text>全部订单</Text>
                                     <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                                 </View>
                             </View>
                             <View className='orderstate'>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=1'})}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=1'})}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=2'})}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=2'})}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=3'})}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=3'})}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=4'})}>
+                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=4'})}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
                                 </View>
@@ -517,7 +517,7 @@ export default class Me extends Component<any, MeState> {
                                         works.length === 0
                                             ? <Empty button="我要创作" onClick={() => {
                                                 Taro.switchTab({
-                                                    url: "/pages/template/index"
+                                                    url: "/pages/order/pages/template/index"
                                                 })
                                             }}/>
                                             : <View className="more_View">

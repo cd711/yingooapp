@@ -61,8 +61,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             token: getToken()
         }))
         return process.env.NODE_ENV == 'production'
-            ? `https://${config.weappUrl}/pages/editor/printedit?${str}`
-            : `http://${config.h5Url}/pages/editor/printedit?${str}`
+            ? `https://${config.weappUrl}/pages/editor/pages/printedit?${str}`
+            : `http://${config.h5Url}/pages/editor/pages/printedit?${str}`
     }
 
     render() {

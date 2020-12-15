@@ -1,8 +1,6 @@
 import Taro, {useEffect, useState} from '@tarojs/taro'
 import {Button, Image, ScrollView, Swiper, SwiperItem, Text, View} from '@tarojs/components'
-import {AtFloatLayout} from "taro-ui"
 import './place.less'
-
 import IconFont from '../../../../components/iconfont'
 import Counter from '../../../../components/counter/counter'
 import Fragment from '../../../../components/Fragment'
@@ -98,7 +96,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButto
     }, [isShow])
     return <View className='placeOrder'>
         <View className={isShow?'float-layout float-layout--active':'float-layout'}>
-            <View className='float-layout__overlay'></View>
+            <View className='float-layout__overlay' />
             <View className='float-layout__container'>
                 <View className='float-container'>
                     <View className='swiper-images-warp'>

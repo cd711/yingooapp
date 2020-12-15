@@ -94,7 +94,7 @@ export default class Template extends Component<any, {
                 duration: 2000
             }).then(() => {
                 Taro.reLaunch({
-                    url: '/pages/index/index'
+                    url: '/pages/tabbar/index/index'
                 })
             });
         })
@@ -275,7 +275,7 @@ export default class Template extends Component<any, {
     onTagItemClick = (item, cid, tpl_type) => {
         if (tpl_type == "phone") {
             Taro.navigateTo({
-                url: `/pages/template/detail?id=${item.id}&cid=${cid}`
+                url: `/pages/order/pages/template/detail?id=${item.id}&cid=${cid}`
             });
         }
         if (tpl_type == "photo") {
@@ -291,7 +291,7 @@ export default class Template extends Component<any, {
                 status: "t"
             }))
             Taro.navigateTo({
-                url: `/pages/printing/index?${str}`
+                url: `/pages/editor/pages/printing/index?${str}`
             });
         }
     }
@@ -435,7 +435,7 @@ export default class Template extends Component<any, {
                                                   return
                                               }
                                               Taro.navigateTo({
-                                                  url: `/pages/printing/index?id=34`
+                                                  url: `/pages/editor/pages/printing/index?id=34`
                                               })
                                           }}>
                                         <View className='print-warp'

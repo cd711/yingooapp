@@ -2,10 +2,9 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image, Button, Input,Picker } from '@tarojs/components'
 import './profile.less'
 import IconFont from '../../../../components/iconfont';
-// / npx iconfont-taro
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import { AtNavBar,AtFloatLayout} from 'taro-ui'
+import {AtFloatLayout} from 'taro-ui'
 import { api,updateLocalUserInfo } from '../../../../utils/net';
 import moment from "moment";
 import UploadFile from "../../../../components/Upload/Upload";
@@ -44,7 +43,6 @@ export default class Profile extends Component<any,{
 
 
     componentDidMount() {
-        // alert(Taro.getSystemInfoSync().statusBarHeight);
         console.log(Taro.getSystemInfoSync())
 
     }

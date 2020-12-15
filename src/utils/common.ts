@@ -333,13 +333,13 @@ export function fixStatusBarHeight() {
 export function jumpToEditor(params: {[key: string] : any} = {}) {
     const paramsStr = getURLParamsStr(urlEncode(params));
     Taro.navigateTo({
-        url: deviceInfo.env === "h5" ? `/pages/editor/shell?${paramsStr}` : `/pages/editor/wxshell?${paramsStr}`
+        url: deviceInfo.env === "h5" ? `/pages/editor/pages/shell?${paramsStr}` : `/pages/editor/pages/wxshell?${paramsStr}`
     })
 }
 export function jumpToPrintEditor(params: {[key: string] : any} = {}) {
     const paramsStr = getURLParamsStr(urlEncode(params));
     Taro.navigateTo({
-        url: deviceInfo.env === "h5" ? `/pages/editor/printedit?${paramsStr}` : `/pages/editor/wxprintedit?${paramsStr}`
+        url: deviceInfo.env === "h5" ? `/pages/editor/pages/printedit?${paramsStr}` : `/pages/editor/pages/wxprintedit?${paramsStr}`
     })
 }
 

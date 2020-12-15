@@ -4,7 +4,6 @@ import './editor.less'
 import IconFont from '../../../../../components/iconfont';
 import { api } from '../../../../../utils/net';
 import { AtTextarea,AtSwitch } from 'taro-ui';
-// import region from '../../../utils/region';
 import TipModal from '../../../../../components/tipmodal/TipModal'
 import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../../../store/user';
@@ -53,7 +52,7 @@ export default class Editor extends Component<any,{
     componentDidMount() {
         if (!userStore.isLogin) {
             Taro.switchTab({
-                url:'/pages/index/index'
+                url:'/pages/tabbar/index/index'
             })
         }
         this.getRegion()

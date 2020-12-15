@@ -3,7 +3,6 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image,Input, Button } from '@tarojs/components'
 import './refund.less'
 import IconFont from '../../../../components/iconfont';
-// import { api } from '../../utils/net'
 import { AtNavBar,AtTextarea} from 'taro-ui'
 
 export default class Refund extends Component<any,{

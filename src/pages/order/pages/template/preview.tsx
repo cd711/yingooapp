@@ -10,7 +10,6 @@ import {userStore} from "../../../../store/user";
 import { deviceInfo,fixStatusBarHeight } from '../../../../utils/common';
 
 
-
 let editorProxy: WindowProxy | null | undefined;
 
 export const sendMessage: { (type: string, data: any): void } = (type, data) => {
@@ -88,7 +87,7 @@ export default class Preview extends Component<any, {
             Taro.hideLoading();
             this.initModalShow = true
             if (deviceInfo.env == 'h5') {
-                window.history.replaceState(null,null,`/pages/template/preview?workid=${res.id}`);
+                window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${res.id}`);
             }
             this.setState({
                 workInfo:res
@@ -102,7 +101,7 @@ export default class Preview extends Component<any, {
             });
             setTimeout(() => {
                 Taro.reLaunch({
-                    url:'/pages/index/index'
+                    url:'/pages/tabbar/index/index'
                 })
             }, 1500);
         })
@@ -161,7 +160,7 @@ export default class Preview extends Component<any, {
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
                     // const {doc_id} = this.$router.params;
                     if (parseInt(docId+"")>0) {
-                        window.history.replaceState(null,null,`/pages/template/preview?workid=${docId}`);
+                        window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${docId}`);
                     }
                     this.setState({
                         workId:parseInt(docId+"")>=0?docId:0,
@@ -205,7 +204,7 @@ export default class Preview extends Component<any, {
                 workId: res.id
             })
             Taro.hideLoading();
-            window.history.replaceState(null,null,`/pages/template/preview?workid=${res.id}`)
+            window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${res.id}`)
             Taro.showToast({
                 title:"保存成功",
                 icon:"success",
@@ -351,7 +350,7 @@ export default class Preview extends Component<any, {
                                 placeOrderShow:false
                             })
                             Taro.navigateTo({
-                                url:`/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
+                                url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
                             })
                         } else {
                             Taro.showToast({

@@ -2,7 +2,6 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text, Button,ScrollView } from '@tarojs/components'
 import './setting.less'
 import IconFont from '../../../../components/iconfont';
-// / npx iconfont-taro
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
@@ -31,10 +30,10 @@ export default class Setting extends Component<any,{
     componentDidMount(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/index/index";
+                window.location.href = "/pages/tabbar/index/index";
             } else {
                 Taro.switchTab({
-                    url:'/pages/index/index'
+                    url:'/pages/tabbar/index/index'
                 })
             }
         }
@@ -59,9 +58,9 @@ export default class Setting extends Component<any,{
             }, 1500)
             setTimeout(() => {
                 if(process.env.TARO_ENV === 'h5'){
-                    window.location.href = "/pages/index/index"
+                    window.location.href = "/pages/tabbar/index/index"
                 } else {
-                    Taro.reLaunch({url: "/pages/index/index"});
+                    Taro.reLaunch({url: "/pages/tabbar/index/index"});
                 }
             }, 1501)
         }catch (e) {
@@ -79,11 +78,11 @@ export default class Setting extends Component<any,{
                     <View className='left' onClick={() => {
                         if(process.env.TARO_ENV === 'h5'){
                             Taro.reLaunch({
-                                url:'/pages/me/me'
+                                url:'/pages/tabbar/me/me'
                             });
                         } else {
                             Taro.switchTab({
-                                url:'/pages/me/me'
+                                url:'/pages/tabbar/me/me'
                             });
                         }
                     }}>
@@ -98,7 +97,7 @@ export default class Setting extends Component<any,{
                     <Text className='title'>个人/账号</Text>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/profile'
+                            url:'/pages/me/pages/me/profile'
                         })
                     }}>
                         <Text className='name'>个人信息</Text>
@@ -106,7 +105,7 @@ export default class Setting extends Component<any,{
                     </View>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/acount'
+                            url:'/pages/me/pages/me/acount'
                         })
                     }}>
                         <Text className='name'>账号管理</Text>
@@ -117,7 +116,7 @@ export default class Setting extends Component<any,{
                     <Text className='title'>通用</Text>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/photos'
+                            url:'/pages/me/pages/me/photos'
                         })
                     }}>
                         <Text className='name'>素材库</Text>
@@ -125,7 +124,7 @@ export default class Setting extends Component<any,{
                     </View>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/address/index'
+                            url:'/pages/me/pages/me/address/index'
                         })
                     }}>
                         <Text className='name'>收货地址</Text>
@@ -134,19 +133,19 @@ export default class Setting extends Component<any,{
                 </View>
                 <View className='slist'>
                     <Text className='title'>关于反馈</Text>
-                    <View className='item' onClick={() => Taro.navigateTo({url: "/pages/me/feedback"})}>
+                    <View className='item' onClick={() => Taro.navigateTo({url: "/pages/me/pages/me/feedback"})}>
                         <Text className='name'>问题反馈</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/privacy?pageType=user_agreement`})}>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=user_agreement`})}>
                         <Text className='name'>用户协议</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/privacy?pageType=privacy`})}>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=privacy`})}>
                         <Text className='name'>隐私政策</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/aboutus`})}>
+                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/pages/me/aboutus`})}>
                         <Text className='name'>关于我们</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
@@ -156,7 +155,7 @@ export default class Setting extends Component<any,{
                         tipModalShow:true
                     })
                 }}>退出登录</Button>
-                <View style={{paddingTop:54}}></View>
+                <View style={{paddingTop:54}} />
                 </ScrollView>
                 <TipModal isShow={tipModalShow} tip='是否退出当前账号？' onCancel={()=>{
                     this.setState({

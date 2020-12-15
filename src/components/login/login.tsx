@@ -34,7 +34,7 @@ const Logins: Taro.FC<LoginProps> = (props) => {
 
     const privacyView = type => {
         setVisible(false)
-        Taro.navigateTo({url: `/pages/me/privacy?pageType=${type}`})
+        Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=${type}`})
     }
 
     const _onClose = () => {

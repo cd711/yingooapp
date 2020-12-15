@@ -476,11 +476,11 @@ const PrintChange: Taro.FC<any> = () => {
                 templateStore.photoParams = data;
             }
             Taro.navigateTo({
-                url: `/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
+                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
             })
         } else {
             Taro.navigateTo({
-                url: `/pages/template/confirm?${paramsStr}&succ=1`
+                url: `/pages/order/pages/template/confirm?${paramsStr}&succ=1`
             })
         }
     }
@@ -520,7 +520,7 @@ const PrintChange: Taro.FC<any> = () => {
             }
 
             // Taro.navigateTo({
-            //     url: `/pages/editor/printedit?${str}`
+            //     url: `/pages/editor/pages/printedit?${str}`
             // })
 
             jumpToPrintEditor(obj)
@@ -650,7 +650,7 @@ const PrintChange: Taro.FC<any> = () => {
             jumpToPrintEditor(obj)
         } else {
             Taro.navigateTo({
-                url: `/pages/editor/printedit?${str}`
+                url: `/pages/editor/pages/printedit?${str}`
             })
         }
     }

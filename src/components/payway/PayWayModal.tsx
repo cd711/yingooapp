@@ -1,7 +1,5 @@
-
 import Taro, { useEffect,useState } from '@tarojs/taro'
 import { View, Text,Button } from '@tarojs/components'
-
 import FloatModal from '../floatModal/FloatModal';
 import { api } from '../../utils/net';
 import wx from 'weixin-js-sdk'
@@ -77,7 +75,7 @@ const PayWayModal: Taro.FC<{
                 });
                 wx.ready(()=>{
                     if (callback) callback()
-                })   
+                })
             }
 
         }).catch((e)=>{
@@ -104,16 +102,16 @@ const PayWayModal: Taro.FC<{
             });
             setTimeout(() => {
                 Taro.navigateTo({
-                    url:'/pages/me/order?tab=0'
+                    url:'/pages/tabbar/order/order?tab=0'
                 })
             }, 2000);
             return;
         }
         // if (totalPrice && parseInt(totalPrice+"")==0 && parseInt(payStatus+"")>0) {
-        //     window.history.pushState(null,null,'/pages/me/me')
-        //     window.history.pushState(null,null,'/pages/me/order?tab=0')
+        //     window.history.pushState(null,null,'/pages/tabbar/me/me')
+        //     window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0')
         //     Taro.navigateTo({
-        //         url:`/pages/template/success?pay_order_sn=${orderSN}`
+        //         url:`/pages/order/pages/template/success?pay_order_sn=${orderSN}`
         //     });
         //     return;
         // }
@@ -163,7 +161,7 @@ const PayWayModal: Taro.FC<{
                                 }
                                 onResult && onResult(d);
                             }
-    
+
                         });
                     },(e)=>{
                         setIsOpened(false)
@@ -175,7 +173,7 @@ const PayWayModal: Taro.FC<{
                         });
                         setTimeout(() => {
                             Taro.navigateTo({
-                                url:'/pages/me/order?tab=0'
+                                url:'/pages/tabbar/order/order?tab=0'
                             })
                         }, 2000);
                     });
@@ -189,7 +187,7 @@ const PayWayModal: Taro.FC<{
                     });
                     setTimeout(() => {
                         Taro.navigateTo({
-                            url:'/pages/me/order?tab=0'
+                            url:'/pages/tabbar/order/order?tab=0'
                         })
                     }, 2000);
                 })
@@ -201,7 +199,7 @@ const PayWayModal: Taro.FC<{
                 }
                 payOrder(d,(res)=>{
                     setIsOpened(false)
-                    window.history.pushState(null,null,'/pages/me/order?tab=0');
+                    window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
                     setTimeout(() => {
                         window.location.href = res.payinfo;
                     }, 1000);
@@ -213,9 +211,9 @@ const PayWayModal: Taro.FC<{
                     }
                     onResult && onResult(d);
                 })
-            }            
+            }
         }
-        
+
         if (process.env.TARO_ENV === 'weapp') {
             const d = {
                 platform: "wxapp",
@@ -231,7 +229,7 @@ const PayWayModal: Taro.FC<{
                     package: res.payinfo.package,
                     signType: res.payinfo.signType,
                     paySign: res.payinfo.paySign,
-                }).then((result)=>{
+                }).then((_)=>{
                     Taro.hideLoading();
                     const d = {
                         code:1,
@@ -251,7 +249,7 @@ const PayWayModal: Taro.FC<{
                 })
 
                 // setIsOpened(false)
-                // window.history.pushState(null,null,'/pages/me/order?tab=0');
+                // window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
                 // setTimeout(() => {
                 //     window.location.href = res.payinfo;
                 // }, 1000);

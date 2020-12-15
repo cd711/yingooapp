@@ -1,13 +1,11 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Input,Button } from '@tarojs/components'
+import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import './find.less'
 import IconFont from '../../components/iconfont';
-import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import { fixStatusBarHeight,deviceInfo } from '../../utils/common';
-// import page from '../../utils/ext';
 
 @inject("userStore")
 @observer
@@ -40,10 +38,10 @@ export default class Set extends Component<any,{
     componentDidMount(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/index/index";
+                window.location.href = "/pages/tabbar/index/index";
             } else {
                 Taro.switchTab({
-                    url:'/pages/index/index'
+                    url:'/pages/tabbar/index/index'
                 })
             }
         }

@@ -2,7 +2,6 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image } from '@tarojs/components'
 import './acount.less'
 import IconFont from '../../../../components/iconfont';
-// / npx iconfont-taro
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
@@ -113,14 +112,11 @@ export default class Setting extends Component<any,{
                 </View>
 
 
-                <View style={{paddingTop:54}}></View>
-                <TipModal isShow={tipModalShow} tip='是否解除当前绑定的微信？' onCancel={(e)=>{
+                <View style={{paddingTop:54}} />
+                <TipModal isShow={tipModalShow} tip='是否解除当前绑定的微信？' onCancel={()=>{
                     this.setState({
                         tipModalShow:false
                     })
-                    console.log(e)
-                }} onOK={(e)=>{
-                    console.log(e)
                 }} cancelText='取消' okText='解绑' />
             </View>
         )
