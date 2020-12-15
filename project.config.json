@@ -7,7 +7,9 @@
     "urlCheck": false,
     "es6": false,
     "postcss": false,
-    "minified": true
+    "minified": true,
+    "checkSiteMap":false
   },
-  "compileType": "miniprogram"
+  "compileType": "miniprogram",
+  "libVersion":"2.12.2"
 }

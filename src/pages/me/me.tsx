@@ -371,7 +371,7 @@ export default class Me extends Component<any, MeState> {
                 >
                     <View className='me_bg'></View>
                     <View className='me_top'
-                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: 1s opacity ease-out;` : `height:0;opacity: 0;transition: 1s opacity ease-in;`}>
+                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: 1s opacity ease-out;` : `position: fixed;opacity: 0;transition: 1s opacity ease-in;`}>
                                 <Text className='me_txt'>我的</Text>
                     </View>
                     {/* @ts-ignore */}
