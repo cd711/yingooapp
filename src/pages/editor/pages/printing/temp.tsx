@@ -213,11 +213,11 @@ class PrintChange extends Component<any, PrintChangeState>{
                 templateStore.photoParams = data;
             }
             Taro.navigateTo({
-                url: `/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
+                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
             })
         } else {
             Taro.navigateTo({
-                url: `/pages/template/confirm?${paramsStr}&succ=1`
+                url: `/pages/order/pages/template/confirm?${paramsStr}&succ=1`
             })
         }
     }
@@ -252,7 +252,7 @@ class PrintChange extends Component<any, PrintChangeState>{
 
     onEditClick = (item ,index) => {
         Taro.navigateTo({
-            url: `/pages/editor/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`
+            url: `/pages/editor/pages/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`
         })
     }
 
@@ -290,8 +290,6 @@ class PrintChange extends Component<any, PrintChangeState>{
     }
 
     componentDidShow() {
-        const params = this.getLocalParams();
-        console.log(2222222)
 
         // console.log("读取的photo params：", params)
         //

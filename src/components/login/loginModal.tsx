@@ -1,9 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import {userStore} from "../../store/user";
-import {inject, observer} from '@tarojs/mobx'
 import Logins from './login';
 import Fragment from '../Fragment';
-import { View } from '@tarojs/components';
 import { observe } from 'mobx';
 
 class LoginModal extends Component<{},any>{

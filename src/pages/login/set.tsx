@@ -4,7 +4,6 @@ import './index.less'
 import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
-import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx';
 import { fixStatusBarHeight } from '../../utils/common';
 
@@ -29,11 +28,11 @@ export default class Set extends Component<any,{
         }
     }
     componentDidMount(){
-        
+
 
     }
     onSetPassword = () => {
-        // 
+        //
         const {pwd,again} = this.state;
         if (pwd.length>=6 && again.length>=6 && again == pwd) {
             Taro.showLoading({title:"正在设置"})

@@ -62,7 +62,7 @@ export default class Shell extends Component<{}, {
 
     next = async () => {
 
-        window.location.replace(`/pages/template/preview`);
+        window.location.replace(`/pages/order/pages/template/preview`);
     }
 
     getUrl = () => {

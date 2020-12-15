@@ -123,7 +123,7 @@ export const jsApiList = [
 export const deviceInfo = {
     ...Taro.getSystemInfoSync(),
     env: process.env.TARO_ENV,
-    menu: process.env.TARO_ENV !== "h5" ? Taro.getMenuButtonBoundingClientRect() : {}
+    menu: process.env.TARO_ENV !== "h5" ? Taro.getMenuButtonBoundingClientRect() : {} as any
 };
 
 
@@ -333,13 +333,13 @@ export function fixStatusBarHeight() {
 export function jumpToEditor(params: {[key: string] : any} = {}) {
     const paramsStr = getURLParamsStr(urlEncode(params));
     Taro.navigateTo({
-        url: deviceInfo.env === "h5" ? `/pages/editor/shell?${paramsStr}` : `/pages/editor/wxshell?${paramsStr}`
+        url: deviceInfo.env === "h5" ? `/pages/editor/pages/shell?${paramsStr}` : `/pages/editor/pages/wxshell?${paramsStr}`
     })
 }
 export function jumpToPrintEditor(params: {[key: string] : any} = {}) {
     const paramsStr = getURLParamsStr(urlEncode(params));
     Taro.navigateTo({
-        url: deviceInfo.env === "h5" ? `/pages/editor/printedit?${paramsStr}` : `/pages/editor/wxprintedit?${paramsStr}`
+        url: deviceInfo.env === "h5" ? `/pages/editor/pages/printedit?${paramsStr}` : `/pages/editor/pages/wxprintedit?${paramsStr}`
     })
 }
 
@@ -355,4 +355,15 @@ export function cutString(str: string = "", len: number = 1, suffix: string = ".
 
 export function getUserKey() {
     return `${userStore.id}_key_${moment().date()}`
+}
+
+// 数组取双，3取2, 5取4...
+export function getEvenArr(arr = []) {
+    if (arr.length < 2) {
+        return []
+    }
+    if (arr.length % 3 === 0) {
+        return arr.slice(0, arr.length - 1)
+    }
+    return arr
 }

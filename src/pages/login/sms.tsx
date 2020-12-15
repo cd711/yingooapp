@@ -29,10 +29,10 @@ export default class SMS extends Component<any,{
         }
     }
     componentDidMount(){
-        
+
         // setTimeout(()=>{
         //     console.log(this.input);
-        //     
+        //
         // },500)
         if (deviceInfo.env == "h5") {
             this.input.inputRef.focus();
@@ -87,7 +87,7 @@ export default class SMS extends Component<any,{
                 userStore.setInfo(res);
                 Taro.hideLoading();
                 Taro.reLaunch({
-                    url:"/pages/me/me"
+                    url:"/pages/tabbar/me/me"
                 })
             }).catch((e)=>{
                 Taro.hideLoading();

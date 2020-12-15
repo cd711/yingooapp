@@ -49,7 +49,7 @@ const Search:Taro.FC<any> = () => {
         switch (item.category.type) {
             case "phone":
                 Taro.navigateTo({
-                    url: `/pages/template/detail?id=${item.id}&cid=${item.category.id}`
+                    url: `/pages/order/pages/template/detail?id=${item.id}&cid=${item.category.id}`
                 });
                 break;
             case "photo":
@@ -61,7 +61,7 @@ const Search:Taro.FC<any> = () => {
                     img: item.thumb_image,
                 }))
                 Taro.navigateTo({
-                    url: `/pages/printing/index?${str}`
+                    url: `/pages/editor/pages/printing/index?${str}`
                 });
                 break;
         }

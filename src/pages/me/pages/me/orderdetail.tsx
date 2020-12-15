@@ -50,10 +50,10 @@ export default class OrderDetail extends Component<{},{
     componentDidMount(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/index/index";
+                window.location.href = "/pages/tabbar/index/index";
             } else {
                 Taro.switchTab({
-                    url:'/pages/index/index'
+                    url:'/pages/tabbar/index/index'
                 })
             }
         }
@@ -275,7 +275,7 @@ export default class OrderDetail extends Component<{},{
                     <View className='left' onClick={() => {
                         if (Taro.getCurrentPages().length==1) {
                             Taro.navigateTo({
-                                url:"/pages/me/order?tab=0"
+                                url:"/pages/tabbar/order/order?tab=0"
                             })
                         }else{
                             Taro.navigateBack();
@@ -408,7 +408,7 @@ export default class OrderDetail extends Component<{},{
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
                         <Button className='red-border-btn' onClick={()=>{
                             Taro.navigateTo({
-                                url:`/pages/me/address/index?t=select&id=${0}`
+                                url:`/pages/me/pages/me/address/index?t=select&id=${0}`
                             })
                         }}>修改地址</Button>
                         {/* <Button className='gray-border-btn' onClick={()=>{

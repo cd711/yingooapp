@@ -52,7 +52,7 @@ export default class Detail extends Component<{},{
 
         if (process.env.TARO_ENV === 'h5') {
             const url = window.location.href;
-            window.history.pushState(null,null,'/pages/template/index');
+            window.history.pushState(null,null,'/pages/order/pages/template/index');
             window.history.pushState(null,'模板详情',url);
         }
         const { id,cid } = this.$router.params
@@ -70,7 +70,7 @@ export default class Detail extends Component<{},{
         Taro.showLoading({title:"加载中..."});
         api('app.product_tpl/info',{id}).then((res)=>{
             if (this.$router.params.id != res.id && process.env.TARO_ENV === 'h5') {
-                window.history.replaceState(null,null,`/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
+                window.history.replaceState(null,null,`/pages/order/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
             this.setState({
                 currentItem: res,
@@ -163,11 +163,11 @@ export default class Detail extends Component<{},{
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (process.env.TARO_ENV === 'h5') {
-                            window.location.href = '/pages/template/index';
+                            window.location.href = '/pages/order/pages/template/index';
                             return;
                         }
                         Taro.switchTab({
-                            url:'/pages/template/index'
+                            url:'/pages/order/pages/template/index'
                         });
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>

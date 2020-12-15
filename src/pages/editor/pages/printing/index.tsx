@@ -80,7 +80,7 @@ const Index: Taro.FC<any> = () => {
         const str = getURLParamsStr(urlEncode(obj))
         console.log(str)
         Taro.navigateTo({
-            url: `/pages/printing/change?${str}`
+            url: `/pages/editor/pages/printing/change?${str}`
         })
     }
 

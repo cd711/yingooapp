@@ -2,7 +2,6 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image, Button,ScrollView } from '@tarojs/components'
 import './order.less'
 import IconFont from '../../../components/iconfont';
-// / npx iconfont-taro
 import {userStore} from "../../../store/user";
 import {templateStore} from "../../../store/template";
 import { observer, inject } from '@tarojs/mobx'
@@ -117,7 +116,7 @@ export default class Order extends Component<any,{
             });
             setTimeout(() => {
                 Taro.reLaunch({
-                    url:'/pages/me/me'
+                    url:'/pages/tabbar/me/me'
                 })
             }, 1500);
         })
@@ -196,7 +195,7 @@ export default class Order extends Component<any,{
         });
         let title = res.data;
         const {orderId} =this.state;
-        let url = `/pages/me/orderdetail?id=${orderId}`;
+        const url = `/pages/me/pages/me/orderdetail?id=${orderId}`;
         if (res.code == 1) {
             title = '支付成功';
         }
@@ -224,11 +223,11 @@ export default class Order extends Component<any,{
                     {/* <View className='left' onClick={() => {
                         if (deviceInfo.env == 'h5') {
                             Taro.reLaunch({
-                                url:"/pages/me/me"
+                                url:"/pages/tabbar/me/me"
                             })
                         }else{
                             Taro.switchTab({
-                                url:"/pages/me/me"
+                                url:"/pages/tabbar/me/me"
                             })
                         }
                     }}>
@@ -246,7 +245,7 @@ export default class Order extends Component<any,{
                                     switchTabActive:index
                                 });
                                 if (deviceInfo.env == 'h5') {
-                                    window.history.replaceState(null,null,`/pages/me/order?tab=${index}`);
+                                    window.history.replaceState(null,null,`/pages/tabbar/order/order?tab=${index}`);
                                 }
                             }} key={index+""}>
                                 <Text className='txt'>{item}</Text>
@@ -263,7 +262,7 @@ export default class Order extends Component<any,{
                             <Text className='txt'>暂无订单</Text>
                             <Button className='gofind' onClick={()=>{
                                 Taro.switchTab({
-                                    url:'/pages/index/index'
+                                    url:'/pages/tabbar/index/index'
                                 })
                             }}>去发现</Button>
                         </View>:list.map((item)=>(
@@ -290,7 +289,7 @@ export default class Order extends Component<any,{
                                     item.products.map((product)=>(
                                         <View className='order-info' key={product.product_id} onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/orderdetail?id=${item.id}`
+                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>
                                             <View className='order-img'>
@@ -328,7 +327,7 @@ export default class Order extends Component<any,{
                                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,item.id)}>取消订单</Button>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/orderdetail?id=${item.id}`
+                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
                                         <Button className='red-full-btn' onClick={()=>{
@@ -350,13 +349,13 @@ export default class Order extends Component<any,{
                                     </View>:item.state_tip.value == 2 && item.after_sale_status_tip.value==0 ? <View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/orderdetail?id=${item.id}`
+                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
                                     </View>:item.state_tip.value == 3&& item.after_sale_status_tip.value==0  ?<View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/orderdetail?id=${item.id}`
+                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
                                         <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,item.id)}>确定收货</Button>
@@ -364,7 +363,7 @@ export default class Order extends Component<any,{
                                         <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,item.id)}>删除订单</Button>
                                         <Button className='gray-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/orderdetail?id=${item.id}`
+                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
                                             })
                                         }}>查看订单</Button>
                                     </View>:null

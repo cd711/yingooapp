@@ -1,0 +1,60 @@
+.uncultivated_container{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3000;
+    background: #00000056;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .uncultivated_main{
+        width: 590px;
+        height: 684px;
+        position: relative;
+        .uncultivated_img, .unc_img{
+            width: 590px;
+            height: 684px;
+        }
+        .uncultivated_info{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            .h1{
+                font-size: 48px;
+                color: #000;
+                display: block;
+                margin-top: 324px;
+            }
+            &>.txt{
+                font-size: 28px;
+                color: #9C9DA6;
+                display: block;
+                margin-top: 24px;
+            }
+            .close_btn{
+                width: 328px;
+                height: 96px;
+                margin-top: 52px;
+                background: #FF4966;
+                border-radius: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .txt{
+                    color: #fff;
+                    font-size: 32px;
+                }
+            }
+        }
+    }
+}

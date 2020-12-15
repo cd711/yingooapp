@@ -3,18 +3,12 @@ import { View, Text, Button,Image } from '@tarojs/components'
 import './success.less';
 import IconFont from '../../../../components/iconfont';
 import { observer, inject } from '@tarojs/mobx';
-
 import SuccessIcon from '../../../../components/icon/SuccessIcon';
 import WarmIcon from '../../../../components/icon/WarmIcon';
 import { api } from '../../../../utils/net';
 import { Base64 } from 'js-base64';
 import { deviceInfo, fixStatusBarHeight } from '../../../../utils/common';
-// interface LikeData{
-//     list:Array<any>,
-//     size:number,
-//     start:number,
-//     total:number
-// }
+
 
 @inject("templateStore")
 @observer
@@ -41,8 +35,8 @@ export default class Success extends Component<{},{
 
         if (deviceInfo.env == 'h5') {
             const url = window.location.href;
-            window.history.pushState(null,null,'/pages/me/me');
-            window.history.pushState(null,null,'/pages/me/order?tab=0');
+            window.history.pushState(null,null,'/pages/tabbar/me/me');
+            window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
             window.history.pushState(null,'支付结果',url);
         }
         // Taro.showLoading({title:"查询订单状态"});
@@ -87,7 +81,7 @@ export default class Success extends Component<{},{
                     }, 5000);
                 }else{
                     // Taro.navigateTo({
-                    //     url:'/pages/me/order?tab=1'
+                    //     url:'/pages/tabbar/order/order?tab=1'
                     // })
                 }
             }
@@ -100,7 +94,7 @@ export default class Success extends Component<{},{
             });
             setTimeout(() => {
                 Taro.navigateTo({
-                    url:'/pages/me/order?tab=1'
+                    url:'/pages/tabbar/order/order?tab=1'
                 })
             }, 2000);
         })
@@ -116,7 +110,7 @@ export default class Success extends Component<{},{
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/order?tab=1'
+                            url:'/pages/tabbar/order/order?tab=1'
                         })
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
@@ -139,14 +133,14 @@ export default class Success extends Component<{},{
                     {
                        state? <View className="ops">
                         <Button className='look-order-btn' onClick={()=>{
-                            window.history.pushState(null,null,'/pages/me/me');
+                            window.history.pushState(null,null,'/pages/tabbar/me/me');
                             Taro.navigateTo({
-                                url:'/pages/me/order?tab=0'
+                                url:'/pages/tabbar/order/order?tab=0'
                             })
                         }}>查看订单</Button>
                         <Button className='back-home-btn' onClick={()=>{
-                            window.history.pushState(null,null,'/pages/me/order?tab=0');
-                            window.location.href = '/pages/index/index';
+                            window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
+                            window.location.href = '/pages/tabbar/index/index';
                         }}>返回首页</Button>
                     </View>:<View className="ops">
                         <Button className='look-order-btn' onClick={()=>{
@@ -154,9 +148,9 @@ export default class Success extends Component<{},{
                                 Taro.showLoading({title:"正在查询订单支付状态"})
                                 this.getOrderStatus(pay_order_sn)
                             } else {
-                                window.history.pushState(null,null,'/pages/me/me');
+                                window.history.pushState(null,null,'/pages/tabbar/me/me');
                                 Taro.navigateTo({
-                                    url:'/pages/me/order?tab=0'
+                                    url:'/pages/tabbar/order/order?tab=0'
                                 })
                             }
                         }}>未支付</Button>

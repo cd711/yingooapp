@@ -31,7 +31,7 @@ export default class Login extends Component<{},{
         }
     }
     componentDidMount(){
-        
+
     }
 
     onLogin = () => {
@@ -53,7 +53,7 @@ export default class Login extends Component<{},{
                 userStore.setInfo(res);
                 Taro.hideLoading();
                 Taro.reLaunch({
-                    url:"/pages/me/me"
+                    url:"/pages/tabbar/me/me"
                 })
             }).catch((e)=>{
                 Taro.hideLoading();

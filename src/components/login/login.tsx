@@ -1,4 +1,4 @@
-import Taro, {useState, useEffect, onCompassChange} from "@tarojs/taro";
+import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Button} from "@tarojs/components";
 import IconFont from "../iconfont";
 import "./login.less"
@@ -34,7 +34,7 @@ const Logins: Taro.FC<LoginProps> = (props) => {
 
     const privacyView = type => {
         setVisible(false)
-        Taro.navigateTo({url: `/pages/me/privacy?pageType=${type}`})
+        Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=${type}`})
     }
 
     const _onClose = () => {

@@ -309,7 +309,7 @@ export default class Me extends Component<any, MeState> {
     previewOrder = (item: WorksProps) => {
         console.log(item.id)
         Taro.navigateTo({
-            url: `/pages/template/preview?workid=${item.id}`
+            url: `/pages/order/pages/template/preview?workid=${item.id}`
         })
     }
 
@@ -529,7 +529,7 @@ export default class Me extends Component<any, MeState> {
                                         works.length === 0
                                             ? <Empty button="我要创作" onClick={() => {
                                                 Taro.switchTab({
-                                                    url: "/pages/template/index"
+                                                    url: "/pages/order/pages/template/index"
                                                 })
                                             }}/>
                                             : <View className="more_View">

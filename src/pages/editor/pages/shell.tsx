@@ -3,13 +3,13 @@ import {Image, ScrollView, Text, View} from '@tarojs/components';
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
 import './editor.less';
 import './shell.less';
-import {api, getToken, setUserInfo} from '../../../utils/net';
+import {api, getToken} from '../../../utils/net';
 import IconFont from '../../../components/iconfont';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import Fragment from '../../../components/Fragment';
 import UploadFile from "../../../components/Upload/Upload";
-import {debounce, deviceInfo, getNextPage, notNull, ossUrl, pageTotal} from "../../../utils/common";
+import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../../utils/common";
 import {userStore} from "../../../store/user";
 import moment from "moment";
 import LoadMore from "../../../components/listMore/loadMore";
@@ -1614,7 +1614,7 @@ export default class Shell extends Component<{}, {
             const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
             console.log(res)
             wx.miniProgram.navigateTo({
-                url: `/pages/template/preview?workid=${res.id}`,
+                url: `/pages/order/pages/template/preview?workid=${res.id}`,
             })
         }catch (e) {
             console.log("点击下一步出错：", e)
@@ -1644,7 +1644,7 @@ export default class Shell extends Component<{}, {
             doc: doc
         });
         Taro.hideLoading();
-        window.location.replace(`/pages/template/preview?workid=${res.id}`);
+        window.location.replace(`/pages/order/pages/template/preview?workid=${res.id}`);
     }
 
 
