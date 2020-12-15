@@ -184,7 +184,7 @@ export default class Me extends Component<any, MeState> {
                         top_rect.forEach((l_rect) => {
                             if (l_rect.height > 0) {
                                 this.setState({
-                                    topHeight: l_rect.height + Taro.getSystemInfoSync().statusBarHeight
+                                    topHeight: l_rect.height
                                 })
                             }
                         });
@@ -371,13 +371,13 @@ export default class Me extends Component<any, MeState> {
                 >
                     <View className='me_bg'/>
                     <View className='me_top'
-                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: 1s opacity ease-out;` : `position: fixed;opacity: 0;transition: 1s opacity ease-in;`}>
+                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: .8s opacity ease-out;` : `position: fixed;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 0;transition: .3s opacity ease-in;`}>
                                 <Text className='me_txt'>我的</Text>
                     </View>
                     {/* @ts-ignore */}
                     <View className='topBox' style={fixStatusBarHeight()}>
                         <View className='top_weapp'/>
-                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/setting')}>
+                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../../source/defaultAvatar.png')}
                                        className='avatarImg'/>
@@ -388,25 +388,37 @@ export default class Me extends Component<any, MeState> {
                         <View className='orderWarp'>
                             <View className='myorall'>
                                 <Text className='myorder'>我的订单</Text>
-                                <View className='allorder' onClick={() => Taro.switchTab({url:'/pages/me/order'})}>
+                                <View className='allorder' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order'})}>
                                     <Text>全部订单</Text>
                                     <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                                 </View>
                             </View>
                             <View className='orderstate'>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=1'})}>
+                                <View className='oitem' onClick={() => {
+                                    Taro.getApp().tab = 1;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                }}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=2'})}>
+                                <View className='oitem' onClick={() => {
+                                    Taro.getApp().tab = 2;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'});
+                                }}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=3'})}>
+                                <View className='oitem' onClick={() =>{
+                                    Taro.getApp().tab = 3;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                }}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/me/order?tab=4'})}>
+                                <View className='oitem' onClick={() =>{
+                                    Taro.getApp().tab = 4;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                }}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
                                 </View>

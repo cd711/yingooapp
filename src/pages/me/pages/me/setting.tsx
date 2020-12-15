@@ -79,11 +79,11 @@ export default class Setting extends Component<any,{
                     <View className='left' onClick={() => {
                         if(process.env.TARO_ENV === 'h5'){
                             Taro.reLaunch({
-                                url:'/pages/me/me'
+                                url:'/pages/tabbar/me/me'
                             });
                         } else {
                             Taro.switchTab({
-                                url:'/pages/me/me'
+                                url:'/pages/tabbar/me/me'
                             });
                         }
                     }}>
