@@ -52,15 +52,6 @@ export default class Order extends Component<any,{
         }
     }
     componentDidMount(){
-        if (!userStore.isLogin) {
-            if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
-            } else {
-                Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
-                })
-            }
-        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react)=>{
@@ -73,7 +64,7 @@ export default class Order extends Component<any,{
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
         templateStore.address = null;
-
+        Taro.getApp().tab = -1;
         if(parseInt(tab)>=0){
             if (switchTabActive != parseInt(tab)) {
                 this.setState({
@@ -87,6 +78,16 @@ export default class Order extends Component<any,{
 
             this.getList();
         }
+    }
+    componentDidShow(){
+        console.log(Taro.getApp().tab,this.$router.params);
+        const {tab} = Taro.getApp();
+        if (tab>=0) {
+            this.setState({
+                switchTabActive:tab
+            })
+        }
+        Taro.getApp().tab = -1;
     }
     componentWillUpdate(_, nextState) {
         const {switchTabActive} = this.state;

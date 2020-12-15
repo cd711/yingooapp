@@ -184,7 +184,7 @@ export default class Me extends Component<any, MeState> {
                         top_rect.forEach((l_rect) => {
                             if (l_rect.height > 0) {
                                 this.setState({
-                                    topHeight: l_rect.height + Taro.getSystemInfoSync().statusBarHeight
+                                    topHeight: l_rect.height
                                 })
                             }
                         });
@@ -371,7 +371,7 @@ export default class Me extends Component<any, MeState> {
                 >
                     <View className='me_bg'/>
                     <View className='me_top'
-                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: 1s opacity ease-out;` : `position: fixed;opacity: 0;transition: 1s opacity ease-in;`}>
+                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: .8s opacity ease-out;` : `position: fixed;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 0;transition: .3s opacity ease-in;`}>
                                 <Text className='me_txt'>我的</Text>
                     </View>
                     {/* @ts-ignore */}
@@ -394,19 +394,31 @@ export default class Me extends Component<any, MeState> {
                                 </View>
                             </View>
                             <View className='orderstate'>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=1'})}>
+                                <View className='oitem' onClick={() => {
+                                    Taro.getApp().tab = 1;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                }}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=2'})}>
+                                <View className='oitem' onClick={() => {
+                                    Taro.getApp().tab = 2;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'});
+                                }}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=3'})}>
+                                <View className='oitem' onClick={() =>{
+                                    Taro.getApp().tab = 3;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                }}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
-                                <View className='oitem' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order?tab=4'})}>
+                                <View className='oitem' onClick={() =>{
+                                    Taro.getApp().tab = 4;
+                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                }}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
                                 </View>

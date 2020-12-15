@@ -50,7 +50,6 @@ class App extends Component {
             'pages/login/find',
             'pages/login/acount',
             'pages/login/sms',
-
             'pages/search/index',
             'pages/search/result',
         ],
@@ -63,6 +62,7 @@ class App extends Component {
             },
             {
                 root: "pages/editor",
+                // @ts-ignore
                 pages: preval`
                     module.exports=(function() {
                     const route = [
@@ -106,6 +106,7 @@ class App extends Component {
                     'pages/template/preview',
                     'pages/template/confirm',
                     'pages/template/success',
+                    'pages/product/detail'
                 ]
             },
             {
