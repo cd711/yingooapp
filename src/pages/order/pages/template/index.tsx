@@ -8,6 +8,7 @@ import {deviceInfo, getURLParamsStr, ossUrl, urlEncode} from '../../../../utils/
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
+import {AtNavBar} from "taro-ui";
 
 interface TagData {
     list: Array<any>,
@@ -326,17 +327,6 @@ export default class Template extends Component<any, {
         const tagList = tagData && tagData[`${tplid}-${tagid}`] && tagData[`${tplid}-${tagid}`].list && tagData[`${tplid}-${tagid}`].list.length > 0 ? tagData[`${tplid}-${tagid}`].list : [];
         const tpl_type = cates && cates[switchActive] && cates[switchActive].tpl_type ? cates[switchActive].tpl_type : "";
 
-        const searchBox = process.env.TARO_ENV === 'h5' ? <View className='top-search'>
-            <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
-                <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
-                <Text className='placeholders'>搜索海量模板</Text>
-            </View>
-        </View> : <View className='top-search-weapp'>
-            <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
-                <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
-                <Text className='placeholders'>搜索海量模板</Text>
-            </View>
-        </View>
         return (
             <View className='template'>
                 <LoginModal />
@@ -344,8 +334,18 @@ export default class Template extends Component<any, {
                       style={`padding-top:${deviceInfo.statusBarHeight}px;background: #FFF;`}>
                     {
                         showAllCates ? <View className='all-category-warp'
-                                             style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight}px;`}>
-                            {searchBox}
+                                             style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight + deviceInfo.menu.bottom}px;`}>
+                            <AtNavBar
+                                onClickLeftIcon={() => Taro.navigateBack()}
+                                color='#121314' title=" "
+                                border fixed
+                                customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
+                                leftIconType={{
+                                    value:'chevron-left',
+                                    color:'#121314',
+                                    size: 24
+                                }}
+                            />
                             <View className='all-category'>
                                 <View className='title-box'>
                                     <Text className='txt'>全部品类</Text>
@@ -369,8 +369,22 @@ export default class Template extends Component<any, {
                             </View>
                         </View> : null
                     }
-                    {searchBox}
-                    <View className='top-switch'>
+                    <AtNavBar
+                        onClickLeftIcon={() => Taro.navigateBack()}
+                        color='#121314' title=" "
+                        border fixed
+                        customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
+                        leftIconType={{
+                            value:'chevron-left',
+                            color:'#121314',
+                            size: 24
+                        }}
+                    />
+                    <View className='top-switch'
+                          style={{
+                              marginTop: (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0) + "px"
+                          }}
+                    >
                         <ScrollView scrollX className='switch-scroll'>
                             <View className='warp' style={`width:${Taro.pxTransform((cates.length + 1) * 128)}`}>
                                 {
@@ -385,11 +399,7 @@ export default class Template extends Component<any, {
                                 }
                             </View>
                         </ScrollView>
-                        <View className='all' onClick={() => {
-                            this.setState({
-                                showAllCates: true
-                            })
-                        }}>
+                        <View className='all' onClick={() => this.setState({showAllCates: true})}>
                             <IconFont name='24_gengduofenlei' size={48} color='#121314'/>
                         </View>
                     </View>

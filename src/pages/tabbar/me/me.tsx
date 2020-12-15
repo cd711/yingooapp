@@ -540,7 +540,11 @@ export default class Me extends Component<any, MeState> {
                                 : <View className="collection_container">
                                     {
                                         collectionList.map((value: CollectiongProps, index) => (
-                                            <View className="collection_item" key={index+""}>
+                                            <View className="collection_item" key={index+""}
+                                                  style={{
+                                                      width: deviceInfo.windowWidth / 2 - 10 + "px"
+                                                  }}
+                                            >
                                                 <View className="collection_pic"
                                                       style={{
                                                           width: deviceInfo.screenWidth / 2 - 15 + "px",
