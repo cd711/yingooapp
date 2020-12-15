@@ -8,12 +8,14 @@ import {api} from "../../../utils/net";
 import {deviceInfo, getEvenArr, notNull, ossUrl} from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import ImageSwiper from "./ImageSwiper";
+import Uncultivated from "../../../components/uncultivated";
 
 
 interface IndexState {
     data: any;
     centerPartyHeight: number;
-    banners: []
+    banners: [];
+    showUnc: boolean;
 }
 
 @inject("userStore")
@@ -30,7 +32,8 @@ class Index extends Component<any, IndexState> {
         this.state = {
             data: [],
             centerPartyHeight: 500,
-            banners: []
+            banners: [],
+            showUnc: false,
         }
     }
 
@@ -140,10 +143,38 @@ class Index extends Component<any, IndexState> {
         })
     }
 
+    uncClose = () => {
+        this.setState({showUnc: false});
+        Taro.showTabBar()
+    }
+
+    uncShow = () => {
+        this.setState({showUnc: true});
+        Taro.hideTabBar()
+    }
+
+    jumpToTemplate = type => {
+        let url = "";
+        switch (type) {
+            case 1: url = "c=63"; break;
+            case 2: url = "c=41"; break;
+            case 3: url = "c=41"; break;
+        }
+
+        Taro.navigateTo({
+            url: `/pages/order/pages/template/index?${url}`
+        })
+    }
+
     render() {
-        const {data, centerPartyHeight, banners} = this.state;
+        const {data, centerPartyHeight, banners, showUnc} = this.state;
         return (
             <View className='index'>
+                {
+                    showUnc
+                        ? <Uncultivated visible={showUnc} onClose={this.uncClose} />
+                        : null
+                }
                 <View className='top-search'
                       style={{
                           paddingTop: deviceInfo.statusBarHeight + 5 + "px",
@@ -187,14 +218,14 @@ class Index extends Component<any, IndexState> {
                                 : null
                         }
                         <View className="index_fast_link_view">
-                            <View className="read_fast_link">
+                            <View className="read_fast_link" onClick={this.uncShow}>
                                 <Image src={require("../../../source/il.svg")} className="fast_img" />
                                 <View className="info">
                                     <Text className="h2">当面冲印照片</Text>
                                     <Text className="txt">高清冲印照片</Text>
                                 </View>
                             </View>
-                            <View className="read_fast_link">
+                            <View className="read_fast_link" onClick={this.uncShow}>
                                 <Image src={require("../../../source/cnxh.svg")} className="fast_img" />
                                 <View className="info">
                                     <Text className="h2">当面冲印文档</Text>
@@ -203,20 +234,20 @@ class Index extends Component<any, IndexState> {
                             </View>
                         </View>
                         <View className="index_fast_link_view">
-                            <View className="fast_order_link">
+                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
                                 <Image src={require("../../../source/pz.svg")} className="fast_img" />
                                 <Text className="h2">照片冲印</Text>
                                 <Text className="info">高清盐印冲印</Text>
                             </View>
-                            <View className="fast_order_link">
+                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(2)}>
                                 <Image src={require("../../../source/az.svg")} className="fast_img" />
-                                <Text className="h2">照片冲印</Text>
-                                <Text className="info">高清盐印冲印</Text>
-                            </View>
-                            <View className="fast_order_link">
-                                <Image src={require("../../../source/iall.svg")} className="fast_img" />
                                 <Text className="h2">手机壳定制</Text>
                                 <Text className="info">多种精美模板</Text>
+                            </View>
+                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(3)}>
+                                <Image src={require("../../../source/iall.svg")} className="fast_img" />
+                                <Text className="h2">更多定制</Text>
+                                <Text className="info">各种惊喜不断</Text>
                             </View>
                         </View>
                         <View className="remmond_your_love">

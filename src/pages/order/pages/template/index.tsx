@@ -421,7 +421,7 @@ export default class Template extends Component<any, {
                     <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;`}
                                 onScrollToLower={this.onScrollToLower}>
                         {/* min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px */}
-                        <View style={`width:${mainRightWidth}px;height:${Taro.pxTransform(32)};`}></View>
+                        <View style={`width:${mainRightWidth}px;height:${Taro.pxTransform(32)};`} />
                         <View className='warp'
                               style={`width:${mainRightWidth}px;box-sizing:border-box;position: relative;min-height:${colHeight[`${tplid}-${tagid}`] ? Math.max(...colHeight[`${tplid}-${tagid}`]) : 0}px;`}>
 
