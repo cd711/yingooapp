@@ -1,4 +1,4 @@
-import Taro, {useState, useEffect, onCompassChange} from "@tarojs/taro";
+import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Button} from "@tarojs/components";
 import IconFont from "../iconfont";
 import "./login.less"

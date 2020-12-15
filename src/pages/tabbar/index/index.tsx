@@ -5,7 +5,7 @@ import {inject, observer} from '@tarojs/mobx'
 import './index.less'
 import IconFont from '../../../components/iconfont'
 import {api} from "../../../utils/net";
-import {deviceInfo, ossUrl} from "../../../utils/common";
+import {deviceInfo, getEvenArr, notNull, ossUrl} from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import ImageSwiper from "./ImageSwiper";
 
@@ -63,12 +63,10 @@ class Index extends Component<any, IndexState> {
 
     componentDidMount() {
         if (process.env.TARO_ENV != 'h5') {
-            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
-                Taro.createSelectorQuery().select(".top-search").boundingClientRect((top_rect) => {
-                    this.setState({
-                        centerPartyHeight: Taro.getSystemInfoSync().windowHeight - nav_rect.height - top_rect.height
-                    });
-                }).exec();
+            Taro.createSelectorQuery().select(".top-search").boundingClientRect((top_rect) => {
+                this.setState({
+                    centerPartyHeight: deviceInfo.windowHeight - top_rect.height
+                });
             }).exec();
         }
         this.getIndexList();
@@ -88,7 +86,7 @@ class Index extends Component<any, IndexState> {
             return
         }
         Taro.navigateTo({
-            url: `/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
+            url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
         })
     }
 
@@ -136,21 +134,27 @@ class Index extends Component<any, IndexState> {
         }
     }
 
+    jumpToDetail = item => {
+        Taro.navigateTo({
+            url: `/pages/order/pages/product/detail?id=${item.id}`
+        })
+    }
+
     render() {
         const {data, centerPartyHeight, banners} = this.state;
         return (
             <View className='index'>
-                {
-                    process.env.TARO_ENV === 'h5'
-                        ? null
-                        : <View className='nav-bar' style={`padding-top:${deviceInfo.statusBarHeight}px;`}>
-                            <View className='center'>
-                                <Text className='title'>{this.config.navigationBarTitleText}</Text>
-                            </View>
-                        </View>
-                }
-                <View className='top-search'>
-                    <View className='search-box' onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
+                <View className='top-search'
+                      style={{
+                          paddingTop: deviceInfo.statusBarHeight + 5 + "px",
+                          height: 52 + deviceInfo.statusBarHeight + "px"
+                      }}
+                >
+                    <View className='search-box'
+                          style={{
+                              width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
+                          }}
+                          onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                         <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
                         <Text className='placeholders'>搜索海量模板</Text>
                     </View>
@@ -215,6 +219,9 @@ class Index extends Component<any, IndexState> {
                                 <Text className="info">多种精美模板</Text>
                             </View>
                         </View>
+                        <View className="remmond_your_love">
+                            <Image src={require("../../../source/ir.svg")} className="love" />
+                        </View>
                         {
                             data.map((item, index) => {
                                 let list = item.clist;
@@ -222,27 +229,81 @@ class Index extends Component<any, IndexState> {
                                 if (item.model === "tpl_product") {
                                     list = item.clist.length > 6 ? item.clist.slice(1, 7) : item.clist
                                 }
+                                const evenArr = getEvenArr(item.clist);
                                 return <Fragment>
                                     {
                                         item.model === "product"
-                                            ? item.clist.map((product, prodIndex) => {
-                                                return product.info.jump_url &&
-                                                    <View className='product-item' key={prodIndex + ""}>
-                                                        <Image src={ossUrl(product.thumb_image, 1)} className='image'
-                                                               mode='aspectFill'/>
-                                                        <View className='bottom'>
-                                                            <View className='left'>
-                                                                <Text className='title'>{product.title || " "}</Text>
-                                                                {product.subtitle ? <Text
-                                                                    className='subtitle'>{product.subtitle}</Text> : null}
-                                                            </View>
-                                                            <View className='right-btn'
-                                                                  onClick={() => this.onCustomized(product, index)}>
-                                                                <Text className='txt'>我要定制</Text>
-                                                            </View>
+                                            ? len === 1
+                                                ? <View className="single_index_product_item">
+                                                    <View className="single_img_view">
+                                                        <Image src={list[0].info.thumb_image} className="single_img" />
+                                                    </View>
+                                                    <View className="single_index_prod_info">
+                                                        <Text className="h1">{list[0].title}</Text>
+                                                    </View>
+                                                    <View className="prod_bugs">
+                                                        <View className="left">
+                                                            <Text className="red">￥<Text className="price">{list[0].info.price}</Text></Text>
+                                                            <Text className="p_price">￥{list[0].info.cost_price}</Text>
+                                                        </View>
+                                                        <View className="right">
+                                                            <Text className="txt">{list[0].info.sold_count}人已抢</Text>
                                                         </View>
                                                     </View>
-                                                })
+                                                    {
+                                                        !notNull(list[0].coupon) && Object.keys(list[0].coupon).length > 0
+                                                            ? <View className="single_prod_coupon">
+                                                                <Image src={require("../../../source/yhq.svg")} className="prod_yhq" />
+                                                                <View className="single_prod_info">
+                                                                    <View className="left">
+                                                                        <Text className="pri">￥<Text className="pr">{list[0].coupon.money}</Text></Text>
+                                                                    </View>
+                                                                    <View className="mid">
+                                                                        <Text className="h1">{list[0].coupon.name}</Text>
+                                                                        <Text className="txt">{list[0].coupon.use_end_time_text}</Text>
+                                                                    </View>
+                                                                    <View className="right">
+                                                                        <View className="get_btn">
+                                                                            <Text className="txt">立即领取</Text>
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+                                                            </View>
+                                                            : null
+                                                    }
+                                                    <View className="get_submit">
+                                                        <Text className="txt">立即购买</Text>
+                                                    </View>
+                                                </View>
+                                                : <View className="product_more_list_main">
+                                                    <View className="title">{item.title || " "}</View>
+                                                    <View className="sub_tit">{item.subtitle}</View>
+                                                    <View className="product_more_list">
+                                                        {
+                                                            evenArr.map((product, prodIndex) => {
+                                                                return <View className="product_list_item_wrap" key={prodIndex + ""}>
+                                                                    <View className="prod_list" onClick={() => this.jumpToDetail(product)}>
+                                                                        <View className="img">
+                                                                            <Image src={product.thumb_image} className="prod_img" mode="widthFix" />
+                                                                        </View>
+                                                                        <View className="prod_tit">
+                                                                            <Text className="txt">{product.title}</Text>
+                                                                        </View>
+                                                                        <View className="prod_bugs">
+                                                                            <View className="left">
+                                                                                <Text className="red">￥<Text className="price">{product.info.price}</Text></Text>
+                                                                                <Text className="p_price">￥{product.info.cost_price}</Text>
+                                                                            </View>
+                                                                            <View className="right">
+                                                                                <Text className="txt">{product.info.sold_count}人已抢</Text>
+                                                                            </View>
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+                                                            })
+                                                        }
+                                                    </View>
+                                                </View>
                                             : null
                                     }
                                     {
@@ -316,13 +377,13 @@ class Index extends Component<any, IndexState> {
                                             ? item.clist.map((coupon, cIndex) => (
                                                 <View className="index_coupon_main" key={`${index}_${cIndex}`}
                                                       onClick={() => this.receiveCoupon(coupon)}>
-                                                    <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img"/>
-                                                    <View className="receive_btn">
-                                                        <View className="anim_btn_receive">
-                                                            <Text className="txt">立即领取</Text>
-                                                            <View className="icon"><IconFont name="16_xiayiye" color="#fff" size={32}/></View>
-                                                        </View>
-                                                    </View>
+                                                    <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" mode="widthFix" />
+                                                    {/*<View className="receive_btn">*/}
+                                                    {/*    <View className="anim_btn_receive">*/}
+                                                    {/*        <Text className="txt">立即领取</Text>*/}
+                                                    {/*        <View className="icon"><IconFont name="16_xiayiye" color="#fff" size={32}/></View>*/}
+                                                    {/*    </View>*/}
+                                                    {/*</View>*/}
                                                 </View>
                                             ))
                                             : null
