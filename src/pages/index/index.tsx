@@ -218,6 +218,7 @@ class Index extends Component<any, IndexState> {
                         {
                             data.map((item, index) => {
                                 let list = item.clist;
+                                const len = list.length;
                                 if (item.model === "tpl_product") {
                                     list = item.clist.length > 6 ? item.clist.slice(1, 7) : item.clist
                                 }
