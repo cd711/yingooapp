@@ -162,7 +162,7 @@ class Index extends Component<any, IndexState> {
         }
 
         Taro.navigateTo({
-            url: `/pages/order/pages/order/pages/template/index?${url}`
+            url: `/pages/order/pages/template/index?${url}`
         })
     }
 
