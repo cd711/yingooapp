@@ -230,6 +230,7 @@
             .now-design-btn {
                 width: 590px;
                 height: 96px;
+                line-height: 96px;
                 background: #FF4966;
                 border-radius: 24px;
                 margin: 100px auto 40px;
@@ -642,7 +643,7 @@
     width: 670px;
     padding-bottom: 30px;
     background: #fff;
-    margin: 0 auto;
+    margin: 40px auto 0 auto;
     border-radius: 32px;
     .single_img_view{
         width: 670px;
@@ -906,5 +907,134 @@
                 }
             }
         }
+    }
+}
+
+
+.photo_item_view_container{
+
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+
+    .photo_item_view_wrap{
+        width: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        margin-bottom: 40px;
+
+        .photo_item_view{
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .photo_item_hidden{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                position: relative;
+                .hidden_view{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: 1;
+                }
+            }
+        }
+    }
+
+    .rectangle{
+        width: 294px;
+        height: 388px;
+    }
+    .rectangle_img{
+        width: 252px;
+        height: 355px;
+    }
+    .transverse_img{
+        width: 284px;
+        height: 284px;
+    }
+    .transverse{
+        width: 260px;
+        height: 260px;
+    }
+    .square{
+        width: 388px;
+        height: 284px;
+    }
+    .square_img{
+        width: 355px;
+        height: 251px;
+    }
+}
+.single_phone_shell_view{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0 0 0;
+    box-sizing: border-box;
+    .single_phone_shell{
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        width: 220px;
+        height: 441px;
+
+        .shell_ke{
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            width: 220px;
+            height: 441px;
+        }
+        .photo{
+            border-radius: 36px;
+            width: 220px;
+            height: 441px;
+        }
+    }
+}
+
+
+.phone_shell_view_list{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    .single_phone_shell_wrap{
+        width: 33.3333%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        .single_phone_shell{
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            .shell_ke{
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 1;
+            }
+            .photo{
+                border-radius: 32px;
+            }
+        }
+    }
+    .rectangle_ke{
+        width: 176px;
+        height: 351px;
     }
 }

@@ -382,7 +382,6 @@ export default class Me extends Component<any, MeState> {
                                 <Image src={avatar.length > 0 ? avatar : require('../../../source/defaultAvatar.png')}
                                        className='avatarImg'/>
                             </View>
-                            {/* todo: 昵称6个字 */}
                             <Text className='nickname'>{nickname.length > 0 ? `Hi，${nickname}` : "Hi，未登录"}</Text>
                         </View>
                         <View className='orderWarp'>
