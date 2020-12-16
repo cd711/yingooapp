@@ -4,10 +4,13 @@ import IconFont from '../../../../components/iconfont';
 import { deviceInfo,fixStatusBarHeight, notNull, ossUrl } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
+import { PlaceOrder } from '../template/place';
 
 export default class Login extends Component<{},{
     data:any,
-    currentPreImageIndex:number
+    currentPreImageIndex:number,
+    placeOrderShow:boolean,
+    buyTotal:number
 }> {
 
     config: Config = {
@@ -18,7 +21,9 @@ export default class Login extends Component<{},{
         super(props);
         this.state = {
             data:null,
-            currentPreImageIndex:0
+            currentPreImageIndex:0,
+            placeOrderShow:false,
+            buyTotal:1
         }
     }
     componentDidMount(){
@@ -40,17 +45,24 @@ export default class Login extends Component<{},{
             currentPreImageIndex:current
         })
     }
-    onCollected = () => {
-        
-    }
-    onAddCart= () => {
 
+    onAddCart= () => {
+        this.setState({
+            placeOrderShow: true
+        });
     }
     onNowBuy = () => {
-
+        this.setState({
+            placeOrderShow: true
+        });
+    }
+    onPlaceOrderClose = () => {
+        this.setState({
+            placeOrderShow: false
+        });
     }
     render() {
-        const {data,currentPreImageIndex} = this.state;
+        const {data,currentPreImageIndex,placeOrderShow,buyTotal} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
         const flag_text:Array<any> = data && !notNull(data.flag_text) ? data.flag_text:[];
         const tags_text:Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0,4):[];
@@ -144,7 +156,18 @@ export default class Login extends Component<{},{
                         <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
                     </View>
                 </View>
+                <PlaceOrder  data={data} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
+                    onBuyNumberChange={(n) => {
+                        this.setState({
+                            buyTotal:n
+                        })
+                    }} onAddCart={()=>{
 
+                    }} onNowBuy={()=>{
+
+                    }} onSkuChange={(sku)=>{
+
+                    }}/>
             </View>
         )
     }
