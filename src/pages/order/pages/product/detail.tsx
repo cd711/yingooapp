@@ -137,7 +137,11 @@ export default class Login extends Component<{},{
                         </View>
                     </View>
                     <View className='sku_box'>
-                        <View className='item'>
+                        <View className='item' onClick={()=>{
+                            this.setState({
+                                placeOrderShow: true
+                            });
+                        }}>
                             <View className='content'>
                                 <Text className='title'>规格</Text>
                                 <Text className='sku'>选择 {attrGroup.map((item)=>item["name"]).join("")}</Text>
@@ -147,16 +151,18 @@ export default class Login extends Component<{},{
                     </View>
                 </ScrollView>
                 <View className='product_bottom_bar'>
-                    <View className='cart' onClick={()=>Taro.switchTab({url:'/pages/tabbar/cart/index'})}>
-                        <IconFont name={'24_gouwuche'} size={48} color={'#707177'} />
-                        <Text className='txt'>购物车</Text>
-                    </View>
-                    <View className='ops'>
-                        <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
-                        <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
+                    <View className='main'>
+                        <View className='cart' onClick={()=>Taro.switchTab({url:'/pages/tabbar/cart/index'})}>
+                            <IconFont name="24_gouwuche" size={48} color="#707177" />
+                            <Text className='txt'>购物车</Text>
+                        </View>
+                        <View className='ops'>
+                            <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
+                            <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
+                        </View>
                     </View>
                 </View>
-                <PlaceOrder  data={data} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
+                <PlaceOrder  data={data} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         this.setState({
                             buyTotal:n
@@ -166,7 +172,7 @@ export default class Login extends Component<{},{
                     }} onNowBuy={()=>{
 
                     }} onSkuChange={(sku)=>{
-
+                        console.log(sku)
                     }}/>
             </View>
         )

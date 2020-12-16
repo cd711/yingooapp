@@ -17,20 +17,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
     const [attrItems,setAttrItems] = useState([]);
     
     let currentSku = null;
-    useEffect(() => {
-        if (!isEmpty(data)) {
-            initSkus(data.skus);
-            selectAtteItems(currentSku,data.attrItems);
-            const prices = data.skus.map((item) => {
-                return item.price;
-            })
-            prices.sort(function (a, b) {
-                return parseFloat(a + "") - parseFloat(b + "")
-            });
-            data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
-            data.image && setImgs(data.image);
-        }
-    }, [data]);
+
 
     const initSkus = (skus) => {
         let currentValue = "";
@@ -97,46 +84,82 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
         selectIds.sort(function(value1, value2) {
             return parseInt(value1) - parseInt(value2);
         });
-        let skuValue = selectIds.join(',');
-        const currentSkus = skus.filter((obj)=>{
+        const skuValue = selectIds.join(',');
+
+        const maybeSkus = skus.filter((obj)=>{
             if (selectIds.length>0) {
-                return obj.value.indexOf(skuValue)>-1
+                return selectIds.some((val)=>{
+                    return obj.value.indexOf(val)>-1
+                });
             }
-            return false;
+            return true;
         });
-        items = items.map((item,idx)=>{
+        items = items.map((item)=>{
             return item.map((tag)=>{
                 tag["over"] = false;
-                for (const sku of currentSkus) {
-                    if (sku.value.indexOf(tag.id)>-1 && parseInt(sku.stock+"")<=0 && idx != itemIdx) {
-                        tag["over"] = true;
-                    }
+                if (!tag["selected"] && selectIds.length>0) {
+                    maybeSkus.map((sku)=>{
+                        if (sku.value.indexOf(tag.id)>-1 && parseInt(sku.stock+"")<=0) {
+                            tag["over"] = true;
+                        }
+                    })
                 }
                 return tag;
             });
         });
-        console.log(items)
         setAttrItems(items);
         if (selectIds.length != items.length) {
-            const prices = currentSkus.map((item) => {
+            const prices = maybeSkus.map((item) => {
                 return item.price;
             })
             prices.sort(function (a, b) {
                 return parseFloat(a + "") - parseFloat(b + "")
             });
             setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
-        }
-        
-        currentSkus.map((sku)=>{
-            if (selectIds.length == items.length && sku.value == skuValue) {
-                setPrice(sku.price);
-                setMarketPriceShow(true);
-                setMarketPrice(sku.market_price);
-                onSkuChange && onSkuChange(sku);
+            setMarketPriceShow(false);
+        } else {
+            for (let i = 0; i<maybeSkus.length; i++) {
+                const sku = maybeSkus[i];
+                if (sku.value == skuValue) {
+                    setPrice(sku.price);
+                    setMarketPriceShow(true);
+                    setMarketPrice(sku.market_price);
+                    onSkuChange && onSkuChange(sku);
+                    break;
+                }
             }
-        });
+        }
+        if (selectIds.length>0 && data.imgs && data.imgs.length>0) {
+            const ids = [];
+            for (let i = 0; i<items.length; i++) {
+                const element = items[i];
+                let tid = "";
+                for (let j = 0; j<element.length;j++) {
+                    if(element[j]["selected"]){
+                        tid = element[j].id;
+                        break;
+                    }
+                }
+                ids.push(tid)
+            }
+            const imgs = data.imgs.filter((item)=>item.image.length>0 && item.value == ids.join(","));
+            setImgs(imgs.length==1?imgs[0].image:data.image);
+        }
     }
-
+    useEffect(() => {
+        if (!isEmpty(data)) {
+            initSkus(data.skus);
+            selectAtteItems(currentSku,data.attrItems);
+            const prices = data.skus.map((item) => {
+                return item.price;
+            })
+            prices.sort(function (a, b) {
+                return parseFloat(a + "") - parseFloat(b + "")
+            });
+            data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
+            data.image && setImgs(data.image);
+        }
+    }, [data]);
     return <View className='placeOrder'>
         <View className={isShow?'float-layout float-layout--active':'float-layout'}>
             <View className='float-layout__overlay' />

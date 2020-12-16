@@ -183,11 +183,16 @@
         }
     }
     .product_bottom_bar{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 40px;
-        background: #FFF;
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
+        .main{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 40px;
+            background: #FFF;
+        }
+
         .cart{
             display: flex;
             flex-direction: column;
