@@ -12,7 +12,8 @@ export default class Login extends Component<{},{
     placeOrderShow:boolean,
     buyTotal:number,
     sku:any,
-    skuName:Array<string>
+    skuName:Array<string>,
+    showOkButton:boolean
 }> {
 
     config: Config = {
@@ -27,7 +28,8 @@ export default class Login extends Component<{},{
             placeOrderShow:false,
             buyTotal:1,
             sku:null,
-            skuName:[]
+            skuName:[],
+            showOkButton:false
         }
     }
     componentDidMount(){
@@ -99,11 +101,12 @@ export default class Login extends Component<{},{
         
         this.setState({
             skuName:names,
-            placeOrderShow: false
+            placeOrderShow: false,
+            // showOkButton:false
         });
     }
     render() {
-        const {data,currentPreImageIndex,placeOrderShow,skuName} = this.state;
+        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
         const flag_text:Array<any> = data && !notNull(data.flag_text) ? data.flag_text:[];
         const tags_text:Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0,4):[];
@@ -200,10 +203,16 @@ export default class Login extends Component<{},{
                         <View className='ops'>
                             <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
                             <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
+                            {/* <Button className='red-ok-btn' onClick={()=>{
+                                this.setState({
+                                    placeOrderShow: true,
+                                    showOkButton:true
+                                });
+                            }}>确定</Button> */}
                         </View>
                     </View>
                 </View>
-                <PlaceOrder  data={data} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                <PlaceOrder  data={data} showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         console.log(n)
                         this.setState({

@@ -7,7 +7,7 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,selectedSku,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
@@ -265,10 +265,14 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
                         <Text className='title'>购买数量</Text>
                         <Counter num={1} onCounterChange={onBuyNumberChange}/>
                     </View>
-                    <View className='ops'>
-                        <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
-                        <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
-                    </View>
+                    {
+                        showOkButton ?<View className='ops'>
+                            <Button className='red-ok-btn'>确定</Button>
+                        </View>:<View className='ops'>
+                            <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
+                            <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
+                        </View>
+                    }
                 </View>
             </View>
         </View>
