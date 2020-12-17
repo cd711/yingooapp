@@ -65,6 +65,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
         setAttrItems(items);
     }
     const onSelectItem = (itemIdx,tagIdx,state) => {
+        onSkuChange && onSkuChange(null);
         const selectIds = [];
         let items = attrItems;
         items[itemIdx].map((tag,idx)=>{
@@ -85,7 +86,6 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
             return parseInt(value1) - parseInt(value2);
         });
         const skuValue = selectIds.join(',');
-
         const maybeSkus = skus.filter((obj)=>{
             if (selectIds.length>0) {
                 return selectIds.some((val)=>{
@@ -144,6 +144,8 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
             }
             const imgs = data.imgs.filter((item)=>item.image.length>0 && item.value == ids.join(","));
             setImgs(imgs.length==1?imgs[0].image:data.image);
+        } else {
+            setImgs(data.image);
         }
     }
     useEffect(() => {
@@ -160,6 +162,36 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
             data.image && setImgs(data.image);
         }
     }, [data]);
+    const _onClose = () => {
+        let names = [];
+        for (let i = 0; i<attrItems.length; i++) {
+            const element = attrItems[i];
+            let tid = "";
+            for (let j = 0; j<element.length;j++) {
+                if(element[j]["selected"]){
+                    tid = element[j].name;
+                    break;
+                }
+            }
+            names.push(tid);
+        }
+        let n = 0;
+        const ns = [];
+        for (let i = 0; i<names.length; i++) {
+            const item = names[i];
+            if (item == "") {
+                n += 1;
+                ns.push(data.attrGroup[i].name)
+            }
+        }
+        if (n == attrItems.length) {
+            names = [];
+        }
+        if (n>0 && n<attrItems.length) {
+            names = ns;
+        }
+        onClose && onClose(names)
+    }
     return <View className='placeOrder'>
         <View className={isShow?'float-layout float-layout--active':'float-layout'}>
             <View className='float-layout__overlay' />
@@ -183,7 +215,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, selectedSkuId,se
                             </Swiper> : null
                         }
 
-                        <View className='close' onClick={onClose}>
+                        <View className='close' onClick={_onClose}>
                             <IconFont name='32_guanbi' size={64} color='#333'/>
                         </View>
                     </View>

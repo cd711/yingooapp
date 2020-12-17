@@ -10,7 +10,9 @@ export default class Login extends Component<{},{
     data:any,
     currentPreImageIndex:number,
     placeOrderShow:boolean,
-    buyTotal:number
+    buyTotal:number,
+    sku:any,
+    skuName:Array<string>
 }> {
 
     config: Config = {
@@ -23,21 +25,57 @@ export default class Login extends Component<{},{
             data:null,
             currentPreImageIndex:0,
             placeOrderShow:false,
-            buyTotal:1
+            buyTotal:1,
+            sku:null,
+            skuName:[]
         }
     }
     componentDidMount(){
         const {id} = this.$router.params;
-        api("app.product/info",{
-            id
-        }).then((res)=>{
-            console.log(res);
-            this.setState({
-                data:res,
+        if (id != "" && id != undefined && id != null && parseInt(id) > 0) {
+            Taro.showLoading({title:'加载中...'})
+            api("app.product/info",{
+                id
+            }).then((res)=>{
+                Taro.hideLoading();
+                this.setState({
+                    data:res,
+                })
+            }).catch((e)=>{
+                console.log(e);
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:e,
+                    duration:2000,
+                    icon:'none'
+                });
+                setTimeout(() => {
+                    if (Taro.getCurrentPages().length>1) {
+                        Taro.navigateBack();
+                    } else {
+                        Taro.switchTab({
+                            url:'/pages/tabbar/index/index'
+                        })
+                    }
+                }, 2001);
             })
-        }).catch((e)=>{
-            console.log(e);
-        })
+        } else {
+            Taro.showToast({
+                title:'参数错误',
+                duration:2000,
+                icon:'none'
+            });
+            setTimeout(() => {
+                if (Taro.getCurrentPages().length>1) {
+                    Taro.navigateBack();
+                } else {
+                    Taro.switchTab({
+                        url:'/pages/tabbar/index/index'
+                    })
+                }
+            }, 2001);
+        }
+
     }
 
     onSwiperChange = ({detail:{current}}) => {
@@ -56,13 +94,16 @@ export default class Login extends Component<{},{
             placeOrderShow: true
         });
     }
-    onPlaceOrderClose = () => {
+    onPlaceOrderClose = (names) => {
+        console.log("aa",names)
+        
         this.setState({
+            skuName:names,
             placeOrderShow: false
         });
     }
     render() {
-        const {data,currentPreImageIndex,placeOrderShow,buyTotal} = this.state;
+        const {data,currentPreImageIndex,placeOrderShow,skuName} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
         const flag_text:Array<any> = data && !notNull(data.flag_text) ? data.flag_text:[];
         const tags_text:Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0,4):[];
@@ -144,7 +185,7 @@ export default class Login extends Component<{},{
                         }}>
                             <View className='content'>
                                 <Text className='title'>规格</Text>
-                                <Text className='sku'>选择 {attrGroup.map((item)=>item["name"]).join("")}</Text>
+                                <Text className='sku'>选择 {skuName.length>0?skuName.join("/"):attrGroup.map((item)=>item["name"]).join("/")}</Text>
                             </View>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
@@ -164,15 +205,62 @@ export default class Login extends Component<{},{
                 </View>
                 <PlaceOrder  data={data} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
+                        console.log(n)
                         this.setState({
                             buyTotal:n
                         })
                     }} onAddCart={()=>{
-
+                        const {sku,skuName,data,buyTotal} = this.state;
+                        const {attrGroup} = data;
+                        if (sku != null && skuName.length == attrGroup.length && buyTotal>0) {
+                            Taro.showLoading({title:"加载中"})
+                            api("app.cart/add",{
+                                sku_id:sku.id,
+                                user_tpl_id:0,
+                                quantity:buyTotal
+                            }).then(()=>{
+                                Taro.hideLoading();
+                                Taro.showToast({
+                                    title:"已添加到购物车!",
+                                    icon:"success",
+                                    duration:2000
+                                })
+                            }).catch((e)=>{
+                                Taro.hideLoading();
+                                Taro.showToast({
+                                    title:e,
+                                    icon:"none",
+                                    duration:2000
+                                })
+                            })
+                        } else {
+                            Taro.showToast({
+                                title:"请选择规格!",
+                                icon:"none",
+                                duration:2000
+                            });
+                        }
                     }} onNowBuy={()=>{
-
+                        const {buyTotal,sku} = this.state;
+                        if (sku != null && buyTotal>0) {
+                            this.setState({
+                                placeOrderShow:false
+                            })
+                            Taro.navigateTo({
+                                url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${0}&model=${0}`
+                            })
+                        } else {
+                            Taro.showToast({
+                                title:"请选择规格!",
+                                icon:"none",
+                                duration:2000
+                            });
+                        }
                     }} onSkuChange={(sku)=>{
-                        console.log(sku)
+                        console.log("sku change",sku);
+                        this.setState({
+                            sku
+                        })
                     }}/>
             </View>
         )

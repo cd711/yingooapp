@@ -177,6 +177,46 @@
                 }
             }
         }
+        .add_buy{
+            margin-top: 32px;
+            position: relative;
+            // .back_ground{
+            //     position: absolute;
+            //     width: 100%;
+            //     height: 176px;
+            //     background: linear-gradient(180deg, #FFF5F5 0%, #FFFFFF 100%);
+            //     z-index: 0;
+            // }
+            .add_buy_title{
+                z-index: 1;
+                margin-bottom: 44px;
+                .line{
+                    display: flex;
+                }
+                .ygyp{
+                    width: 132px;
+                    height: 28px;
+                    display: flex;
+                }
+                .adv{
+                    font-size: 28px;
+                    font-weight: 400;
+                    color: #707177;
+                    line-height: 28px;
+                    padding-left: 12px;
+                }
+                .tip{
+                    font-size: 28px;
+                    font-weight: 400;
+                    color: #FF4966; 
+                    line-height: 28px;
+                    padding-left: 16px;
+                }
+            }
+        }
+        .add_buy_container{
+            z-index: 1;
+        }
     }
     .goods-item{
         padding: 32px;
@@ -230,18 +270,18 @@
         }
     }
     .bottom{
-        // position: fixed;
-        // bottom: 0;
-        width: 100%;
-        padding: 0 32px;
-        height: 120px;
-        box-sizing: border-box;
-        background: #FFF;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
         padding-bottom: constant(safe-area-inset-bottom);
         padding-bottom: env(safe-area-inset-bottom);
+        background: #FFF;
+        .main{
+            width: 100%;
+            padding: 0 32px;
+            height: 120px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
         .left{
             display: flex;
             align-items: baseline;

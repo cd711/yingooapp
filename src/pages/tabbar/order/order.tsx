@@ -11,6 +11,8 @@ import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl } from '../../../util
 import PayWayModal from '../../../components/payway/PayWayModal';
 import copy from 'copy-to-clipboard';
 import TipModal from '../../../components/tipmodal/TipModal';
+import { observe } from 'mobx';
+import LoginModal from '../../../components/login/loginModal';
 
 
 const tabs = ["全部","待付款","待发货","待收货","已完成"];
@@ -61,6 +63,16 @@ export default class Order extends Component<any,{
                 }).exec();
             }).exec();
         }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue) {
+                this.initData();
+            }
+        })
+        if (userStore.isLogin) {
+            this.initData();
+        }
+    }
+    initData = () => {
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
         templateStore.address = null;
@@ -218,6 +230,7 @@ export default class Order extends Component<any,{
         //
         return (
             <View className='order'>
+                <LoginModal />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     {/* <View className='left' onClick={() => {
@@ -241,6 +254,10 @@ export default class Order extends Component<any,{
                     {
                         tabs.map((item,index)=>(
                             <View className={switchTabActive==index?'item active':'item'} onClick={()=>{
+                                if (!userStore.isLogin) {
+                                    userStore.showLoginModal = true;
+                                    return;
+                                }
                                 this.setState({
                                     switchTabActive:index
                                 });
