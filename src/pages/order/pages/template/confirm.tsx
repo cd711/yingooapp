@@ -298,13 +298,8 @@ export default class Confirm extends Component<any, {
             this.setState({
                 order_sn: res.order_sn,
                 showPayWayModal: true,
-<<<<<<< HEAD
                 payStatus:res.status
             });
-=======
-                payStatus: res.status
-            })
->>>>>>> 35e5d5a8988874ff964df9ac79d681a865c0b50f
         }).catch((e) => {
             Taro.hideLoading();
             setTimeout(() => {
@@ -522,7 +517,6 @@ export default class Confirm extends Component<any, {
         } else {
             if (item.sku == null || item.sku == "") {
                 const {data} = this.state;
-<<<<<<< HEAD
                 setTempDataContainer(`${item.id}_${mainProductId}`,{
                     prepay_id:data.prepay_id,
                     pre_order_id:preOrderId,
@@ -532,18 +526,6 @@ export default class Confirm extends Component<any, {
                     hasOldSku:item.sku != null ?true:false,
                     selectSku:subItem && subItem.sku ? subItem.sku : null
                 },(is)=>{
-=======
-                console.log("subitem", subItem)
-                setTempDataContainer(`${item.id}_${mainProductId}`, {
-                    prepay_id: data.prepay_id,
-                    pre_order_id: preOrderId,
-                    product_id: mainProductId,
-                    mainProduct: mainProduct,
-                    currentAddBuyItem: item,
-                    hasOldSku: item.sku != null ? true : false,
-                    selectSku: subItem && subItem.sku ? subItem.sku : null
-                }, (is) => {
->>>>>>> 35e5d5a8988874ff964df9ac79d681a865c0b50f
                     if (is) {
                         this.tempContainerKey = `${item.id}_${mainProductId}`;
                         Taro.navigateTo({
