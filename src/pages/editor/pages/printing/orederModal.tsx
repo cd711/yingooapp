@@ -3,95 +3,144 @@ import {ScrollView, Text, View} from '@tarojs/components'
 import "../../../order/pages/template/place.less"
 import {AtFloatLayout} from "taro-ui"
 import IconFont from '../../../../components/iconfont'
-import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
-const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuChange, onNowBuy}) => {
+const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], onSkuChange, onNowBuy}) => {
 
-    const [activeCur, setActiveCur] = useState([]);
-    const [itemActive, setItemActive] = useState([])
-    const [tags, setTags] = useState([]);
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
     const [marketPriceShow, setMarketPriceShow] = useState(true);
-    const [selectSku, setSelectSku] = useState({});
-    // @ts-ignore
-    const [imgs, setImgs] = useState([]);
+    const [attrItems, setAttrItems] = useState([]);
+    const [skus, setSkus] = useState([]);
 
-    useEffect(() => {
-        if (defaultActive && defaultActive instanceof Array) {
-            setItemActive(defaultActive);
-            setActiveCur([-2, -2])
-        }
-    }, [])
+    const initSkus = (skus) => {
 
-    const onItemSelect = (idx, itemId, tagId) => {
-        const items = [...itemActive];
-        const tArr = [...activeCur];
-        const index = tArr.findIndex(val => {
-            return val !== -2 && val == itemId
-        });
-        if (index > -1) {
-            items[index] = tagId;
-        } else {
-            items.push(tagId);
-            tArr.push(itemId)
-        }
-        setActiveCur([...tArr])
-        setItemActive([...items]);
-        let temp = "";
-        const skus = data.skus.filter(item => item.value.indexOf(tagId) != -1);
-        let sku = [];
-        let overskus = '';
         for (let index = 0; index < skus.length; index++) {
-            const iterator = skus[index];
-            if (iterator.stock > 0) {
-                temp += temp.length > 0 ? `${iterator.value}` : `,${iterator.value}`
-            } else {
-                overskus += overskus.length > 0 ? `${iterator.value}` : `,${iterator.value}`
-            }
+            const skuItem = skus[index];
+            const skuKeyAttrs: Array<any> = skuItem.value.split(',');
+            skuKeyAttrs.sort(function (value1, value2) {
+                return parseInt(value1) - parseInt(value2);
+            });
+            skuItem.value = skuKeyAttrs.join(',');
         }
-        const t = [];
-        for (let index = 0; index < data.attrGroup.length; index++) {
-            sku.push(items[index] ? `${items[index]}` : "");
-            if (index != idx) {
-                tags[index] = tags[index].map((item) => {
-                    item["over"] = false;
-                    if (overskus.indexOf(item.id) != -1) {
-                        item["over"] = true;
+
+        setSkus(skus);
+    }
+
+
+    const selectAtteItems = (attrItems: Array<Array<any>>) => {
+        const items = attrItems.map((value) => {
+            return value.map((val) => {
+                val["selected"] = false;
+                val["over"] = false;
+                for (const child of defaultActive) {
+                    if (child == val.id) {
+                        val["selected"] = true
                     }
-                    return item;
-                });
-                const tt = tags[index].filter(item => overskus.indexOf(item.id) != -1 || temp.indexOf(item.id) != -1);
-                t.push(tt)
+                }
+                return val;
+            });
+        });
+        setAttrItems(items);
+    }
+
+    function recursionSku(arr, idArr) {
+        let tempArr = [];
+        const filterArr = (fnArr, idArr, current) => {
+            let c = current;
+            const id = idArr[c];
+            if (c === fnArr.length || !id) {
+                tempArr = fnArr;
+                return
             } else {
-                t.push(tags[index])
+                const childArr = [];
+                for (let i = 0; i < fnArr.length; i++) {
+                    const obj = fnArr[i];
+                    if (obj.value.indexOf(id) > -1) {
+                        childArr.push(obj);
+                    }
+                }
+                c++;
+                filterArr(childArr, idArr, c)
             }
         }
+        filterArr(arr, idArr, 0);
+        return tempArr
+    }
 
-        sku = sku.sort((a, b) => a - b);
-        console.log(sku)
-        if (sku.length == data.attrGroup.length) {
+    const onItemSelect = (itemIdx, tagIdx, state) => {
 
-            const sk = sku.join(",");
-            const a = data.skus.filter(item => item.value == sk)[0];
-            const imgs = data.imgs.filter(item => item.value == sk)[0];
-            setImgs(imgs && imgs.image && imgs.image.length > 0 ? imgs.image : data.image)
-            if (a) {
-                setPrice(a.price);
-                setMarketPriceShow(true);
-                setMarketPrice(a.market_price);
-                setSelectSku(a);
+        onSkuChange && onSkuChange({});
+        const selectIds = [];
+        let items = [...attrItems];
+        items[itemIdx].map((tag, idx) => {
+            tag["selected"] = false;
+            if (tagIdx == idx) {
+                tag["selected"] = state;
+            }
+            return tag;
+        });
+        for (const item of items) {
+            for (const tag of item) {
+                if (tag["selected"]) {
+                    selectIds.push(tag.id);
+                }
             }
         }
-        setTags(t);
+        selectIds.sort(function (value1, value2) {
+            return parseInt(value1) - parseInt(value2);
+        });
+        const skuValue = selectIds.join(',');
+
+        let maybeSkus = [];
+
+        maybeSkus = recursionSku(skus, selectIds )
+
+        console.log("maybeSkus", maybeSkus)
+        items = items.map((item) => {
+            return item.map((tag) => {
+                tag["over"] = false;
+                if (!tag["selected"] && selectIds.length > 0) {
+                    maybeSkus.map((sku) => {
+                        if (sku.value.indexOf(tag.id) > -1 && parseInt(sku.stock + "") < 1) {
+                            tag["over"] = true;
+                        }
+                    })
+                }
+                return tag;
+            });
+        });
+        setAttrItems(items);
+        console.log(selectIds)
+        if (selectIds.length != items.length) {
+            const prices = maybeSkus.map((item) => {
+                return item.price;
+            })
+            prices.sort(function (a, b) {
+                return parseFloat(a + "") - parseFloat(b + "")
+            });
+            setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
+            setMarketPriceShow(false);
+        } else {
+            for (let i = 0; i < maybeSkus.length; i++) {
+                const sku = maybeSkus[i];
+                if (sku.value == skuValue) {
+                    setPrice(sku.price);
+                    setMarketPriceShow(true);
+                    setMarketPrice(sku.market_price);
+                    onSkuChange && onSkuChange(sku);
+                    break;
+                }
+            }
+        }
     }
 
 
     useEffect(() => {
 
         if (!isEmpty(data)) {
-            data.attrItems && setTags(data.attrItems);
+            initSkus(data.skus);
+            selectAtteItems([...data.attrItems]);
             const prices = data.skus.map((item) => {
                 return item.price;
             })
@@ -99,21 +148,11 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                 return parseFloat(a + "") - parseFloat(b + "")
             });
             data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
-            setMarketPriceShow(false);
-            data.market_price && setMarketPrice(data.market_price);
-            data.image && setImgs(data.image);
         }
     }, [data]);
 
 
-    useEffect(() => {
-        if (onSkuChange) {
-            onSkuChange(selectSku);
-        }
-    }, [selectSku])
-
     const onSubmit = () => {
-        // const skuArr = selectSku.split(",")
         onNowBuy && onNowBuy()
     }
 
@@ -142,25 +181,25 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive, onSkuCh
                     <View className='param-part'>
                         {
                             data && data.attrGroup && data.attrGroup.map((item, index) => (
-                                <View className='param' key={item.id}>
-                                    {!item.disable ? <Text className='title'>{item.name}</Text> : null}
+                                <View className='param' key={item.id} style={item.disable ? {display: "none"} : null}>
+                                    <Text className='title'>{item.name}</Text>
                                     <View className='params'>
                                         {
-                                            tags && tags[index] && tags[index].map((tag) => {
-                                                return !item.disable && <Fragment key={tag.id}>
-                                                    <View className={itemActive.indexOf(tag.id) > -1 ? 'item active' : tag.over ? 'item over' : 'item'}
-                                                          style={item.disable ? {opacity: 0.7} : null}
-                                                          onClick={() => {
-                                                              if (item.disable) {
-                                                                  return
-                                                              }
-                                                              if (!tag.over) {
-                                                                  onItemSelect(index, item.id, tag.id)
-                                                              }
-                                                          }}>
-                                                        <Text className='txt'>{tag.name}</Text>
-                                                    </View>
-                                                </Fragment>
+                                            attrItems && attrItems[index] && attrItems[index].map((tag, idx) => {
+                                                return <View
+                                                    className={tag.over ? 'item over' : (tag.selected ? 'item active' : 'item')}
+                                                    key={`${index}-${idx}`}
+                                                    style={item.disable ? {opacity: 0.7} : null}
+                                                    onClick={() => {
+                                                        if (item.disable) {
+                                                            return
+                                                        }
+                                                        if (!tag.over) {
+                                                            onItemSelect(index, idx, !tag.selected)
+                                                        }
+                                                    }}>
+                                                    <Text className='txt'>{tag.name}</Text>
+                                                </View>
                                             })
                                         }
                                     </View>

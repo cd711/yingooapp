@@ -1,50 +1,52 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Image,ScrollView } from '@tarojs/components'
+import Taro, {Component, Config} from '@tarojs/taro'
+import {Image, ScrollView, Text, View} from '@tarojs/components'
 import './detail.less';
 import IconFont from '../../../../components/iconfont';
-import { api } from '../../../../utils/net'
-import { observer, inject } from '@tarojs/mobx';
+import {api} from '../../../../utils/net'
+import {inject, observer} from '@tarojs/mobx';
 import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl} from '../../../../utils/common'
 
 import LoginModal from '../../../../components/login/loginModal';
-import { userStore } from '../../../../store/user';
+import {userStore} from '../../../../store/user';
 
-@inject("templateStore","userStore")
+@inject("templateStore", "userStore")
 @observer
 
-export default class Detail extends Component<{},{
-    isLike:boolean;
-    likeList:Array<any>;
-    currentItem:any;
+export default class Detail extends Component<{}, {
+    isLike: boolean;
+    likeList: Array<any>;
+    currentItem: any;
     isOpened: boolean;
-    scrollTop:number;
-    centerPartyHeight:number
+    scrollTop: number;
+    centerPartyHeight: number
 }> {
 
     config: Config = {
         navigationBarTitleText: '模板详情'
     }
-    constructor(props){
+
+    constructor(props) {
         super(props);
         this.state = {
-            isLike:false,
-            likeList:[],
-            currentItem:{},
+            isLike: false,
+            likeList: [],
+            currentItem: {},
             isOpened: false,
-            scrollTop:0,
-            centerPartyHeight:530
+            scrollTop: 0,
+            centerPartyHeight: 530
         }
     }
+
     // private lastBottomTime = 0;
 
     componentDidMount() {
         // const {selectItem} = templateStore;
         // centerPartyHeight
         if (process.env.TARO_ENV != 'h5') {
-            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
-                Taro.createSelectorQuery().select(".bottom_bar").boundingClientRect((bottom_rect)=>{
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
+                Taro.createSelectorQuery().select(".bottom_bar").boundingClientRect((bottom_rect) => {
                     this.setState({
-                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-bottom_rect.height
+                        centerPartyHeight: Taro.getSystemInfoSync().windowHeight - nav_rect.height - bottom_rect.height
                     });
                 }).exec();
             }).exec();
@@ -52,58 +54,60 @@ export default class Detail extends Component<{},{
 
         if (process.env.TARO_ENV === 'h5') {
             const url = window.location.href;
-            window.history.pushState(null,null,'/pages/order/pages/template/index');
-            window.history.pushState(null,'模板详情',url);
+            window.history.pushState(null, null, '/pages/order/pages/template/index');
+            window.history.pushState(null, '模板详情', url);
         }
-        const { id,cid } = this.$router.params
-        console.log(id,cid)
+        const {id, cid} = this.$router.params
+        console.log(id, cid)
         if (!id || !cid) {
             Taro.navigateBack();
         }
-        if (parseInt(id)>0) {
+        if (parseInt(id) > 0) {
             this.getCurrentItem(id);
         }
         // this.lastBottomTime = moment().unix();
 
     }
-    getCurrentItem(id){
-        Taro.showLoading({title:"加载中..."});
-        api('app.product_tpl/info',{id}).then((res)=>{
+
+    getCurrentItem(id) {
+        Taro.showLoading({title: "加载中..."});
+        api('app.product_tpl/info', {id}).then((res) => {
             if (this.$router.params.id != res.id && process.env.TARO_ENV === 'h5') {
-                window.history.replaceState(null,null,`/pages/order/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
+                window.history.replaceState(null, null, `/pages/order/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
             this.setState({
                 currentItem: res,
                 isLike: res.favorite !== 0
             });
             this.getLikeList(res.category_id);
-        }).catch((e)=>{
+        }).catch((e) => {
             Taro.hideLoading();
             Taro.showToast({
-                title:e,
-                icon:'none',
-                duration:2000
+                title: e,
+                icon: 'none',
+                duration: 2000
             })
             setTimeout(() => {
                 Taro.navigateBack();
             }, 2000);
         })
     }
+
     getLikeList = (id) => {
-        api("app.product_tpl/like",{
-            size:20,
-            start:0,
-            category_id:id
-        }).then((res)=>{
+        api("app.product_tpl/like", {
+            size: 20,
+            start: 0,
+            category_id: id
+        }).then((res) => {
             Taro.hideLoading();
             this.setState({
-                likeList:res
+                likeList: res
             })
-        }).catch((e)=>{
+        }).catch((e) => {
             Taro.showToast({
-                title:e,
-                icon:'none',
-                duration:2000
+                title: e,
+                icon: 'none',
+                duration: 2000
             })
         })
     }
@@ -132,14 +136,14 @@ export default class Detail extends Component<{},{
                 tpl_id: currentItem.id,
                 cid: currentItem.category_id
             })
-        }else{
+        } else {
             userStore.showLoginModal = true;
         }
     }
 
     collectedProd = async () => {
         const {isLike, currentItem} = this.state;
-        try{
+        try {
             await api("app.profile/favorite", {
                 id: currentItem.id,
                 model: "tpl_product",
@@ -149,26 +153,20 @@ export default class Detail extends Component<{},{
                 title: `${isLike ? "取消收藏成功" : "收藏成功"}`
             })
             this.setState({isLike: !isLike})
-        }catch (e) {
+        } catch (e) {
             console.log(`${isLike ? "取消收藏失败" : "收藏失败"}：`, e)
         }
     }
 
     render() {
-        const { isLike,likeList,currentItem, scrollTop,centerPartyHeight } = this.state;
+        const {isLike, likeList, currentItem, scrollTop, centerPartyHeight} = this.state;
         // @ts-ignore
         return (
-            <View className='detail' >
+            <View className='detail'>
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
-                        if (process.env.TARO_ENV === 'h5') {
-                            window.location.href = '/pages/order/pages/template/index';
-                            return;
-                        }
-                        Taro.switchTab({
-                            url:'/pages/order/pages/template/index'
-                        });
+                        Taro.navigateBack()
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
@@ -176,29 +174,32 @@ export default class Detail extends Component<{},{
                         {!notNull(currentItem.id) ? <Text className='title'>{`ID:${currentItem.id}`}</Text> : null}
                     </View>
                 </View>
-                <LoginModal />
-                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop} onScroll={({detail:{scrollTop}})=>{
-                    this.setState({
-                        scrollTop:deviceInfo.env=="weapp"?-1:scrollTop
-                    })
-                }} style={process.env.TARO_ENV === 'h5'?"":`height:${centerPartyHeight}px`}>
-                    <View className='shell_thumb' style={`height:${Taro.pxTransform(472/(795/1635))}`}>
-                        <Image src={ossUrl(currentItem.thumb_image,1)} className='thumb' mode='aspectFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
-                        <Image src={require('../../../../source/ke.png')} className='shell' mode='scaleToFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
+                <LoginModal/>
+                <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop}
+                            onScroll={({detail: {scrollTop}}) => {
+                                this.setState({
+                                    scrollTop: deviceInfo.env == "weapp" ? -1 : scrollTop
+                                })
+                            }} style={process.env.TARO_ENV === 'h5' ? "" : `height:${centerPartyHeight}px`}>
+                    <View className='shell_thumb' style={`height:${Taro.pxTransform(472 / (795 / 1635))}`}>
+                        <Image src={ossUrl(currentItem.thumb_image, 1)} className='thumb' mode='aspectFill'
+                               style={`height:${Taro.pxTransform(472 / (795 / 1635))}`}/>
+                        <Image src={require('../../../../source/ke.png')} className='shell' mode='scaleToFill'
+                               style={`height:${Taro.pxTransform(472 / (795 / 1635))}`}/>
                     </View>
                     <View className='doyoulike'>
-                        <View className='opsline'></View>
+                        <View className='opsline'/>
                         <Text className='liketxt'>猜你喜欢</Text>
                         <View className='like-list'>
                             {
-                                likeList && likeList.map((item)=>(
-                                    <View className='item' onClick={()=>{
+                                likeList && likeList.map((item) => (
+                                    <View className='item' onClick={() => {
                                         this.getCurrentItem(item.id);
                                         this.setState({
-                                            scrollTop:0
+                                            scrollTop: 0
                                         })
                                     }} key={item.id}>
-                                        <Image src={ossUrl(item.thumb_image,1)} className='image' mode='aspectFill' />
+                                        <Image src={ossUrl(item.thumb_image, 1)} className='image' mode='aspectFill'/>
                                     </View>
                                 ))
                             }
@@ -207,7 +208,8 @@ export default class Detail extends Component<{},{
                 </ScrollView>
                 <View className='bottom_bar'>
                     <View className='favorite' onClick={this.collectedProd}>
-                        <IconFont name={isLike?'24_shoucangB':'24_shoucangA'} size={48} color={isLike?'#FFAF39':'#707177'} />
+                        <IconFont name={isLike ? '24_shoucangB' : '24_shoucangA'} size={48}
+                                  color={isLike ? '#FFAF39' : '#707177'}/>
                         <Text className='txt'>收藏</Text>
                     </View>
                     <View className='now-editor' onClick={this.onEditor}>

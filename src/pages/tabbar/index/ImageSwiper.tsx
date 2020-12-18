@@ -1,7 +1,7 @@
 import Taro, {useState} from "@tarojs/taro";
 import {View, Text, Image, Swiper, SwiperItem, Button} from "@tarojs/components";
-import "./ImageSwiper.less";
-import {ossUrl, RGBAster} from "../../../utils/common";
+import "./imageSwiper.less";
+import {deviceInfo, ossUrl, RGBAster} from "../../../utils/common";
 
 interface ImageSwiperProps {
     item: any;
@@ -61,7 +61,6 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
 
     return (
         <View className='temp-warp' style={{background: color}}>
-            {/* <Canvas canvasId="img-canvas" type="2d"></Canvas> */}
             <View style={process.env.TARO_ENV === 'h5'?'background:rgba(0, 0, 0, 0.03);':''} className='masks'>
                 <View className='title'>
                     <Text className='txt' style={{color: fontColor}}>{item.title}</Text>
@@ -70,10 +69,10 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
                 <View className='swiper-back'>
                     <Swiper className='temp-swiper' vertical autoplay={false} circular={false} indicatorDots={false}
                             onChange={({detail: {current}}) => {
-                                if (process.env.TARO_ENV === 'h5') {
+                                if (deviceInfo.env === 'h5') {
                                     getCurrentSwiperColor(current)
                                 }
-                                if (process.env.TARO_ENV === 'weapp') {
+                                if (deviceInfo.env === 'weapp') {
                                     setCurrent(current)
                                 }
                             }}

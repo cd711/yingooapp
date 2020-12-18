@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="142px" height="142px" viewBox="0 0 142 142" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 13</title>
+    <defs>
+        <path d="M140.388094,2 L140.388094,140 L2.38809354,140 L2.38809354,2 L140.388094,2 Z M136.388094,6 L6.38809354,6 L6.38809354,136 L136.388094,136 L136.388094,6 Z" id="path-1"></path>
+        <filter x="-7.2%" y="-5.8%" width="114.5%" height="114.5%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.142663489 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="首页改版" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="模版-冲印-1-方版" transform="translate(-116.000000, -160.000000)">
+            <g id="相册模版" transform="translate(20.000000, 20.000000)">
+                <g id="编组-13" transform="translate(96.000000, 140.000000)">
+                    <polygon id="路径-10" fill="#9C9DA6" opacity="0.699999988" points="2.38809354 102 0 4 2.38809354 4"></polygon>
+                    <polygon id="路径-10" fill="#9C9DA6" opacity="0.699999988" transform="translate(4.194047, 90.000000) rotate(182.000000) translate(-4.194047, -90.000000) " points="5.38809354 139 3 41 5.38809354 41"></polygon>
+                    <polygon id="路径-10" fill="#9C9DA6" opacity="0.699999988" transform="translate(90.194047, 1.794047) rotate(90.000000) translate(-90.194047, -1.794047) " points="91.3880935 50.7940468 89 -47.2059532 91.3880935 -47.2059532"></polygon>
+                    <polygon id="路径-10" fill="#9C9DA6" opacity="0.699999988" transform="translate(90.000000, 140.444047) scale(1, -1) rotate(90.000000) translate(-90.000000, -140.444047) " points="91.1940468 189.444047 88.8059532 91.4440468 91.1940468 91.4440468"></polygon>
+                    <g id="形状结合">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                        <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

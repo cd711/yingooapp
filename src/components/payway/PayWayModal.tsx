@@ -134,7 +134,6 @@ const PayWayModal: Taro.FC<{
                             signType: res.payinfo.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
                             paySign: res.payinfo.paySign, // 支付签名
                             success: function (result) {
-                                // alert(JSON.stringify(result));
                                 Taro.hideLoading();
                                 const d = {
                                     code:1,

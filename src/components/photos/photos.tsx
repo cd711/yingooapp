@@ -2,17 +2,14 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import {View, Text, Image, Button, ScrollView} from '@tarojs/components'
 import './photos.less'
 import IconFont from '../../components/iconfont';
-import {AtActivityIndicator, AtModal} from 'taro-ui'
+import {AtActivityIndicator} from 'taro-ui'
 import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {ossUrl, deviceInfo, notNull} from "../../utils/common";
+import {ossUrl, deviceInfo} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
-import {templateStore} from "../../store/template";
-import {userStore} from "../../store/user";
-import moment from "moment";
 
 
 interface PhotosEleProps {
@@ -30,10 +27,8 @@ interface PhotosEleState {
     loading: boolean;
     imageList: any[];
     videoList: any[];
-    selects: number[];
     loadStatus: 'more' | 'loading' | 'noMore';
     isEdit: boolean;
-    isOpened: boolean;
     sortActive: object;
     editSelectImgs: string[];
     editSelectImgIds: any[];
@@ -55,9 +50,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         navigationBarTitleText: '首页'
     }
 
-    // 小程序专用props,解析extraProps的内容,详情：https://nervjs.github.io/taro/docs/miniprogram-plugin#taro-v13-%E7%BB%84%E4%BB%B6%E6%8F%92%E4%BB%B6%E6%8E%A5%E5%8F%97%E5%A4%96%E9%83%A8-props-%E7%9A%84%E9%97%AE%E9%A2%98
-    private _props: any = {};
-
     private scrollView: ScrollViewProps;
     constructor(props){
         super(props);
@@ -66,10 +58,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             loading: true,
             imageList: [],
             videoList: [],
-            selects: [],
             loadStatus: "noMore",
             isEdit: false,
-            isOpened: false,
             sortActive: {},
             editSelectImgs: [],
             editSelectImgIds: [],
@@ -81,7 +71,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     private total: number = 0;
-    private setLocal: boolean = false;
 
     async getList(data) {
 
@@ -121,31 +110,24 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     initPropsToState = () => {
-        let _props: any = {};
-        _props = {...this.props}
-        console.log(this.props)
 
-        const {editSelect, count, max} = _props;
-        // 读取router的参数是因为小程序是页面跳转
-        const router = this.$router;
-        const {edit, c, m, l} = router.params;
-        const _editSelect = templateStore.printStatus || (edit && edit === "t") || editSelect || false;
-        const _count = count || (!notNull(c) && parseInt(c)) || 0;
-        const _max = max || (!notNull(m) && parseInt(m)) || 100;
-        this.setLocal = !notNull(l) && l === "t"
+        const {editSelect, count, max} = this.props;
+
+        const _editSelect = editSelect || false;
+        const _count = count || 0;
+        const _max = max  || 100;
         this.setState({
             _editSelect,
             _count,
             _max
         });
-        this._props = _props
     }
 
     componentWillMount() {
         if (deviceInfo.env === "weapp") {
             this.initPropsToState()
             this.getList({start: 0}).then(() => {
-                const {defaultSelect} = this._props;
+                const {defaultSelect} = this.props;
                 const {navSwitchActive} = this.state;
 
                 if (defaultSelect && navSwitchActive === 0) {
@@ -169,7 +151,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     componentDidMount() {
         this.initPropsToState()
         this.getList({start: 0}).then(() => {
-            const {defaultSelect} = this._props;
+            const {defaultSelect} = this.props;
             const {navSwitchActive} = this.state;
 
             if (defaultSelect && navSwitchActive === 0) {
@@ -221,15 +203,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
             return
         }
-
-        const selects = this.state.selects;
-        const idx = selects.indexOf(Number(id));
-        if (idx > -1) {
-            selects.splice(idx, 1)
-        } else {
-            selects.push(Number(id))
-        }
-        this.setState({selects})
     }
 
     delEditSelectImg = idx => {
@@ -254,7 +227,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     submitEditSelect = () => {
         const {_count} = this.state;
         const {editSelectImgs, editSelectImgIds, editSelectAttr} = this.state;
-        const {onPhotoSelect} = this._props;
+        const {onPhotoSelect} = this.props;
         if (editSelectImgs.length === 0 || editSelectImgIds.length === 0) {
             Taro.showToast({title: "未选择素材", icon: "none"})
             return
@@ -270,40 +243,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             attrs: editSelectAttr
         }
 
-        templateStore.printStatus = false
-        templateStore.printWxPhotoData = data as any;
-
-        if (this.setLocal) {
-            const path = [];
-            for (let i = 0; i < data.ids.length; i++) {
-                path.push({
-                    id: data.ids[i],
-                    url: data.imgs[i],
-                    attr: data.attrs[i],
-                    edited: false,
-                    doc: ""
-                })
-            }
-            this.updateLocalPhotos(path)
-        }
-
         onPhotoSelect && onPhotoSelect(data)
-    }
-
-    updateLocalPhotos = (arr = []) => {
-        try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
-            if (res) {
-                let temp = JSON.parse(res);
-                const _arr = [...temp.path, ...arr];
-                temp = {...temp, path: _arr}
-                Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp))
-            } else {
-                console.log("选图没有本地存储")
-            }
-        }catch (e) {
-            console.log("选图本地存储失败")
-        }
     }
 
     changeType = idx => {
@@ -337,41 +277,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         this.getList(temp);
     }
 
-    onEdit = (isEdit) => {
-        this.setState({isEdit})
-        if (!isEdit) {
-            this.setState({selects: []})
-        }
-    }
-
-    selectAll = () => {
-        const {navSwitchActive, imageList, videoList} = this.state;
-        const len = navSwitchActive === 0 ? imageList.length : videoList.length;
-        const list = navSwitchActive === 0 ? imageList : videoList;
-        let selects = this.state.selects;
-        if (len === selects.length) {
-            selects = []
-        } else {
-            selects = list.map(value => Number(value.id))
-        }
-        this.setState({selects})
-    }
-
-    onDeleteSelect = async () => {
-        this.setState({isOpened: true})
-    }
-
-    handleConfirm = async () => {
-        const {selects} = this.state;
-        try {
-            await api("app.profile/delImgs", {ids: selects.join(",")});
-            this.setState({selects: []})
-            this.getList({start: 0})
-        }catch (e) {
-            console.log("删除出错：", e)
-        }
-        this.setState({isOpened: false})
-    }
 
     changeSort = (data: PopoverItemClickProps) => {
         console.log(data.value)
@@ -445,9 +350,9 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     render() {
-        const {onClose} = this._props;
+        const {onClose} = this.props;
         const {_editSelect, _count} = this.state;
-        const { navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened, editSelectImgs, editSelectImgIds} = this.state;
+        const { navSwitchActive, loading, imageList, videoList, loadStatus, editSelectImgs, editSelectImgIds} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片","视频"];
         return (
@@ -457,14 +362,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                         ? `padding-top: ${deviceInfo.statusBarHeight}px;height: 64px`
                         : ""
                 }>
-                    <View className='left' onClick={()=>{
-                        if (!_editSelect) {
-                            Taro.navigateBack()
-                        } else {
-                            onClose && onClose()
-                        }
-                    }}>
-                        <IconFont name='24_shangyiye' size={48} color='#121314' />
+                    <View className='left' onClick={onClose}>
+                        <Text className="cl_t">关闭</Text>
                     </View>
                     <View className='center'>
                         <View className='nav-switch'>
@@ -477,19 +376,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             }
                         </View>
                     </View>
-                    {
-                        list.length > 0 && deviceInfo.env === "h5"
-                            ? _editSelect
-                                ? <View className="right">
-                                    <Popover popoverItem={this.popoverItem}>
-                                        <View><IconFont size={48} name="24_tupianpaixu"/></View>
-                                    </Popover>
-                                </View>
-                                : <View className="right" onClick={() => this.onEdit(!isEdit)}>
-                                    <Text>{isEdit ? "完成" : "编辑"}</Text>
-                                </View>
-                            : <View className="right"/>
-                    }
+                    <View className="right"/>
                 </View>
                 <View className='container'>
                     <ScrollView className='list_scrollview'
@@ -513,32 +400,15 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     </UploadFile>
                                 </View>
                                 : <View className="list_container">
-                                    {
-                                        deviceInfo.env === "weapp"
-                                            ? !_editSelect
-                                                ? <View className="list_filter">
-                                                    <Text className="tit" onClick={() => this.onEdit(!isEdit)}>{isEdit ? "完成" : "管理"}</Text>
-                                                    {
-                                                        isEdit
-                                                            ? <View className="weapp_list_filter_act">
-                                                                <Text onClick={() => this.onEdit(!isEdit)}>取消</Text>
-                                                            </View>
-                                                            : <Popover popoverItem={this.popoverItem}>
-                                                                <View className="weapp_list_filter_act">
-                                                                    <Text className="txt">排序</Text>
-                                                                    <IconFont size={48} name="24_tupianpaixu"/>
-                                                                </View>
-                                                            </Popover>
-                                                    }
-                                                </View>
-                                                : null
-                                            : <View className="list_filter">
-                                                <Text className="tit">排序</Text>
-                                                <Popover popoverItem={this.popoverItem}>
-                                                    <View><IconFont size={48} name="24_tupianpaixu"/></View>
-                                                </Popover>
+                                    <View className="list_filter">
+                                        <Text className="tit" />
+                                        <Popover popoverItem={this.popoverItem}>
+                                            <View className="weapp_list_filter_act">
+                                                <Text className="txt">排序</Text>
+                                                <IconFont size={48} name="24_tupianpaixu"/>
                                             </View>
-                                    }
+                                        </Popover>
+                                    </View>
                                     <View className="list_main">
                                         <View className="list_item">
                                             <UploadFile
@@ -546,7 +416,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                                 type="card"
                                                 count={9}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
-                                                style={"width: 248rpx"}
+                                                style="width: 248rpx"
                                                 onChange={this.uploadFile}/>
                                         </View>
                                         {
@@ -563,14 +433,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                                             <Text className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
                                                         </View>
                                                         : null}
-                                                    {
-                                                        isEdit
-                                                            ? <View className="act_btn">
-                                                                <IconFont name={selects.indexOf(Number(item.id)) > -1 ? "22_yixuanzhong" : "22_touming-weixuanzhong"}
-                                                                          size={44} />
-                                                            </View>
-                                                            : null
-                                                    }
                                                 </View>
                                             })
                                         }
@@ -611,35 +473,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             : null
                     }
                     {loading ? <AtActivityIndicator mode='center' /> : null}
-                    {
-                        isEdit
-                            ? <View className="select_all_container">
-                                <View className="left">
-                                    <View onClick={this.selectAll}>
-                                        <IconFont name={selects.length === list.length ? "22_yixuanzhong" : "22_touming-weixuanzhong"} size={44}/>
-                                        <Text>全选</Text>
-                                    </View>
-                                </View>
-                                <View className="right">
-                                    <View className="btn" onClick={this.onDeleteSelect}>删除{selects.length > 0 ? `(${selects.length})` : null}</View>
-                                </View>
-                            </View>
-                            : null
-                    }
                 </View>
-                {
-                    isOpened
-                        ? <AtModal
-                            className="modal_confirm_container"
-                            isOpened={isOpened}
-                            cancelText='取消'
-                            confirmText='确认'
-                            onCancel={() => this.setState({isOpened: false})}
-                            onConfirm={this.handleConfirm}
-                            content={`是否删除这${selects.length}${navSwitchActive === 0 ? "张照片" : "个视频"}?`}
-                        />
-                        : null
-                }
             </View>
         )
     }
