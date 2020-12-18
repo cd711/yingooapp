@@ -220,7 +220,7 @@ export default class Cart extends Component<{}, {
                                             <Checkboxs isChecked={item.checked} className='left' disabled/>
                                             <View className='right'>
                                                 <View className='pre-image'>
-                                                    <Image src={ossUrl(item.tpl.thumb_image, 0)} className='img'
+                                                    <Image src={ossUrl(item.thumb_image, 0)} className='img'
                                                            mode='aspectFill'/>
                                                     <View className='big'><IconFont name='20_fangdayulan'
                                                                                     size={40}/></View>
