@@ -6,8 +6,6 @@ import IconFont from "../../../../components/iconfont";
 import {deviceInfo, getURLParamsStr, getUserKey, jumpToPrintEditor, notNull, urlEncode} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 import OrderModal from "./orederModal";
-import {userStore} from "../../../../store/user";
-import moment from "moment";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -318,7 +316,7 @@ const PrintChange: Taro.FC<any> = () => {
         setSkuInfo({...data})
     }
 
-    const onSubmitOrder = () => {
+    const onSubmitOrder = async () => {
         let count = 0;
         for (const item of photos) {
             count += parseInt(item.count)
@@ -362,25 +360,19 @@ const PrintChange: Taro.FC<any> = () => {
         }
         const paramsStr = getURLParamsStr(urlEncode(data));
 
-        // 如果地址栏参数长度大于200，就使用本地存储加store存储
-        if (paramsStr.length > 200) {
-            try {
-                Taro.setStorageSync(`${userStore.id}_${skuInfo.id}_${count}_${moment().date()}`, JSON.stringify(data));
-                photoStore.photoProcessParams.changeUrlParams = paramsStr
+        try {
 
-            } catch (e) {
-                console.log("本地存储失败：", e)
+            await photoStore.updateServerParams(photoStore.printKey, {
+                changeUrlParams: paramsStr
+            })
 
-                photoStore.photoProcessParams.changeUrlParams = paramsStr
-            }
-            Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
-            })
-        } else {
-            Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?${paramsStr}&succ=1`
-            })
+        } catch (e) {
+            console.log("本地存储失败：", e)
+
         }
+        Taro.navigateTo({
+            url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo`
+        })
     }
 
     const closeSelectPhoto = () => {
