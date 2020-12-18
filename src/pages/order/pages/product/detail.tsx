@@ -308,8 +308,9 @@ export default class Login extends Component<{},{
                         })
                     }} onAddCart={()=>{
                         const {sku,skuName,data,buyTotal} = this.state;
-                        const {attrGroup} = data;
-                        if (sku != null && skuName.length == attrGroup.length && buyTotal>0) {
+                        // const {attrGroup} = data;
+                        // console.log(sku,skuName,buyTotal)
+                        if (sku != null && buyTotal>0) {
                             Taro.showLoading({title:"加载中"})
                             api("app.cart/add",{
                                 sku_id:sku.id,
