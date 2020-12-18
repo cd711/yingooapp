@@ -4,7 +4,7 @@ import './index.less'
 import IconFont from '../../../../components/iconfont'
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, getURLParamsStr, ossUrl, urlEncode} from '../../../../utils/common'
+import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from '../../../../utils/common'
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
@@ -34,7 +34,8 @@ export default class Template extends Component<any, {
     mainRightWidth: number;
     showAllCates: boolean;
     loadStatus: LoadMoreEnum;
-    colHeight: any
+    colHeight: any;
+    hiddenBar: boolean
 }> {
     config: Config = {
         navigationBarTitleText: '模板'
@@ -52,11 +53,12 @@ export default class Template extends Component<any, {
             mainRightWidth: 0,
             showAllCates: false,
             loadStatus: LoadMoreEnum.more,
-            colHeight: {}
+            colHeight: {},
+            hiddenBar: false
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (process.env.TARO_ENV === 'h5') {
             if (window.location.href.indexOf("template") == -1) {
                 return;
@@ -66,13 +68,57 @@ export default class Template extends Component<any, {
             }, false)
         }
 
-        // Taro.getStorage({key:"template_cate"}).then((res)=>{
-        //     this.handleCate(res.data);
-        //     this.getCate();
-        // }).catch(()=>{
-        //     this.getCate();
-        // })
-        this.getCate();
+        const {j} = this.$router.params;
+        if (!notNull(j)) {
+            // 从首页快捷方式直接跳转过来
+            this.setState({hiddenBar: true});
+
+            this.fastInitCate()
+
+        } else {
+            this.getCate();
+        }
+    }
+
+    fastInitCate = async () => {
+        const {c, t} = this.$router.params;
+        console.log(c, t)
+        try {
+            let res = await api("app.product/cate");
+            res = res.map(v => {
+                v.tags.unshift({
+                    id: 0,
+                    name: "全部"
+                });
+                return v
+            });
+
+            let ca = 0;
+            const ta = 0;
+            for (let index = 0; index < res.length; index++) {
+                const element = res[index];
+                console.log(parseInt(c) == element.tpl_category_id, element.tpl_category_id, index)
+                if (parseInt(c) == element.tpl_category_id) {
+                    ca = index
+                    break;
+                }
+            }
+            this.setState({
+                cates: [...res],
+                switchActive: ca,
+                switchTagActive: ta
+            }, () => {
+                this.calcDeviceRota().then(() => {
+                    this.getTagContext(res[ca].tags[ta]);
+                    Taro.hideLoading();
+                }).catch(() => {
+                    Taro.hideLoading();
+                });
+            })
+
+        }catch (e) {
+
+        }
     }
 
     getCate = () => {
@@ -85,7 +131,7 @@ export default class Template extends Component<any, {
                 });
                 return item
             });
-            // Taro.setStorage({key:"template_cate",data:res});
+            this.setState({cates: res})
             this.handleCate(res);
         }).catch((e) => {
             Taro.hideLoading();
@@ -100,10 +146,11 @@ export default class Template extends Component<any, {
             });
         })
     }
+
     handleCate = (res) => {
         const {c, t} = this.$router.params;
         let ca = 0;
-        let ta = 0;
+        const ta = 0;
         const cid = c ? parseInt(c) : 0;
         const tid = t ? parseInt(t) : 0;
         for (let index = 0; index < res.length; index++) {
@@ -112,13 +159,12 @@ export default class Template extends Component<any, {
             for (let i = 0; i < element.tags.length; i++) {
                 const tag = element.tags[i];
                 if (parseInt(tag.id + "") == tid) {
-                    ta = i;
+                    // ta = i;
                     break;
                 }
             }
         }
         this.setState({
-            cates: res,
             switchActive: ca,
             switchTagActive: ta
         }, () => {
@@ -131,14 +177,16 @@ export default class Template extends Component<any, {
         })
         Taro.hideLoading();
     }
+
     calcDeviceRota = () => {
         return new Promise<any>((resolve, reject) => {
-            const ww = Taro.getSystemInfoSync().windowWidth;
+            const ww = deviceInfo.windowWidth;
             const query = Taro.createSelectorQuery;
             if (!query) {
                 reject();
                 return;
             }
+            const {hiddenBar} = this.state;
             query().selectViewport().boundingClientRect((vres) => {
                 query().selectAll(".t_tops").boundingClientRect((res: any) => {
                     query().selectAll('.left-menu').boundingClientRect((rect: any) => {
@@ -146,13 +194,21 @@ export default class Template extends Component<any, {
                             if (t_rect.height > 0) {
                                 rect.forEach((l_rect) => {
                                     if (l_rect.width > 0) {
+                                        let otherHeight = 0;
+                                        if (deviceInfo.env !== "h5") {
+                                            otherHeight = vres.height - t_rect.height;
+                                        } else {
+                                            otherHeight = vres.height - t_rect.height - 50;
+                                        }
+                                        if (hiddenBar) {
+                                            otherHeight -= 50
+                                        }
                                         this.setState({
                                             topsHeight: t_rect.height,
-                                            otherHeight: process.env.TARO_ENV === 'h5' ? vres.height - t_rect.height - 50 : vres.height - t_rect.height,
+                                            otherHeight,
                                             mainRightWidth: ww - l_rect.width
                                         });
                                         setTimeout(() => {
-                                            // @ts-ignore
                                             resolve();
                                         }, 100);
                                     }
@@ -273,6 +329,7 @@ export default class Template extends Component<any, {
             })
         }
     }
+
     onTagItemClick = (item, cid, tpl_type) => {
         if (tpl_type == "phone") {
             Taro.navigateTo({
@@ -293,6 +350,7 @@ export default class Template extends Component<any, {
             });
         }
     }
+
     onCateSwitch = (index, tags) => {
         this.setState({
             switchActive: index,
@@ -316,7 +374,9 @@ export default class Template extends Component<any, {
             mainRightWidth,
             showAllCates,
             loadStatus,
-            colHeight
+            colHeight,
+            topsHeight,
+            hiddenBar
         } = this.state;
         const tags = cates && cates[switchActive] ? cates[switchActive].tags : [];
         const tplid = cates && cates[switchActive] && cates[switchActive].tpl_category_id ? cates[switchActive].tpl_category_id : 0;
@@ -330,41 +390,47 @@ export default class Template extends Component<any, {
                 <View className='t_tops'
                       style={`padding-top:${deviceInfo.statusBarHeight}px;background: #FFF;`}>
                     {
-                        showAllCates ? <View className='all-category-warp'
+                        showAllCates
+                            ? <View className='all-category-warp'
                                              style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight + deviceInfo.menu.bottom}px;`}>
-                            <AtNavBar
-                                onClickLeftIcon={() => Taro.navigateBack()}
-                                color='#121314' title=" "
-                                border fixed
-                                customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
-                                leftIconType={{
-                                    value:'chevron-left',
-                                    color:'#121314',
-                                    size: 24
-                                }}
-                            />
-                            <View className='all-category'>
-                                <View className='title-box'>
-                                    <Text className='txt'>全部品类</Text>
-                                    <View onClick={() => {
-                                        this.setState({
-                                            showAllCates: false
-                                        })
-                                    }}><IconFont name='24_guanbi' size={48} color='#121314'/></View>
-                                </View>
-                                <View className='all-item'>
-                                    {
-                                        cates.length > 0 && cates.map((item, index) => (
-                                            <View className='item' key={item.id}
-                                                  onClick={() => this.onCateSwitch(index, cates && cates[index] ? cates[index].tags : [])}>
-                                                <Image src={item.image} className='img'/>
-                                                <Text className='name'>{item.name}</Text>
+                                <AtNavBar
+                                    onClickLeftIcon={() => Taro.navigateBack()}
+                                    color='#121314' title=" "
+                                    border fixed
+                                    customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
+                                    leftIconType={{
+                                        value:'chevron-left',
+                                        color:'#121314',
+                                        size: 24
+                                    }}
+                                />
+                                {
+                                    !hiddenBar
+                                        ? <View className='all-category'>
+                                            <View className='title-box'>
+                                                <Text className='txt'>全部品类</Text>
+                                                <View onClick={() => {
+                                                    this.setState({
+                                                        showAllCates: false
+                                                    })
+                                                }}><IconFont name='24_guanbi' size={48} color='#121314'/></View>
                                             </View>
-                                        ))
-                                    }
-                                </View>
+                                            <View className='all-item'>
+                                                {
+                                                    cates.length > 0 && cates.map((item, index) => (
+                                                        <View className='item' key={item.id}
+                                                              onClick={() => this.onCateSwitch(index, cates && cates[index] ? cates[index].tags : [])}>
+                                                            <Image src={item.image} className='img'/>
+                                                            <Text className='name'>{item.name}</Text>
+                                                        </View>
+                                                    ))
+                                                }
+                                            </View>
+                                        </View>
+                                        : null
+                                }
                             </View>
-                        </View> : null
+                            : null
                     }
                     <AtNavBar
                         onClickLeftIcon={() => Taro.navigateBack()}
@@ -377,32 +443,39 @@ export default class Template extends Component<any, {
                             size: 24
                         }}
                     />
-                    <View className='top-switch'
-                          style={{
-                              marginTop: `${deviceInfo.env === "h5" ? 50 : (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0)}px`
-                          }}
-                    >
-                        <ScrollView scrollX className='switch-scroll'>
-                            <View className='warp' style={`width:${Taro.pxTransform((cates.length + 1) * 128)}`}>
-                                {
-                                    cates.length > 0 && cates.map((item, index) => (
-                                        <View className={index == switchActive ? 'item active' : 'item'} key={item.id}
-                                              onClick={() => this.onCateSwitch(index, cates && cates[index] ? cates[index].tags : [])}>
-                                            <Text className='text'>{item.name}</Text>
-                                            {index == switchActive ? <Image className='icon'
-                                                                            src={require("../../../../source/switchBottom.png")}/> : null}
-                                        </View>
-                                    ))
-                                }
+                    {
+                        !hiddenBar
+                            ? <View className='top-switch'
+                                    style={{
+                                        marginTop: `${deviceInfo.env === "h5" ? 50 : (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0)}px`
+                                    }}
+                            >
+                                <ScrollView scrollX className='switch-scroll'>
+                                    <View className='warp' style={`width:${Taro.pxTransform((cates.length + 1) * 128)}`}>
+                                        {
+                                            cates.length > 0 && cates.map((item, index) => (
+                                                <View className={index == switchActive ? 'item active' : 'item'} key={item.id}
+                                                      onClick={() => this.onCateSwitch(index, cates && cates[index] ? cates[index].tags : [])}>
+                                                    <Text className='text'>{item.name}</Text>
+                                                    {index == switchActive ? <Image className='icon'
+                                                                                    src={require("../../../../source/switchBottom.png")}/> : null}
+                                                </View>
+                                            ))
+                                        }
+                                    </View>
+                                </ScrollView>
+                                <View className='all' onClick={() => this.setState({showAllCates: true})}>
+                                    <IconFont name='24_gengduofenlei' size={48} color='#121314'/>
+                                </View>
                             </View>
-                        </ScrollView>
-                        <View className='all' onClick={() => this.setState({showAllCates: true})}>
-                            <IconFont name='24_gengduofenlei' size={48} color='#121314'/>
-                        </View>
-                    </View>
+                            : null
+                    }
                 </View>
 
-                <View className='main' style={`height:${otherHeight}px;`}>
+                <View className='main' style={{
+                    height: otherHeight + "px",
+                    marginTop: (hiddenBar ? topsHeight + deviceInfo.statusBarHeight : 0) + "px"
+                }}>
                     <View className='left-menu' id="template_left_menu"
                           style={`height:${otherHeight}px;background:#FFF`}>
                         <ScrollView scrollY className='left-scroll' style={`height:${otherHeight}px;background:#FFF`}>

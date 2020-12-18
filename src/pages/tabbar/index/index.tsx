@@ -17,6 +17,7 @@ interface IndexState {
     centerPartyHeight: number;
     banners: [];
     showUnc: boolean;
+    cateInfo: any[]
 }
 
 @inject("userStore")
@@ -35,7 +36,9 @@ class Index extends Component<any, IndexState> {
             centerPartyHeight: 500,
             banners: [],
             showUnc: false,
+            cateInfo: []
         }
+
     }
 
     private total: number = 0;
@@ -80,6 +83,12 @@ class Index extends Component<any, IndexState> {
             this.setState({banners: res || []})
         }).catch(e => {
             console.log("首页banner获取失败：", e)
+        })
+
+        api("app.product/cate").then(res => {
+            this.setState({cateInfo: [...res]})
+        }).catch(_ => {
+
         })
     }
 
@@ -170,10 +179,33 @@ class Index extends Component<any, IndexState> {
 
     jumpToTemplate = type => {
         let url = "";
+        let picID = "63";
+        let firstPicID = "";
+        let phoneID = "41";
+        let firstPhoneID = "";
+
+        const {cateInfo} = this.state;
+
+        for (const item of cateInfo) {
+            if (item.tpl_type === "phone") {
+                phoneID = item.tpl_category_id;
+                if (item.tags.length > 0) {
+                    firstPhoneID = item.tags[0].id
+                }
+            }
+            if (item.tpl_type === "photo") {
+                picID = item.tpl_category_id;
+                if (item.tags.length > 0) {
+                    firstPicID = item.tags[0].id
+                }
+            }
+        }
+
+
         switch (type) {
-            case 1: url = "c=63"; break;
-            case 2: url = "c=41"; break;
-            case 3: url = "c=41"; break;
+            case 1: url = `c=${picID}&t=${firstPicID}&j=t`; break;  // 照片
+            case 2: url = `c=${phoneID}&t=${firstPhoneID}&j=t`; break;  // 手机壳
+            case 3: url = `c=${cateInfo[0].tpl_category_id}&t=${cateInfo[0].tags[0].id}`; break;  // 全部
         }
 
         Taro.navigateTo({
