@@ -17,7 +17,6 @@ import {
     notNull,
     ossUrl,
     setTempDataContainer,
-    urlDeCode
 } from '../../../../utils/common';
 import {Base64} from 'js-base64';
 import PayWayModal from '../../../../components/payway/PayWayModal';
@@ -103,7 +102,8 @@ export default class Confirm extends Component<any, {
         if (this.isPhoto) {
             try {
                 await photoStore.getServerParams({setLocal: true});
-                params = urlDeCode(photoStore.photoProcessParams.changeUrlParams)
+                console.log(photoStore.photoProcessParams.changeUrlParams)
+                params = photoStore.photoProcessParams.changeUrlParams
             } catch (e) {
                 console.log("读取参数出错：", e)
 

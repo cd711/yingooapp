@@ -358,12 +358,11 @@ const PrintChange: Taro.FC<any> = () => {
                 }
             })
         }
-        const paramsStr = getURLParamsStr(urlEncode(data));
 
         try {
 
             await photoStore.updateServerParams(photoStore.printKey, {
-                changeUrlParams: paramsStr
+                changeUrlParams: data
             })
 
         } catch (e) {
