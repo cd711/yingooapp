@@ -3,11 +3,15 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
-import {deviceInfo, getURLParamsStr, getUserKey, jumpToPrintEditor, notNull, urlEncode} from "../../../../utils/common";
+import {
+    deviceInfo, getURLParamsStr,
+    getUserKey,
+    jumpToPrintEditor,
+    notNull, sleep,
+    urlEncode
+} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 import OrderModal from "./orederModal";
-import {userStore} from "../../../../store/user";
-import moment from "moment";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -160,6 +164,7 @@ const PrintChange: Taro.FC<any> = () => {
     Taro.useDidShow(async () => {
 
         Taro.showLoading({title: "初始化中..."});
+        console.log(router)
 
 
         // 解析参数
@@ -168,7 +173,19 @@ const PrintChange: Taro.FC<any> = () => {
         let params: any = {};
 
         try {
-            params = await photoStore.getServerParams({setLocal: true});
+            if (router.params.init) {
+                params = await getRouterParams();
+                const ap = router.params;
+                if (ap.init) {
+                    delete ap.init
+                }
+                await sleep(300)
+                Taro.redirectTo({
+                    url: `/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`
+                })
+            } else {
+                params = await photoStore.getServerParams({setLocal: true});
+            }
         }catch (e) {
             console.log("初始化获取服务器的数据出错：", e)
         }
@@ -318,7 +335,7 @@ const PrintChange: Taro.FC<any> = () => {
         setSkuInfo({...data})
     }
 
-    const onSubmitOrder = () => {
+    const onSubmitOrder = async () => {
         let count = 0;
         for (const item of photos) {
             count += parseInt(item.count)
@@ -360,27 +377,20 @@ const PrintChange: Taro.FC<any> = () => {
                 }
             })
         }
-        const paramsStr = getURLParamsStr(urlEncode(data));
 
-        // 如果地址栏参数长度大于200，就使用本地存储加store存储
-        if (paramsStr.length > 200) {
-            try {
-                Taro.setStorageSync(`${userStore.id}_${skuInfo.id}_${count}_${moment().date()}`, JSON.stringify(data));
-                photoStore.photoProcessParams.changeUrlParams = paramsStr
+        try {
 
-            } catch (e) {
-                console.log("本地存储失败：", e)
-
-                photoStore.photoProcessParams.changeUrlParams = paramsStr
-            }
-            Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
+            await photoStore.updateServerParams(photoStore.printKey, {
+                changeUrlParams: data
             })
-        } else {
-            Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?${paramsStr}&succ=1`
-            })
+
+        } catch (e) {
+            console.log("本地存储失败：", e)
+
         }
+        Taro.navigateTo({
+            url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo`
+        })
     }
 
     const closeSelectPhoto = () => {
@@ -466,7 +476,13 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onBackHandle = async () => {
         photoStore.updateServerParams(getUserKey(), new PhotoParams())
-        Taro.navigateBack()
+        if (Taro.getCurrentPages().length > 1) {
+            Taro.navigateBack()
+        } else {
+            Taro.switchTab({
+                url: "/pages/tabbar/index/index"
+            })
+        }
     }
 
     const getScrollHeight = () => {
