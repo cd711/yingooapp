@@ -19,7 +19,7 @@ const PrintChange: Taro.FC<any> = () => {
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
     const goodsInfo = Taro.useRef({});
-    const [skus, setSkus] = useState([]);
+    const [skus, setSkus] = useState<any[]>([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
@@ -547,7 +547,7 @@ const PrintChange: Taro.FC<any> = () => {
                 visible
                     ? <OrderModal data={goodsInfo.current}
                                   isShow={visible}
-                                  defaultActive={skus}
+                                  defaultActive={skus || []}
                                   onClose={() => setVisible(false)}
                                   onSkuChange={orderSkuChange}
                                   onNowBuy={onSubmitOrder}
