@@ -2,7 +2,7 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image, ScrollView} from "@tarojs/components";
 import "../../tabbar/index/index.less";
 import IconFont from "../../../components/iconfont";
-import {cutString, deviceInfo, fixStatusBarHeight, ossUrl} from "../../../utils/common";
+import {cutString, deviceInfo, fixStatusBarHeight, getURLParamsStr, ossUrl, urlEncode} from "../../../utils/common";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../../utils/net";
 import LoadMore from "../../../components/listMore/loadMore";
@@ -96,9 +96,20 @@ const Special: Taro.FC<any> = () => {
             Taro.navigateTo({url: item.info.jump_url});
             return
         }
-        Taro.navigateTo({
-            url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
-        })
+        const {type} = router.params;
+        if (type === "phone") {
+            Taro.navigateTo({
+                url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
+            })
+        } else {
+            const str = getURLParamsStr(urlEncode({
+                id: 34,
+                tplid: item.info.id,
+            }))
+            Taro.navigateTo({
+                url: `/pages/editor/pages/printing/index?${str}`
+            });
+        }
     }
 
     const getHeight = () => {

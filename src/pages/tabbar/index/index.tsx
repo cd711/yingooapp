@@ -5,7 +5,7 @@ import {inject, observer} from '@tarojs/mobx'
 import './index.less'
 import IconFont from '../../../components/iconfont'
 import {api} from "../../../utils/net";
-import {deviceInfo, getEvenArr, notNull, ossUrl} from "../../../utils/common";
+import {deviceInfo, getEvenArr, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
 import PhotoSwiper from "./photoSwiper";
@@ -92,22 +92,42 @@ class Index extends Component<any, IndexState> {
         })
     }
 
-    onItemClick = (item, parentIdx) => {
-        console.log(item, parentIdx)
+    onItemClick = (item, _) => {
+        console.log(item)
         if (item.info.jump_url) {
             Taro.navigateTo({url: item.info.jump_url});
             return
         }
-        Taro.navigateTo({
-            url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
-        })
+        if (item.info.category.type === "photo") {
+            const str = getURLParamsStr(urlEncode({
+                id: 34,
+                tplid: item.info.id,
+            }))
+            Taro.navigateTo({
+                url: `/pages/editor/pages/printing/index?${str}`
+            });
+        } else if (item.info.category.type === "phone") {
+            const str = getURLParamsStr(urlEncode({
+                id: item.info.id,
+                cid: item.info.category.id
+            }))
+            Taro.navigateTo({
+                url: `/pages/order/pages/template/detail?${str}`
+            });
+        }
     }
 
     viewMoreSpecial = (item) => {
+        console.log(item)
         if (item.more_url) {
-            Taro.navigateTo({url: item.more_url})
-        } else {
-            Taro.navigateTo({url: `/pages/home/pages/special?specialid=${item.id}`})
+            Taro.navigateTo({url: item.more_url});
+            return
+        }
+        const type = item.clist[0].info.category.type;
+        if (type === "photo") {
+            Taro.navigateTo({url: `/pages/home/pages/special?specialid=${item.id}&type=photo`})
+        } else if (type === "phone") {
+            Taro.navigateTo({url: `/pages/home/pages/special?specialid=${item.id}&type=phone`})
         }
     }
 
@@ -317,9 +337,8 @@ class Index extends Component<any, IndexState> {
                                 const phoneArr = this.filterArrForType(list, "phone");  // 手机壳
                                 const photoArr = this.filterArrForType(list, "photo");  // 照片
                                 const onlyFourPhoto = photoArr.length > 3 ? photoArr.slice(0, 4) : [];
-                                const onlyFourPhone = phoneArr.length >= 6 ? photoArr.slice(0, 6) : [];
-                                console.log("phone",phoneArr, "photo", photoArr, onlyFourPhone)
-                                return <Fragment>
+
+                                return <Fragment key={index}>
                                     {
                                         item.model === "product"
                                             ? len === 1
@@ -509,9 +528,9 @@ class Index extends Component<any, IndexState> {
                                                                     onlyFourPhoto.map((childPhoto, photoIdx) => (
                                                                         <View className="photo_item_view_wrap" key={photoIdx}>
                                                                             <View className="photo_item_view" onClick={() => this.onItemClick(childPhoto, index)}>
-                                                                                <View className="photo_item_hidden rectangle">
-                                                                                    <Image src={require("../../../source/rectangle.svg")} className="hidden_view rectangle" />
-                                                                                    <Image src={ossUrl(childPhoto.thumb_image, 1)} className="rectangle_img" mode="aspectFill" />
+                                                                                <View className="photo_item_hidden transverse">
+                                                                                    <Image src={require("../../../source/transverse.svg")} className="hidden_view transverse" />
+                                                                                    <Image src={ossUrl(childPhoto.thumb_image, 1)} className="transverse_img" mode="aspectFill" />
                                                                                 </View>
                                                                             </View>
                                                                         </View>

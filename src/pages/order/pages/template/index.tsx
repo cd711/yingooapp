@@ -116,7 +116,7 @@ export default class Template extends Component<any, {
                 });
             })
 
-        }catch (e) {
+        } catch (e) {
 
         }
     }
@@ -337,10 +337,6 @@ export default class Template extends Component<any, {
             });
         }
         if (tpl_type == "photo") {
-            Taro.setStorage({
-                key: "imageCount",
-                data: item.image_num
-            })
             const str = getURLParamsStr(urlEncode({
                 id: 34,
                 tplid: item.id,
@@ -386,21 +382,21 @@ export default class Template extends Component<any, {
 
         return (
             <View className='template'>
-                <LoginModal />
+                <LoginModal/>
                 <View className='t_tops'
                       style={`padding-top:${deviceInfo.statusBarHeight}px;background: #FFF;`}>
                     {
                         showAllCates
                             ? <View className='all-category-warp'
-                                             style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight + deviceInfo.menu.bottom}px;`}>
+                                    style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight + deviceInfo.menu.bottom}px;`}>
                                 <AtNavBar
                                     onClickLeftIcon={() => Taro.navigateBack()}
                                     color='#121314' title=" "
                                     border fixed
                                     customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
                                     leftIconType={{
-                                        value:'chevron-left',
-                                        color:'#121314',
+                                        value: 'chevron-left',
+                                        color: '#121314',
                                         size: 24
                                     }}
                                 />
@@ -438,8 +434,8 @@ export default class Template extends Component<any, {
                         border fixed
                         customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
                         leftIconType={{
-                            value:'chevron-left',
-                            color:'#121314',
+                            value: 'chevron-left',
+                            color: '#121314',
                             size: 24
                         }}
                     />
@@ -454,7 +450,8 @@ export default class Template extends Component<any, {
                                     <View className='warp' style={`width:${Taro.pxTransform((cates.length + 1) * 128)}`}>
                                         {
                                             cates.length > 0 && cates.map((item, index) => (
-                                                <View className={index == switchActive ? 'item active' : 'item'} key={item.id}
+                                                <View className={index == switchActive ? 'item active' : 'item'}
+                                                      key={item.id}
                                                       onClick={() => this.onCateSwitch(index, cates && cates[index] ? cates[index].tags : [])}>
                                                     <Text className='text'>{item.name}</Text>
                                                     {index == switchActive ? <Image className='icon'
@@ -501,7 +498,7 @@ export default class Template extends Component<any, {
                     <ScrollView scrollY className='right-scroll' style={`width:${mainRightWidth}px;`}
                                 onScrollToLower={this.onScrollToLower}>
                         {/* min-height:${colHeight[`${tplid}-${tagid}`]?Math.max(...colHeight[`${tplid}-${tagid}`]):0}px */}
-                        <View style={`width:${mainRightWidth}px;height:${Taro.pxTransform(32)};`} />
+                        <View style={`width:${mainRightWidth}px;height:${Taro.pxTransform(32)};`}/>
                         <View className='warp'
                               style={`width:${mainRightWidth}px;box-sizing:border-box;position: relative;min-height:${colHeight[`${tplid}-${tagid}`] ? Math.max(...colHeight[`${tplid}-${tagid}`]) : 0}px;`}>
 
@@ -520,7 +517,8 @@ export default class Template extends Component<any, {
                                           }}>
                                         <View className='print-warp'
                                               style={`width:${(mainRightWidth - (14 * 3)) / 2}px;height:${(mainRightWidth - (14 * 3)) / 2}px;`}>
-                                            <Image src={require("../../../../source/editor-print.png")} className='print'/>
+                                            <Image src={require("../../../../source/editor-print.png")}
+                                                   className='print'/>
                                             <Text className='print-txt'>直接冲印</Text>
                                         </View>
                                         <View className='nook'>
