@@ -7,6 +7,8 @@ import {inject, observer} from '@tarojs/mobx'
 import {deviceInfo, fixStatusBarHeight, ListModel} from '../../../utils/common';
 import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
+import { observe } from 'mobx';
+import LoginModal from "../../../components/login/loginModal";
 
 const tabs = ["全部", "未使用", "已使用", "已失效"];
 
@@ -42,15 +44,15 @@ export default class Login extends Component<{}, {
 
 
     componentDidMount() {
-        if (!userStore.isLogin) {
-            if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
-            } else {
-                Taro.switchTab({
-                    url: '/pages/tabbar/index/index'
-                })
-            }
-        }
+        // if (!userStore.isLogin) {
+        //     if (deviceInfo.env == 'h5') {
+        //         window.location.href = "/pages/tabbar/index/index";
+        //     } else {
+        //         Taro.switchTab({
+        //             url: '/pages/tabbar/index/index'
+        //         })
+        //     }
+        // }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react) => {
@@ -60,6 +62,17 @@ export default class Login extends Component<{}, {
                 }).exec();
             }).exec();
         }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue) {
+                this.requestData();
+            }
+        })
+        if (userStore.isLogin) {
+            this.requestData();
+        }
+    }
+
+    requestData = () => {
         const {tab} = this.$router.params;
         const {data, switchTabActive} = this.state;
         if (parseInt(tab) >= 0) {
@@ -141,6 +154,7 @@ export default class Login extends Component<{}, {
 
         return (
             <View className='ticket_page'>
+                <LoginModal />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     {/* <View className='left' onClick={() => {
@@ -159,6 +173,10 @@ export default class Login extends Component<{}, {
                         {
                             tabs.map((item, index) => (
                                 <View className={switchTabActive == index ? 'item active' : 'item'} onClick={() => {
+                                    if (!userStore.isLogin) {
+                                        userStore.showLoginModal = true;
+                                        return;
+                                    }
                                     this.setState({
                                         switchTabActive: index
                                     });

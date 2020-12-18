@@ -11,8 +11,13 @@ import {Base64} from 'js-base64';
 import {AtSwipeAction} from "taro-ui"
 import './index.less'
 import TipModal from '../../../components/tipmodal/TipModal';
+import {inject, observer} from '@tarojs/mobx'
 import {userStore} from '../../../store/user';
+import { observe } from 'mobx';
+import LoginModal from "../../../components/login/loginModal";
 
+@inject("userStore")
+@observer
 export default class Cart extends Component<{}, {
     source: any;
     allSelected: boolean;
@@ -40,21 +45,25 @@ export default class Cart extends Component<{}, {
     }
 
     componentDidMount() {
-        if (!userStore.isLogin) {
-            if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
-            } else {
-                Taro.switchTab({
-                    url: '/pages/tabbar/index/index'
-                })
+        // if (!userStore.isLogin) {
+        //     if (deviceInfo.env == 'h5') {
+        //         window.location.href = "/pages/tabbar/index/index";
+        //     } else {
+        //         Taro.switchTab({
+        //             url: '/pages/tabbar/index/index'
+        //         })
+        //     }
+        // }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue) {
+                this.initData();
             }
+        })
+        if (userStore.isLogin) {
+            this.initData();
         }
-        const {manage} = this.$router.params;
-        if (manage) {
-            this.setState({
-                isManage: true
-            })
-        }
+    }
+    initData = () => {
         Taro.showLoading({title: '加载中'});
         api("app.cart/list", {
             size: 20,
@@ -76,7 +85,6 @@ export default class Cart extends Component<{}, {
             console.log(e);
         })
     }
-
     onItemClick = (list, index) => {
         list[index]["checked"] = !list[index]["checked"];
         const {source} = this.state;
@@ -87,6 +95,10 @@ export default class Cart extends Component<{}, {
         })
     }
     onAllSelect = (list, allSelected) => {
+        if (!userStore.isLogin) {
+            userStore.showLoginModal = true;
+            return;
+        }
         const {source} = this.state;
         source.list = list.map((item) => {
             item["checked"] = !allSelected;
@@ -163,13 +175,14 @@ export default class Cart extends Component<{}, {
         }];
         return (
             <View className='cart'>
+                <LoginModal />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
-                    <View className='left' onClick={() => {
+                    {/* <View className='left' onClick={() => {
                         Taro.navigateBack();
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
-                    </View>
+                    </View> */}
                     <View className='center'>
                         <Text className='title'>购物车</Text>
                     </View>

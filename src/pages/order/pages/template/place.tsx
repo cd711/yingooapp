@@ -7,68 +7,151 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButtonClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
-    const [itemActive, setItemActive] = useState([])
-    const [tags, setTags] = useState([]);
+export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
+
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
-    const [marketPriceShow, setMarketPriceShow] = useState(true);
-    const [selectSku, setSelectSku] = useState({});
+    const [marketPriceShow, setMarketPriceShow] = useState(false);
     const [imgs, setImgs] = useState([]);
-    const onItemSelect = (idx, _, tagId) => {
-        const items = itemActive;
-        items[idx] = tagId;
-        setItemActive(items);
-        let temp = "";
-        const skus = data.skus.filter(item => item.value.indexOf(tagId) != -1);
-        const sku = [];
-        let overskus = '';
+    const [skus,setSkus] = useState([]);
+    const [attrItems,setAttrItems] = useState([]);
+    
+    let currentSku = null;
+
+
+    const initSkus = (skus) => {
+        let currentValue = "";
+        if (selectedSku) {
+            const skuKeyAttr:Array<any> = selectedSku.split(',');
+            skuKeyAttr.sort(function(value1, value2) {
+                return parseInt(value1) - parseInt(value2);
+            });
+            currentValue = skuKeyAttr.join(',');
+        }
         for (let index = 0; index < skus.length; index++) {
-            const iterator = skus[index];
-            if (iterator.stock > 0) {
-                temp += temp.length > 0 ? `${iterator.value}` : `,${iterator.value}`
-            } else {
-                overskus += overskus.length > 0 ? `${iterator.value}` : `,${iterator.value}`
+            const skuItem = skus[index];
+            const skuKeyAttrs:Array<any> = skuItem.value.split(',');
+            skuKeyAttrs.sort(function(value1, value2) {
+                return parseInt(value1) - parseInt(value2);
+            });
+            skuItem.value = skuKeyAttrs.join(',');
+            if (selectedSkuId && parseInt(skuItem.id+"") == parseInt(selectedSkuId+"")) {
+                currentSku = skuItem;
+            }
+            if (currentValue.length>0 && currentValue == skuItem.value) {
+                currentSku = skuItem;
             }
         }
-        const t = [];
-        for (let index = 0; index < data.attrGroup.length; index++) {
-            sku.push(items[index] ? `${items[index]}` : "");
-            if (index != idx) {
-                tags[index] = tags[index].map((item) => {
-                    item["over"] = false;
-                    if (overskus.indexOf(item.id) != -1) {
-                        item["over"] = true;
+        setSkus(skus);
+    }
+
+    const selectAtteItems = (sku,attrItems:Array<Array<any>>) => {
+        const items = attrItems.map((value)=>{
+            return value.map((val)=>{
+                val["selected"] = false;
+                val["over"] = false;
+                if (sku && sku.value && sku.value.indexOf(val.id)>-1) {
+                    val["selected"] = true;
+                    if (parseInt(sku.stock+"")>0) {
+                        val["over"] = false;
+                    } else {
+                        val["over"] = true;
+                        val["selected"] = false;
                     }
-                    return item;
+                }
+                return val;
+            });
+        });
+        setAttrItems(items);
+    }
+    const onSelectItem = (itemIdx,tagIdx,state) => {
+        onSkuChange && onSkuChange(null);
+        const selectIds = [];
+        let items = attrItems;
+        items[itemIdx].map((tag,idx)=>{
+            tag["selected"] = false;
+            if (tagIdx == idx) {
+                tag["selected"] = state;
+            }
+            return tag;
+        });
+        for (const item of items) {
+            for (const tag of item) {
+                if (tag["selected"]) {
+                    selectIds.push(tag.id);
+                }
+            }
+        }
+        selectIds.sort(function(value1, value2) {
+            return parseInt(value1) - parseInt(value2);
+        });
+        const skuValue = selectIds.join(',');
+        const maybeSkus = skus.filter((obj)=>{
+            if (selectIds.length>0) {
+                return selectIds.some((val)=>{
+                    return obj.value.indexOf(val)>-1
                 });
-                const tt = tags[index].filter(item => overskus.indexOf(item.id) != -1 || temp.indexOf(item.id) != -1);
-                t.push(tt)
-            } else {
-                t.push(tags[index])
+            }
+            return true;
+        });
+        items = items.map((item)=>{
+            return item.map((tag)=>{
+                tag["over"] = false;
+                if (!tag["selected"] && selectIds.length>0) {
+                    maybeSkus.map((sku)=>{
+                        if (sku.value.indexOf(tag.id)>-1 && parseInt(sku.stock+"")<=0) {
+                            tag["over"] = true;
+                        }
+                    })
+                }
+                return tag;
+            });
+        });
+        setAttrItems(items);
+        if (selectIds.length != items.length) {
+            const prices = maybeSkus.map((item) => {
+                return item.price;
+            })
+            prices.sort(function (a, b) {
+                return parseFloat(a + "") - parseFloat(b + "")
+            });
+            setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
+            setMarketPriceShow(false);
+        } else {
+            for (let i = 0; i<maybeSkus.length; i++) {
+                const sku = maybeSkus[i];
+                if (sku.value == skuValue) {
+                    setPrice(sku.price);
+                    setMarketPriceShow(true);
+                    setMarketPrice(sku.market_price);
+                    onSkuChange && onSkuChange(sku);
+                    break;
+                }
             }
         }
-
-        if (sku.length == data.attrGroup.length) {
-
-            const sk = sku.join(",");
-            const a = data.skus.filter(item => item.value == sk)[0];
-            const imgs = data.imgs.filter(item => item.value == sk)[0];
-            setImgs(imgs && imgs.image && imgs.image.length > 0 ? imgs.image : data.image)
-            // console.log(imgs.image);
-            if (a) {
-                setPrice(a.price);
-                setMarketPriceShow(true);
-                setMarketPrice(a.market_price);
-                setSelectSku(a);
+        if (selectIds.length>0 && data.imgs && data.imgs.length>0) {
+            const ids = [];
+            for (let i = 0; i<items.length; i++) {
+                const element = items[i];
+                let tid = "";
+                for (let j = 0; j<element.length;j++) {
+                    if(element[j]["selected"]){
+                        tid = element[j].id;
+                        break;
+                    }
+                }
+                ids.push(tid)
             }
+            const imgs = data.imgs.filter((item)=>item.image.length>0 && item.value == ids.join(","));
+            setImgs(imgs.length==1?imgs[0].image:data.image);
+        } else {
+            setImgs(data.image);
         }
-        setTags(t);
     }
     useEffect(() => {
-
         if (!isEmpty(data)) {
-            data.attrItems && setTags(data.attrItems);
+            initSkus(data.skus);
+            selectAtteItems(currentSku,data.attrItems);
             const prices = data.skus.map((item) => {
                 return item.price;
             })
@@ -76,24 +159,39 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButto
                 return parseFloat(a + "") - parseFloat(b + "")
             });
             data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
-            setMarketPriceShow(false);
-            data.market_price && setMarketPrice(data.market_price);
             data.image && setImgs(data.image);
         }
     }, [data]);
-    useEffect(() => {
-        if (onSkuChange) {
-            onSkuChange(selectSku);
+    const _onClose = () => {
+        let names = [];
+        for (let i = 0; i<attrItems.length; i++) {
+            const element = attrItems[i];
+            let tid = "";
+            for (let j = 0; j<element.length;j++) {
+                if(element[j]["selected"]){
+                    tid = element[j].name;
+                    break;
+                }
+            }
+            names.push(tid);
         }
-    }, [selectSku])
-    useEffect(() => {
-        if (!isShow) {
-            setSelectSku({});
-            setTags([]);
-            setItemActive([]);
-            onClose && onClose();
+        let n = 0;
+        const ns = [];
+        for (let i = 0; i<names.length; i++) {
+            const item = names[i];
+            if (item == "") {
+                n += 1;
+                ns.push(data.attrGroup[i].name)
+            }
         }
-    }, [isShow])
+        if (n == attrItems.length) {
+            names = [];
+        }
+        if (n>0 && n<attrItems.length) {
+            names = ns;
+        }
+        onClose && onClose(names)
+    }
     return <View className='placeOrder'>
         <View className={isShow?'float-layout float-layout--active':'float-layout'}>
             <View className='float-layout__overlay' />
@@ -117,7 +215,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButto
                             </Swiper> : null
                         }
 
-                        <View className='close' onClick={onButtonClose}>
+                        <View className='close' onClick={_onClose}>
                             <IconFont name='32_guanbi' size={64} color='#333'/>
                         </View>
                     </View>
@@ -142,13 +240,14 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButto
                                         <Text className='title'>{item.name}</Text>
                                         <View className='params'>
                                             {
-                                                tags && tags[index] && tags[index].map((tag) => (
+                                                attrItems && attrItems[index] && attrItems[index].map((tag,idx) => (
                                                     <Fragment key={tag.id}>
                                                         <View
-                                                            className={itemActive[index] == tag.id ? 'item active' : tag.over ? 'item over' : 'item'}
+                                                            className={tag.over ?'item over':(tag.selected?'item active' :'item')}
                                                             onClick={() => {
                                                                 if (!tag.over) {
-                                                                    onItemSelect(index, item.id, tag.id)
+                                                                    // onItemSelect(index, item.id, tag.id);
+                                                                    onSelectItem(index,idx,!tag.selected);
                                                                 }
                                                             }}>
                                                             <Text className='txt'>{tag.name}</Text>
@@ -166,10 +265,14 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, onClose, onButto
                         <Text className='title'>购买数量</Text>
                         <Counter num={1} onCounterChange={onBuyNumberChange}/>
                     </View>
-                    <View className='ops'>
-                        <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
-                        <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
-                    </View>
+                    {
+                        showOkButton ?<View className='ops'>
+                            <Button className='red-ok-btn'>确定</Button>
+                        </View>:<View className='ops'>
+                            <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
+                            <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
+                        </View>
+                    }
                 </View>
             </View>
         </View>

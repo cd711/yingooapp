@@ -14,6 +14,7 @@ import {deviceInfo, fixStatusBarHeight, notNull, ossUrl, urlDeCode} from '../../
 import {Base64} from 'js-base64';
 import PayWayModal from '../../../../components/payway/PayWayModal';
 import moment from "moment";
+import AddBuy from '../../../../components/addbuy/addbuy';
 
 
 @inject("templateStore", "userStore")
@@ -30,7 +31,8 @@ export default class Confirm extends Component<any, {
     currentOrderTicketId: number,
     usedTickets: Array<any>
     order_sn: string;
-    payStatus:number
+    payStatus:number,
+    orderid:string
 }> {
 
     config: Config = {
@@ -50,7 +52,8 @@ export default class Confirm extends Component<any, {
             currentTicketOrderId: "",
             currentOrderTicketId: 0,
             usedTickets: [],
-            payStatus:0
+            payStatus:0,
+            orderid:""
         }
     }
 
@@ -132,7 +135,8 @@ export default class Confirm extends Component<any, {
                 }
                 this.filterUsedTicket(res.orders);
                 this.setState({
-                    data: res
+                    data: res,
+                    orderid: res.prepay_id
                 });
             }).catch((e) => {
                 Taro.hideLoading();
@@ -146,17 +150,25 @@ export default class Confirm extends Component<any, {
     }
 
     componentDidShow() {
+        console.log("componentDidShow")
         const {data: {address}} = this.state;
+
         if (!isEmpty(address) && !isEmpty(templateStore.address)) {
+            console.log("a");
             if (address.id == templateStore.address.id) {
+                console.log("B");
                 return;
             }
         }
         const { orderid } = this.$router.params;
-        if (!isEmpty(templateStore.address) && orderid) {
+        let prepay_id = orderid;
+        if (!orderid) {
+            prepay_id = this.state.orderid;
+        }
+        if (!isEmpty(templateStore.address) && prepay_id) {
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/address", {
-                prepay_id: orderid,
+                prepay_id: prepay_id,
                 address_id: templateStore.address.id
             }).then((res) => {
                 Taro.hideLoading();
@@ -400,6 +412,9 @@ export default class Confirm extends Component<any, {
             currentOrderTicketId: ticketId
         })
     }
+    getAddBuyProduct = () => {
+
+    }
     render() {
         const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn} = this.state;
         const {address} = templateStore;
@@ -458,7 +473,7 @@ export default class Confirm extends Component<any, {
                                         item.products.map((product) => (
                                             <View className='info' key={product.id}>
                                                 <View className='pre-image'>
-                                                    <Image src={ossUrl(product.tpl.thumb_image, 0)} className='img'
+                                                    <Image src={ossUrl(product.product.thumb_image, 0)} className='img'
                                                            mode='aspectFill'/>
                                                     <View className='big'><IconFont name='20_fangdayulan'
                                                                                     size={40}/></View>
@@ -482,7 +497,20 @@ export default class Confirm extends Component<any, {
                                             </View>
                                         ))
                                     }
-
+                                    {
+                                        item.products.filter((obj)=>obj.buy_type=="main").length == 1?<View className='add_buy'>
+                                            <View className='add_buy_title'>
+                                                <View className='line'>
+                                                    <Image className='ygyp' src={require("../../../../source/ygyp.svg")} />
+                                                    <Text className='adv'>加购立减邮费</Text>
+                                                    <Text className='tip'>（已减8元邮费）</Text>
+                                                </View>
+                                            </View>
+                                            <View className='add_buy_container'>
+                                                <AddBuy />
+                                            </View>
+                                        </View>:null
+                                    }
                                 </View>
                                 <View className='goods-item'>
                                     <Text className='title'>商品金额</Text>
@@ -546,26 +574,27 @@ export default class Confirm extends Component<any, {
                     }
                 </ScrollView>
                 <View className='bottom'>
-                    <View className='left'>
-                        <Text className='title'>合计：</Text>
-                        <View className='price'>
-                            <Text className='sym'>¥</Text>
-                            <Text
-                                className='num'>{parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "00.00"}</Text>
+                    <View className='main'>
+                        <View className='left'>
+                            <Text className='title'>合计：</Text>
+                            <View className='price'>
+                                <Text className='sym'>¥</Text>
+                                <Text
+                                    className='num'>{parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "00.00"}</Text>
+                            </View>
                         </View>
+                        {
+                            address ? <Button className='submit-order-btn submit-order-active'
+                                            onClick={this.onSubmitOrder}>提交订单</Button> :
+                                <Button className='submit-order-btn' onClick={() => {
+                                    Taro.showToast({
+                                        title: '请选择地址!',
+                                        icon: 'none',
+                                        duration: 1500
+                                    })
+                                }}>提交订单</Button>
+                        }
                     </View>
-                    {
-                        address ? <Button className='submit-order-btn submit-order-active'
-                                          onClick={this.onSubmitOrder}>提交订单</Button> :
-                            <Button className='submit-order-btn' onClick={() => {
-                                Taro.showToast({
-                                    title: '请选择地址!',
-                                    icon: 'none',
-                                    duration: 1500
-                                })
-                            }}>提交订单</Button>
-                    }
-
                 </View>
                 {
                     showTickedModal

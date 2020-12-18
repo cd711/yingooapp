@@ -227,7 +227,7 @@ export default class Preview extends Component<any, {
         api('app.product/info',{
             id:30
         }).then((res)=>{
-            // console.log(res);
+            // console.log("aaa",res);
             this.setState({
                 productInfo:res,
                 placeOrderShow: true
@@ -290,7 +290,7 @@ export default class Preview extends Component<any, {
                 <View className='container'>
                     {/* eslint-disable-next-line react/forbid-elements */}
                     {
-                        workid?<Image src={workInfo.thumb_image} style={`width:230px;height: 478.664px;`} />:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%" />
+                        workid?<Image src={workInfo.thumb_image} style="width:230px;height: 478.664px;" />:<iframe className="editor_frame" src={process.env.NODE_ENV == 'production'?`/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`:`http://192.168.0.166/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`} width="100%" height="100%" />
                     }
                 </View>
                 <View className='bottom'>

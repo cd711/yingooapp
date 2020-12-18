@@ -1,5 +1,5 @@
 {
-  "miniprogramRoot": "./dist",
+  "miniprogramRoot": "dist/",
   "projectname": "yingooShop",
   "description": "映果商城",
   "appid": "wx917e699bf3473296",
@@ -8,8 +8,11 @@
     "es6": false,
     "postcss": false,
     "minified": true,
-    "checkSiteMap":false
+    "checkSiteMap": false
   },
   "compileType": "miniprogram",
-  "libVersion":"2.12.2"
+  "libVersion": "2.12.2",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
+  "condition": {}
 }
