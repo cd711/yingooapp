@@ -48,7 +48,7 @@ export default class Login extends Component<{},{
                 id
             }).then((res)=>{
                 Taro.hideLoading();
-                
+
                 if(pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`,(value)=>{
                         if (value != null) {
@@ -58,20 +58,23 @@ export default class Login extends Component<{},{
                             if (value.hasOldSku) {
                                 res.attrItems = res.attrItems.map((item)=>{
                                     return item.filter((it)=>{
-                                        return value.selectSku.value.some((obj)=>obj==it.name)
+                                        if (value.selectSku != null) {
+                                            return value.selectSku.value.some((obj)=>obj==it.name)
+                                        }
+                                        return true;
                                     })
                                 })
                                 console.log(res.attrItems)
                             }
                             this.setState({
                                 sku:value && value.selectSku ? value.selectSku : null,
-                                skuName:value.selectSku.value.map((item,index)=>{
+                                skuName:value && value.selectSku ?value.selectSku.value.map((item,index)=>{
                                     const key = value.selectSku.keys[index];
                                     if (item == "") {
                                         return key;
                                     }
                                     return item;
-                                }),
+                                }):[],
                                 data:res
                             })
                         }
