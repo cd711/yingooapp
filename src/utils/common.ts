@@ -392,3 +392,23 @@ export function getTempDataContainer(key:string,callback:(value:any)=>void){
         callback(null)
     });
 }
+
+export function removeURLParameter(url, parameter) {
+    const urlparts = url.split('?');
+    if(urlparts.length >= 2) {
+        //参数名前缀
+        const prefix = encodeURIComponent(parameter) + '=';
+        const pars = urlparts[1].split(/[&;]/g);
+
+        //循环查找匹配参数
+        for(let i = pars.length; i-- > 0;) {
+            if(pars[i].lastIndexOf(prefix, 0) !== -1) {
+                //存在则删除
+                pars.splice(i, 1);
+            }
+        }
+
+        return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
+    }
+    return url;
+}

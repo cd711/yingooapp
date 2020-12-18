@@ -3,7 +3,13 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
-import {deviceInfo, getUserKey, jumpToPrintEditor, notNull} from "../../../../utils/common";
+import {
+    deviceInfo, getURLParamsStr,
+    getUserKey,
+    jumpToPrintEditor,
+    notNull, sleep,
+    urlEncode
+} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 import OrderModal from "./orederModal";
 import {PhotoParams} from "../../../../modal/modal";
@@ -158,6 +164,7 @@ const PrintChange: Taro.FC<any> = () => {
     Taro.useDidShow(async () => {
 
         Taro.showLoading({title: "初始化中..."});
+        console.log(router)
 
 
         // 解析参数
@@ -166,7 +173,19 @@ const PrintChange: Taro.FC<any> = () => {
         let params: any = {};
 
         try {
-            params = await photoStore.getServerParams({setLocal: true});
+            if (router.params.init) {
+                params = await getRouterParams();
+                const ap = router.params;
+                if (ap.init) {
+                    delete ap.init
+                }
+                await sleep(300)
+                Taro.redirectTo({
+                    url: `/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`
+                })
+            } else {
+                params = await photoStore.getServerParams({setLocal: true});
+            }
         }catch (e) {
             console.log("初始化获取服务器的数据出错：", e)
         }
@@ -457,7 +476,13 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onBackHandle = async () => {
         photoStore.updateServerParams(getUserKey(), new PhotoParams())
-        Taro.navigateBack()
+        if (Taro.getCurrentPages().length > 1) {
+            Taro.navigateBack()
+        } else {
+            Taro.switchTab({
+                url: "/pages/tabbar/index/index"
+            })
+        }
     }
 
     const getScrollHeight = () => {
