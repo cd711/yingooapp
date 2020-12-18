@@ -286,10 +286,7 @@ export default class Template extends Component<any, {
             })
             const str = getURLParamsStr(urlEncode({
                 id: 34,
-                imgid: item.id,
-                img: item.thumb_image,
-                attr: item.attr.width + "*" + item.attr.height,
-                status: "t"
+                tplid: item.id,
             }))
             Taro.navigateTo({
                 url: `/pages/editor/pages/printing/index?${str}`
@@ -382,7 +379,7 @@ export default class Template extends Component<any, {
                     />
                     <View className='top-switch'
                           style={{
-                              marginTop: (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0) + "px"
+                              marginTop: `${deviceInfo.env === "h5" ? 50 : (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0)}px`
                           }}
                     >
                         <ScrollView scrollX className='switch-scroll'>

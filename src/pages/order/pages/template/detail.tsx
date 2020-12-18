@@ -166,7 +166,7 @@ export default class Detail extends Component<{},{
                             window.location.href = '/pages/order/pages/template/index';
                             return;
                         }
-                        Taro.switchTab({
+                        Taro.navigateTo({
                             url:'/pages/order/pages/template/index'
                         });
                     }}>
@@ -187,7 +187,7 @@ export default class Detail extends Component<{},{
                         <Image src={require('../../../../source/ke.png')} className='shell' mode='scaleToFill' style={`height:${Taro.pxTransform(472/(795/1635))}`}/>
                     </View>
                     <View className='doyoulike'>
-                        <View className='opsline'></View>
+                        <View className='opsline' />
                         <Text className='liketxt'>猜你喜欢</Text>
                         <View className='like-list'>
                             {

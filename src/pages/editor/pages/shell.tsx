@@ -1452,7 +1452,7 @@ export default class Shell extends Component<{}, {
         if (!notNull(router.hidden) && router.hidden === "t") {
             this.hiddenBar = true;
             const accessToken = {
-                token: router.token,
+                token: router.tok,
                 expires: 9999999999.999
             };
             Taro.setStorage({
@@ -1598,7 +1598,7 @@ export default class Shell extends Component<{}, {
             if (process.env.TARO_ENV == "h5") {
                 window.location.href = "/";
             } else {
-                Taro.reLaunch({url: "/pages/index"});
+                Taro.reLaunch({url: "/pages/tabbar/index/index"});
             }
         }
     }

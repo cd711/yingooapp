@@ -343,6 +343,9 @@ export function jumpToPrintEditor(params: {[key: string] : any} = {}) {
     })
 }
 
+export async function sleep(timestamp) {
+    await new Promise((resolve) => setTimeout(resolve, timestamp));
+}
 
 // 从0开始截断字符串
 export function cutString(str: string = "", len: number = 1, suffix: string = "...") {

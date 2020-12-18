@@ -6,8 +6,9 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {deviceInfo} from "../../../utils/common";
+import {deviceInfo, getURLParamsStr, urlEncode} from "../../../utils/common";
 import {getToken} from "../../../utils/net";
+import moment from "moment";
 
 
 class Store {
@@ -55,7 +56,7 @@ export default class Shell extends Component<{}, {
             if (process.env.TARO_ENV == "h5") {
                 window.location.href = "/";
             } else {
-                Taro.reLaunch({url: "/pages/index"});
+                Taro.reLaunch({url: "/pages/tabbar/index/index"});
             }
         }
     }
@@ -66,9 +67,16 @@ export default class Shell extends Component<{}, {
     }
 
     getUrl = () => {
+        const str = getURLParamsStr(urlEncode({
+            ts: moment().valueOf(),  // 加上时间戳去处理小程序webview的缓存问题
+            tok: getToken(),
+            tpl_id: this.tplId,
+            cid: this.$router.params.cid,
+            hidden: "t",
+        }))
         return process.env.NODE_ENV == 'production'
-            ? `https://${config.weappUrl}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
-            : `http://${config.h5Url}/editor/shell?tpl_id=${this.tplId}&cid=${this.$router.params.cid}&hidden=t&token=${getToken()}`
+            ? `${config.weappUrl}/pages/editor/pages/shell?${str}`
+            : `${config.h5Url}/pages/editor/pages/shell?${str}`
     }
 
 

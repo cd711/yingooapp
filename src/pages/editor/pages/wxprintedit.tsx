@@ -7,12 +7,12 @@ import {observer} from '@tarojs/mobx';
 import config from "../../../config";
 import {getURLParamsStr, urlEncode} from "../../../utils/common";
 import {getToken} from "../../../utils/net";
+import moment from "moment";
 
 
 class Store {
     @observable
     tool = 0;
-
 
     @observable
     isEdit = false;
@@ -53,16 +53,17 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     getUrl = () => {
         const str = getURLParamsStr(urlEncode({
+            ts: moment().valueOf(),  // 加上时间戳去处理小程序webview的缓存问题
             ...this.routerParams,
             tpl_id: this.tplId,
             cid: this.routerParams.cid,
             hidden: "t",
             key: this.routerParams.key,
-            token: getToken()
+            tok: getToken(),
         }))
         return process.env.NODE_ENV == 'production'
-            ? `https://${config.weappUrl}/pages/editor/pages/printedit?${str}`
-            : `http://${config.h5Url}/pages/editor/pages/printedit?${str}`
+            ? `${config.weappUrl}/pages/editor/pages/printedit?${str}`
+            : `${config.h5Url}/pages/editor/pages/printedit?${str}`
     }
 
     render() {
@@ -70,9 +71,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
         return <View className='editor-page'>
             <View className="editor" style={size ? {height: size.height + "px"} : undefined}>
-                <WebView src={this.getUrl()} onLoad={(e) => {
-                    console.log("加载完成：", e)
-                }} />
+                <WebView src={this.getUrl()} />
             </View>
         </View>
     }

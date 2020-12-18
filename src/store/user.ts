@@ -1,6 +1,6 @@
-import { observable, action } from 'mobx'
-import { setUserInfo,api } from '../utils/net'
-import { is_weixin } from "../utils/common";
+import {action, observable} from 'mobx'
+import {api, setUserInfo} from '../utils/net'
+import {is_weixin} from "../utils/common";
 
 const sexList = {
     0: '保密',
@@ -8,38 +8,40 @@ const sexList = {
     2: '女',
     3: '其它',
 }
+
 export class UserStore {
     @observable
     public id = null;
     @observable
-    public mobile:string = "";
+    public mobile: string = "";
     @observable
-    public avatar:string = "";
+    public avatar: string = "";
     @observable
-    public nickname:string = "";
+    public nickname: string = "";
     @observable
-    public gender:number = 0;
+    public gender: number = 0;
     @observable
-    public bio:string = "";
+    public bio: string = "";
     @observable
-    public address:any = null;
+    public address: any = null;
     @observable
     public birthday: string = "";
     @observable
-    public set_pwd:boolean = false;
+    public set_pwd: boolean = false;
     @observable
-    public showLoginModal:boolean = false;
+    public showLoginModal: boolean = false;
 
     public get sex() {
-        const s = sexList[this.gender||0];
+        const s = sexList[this.gender || 0];
         return s || '保密';
     }
+
     public get isLogin() {
         return this.id != "" && this.id != null && this.id != 0
     }
-    
+
     @action
-    public setInfo(info){
+    public setInfo(info) {
         if (info.birthday == null || info.birthday == "") {
             info.birthday == ""
         }
@@ -53,12 +55,12 @@ export class UserStore {
         this.address = info.address;
 
         this.birthday = info.birthday;
-        this.set_pwd = info.set_pwd>0?true:false;
+        this.set_pwd = info.set_pwd > 0;
     }
 
     @action
-    public getUserInfo(){
-        api("user/info").then((info)=>{
+    public getUserInfo() {
+        api("user/info").then((info) => {
             setUserInfo(info);
             this.id = info.id;
             this.mobile = info.mobile;
@@ -68,7 +70,7 @@ export class UserStore {
             this.bio = info.bio;
             this.address = info.address;
             this.birthday = info.birthday;
-            this.set_pwd = info.set_pwd>0?true:false;
+            this.set_pwd = info.set_pwd > 0;
         })
     }
 
@@ -84,8 +86,8 @@ export class UserStore {
     }
 
     @action
-    public auth(code:string){
-        return new Promise<any>(async (resolve, reject)=> {
+    public auth(code: string) {
+        return new Promise<any>(async (resolve, reject) => {
             if (is_weixin()) {
 
             } else {
