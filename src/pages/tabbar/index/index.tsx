@@ -463,7 +463,7 @@ class Index extends Component<any, IndexState> {
                                                                     {
                                                                         phoneArr.map((phone, phoneIdx) => (
                                                                             <View className="single_phone_shell_wrap" key={phoneIdx}>
-                                                                                <View className="single_phone_shell rectangle_ke" key={phoneIdx}
+                                                                                <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
                                                                                       onClick={() => this.onItemClick(phone, index)}>
                                                                                     <Image src={require("../../../source/ke.png")} className="shell_ke rectangle_ke" />
                                                                                     <Image src={ossUrl(phone.thumb_image, 1)}
@@ -527,7 +527,7 @@ class Index extends Component<any, IndexState> {
                                                             <View className="photo_item_view_container">
                                                                 {
                                                                     onlyFourPhoto.map((childPhoto, photoIdx) => (
-                                                                        <View className="photo_item_view_wrap" key={photoIdx}>
+                                                                        <View className="photo_item_view_wrap" key={photoIdx+""}>
                                                                             <View className="photo_item_view" onClick={() => this.onItemClick(childPhoto, index)}>
                                                                                 <View className="photo_item_hidden transverse">
                                                                                     <Image src={require("../../../source/transverse.svg")} className="hidden_view transverse" />

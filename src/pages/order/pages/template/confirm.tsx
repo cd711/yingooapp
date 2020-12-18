@@ -10,14 +10,15 @@ import isEmpty from 'lodash/isEmpty';
 import Counter from '../../../../components/counter/counter';
 import FloatModal from '../../../../components/floatModal/FloatModal';
 import Ticket from '../../../../components/ticket/Ticket';
-import {deviceInfo, fixStatusBarHeight, notNull, ossUrl, urlDeCode} from '../../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getTempDataContainer, notNull, ossUrl, setTempDataContainer, urlDeCode} from '../../../../utils/common';
 import {Base64} from 'js-base64';
 import PayWayModal from '../../../../components/payway/PayWayModal';
 import moment from "moment";
 import AddBuy from '../../../../components/addbuy/addbuy';
+import LoginModal from '../../../../components/login/loginModal';
+import { observe } from 'mobx';
 
-
-@inject("templateStore", "userStore")
+@inject("userStore","templateStore")
 @observer
 export default class Confirm extends Component<any, {
     showTickedModal: boolean;
@@ -32,7 +33,8 @@ export default class Confirm extends Component<any, {
     usedTickets: Array<any>
     order_sn: string;
     payStatus:number,
-    orderid:string
+    orderid:string,
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -53,14 +55,42 @@ export default class Confirm extends Component<any, {
             currentOrderTicketId: 0,
             usedTickets: [],
             payStatus:0,
-            orderid:""
+            orderid:"",
+            centerPartyHeight:500
         }
     }
 
     // 是否从照片冲印跳转过来
     private isPhoto: boolean = false;
-
+    private tempContainerKey = "";
     componentDidMount() {
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
+                Taro.createSelectorQuery().select(".bottom").boundingClientRect((status_react) => {
+                    this.setState({
+                        centerPartyHeight: Taro.getSystemInfoSync().windowHeight - nav_rect.height - status_react.height
+                    });
+                }).exec();
+            }).exec();
+        }
+
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue) {
+                this.initData();
+            }
+        });
+
+        this.initData();
+
+        // else {
+        //     console.log(userStore.showLoginModal)
+        //     userStore.showLoginModal = true;
+        //     console.log(userStore.showLoginModal)
+        //     userStore.showLoginModal = true;
+        // }
+
+    }
+    initData = () => {
         // console.log(this.$router.params)
         // skuid=375&total=1&tplid=55&model=0
         const {page, succ, skuid, total}: any = this.$router.params;
@@ -135,7 +165,7 @@ export default class Confirm extends Component<any, {
                 }
                 this.filterUsedTicket(res.orders);
                 this.setState({
-                    data: res,
+                    data: this.handleData(res),
                     orderid: res.prepay_id
                 });
             }).catch((e) => {
@@ -148,11 +178,35 @@ export default class Confirm extends Component<any, {
             })
         }
     }
-
+    handleData = (res:any) => {
+        let temp = res;
+        if (temp && temp.orders) {
+            const orders = temp.orders;
+            for (const iterator of orders) {
+                if (iterator.products.length == 1) {
+                    for (const product of iterator.merge_products) {
+                        product["checked"] = false;
+                        const isSelectItem:Array<any> = iterator.products.filter((obj)=>obj.merge_products.some((ibj)=>ibj.product.id==product.id));
+                        console.log("select_add_product",isSelectItem);
+                        if (isSelectItem.length==1) {
+                            product["checked"] = true;
+                        }
+                    }
+                }
+            }
+        }
+        return temp
+    }
     componentDidShow() {
         console.log("componentDidShow")
         const {data: {address}} = this.state;
-
+        if (this.tempContainerKey != "") {
+            getTempDataContainer(this.tempContainerKey,(value)=>{              
+                if (value != null && value.isOk) {
+                    this.addBuyProduct(value.pre_order_id,value.product_id,value.sku.id,value.buyTotal);
+                }
+            })
+        }
         if (!isEmpty(address) && !isEmpty(templateStore.address)) {
             console.log("a");
             if (address.id == templateStore.address.id) {
@@ -174,7 +228,7 @@ export default class Confirm extends Component<any, {
                 Taro.hideLoading();
                 this.filterUsedTicket(res.orders)
                 this.setState({
-                    data: res
+                    data: this.handleData(res)
                 })
             }).catch((e)=>{
                 console.log(e);
@@ -196,7 +250,7 @@ export default class Confirm extends Component<any, {
             templateStore.address = res.address;
             console.log(res);
             this.setState({
-                data: res,
+                data:this.handleData(res),
                 // showPayWayModal:isInfo?false:true
             });
         }).catch(e => {
@@ -204,6 +258,7 @@ export default class Confirm extends Component<any, {
             Taro.hideLoading();
             setTimeout(() => {
                 window.history.replaceState(null, null, '/pages/tabbar/me/me');
+                Taro.getApp().tab = 1;
                 Taro.navigateTo({
                     url: '/pages/tabbar/order/order?tab=1'
                 })
@@ -260,6 +315,7 @@ export default class Confirm extends Component<any, {
             Taro.hideLoading();
             setTimeout(() => {
                 window.history.replaceState(null, null, '/pages/tabbar/me/me');
+                Taro.getApp().tab = 1;
                 Taro.navigateTo({
                     url: '/pages/tabbar/order/order?tab=1'
                 })
@@ -303,7 +359,7 @@ export default class Confirm extends Component<any, {
                 Taro.hideLoading();
                 this.filterUsedTicket(res.orders)
                 this.setState({
-                    data: res
+                    data: this.handleData(res)
                 })
             }).catch((e) => {
                 Taro.hideLoading();
@@ -332,7 +388,7 @@ export default class Confirm extends Component<any, {
                 Taro.hideLoading();
                 this.filterUsedTicket(res.orders);
                 this.setState({
-                    data: res
+                    data: this.handleData(res)
                 });
             }).catch((e) => {
                 Taro.hideLoading();
@@ -366,6 +422,7 @@ export default class Confirm extends Component<any, {
             showPayWayModal:false,
         });
         let title = '';
+        Taro.getApp().tab = 1;
         let url = '/pages/tabbar/order/order?tab=1';
         switch (res.code) {
             case 1:
@@ -387,9 +444,16 @@ export default class Confirm extends Component<any, {
             });
         }
         setTimeout(() => {
-            Taro.navigateTo({
-                url
-            })
+            if (res.code == 2) {
+                Taro.switchTab({
+                    url
+                });
+            } else {
+                Taro.navigateTo({
+                    url
+                })
+            }
+
         }, 2000);
     }
     onGoodsItemClick = (item,usedTickets) => {
@@ -415,12 +479,123 @@ export default class Confirm extends Component<any, {
     getAddBuyProduct = () => {
 
     }
+    onAddBuyItemDetailClick = (mainProduct,preOrderId,mainProductId,item) => {
+        console.log("onAddBuyItemDetailClick")
+        const {data} = this.state;
+        const subItem = mainProduct.merge_products.find((obj)=>obj.product.id==item.id)
+        setTempDataContainer(`${item.id}_${mainProductId}`,{
+            prepay_id:data.prepay_id,
+            pre_order_id:preOrderId,
+            product_id:mainProductId,
+            mainProduct:mainProduct,
+            currentAddBuyItem:item,
+            hasOldSku:item.sku != null ?true:false,
+            selectSku:subItem && subItem.sku ? subItem.sku : null
+        },(is)=>{
+            this.tempContainerKey = `${item.id}_${mainProductId}`;
+            if (is) {
+                Taro.navigateTo({
+                    url:`/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`
+                });
+            }
+        });
+    }
+    onAddBuyItemClick = (mainProduct,preOrderId,mainProductId,item,index) => {
+        const subItem = mainProduct.merge_products.find((obj)=>obj.product.id==item.id)
+        if (item.checked) {
+           
+            Taro.showLoading({title:"处理中..."})
+            const {data} = this.state;
+            api("app.order_temp/delproduct",{
+                prepay_id:data.prepay_id,
+                pre_order_id:preOrderId,
+                product_id:mainProductId,
+                merge_product_id:subItem.id
+            }).then((res)=>{
+                Taro.hideLoading();
+                this.setState({
+                    data:this.handleData(res)
+                })
+            }).catch((e)=>{
+                console.log("删除加购失败",e);
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:"出了一点小问题，请稍后再试!",
+                    icon:"none",
+                    duration:2000
+                })
+            })
+        }else{
+            if (item.sku == null || item.sku == "") {
+                Taro.getApp().addBuyData = null;
+                const {data} = this.state;
+                console.log("subitem",subItem)
+                setTempDataContainer(`${item.id}_${mainProductId}`,{
+                    prepay_id:data.prepay_id,
+                    pre_order_id:preOrderId,
+                    product_id:mainProductId,
+                    mainProduct:mainProduct,
+                    currentAddBuyItem:item,
+                    hasOldSku:item.sku != null ?true:false,
+                    selectSku:subItem && subItem.sku ? subItem.sku : null
+                },(is)=>{
+                    if (is) {
+                        this.tempContainerKey = `${item.id}_${mainProductId}`;
+                        Taro.navigateTo({
+                            url:`/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`
+                        });
+                    }
+                });
+                
+            } else {
+                this.addBuyProduct(preOrderId,mainProductId,item.sku.id,1);
+                // {
+                //     prepay_id:data.prepay_id,
+                //     pre_order_id:preOrderId,
+                //     product_id:mainProductId,
+                //     sku_id:item.sku.id,
+                //     quantity:1
+                // }
+            }
+        }
+    }
+    addBuyProduct = (preOrderId,mainProductId,sku_id,quantity) => {
+        console.log(preOrderId,mainProductId,sku_id,quantity)
+        Taro.showLoading({title:"处理中..."})
+        const {data} = this.state;
+        api("app.order_temp/product",{
+            prepay_id:data.prepay_id,
+            pre_order_id:preOrderId,
+            product_id:mainProductId,
+            sku_id,
+            quantity
+        }).then((res)=>{
+            Taro.hideLoading();
+            this.setState({
+                data:this.handleData(res)
+            })
+        }).catch((e)=>{
+            console.log("加购失败",e);
+            Taro.hideLoading();
+            Taro.showToast({
+                title:"出了一点小问题，请稍后再试!",
+                icon:"none",
+                duration:2000
+            })
+        })
+    }
+    onAddBuyItemCounterChange = (total,mainProduct,preOrderId,item) => {
+        const subItem = mainProduct.merge_products.find((obj)=>obj.product.id==item.id);
+        const {data} = this.state;
+        this.onCounterChange(total,data.prepay_id,preOrderId,subItem);
+    }
     render() {
-        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn} = this.state;
+        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn,centerPartyHeight} = this.state;
         const {address} = templateStore;
         // @ts-ignore
         return (
             <View className='confirm'>
+                <LoginModal />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
@@ -432,7 +607,7 @@ export default class Confirm extends Component<any, {
                         <Text className='title'>确认订单</Text>
                     </View>
                 </View>
-                <ScrollView scrollY style={{paddingBottom: 40, flex: 1}}>
+                <ScrollView enableFlex scrollY style={deviceInfo.env === 'h5' ? "flex:1" : `height:${centerPartyHeight}px`}>
                     {
                         address ? <View className='address-part-has' onClick={() => {
                             Taro.navigateTo({
@@ -498,26 +673,47 @@ export default class Confirm extends Component<any, {
                                         ))
                                     }
                                     {
-                                        item.products.filter((obj)=>obj.buy_type=="main").length == 1?<View className='add_buy'>
+                                        item.products.length == 1 && item.merge_products.length>0?<View className='add_buy'>
                                             <View className='add_buy_title'>
                                                 <View className='line'>
                                                     <Image className='ygyp' src={require("../../../../source/ygyp.svg")} />
-                                                    <Text className='adv'>加购立减邮费</Text>
-                                                    <Text className='tip'>（已减8元邮费）</Text>
+                                                    <Text className='adv'>{item.merge_discount_list[item.merge_discount_rule]}</Text>
+                                                    {
+                                                        parseInt(item.merge_discount_price+"")>0?<Text className='tip'>{`（已优惠${item.merge_discount_price}元）`}</Text>:null
+                                                    }
+                                                    
                                                 </View>
                                             </View>
                                             <View className='add_buy_container'>
-                                                <AddBuy />
+                                                {
+                                                    item.merge_products.map((addbuyItem,index)=>(
+                                                        <AddBuy key={addbuyItem.id} mainProducts={item.products[0]} product={addbuyItem} isChecked={addbuyItem.checked} onItemClick={()=>this.onAddBuyItemClick(item.products[0],item.pre_order_id,item.products[0].id,addbuyItem,index)} onCounterChange={(n)=>this.onAddBuyItemCounterChange(n,item.products[0],item.pre_order_id,addbuyItem)} onDetailClick={()=>this.onAddBuyItemDetailClick(item.products[0],item.pre_order_id,item.products[0].id,addbuyItem)}/>
+                                                    ))
+                                                }
                                             </View>
                                         </View>:null
                                     }
                                 </View>
-                                <View className='goods-item'>
-                                    <Text className='title'>商品金额</Text>
-                                    <View className='price'>
-                                        <Text className='sym'>¥</Text>
-                                        <Text className='num'>{item.products_price}</Text>
+                                <View className='product_price'>
+                                    <View className='goods-item'>
+                                        <Text className='title'>商品金额</Text>
+                                        <View className='price'>
+                                            <Text className='sym'>¥</Text>
+                                            <Text className='num'>{item.products_price}</Text>
+                                        </View>
                                     </View>
+                                    {
+                                        parseInt(item.merge_discount_price+"")>0?<View className="add_buy_discount">
+                                            <View className='add_buy_name'>
+                                                <Text className='txt'>加购减免</Text>
+                                            </View>
+                                            <View className='price'>
+                                                <Text className='sym'>-¥</Text>
+                                                <Text className='num'>{item.merge_discount_price}</Text>
+                                            </View>
+                                        </View>:null
+                                    }
+                                    
                                 </View>
                                 <View className='goods-item' onClick={() => this.onGoodsItemClick(item,usedTickets)}>
                                     <Text className='title'>优惠券</Text>
@@ -632,7 +828,8 @@ export default class Confirm extends Component<any, {
                             if (deviceInfo.env == 'h5') {
                                 window.history.replaceState(null, null, '/pages/tabbar/me/me');
                             }
-                            Taro.redirectTo({
+                            Taro.getApp().tab = 1;
+                            Taro.switchTab({
                                 url: '/pages/tabbar/order/order?tab=1'
                             })
                         }}/>

@@ -13,6 +13,7 @@ import copy from 'copy-to-clipboard';
 import TipModal from '../../../components/tipmodal/TipModal';
 import { observe } from 'mobx';
 import LoginModal from '../../../components/login/loginModal';
+import Fragment from '../../../components/Fragment';
 
 
 const tabs = ["全部","待付款","待发货","待收货","已完成"];
@@ -230,7 +231,7 @@ export default class Order extends Component<any,{
         //
         return (
             <View className='order'>
-                <LoginModal />
+                <LoginModal isTabbar={true} />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     {/* <View className='left' onClick={() => {
@@ -303,26 +304,50 @@ export default class Order extends Component<any,{
                                     <Text className={`status ${item.state_tip.value==1?'pay':(item.state_tip.value==2||item.state_tip.value==3?'deliver':'complete')}`}>{item.after_sale_status_tip.value!=0?item.after_sale_status_tip.text:item.state_tip.text}</Text>
                                 </View>
                                 {
-                                    item.products.map((product)=>(
-                                        <View className='order-info' key={product.product_id} onClick={()=>{
-                                            Taro.navigateTo({
-                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
-                                            })
-                                        }}>
-                                            <View className='order-img'>
-                                                <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
-                                                <View className='big'><IconFont name='20_fangdayulan' size={40}/></View>
+                                    item.products.length==1?item.products.map((product)=>(
+                                        <Fragment>
+                                            <View className='order-info' key={product.product_id} onClick={()=>{
+                                                Taro.navigateTo({
+                                                    url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                })
+                                            }}>
+                                                <View className='order-img'>
+                                                    <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
+                                                    <View className='big'><IconFont name='20_fangdayulan' size={40}/></View>
+                                                </View>
+                                                <View className='order-name'>
+                                                    <Text className='name'>{product.attributes}</Text>
+                                                    <Text className='num'>x{product.quantity}</Text>
+                                                </View>
+                                                <View className='price'>
+                                                    <Text className='symbol'>￥</Text>
+                                                    <Text className='n'>{product.price}</Text>
+                                                </View>
                                             </View>
-                                            <View className='order-name'>
-                                                <Text className='name'>{product.attributes}</Text>
-                                                <Text className='num'>x{product.quantity}</Text>
-                                            </View>
-                                            <View className='price'>
-                                                <Text className='symbol'>￥</Text>
-                                                <Text className='n'>{product.price}</Text>
-                                            </View>
+                                        </Fragment>
+                                    )):<View className='order-preview'>
+                                        {
+                                            item.products.map((product,index)=>(
+                                                <View style={`width: ${Taro.pxTransform(160)};height: ${Taro.pxTransform(160)};margin-right: 10px;padding: 24rpx 32rpx;`}>
+                                                    {
+                                                        index<3?<View className='order-img' key={product.product_id} onClick={()=>{
+                                                            Taro.navigateTo({
+                                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                            })
+                                                        }}>
+                                                        <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
+                                                        <View className='big'><IconFont name='20_fangdayulan' size={40}/></View>
+                                                    </View>:null
+                                                    }
+                                                    
+                                                </View>
+                                            ))
+                                        }
+                                        <View className='o_p_price'>
+                                            <Text className="aprice">￥{item.pay_price}</Text>
+                                            <Text className='total_n'>共{item.products.length}件</Text>
                                         </View>
-                                    ))
+                                    </View>
                                 }
 
                                 <View className='price-info'>
