@@ -163,7 +163,7 @@ export default class Me extends Component<any, MeState> {
 
     componentDidMount() {
         observe(userStore,"id",(change)=>{
-            if (change.newValue != change.oldValue) {
+            if (change.newValue != change.oldValue && userStore.isLogin) {
                 this.getWorksList({start: 0})
             }
         })
@@ -362,7 +362,7 @@ export default class Me extends Component<any, MeState> {
                         />
                         : null
                 }
-                <LoginModal />
+                <LoginModal isTabbar={true} />
                 <ScrollView scrollY onScroll={this.onMeScroll}
                             className="me_content_scroll"
                             enable-flex="true"

@@ -1,7 +1,7 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Swiper, SwiperItem,ScrollView,Image,Button } from '@tarojs/components'
 import IconFont from '../../../../components/iconfont';
-import { deviceInfo,fixStatusBarHeight, notNull, ossUrl } from '../../../../utils/common';
+import { deviceInfo,fixStatusBarHeight, getTempDataContainer, notNull, ossUrl, setTempDataContainer } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
 import { PlaceOrder } from '../template/place';
@@ -32,17 +32,57 @@ export default class Login extends Component<{},{
             showOkButton:false
         }
     }
+    private tempDataContainerData = null;
+    private tempDataContainerKey = "";
     componentDidMount(){
-        const {id} = this.$router.params;
+        Taro.getApp().addBuyData = null;
+        const {id,pid} = this.$router.params;
+
+        if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
+            this.setState({
+                showOkButton:true
+            });
+
+        }
         if (id != "" && id != undefined && id != null && parseInt(id) > 0) {
             Taro.showLoading({title:'加载中...'})
             api("app.product/info",{
                 id
             }).then((res)=>{
                 Taro.hideLoading();
-                this.setState({
-                    data:res,
-                })
+                if(pid != "" && pid != undefined && pid != null) {
+                    getTempDataContainer(`${id}_${pid}`,(value)=>{
+                        if (value != null) {
+                            console.log(value);
+                            this.tempDataContainerData = value;
+                            this.tempDataContainerKey = `${id}_${pid}`;
+                            if (value.hasOldSku) {
+                                res.attrItems = res.attrItems.map((item)=>{
+                                    return item.filter((it)=>{
+                                        return value.selectSku.value.some((obj)=>obj==it.name)
+                                    })
+                                })
+                                console.log(res.attrItems)
+                            }
+                            this.setState({
+                                sku:value && value.selectSku ? value.selectSku : null,
+                                skuName:value.selectSku.value.map((item,index)=>{
+                                    const key = value.selectSku.keys[index];
+                                    if (item == "") {
+                                        return key;
+                                    }
+                                    return item;
+                                }),
+                                data:res
+                            })
+                        }
+                    })
+                } else {
+                    this.setState({
+                        data:res
+                    })
+                }
+
             }).catch((e)=>{
                 console.log(e);
                 Taro.hideLoading();
@@ -104,6 +144,32 @@ export default class Login extends Component<{},{
             placeOrderShow: false,
             // showOkButton:false
         });
+    }
+    onOkButtonClick = () => {
+        const {buyTotal,sku} = this.state;
+        console.log("asdhdhskjadhskjash",buyTotal,sku)
+        if (sku != null && buyTotal>0) {
+           
+            this.setState({
+                placeOrderShow:false
+            });
+            setTempDataContainer(this.tempDataContainerKey,{
+                ...this.tempDataContainerData,
+                buyTotal,
+                sku,
+                isOk:true
+            },(is)=>{
+                if (is) {
+                    Taro.navigateBack();
+                }
+            })
+        } else {
+            Taro.showToast({
+                title:"请选择规格!",
+                icon:"none",
+                duration:2000
+            });
+        }
     }
     render() {
         const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton} = this.state;
@@ -196,23 +262,45 @@ export default class Login extends Component<{},{
                 </ScrollView>
                 <View className='product_bottom_bar'>
                     <View className='main'>
-                        <View className='cart' onClick={()=>Taro.switchTab({url:'/pages/tabbar/cart/index'})}>
-                            <IconFont name="24_gouwuche" size={48} color="#707177" />
-                            <Text className='txt'>购物车</Text>
-                        </View>
-                        <View className='ops'>
-                            <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
-                            <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
-                            {/* <Button className='red-ok-btn' onClick={()=>{
-                                this.setState({
-                                    placeOrderShow: true,
-                                    showOkButton:true
-                                });
-                            }}>确定</Button> */}
-                        </View>
+                        {
+                            showOkButton?null:<View className='cart' onClick={()=>Taro.switchTab({url:'/pages/tabbar/cart/index'})}>
+                                <IconFont name="24_gouwuche" size={48} color="#707177" />
+                                <Text className='txt'>购物车</Text>
+                            </View>
+                        }
+                        {
+                            showOkButton?<View className='ops'>
+                                <Button className='red-ok-btn' onClick={()=>{
+                                    const {buyTotal,sku,data} = this.state;
+                                    if (sku != null && buyTotal>0) {
+                                        this.setState({
+                                            placeOrderShow:false
+                                        });
+                                        setTempDataContainer(this.tempDataContainerKey,{
+                                            ...this.tempDataContainerData,
+                                            buyTotal,
+                                            sku,
+                                            isOk:true
+                                        },(is)=>{
+                                            if (is) {
+                                                Taro.navigateBack();
+                                            }
+                                        })
+                                        
+                                    } else {
+                                        this.setState({
+                                            placeOrderShow: true
+                                        });
+                                    }
+                                }}>确定</Button>
+                            </View>:<View className='ops'>
+                                <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
+                                <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
+                            </View>
+                        }
                     </View>
                 </View>
-                <PlaceOrder  data={data} showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                <PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0}  data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         console.log(n)
                         this.setState({
@@ -256,7 +344,7 @@ export default class Login extends Component<{},{
                                 placeOrderShow:false
                             })
                             Taro.navigateTo({
-                                url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${0}&model=${0}`
+                                url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}`
                             })
                         } else {
                             Taro.showToast({
@@ -270,7 +358,7 @@ export default class Login extends Component<{},{
                         this.setState({
                             sku
                         })
-                    }}/>
+                    }} onOkButtonClick={()=>this.onOkButtonClick()}/>
             </View>
         )
     }

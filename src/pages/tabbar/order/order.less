@@ -181,12 +181,56 @@
                     }
                 }
             }
+            .order-preview{
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                .order-img{
+                    position: relative;
+                    width: 160px;
+                    height: 160px;
+                    border-radius: 16px;
+                    margin-right: 24px;
+                    .img{
+                        width: 160px;
+                        height: 160px;
+                        border-radius: 16px;
+                        background-color: red;
+                    }
+                    .big{
+                        width: 40px;
+                        height: 40px;
+                        position: absolute;
+                        right: 8px;
+                        bottom: 8px;
+                    }
+                }
+                .o_p_price{
+                    width: 160px;
+                    height: 160px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    .aprice{
+                        font-size: 36px;
+                        font-weight: 500;
+                        color: #FF4966;
+                    }
+                    .total_n{
+                        font-size: 28px;
+                        font-weight: 400;
+                        color: #707177;
+                    }
+                }
+            }
             .price-info{
                 padding: 24px 32px 24px 100px;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 border-top: 1px solid #EDEDEF;
+                
                 .total,.discount,.pay{
                     display: flex;
                     align-items: baseline;
@@ -202,6 +246,7 @@
                     }
                 }
             }
+            
             .ops{
                 padding: 24px 32px;
                 display: flex;

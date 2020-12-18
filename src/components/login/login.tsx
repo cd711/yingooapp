@@ -7,6 +7,7 @@ import Xm from "../../utils/xm";
 
 interface LoginProps {
     isShow:boolean;
+    isTabBar:boolean;
     onClose?: (isShow:boolean) => void;
     // 第三方登录点击
     onThirdPartyAuth?: (type: string) => void;
@@ -14,19 +15,26 @@ interface LoginProps {
 }
 const Logins: Taro.FC<LoginProps> = (props) => {
 
-    const { isShow,onClose, onThirdPartyAuth } = props;
+    const { isShow,isTabBar,onClose, onThirdPartyAuth } = props;
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
         if (visible) {
-            Taro.hideTabBar();
+            if (isTabBar) {
+                Taro.hideTabBar();
+            }
+            
         } else {
-            Taro.showTabBar();
+            if (isTabBar) {
+                Taro.showTabBar();
+            }
+            // 
             onClose && onClose(visible)
         }
     }, [visible])
 
     useEffect(()=>{
+        console.log("登录框显示",isShow)
         if (visible != isShow) {
             setVisible(isShow)
         }
@@ -39,7 +47,10 @@ const Logins: Taro.FC<LoginProps> = (props) => {
 
     const _onClose = () => {
         setVisible(false);
-        Taro.showTabBar();
+        if (isTabBar) {
+            Taro.showTabBar();
+        }
+        // 
     }
     const onPhone = () =>{
         _onClose();

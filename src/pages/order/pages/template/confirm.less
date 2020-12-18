@@ -268,6 +268,46 @@
                 }
             }
         }
+
+    }
+    .product_price{
+        display: flex;
+        flex-direction: column;
+        background: #FFF;
+        .add_buy_discount{
+            display: flex;
+            justify-content: space-between;
+            padding: 0 32px 32px;
+            .add_buy_name{
+                width: 112px;
+                height: 40px;
+                background: #FFF0F0;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .txt{
+                    font-size: 24px;
+                    font-weight: 400;
+                    color: #FF4966;
+                    line-height: 40px;
+                }
+            }
+            .price{
+                display: flex;
+                align-items: baseline;
+                color: #FF4966;
+                .sym{
+                    font-size: 24px;
+                    font-weight: 500;
+                    padding-right: 4px;
+                }
+                .num{
+                    font-size: 32px;
+                    font-weight: 500;
+                }
+            }
+        }
     }
     .bottom{
         padding-bottom: constant(safe-area-inset-bottom);

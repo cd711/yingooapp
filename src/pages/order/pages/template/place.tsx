@@ -7,7 +7,7 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
@@ -35,12 +35,13 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                 return parseInt(value1) - parseInt(value2);
             });
             skuItem.value = skuKeyAttrs.join(',');
+            console.log(selectedSkuId)
             if (selectedSkuId && parseInt(skuItem.id+"") == parseInt(selectedSkuId+"")) {
                 currentSku = skuItem;
             }
-            if (currentValue.length>0 && currentValue == skuItem.value) {
-                currentSku = skuItem;
-            }
+            // if (currentValue.length>0 && currentValue == skuItem.value) {
+            //     currentSku = skuItem;
+            // }
         }
         setSkus(skus);
     }
@@ -267,7 +268,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                     </View>
                     {
                         showOkButton ?<View className='ops'>
-                            <Button className='red-ok-btn'>确定</Button>
+                            <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
                         </View>:<View className='ops'>
                             <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
                             <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>

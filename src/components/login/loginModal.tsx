@@ -4,7 +4,9 @@ import Logins from './login';
 import Fragment from '../Fragment';
 import { observe } from 'mobx';
 
-class LoginModal extends Component<{},any>{
+class LoginModal extends Component<{
+    isTabbar?:boolean
+},any>{
     constructor(props){
         super(props);
         this.state = {
@@ -12,22 +14,25 @@ class LoginModal extends Component<{},any>{
         }
     }
     componentDidMount(){
-        const {showLoginModal,isLogin} = userStore;
-        if (isLogin && showLoginModal) {
-            userStore.showLoginModal = false;
-        }
         observe(userStore,"showLoginModal",(change)=>{
             if (change.newValue != change.oldValue) {
                 this.setState({
                     show:change.newValue
                 })
             }
-        })
+        });
+        const {showLoginModal,isLogin} = userStore;
+        if (isLogin && showLoginModal) {
+            userStore.showLoginModal = false;
+        }
     }
     componentDidHide(){
         const {showLoginModal} = userStore;
         if (showLoginModal) {
-            Taro.showTabBar();
+            if (this.props.isTabbar) {
+                Taro.showTabBar();
+            }
+            
             userStore.showLoginModal = false;
         }
     }
@@ -35,7 +40,7 @@ class LoginModal extends Component<{},any>{
         const {show} = this.state;
 
         return <Fragment>
-            <Logins isShow={show} onClose={(is)=>{
+            <Logins isShow={show} isTabBar={this.props.isTabbar || false} onClose={(is)=>{
                 if (userStore.showLoginModal != is) {
                     userStore.showLoginModal = is;
                 }

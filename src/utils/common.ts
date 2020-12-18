@@ -4,6 +4,7 @@ import {wxColors} from "./wxColor";
 import ENV_TYPE = Taro.ENV_TYPE;
 import {userStore} from "../store/user";
 import moment from "moment";
+import { api } from "./net";
 
 export function ossUrl(url: string, type: number) {
     if (!url) {
@@ -366,4 +367,25 @@ export function getEvenArr(arr = []) {
         return arr.slice(0, arr.length - 1)
     }
     return arr
+}
+
+export function setTempDataContainer(key:string,data:any,callback:(ok:boolean)=>void){
+    api("app.order_temp/container",{
+        field_key:key,
+        content:JSON.stringify(data)
+    }).then(()=>{
+        callback(true)
+    }).catch(()=>{
+        callback(false)
+    });
+}
+export function getTempDataContainer(key:string,callback:(value:any)=>void){
+    api("app.order_temp/pullContainer",{
+        field_key:key
+    }).then((res)=>{
+        callback(JSON.parse(res))
+    }).catch((e)=>{
+        console.log(e);
+        callback(null)
+    });
 }
