@@ -310,7 +310,7 @@ export default class Confirm extends Component<any, {
                 order_sn: res.order_sn,
                 showPayWayModal: true,
                 payStatus:res.status
-            })
+            });
         }).catch((e) => {
             Taro.hideLoading();
             setTimeout(() => {
@@ -527,9 +527,7 @@ export default class Confirm extends Component<any, {
             })
         }else{
             if (item.sku == null || item.sku == "") {
-                Taro.getApp().addBuyData = null;
                 const {data} = this.state;
-                console.log("subitem",subItem)
                 setTempDataContainer(`${item.id}_${mainProductId}`,{
                     prepay_id:data.prepay_id,
                     pre_order_id:preOrderId,

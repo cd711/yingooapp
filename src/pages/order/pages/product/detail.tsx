@@ -35,14 +35,12 @@ export default class Login extends Component<{},{
     private tempDataContainerData = null;
     private tempDataContainerKey = "";
     componentDidMount(){
-        Taro.getApp().addBuyData = null;
         const {id,pid} = this.$router.params;
 
         if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
             this.setState({
                 showOkButton:true
             });
-
         }
         if (id != "" && id != undefined && id != null && parseInt(id) > 0) {
             Taro.showLoading({title:'加载中...'})
@@ -50,6 +48,7 @@ export default class Login extends Component<{},{
                 id
             }).then((res)=>{
                 Taro.hideLoading();
+                
                 if(pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`,(value)=>{
                         if (value != null) {
@@ -82,7 +81,6 @@ export default class Login extends Component<{},{
                         data:res
                     })
                 }
-
             }).catch((e)=>{
                 console.log(e);
                 Taro.hideLoading();
