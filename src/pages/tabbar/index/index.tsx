@@ -182,8 +182,9 @@ class Index extends Component<any, IndexState> {
     }
 
     jumpToDetail = item => {
+        console.log(item)
         Taro.navigateTo({
-            url: `/pages/order/pages/product/detail?id=${item.id}`
+            url: `/pages/order/pages/product/detail?id=${item.info.id}`
         })
     }
 
