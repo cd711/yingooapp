@@ -139,7 +139,7 @@ export default class Login extends Component<{},{
     }
     onPlaceOrderClose = (names) => {
         console.log("aa",names)
-        
+
         this.setState({
             skuName:names,
             placeOrderShow: false,
@@ -150,7 +150,7 @@ export default class Login extends Component<{},{
         const {buyTotal,sku} = this.state;
         console.log("asdhdhskjadhskjash",buyTotal,sku)
         if (sku != null && buyTotal>0) {
-           
+
             this.setState({
                 placeOrderShow:false
             });
@@ -209,11 +209,11 @@ export default class Login extends Component<{},{
                         </Swiper>
                         <View className="indicator">
                             <Text className='txt'>{`${currentPreImageIndex+1}/${image.length}`}</Text>
-                        </View>                     
+                        </View>
                     </View>
                     <View className="product_info">
                         <View className='title'>
-                            <Text className='txt'>{data.title}</Text>
+                            <Text className='txt'>{data && data.title || " "}</Text>
                             {
                                 flag_text.map((item,index)=>(
                                     <View className='hot' key={index+""}>
@@ -233,7 +233,7 @@ export default class Login extends Component<{},{
                                 ))
                             }
                         </View>
-                        
+
                         <View className='price_line'>
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
@@ -287,7 +287,7 @@ export default class Login extends Component<{},{
                                                 Taro.navigateBack();
                                             }
                                         })
-                                        
+
                                     } else {
                                         this.setState({
                                             placeOrderShow: true

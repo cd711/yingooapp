@@ -60,7 +60,7 @@ const PhotoSwiper: Taro.FC<PhotoSwiperProps> = props => {
                     >
                         {
                             datasource.map((child, cIdx) => (
-                                <SwiperItem key={`child_${cIdx}`}>
+                                <SwiperItem key={`child_${cIdx}`} className="photo_glob_swiper_item">
                                     <View
                                         className={`photo_swiper_item_view `}
                                         onClick={() => onItemClick(child)}>

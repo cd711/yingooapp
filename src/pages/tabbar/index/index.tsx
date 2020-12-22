@@ -10,6 +10,8 @@ import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
 import PhotoSwiper from "./photoSwiper";
 import PhoneSwiper from "./phoneSwiper";
+import LoginModal from "../../../components/login/loginModal";
+import {userStore} from "../../../store/user";
 
 
 interface IndexState {
@@ -94,11 +96,19 @@ class Index extends Component<any, IndexState> {
 
     onItemClick = (item, _) => {
         console.log(item)
+        if (notNull(userStore.id) && item.info.category.type === "photo") {
+            userStore.showLoginModal = true;
+            return;
+        }
         if (item.info.jump_url) {
-            Taro.navigateTo({url: item.info.jump_url});
+            Taro.navigateTo({url: `${item.info.jump_url}&back=${deviceInfo.env === "h5" ? "t" : "f"}`});
             return
         }
         if (item.info.category.type === "photo") {
+            if (item.info.jump_url) {
+                Taro.navigateTo({url: item.info.jump_url});
+                return
+            }
             const str = getURLParamsStr(urlEncode({
                 id: 34,
                 tplid: item.info.id,
@@ -109,7 +119,8 @@ class Index extends Component<any, IndexState> {
         } else if (item.info.category.type === "phone") {
             const str = getURLParamsStr(urlEncode({
                 id: item.info.id,
-                cid: item.info.category.id
+                cid: item.info.category.id,
+                back: deviceInfo.env === "h5" ? "t" : "f"
             }))
             Taro.navigateTo({
                 url: `/pages/order/pages/template/detail?${str}`
@@ -244,6 +255,7 @@ class Index extends Component<any, IndexState> {
         const {data, centerPartyHeight, banners, showUnc} = this.state;
         return (
             <View className='index'>
+                <LoginModal isTabbar />
                 {
                     showUnc
                         ? <Uncultivated visible={showUnc} onClose={this.uncClose} />
@@ -258,6 +270,7 @@ class Index extends Component<any, IndexState> {
                     <View className='search-box'
                           style={{
                               width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
+                              height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`
                           }}
                           onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
                         <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
@@ -345,7 +358,7 @@ class Index extends Component<any, IndexState> {
                                             ? len === 1
                                                 ? <View className="single_index_product_item">
                                                     <View className="single_img_view">
-                                                        <Image src={list[0].info.thumb_image} className="single_img" />
+                                                        <Image src={list[0].info.thumb_image} className="single_img" mode="widthFix" />
                                                     </View>
                                                     <View className="single_index_prod_info">
                                                         <Text className="h1">{list[0].title}</Text>
@@ -431,7 +444,8 @@ class Index extends Component<any, IndexState> {
                                                                 <View className="single_phone_shell_view">
                                                                     <View className="single_phone_shell"
                                                                           onClick={() => this.onItemClick(item.clist[0], index)}>
-                                                                        <Image src={require("../../../source/ke.png")} className="shell_ke" />
+                                                                        <Image src={require("../../../source/sjk.png")} className="shell_ke" />
+                                                                        <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
                                                                         <Image src={ossUrl(item.clist[0].thumb_image, 1)}
                                                                                className='photo' mode='aspectFill'/>
                                                                     </View>
@@ -465,7 +479,8 @@ class Index extends Component<any, IndexState> {
                                                                             <View className="single_phone_shell_wrap" key={phoneIdx}>
                                                                                 <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
                                                                                       onClick={() => this.onItemClick(phone, index)}>
-                                                                                    <Image src={require("../../../source/ke.png")} className="shell_ke rectangle_ke" />
+                                                                                    <Image src={require("../../../source/sjk.png")} className="shell_ke rectangle_ke" />
+                                                                                    <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
                                                                                     <Image src={ossUrl(phone.thumb_image, 1)}
                                                                                            className='photo rectangle_ke' mode='aspectFill'/>
                                                                                 </View>

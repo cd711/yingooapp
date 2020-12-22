@@ -2,10 +2,20 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image, ScrollView} from "@tarojs/components";
 import "../../tabbar/index/index.less";
 import IconFont from "../../../components/iconfont";
-import {cutString, deviceInfo, fixStatusBarHeight, getURLParamsStr, ossUrl, urlEncode} from "../../../utils/common";
+import {
+    cutString,
+    deviceInfo,
+    fixStatusBarHeight,
+    getURLParamsStr,
+    notNull,
+    ossUrl,
+    urlEncode
+} from "../../../utils/common";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../../utils/net";
 import LoadMore from "../../../components/listMore/loadMore";
+import LoginModal from "../../../components/login/loginModal";
+import {userStore} from "../../../store/user";
 
 const Special: Taro.FC<any> = () => {
 
@@ -92,12 +102,18 @@ const Special: Taro.FC<any> = () => {
 
     const viewDetail = (item) => {
         console.log(item)
+        const {type} = router.params;
+        if (notNull(userStore.id) && type === "phone") {
+            userStore.showLoginModal = true
+            return;
+        }
         if (item.info.jump_url) {
             Taro.navigateTo({url: item.info.jump_url});
             return
         }
-        const {type} = router.params;
+
         if (type === "phone") {
+
             Taro.navigateTo({
                 url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
             })
@@ -120,6 +136,7 @@ const Special: Taro.FC<any> = () => {
 
     return (
         <View className="special_container">
+            <LoginModal isTabbar />
             <ScrollView className="special_scroll"
                         scrollY
                         style={{

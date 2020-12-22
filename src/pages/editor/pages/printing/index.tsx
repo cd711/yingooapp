@@ -16,6 +16,8 @@ import {api} from "../../../../utils/net";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import {PhotoParams} from "../../../../modal/modal";
+import LoginModal from "../../../../components/login/loginModal";
+import {userStore} from "../../../../store/user";
 
 const Index: Taro.FC<any> = () => {
 
@@ -163,6 +165,10 @@ const Index: Taro.FC<any> = () => {
     }
 
     const selectPhoto = () => {
+        if (notNull(userStore.id)) {
+            userStore.showLoginModal = true
+            return
+        }
 
         setPhotoPickerVisible(true);
 
@@ -201,6 +207,7 @@ const Index: Taro.FC<any> = () => {
 
     return (
         <View className="printing_container">
+            <LoginModal isTabbar />
             <AtNavBar onClickLeftIcon={onBackHandle}
                       color='#121314' title="选择尺寸" border fixed
                       customStyle={{

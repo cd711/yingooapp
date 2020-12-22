@@ -808,9 +808,9 @@
     width: 670px;
     background: #fff;
     border-radius: 32px;
-    padding: 20px;
+    padding: 20px 0;
     display: block;
-    margin: 0 auto;
+    margin: 40px auto;
     .title{
         font-size: 48px;
         font-weight: 500;
@@ -835,7 +835,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 10px 15px;
             .prod_list{
                 width: 100%;
                 box-sizing: border-box;
@@ -993,7 +993,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
+            z-index: 0;
             width: 220px;
             height: 441px;
         }
@@ -1001,6 +1001,7 @@
             border-radius: 36px;
             width: 220px;
             height: 441px;
+            z-index: 10;
         }
     }
 }
@@ -1022,6 +1023,14 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            .shell_ke_tou{
+                position: absolute;
+                top: 20px;
+                left: 16px;
+                z-index: 2999;
+                width: 34px;
+                height: 70px;
+            }
             .shell_ke{
                 position: absolute;
                 top: 0;
@@ -1029,12 +1038,16 @@
                 z-index: 1;
             }
             .photo{
-                border-radius: 32px;
+                border-radius: 12px;
+                z-index: 10;
+                width: 153px;
+                height: 331px;
+                margin-top: -1px;
             }
         }
     }
     .rectangle_ke{
         width: 176px;
-        height: 351px;
+        height: 352px;
     }
 }
