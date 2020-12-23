@@ -1,6 +1,6 @@
 import {ComponentType} from 'react'
 import Taro, {Component, Config} from '@tarojs/taro'
-import {Button, Image, ScrollView, Swiper, SwiperItem, Text, View} from '@tarojs/components'
+import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import {inject, observer} from '@tarojs/mobx'
 import './index.less'
 import IconFont from '../../../components/iconfont'
@@ -12,6 +12,7 @@ import PhotoSwiper from "./photoSwiper";
 import PhoneSwiper from "./phoneSwiper";
 import LoginModal from "../../../components/login/loginModal";
 import {userStore} from "../../../store/user";
+import BannerSwiper from "./bannerSwiper";
 
 
 interface IndexState {
@@ -19,7 +20,9 @@ interface IndexState {
     centerPartyHeight: number;
     banners: [];
     showUnc: boolean;
-    cateInfo: any[]
+    cateInfo: any[];
+    column: any[];
+    scrolling: boolean;
 }
 
 @inject("userStore")
@@ -38,54 +41,35 @@ class Index extends Component<any, IndexState> {
             centerPartyHeight: 500,
             banners: [],
             showUnc: false,
-            cateInfo: []
+            cateInfo: [],
+            column: [],
+            scrolling: false
         }
 
     }
 
-    private total: number = 0;
-    getIndexList = async (data: { start?: number, size?: number, loadMore?: boolean } = {}) => {
-        const opt = {
-            start: data.start || 0,
-            size: data.size || 15,
-            loadMore: data.loadMore || false
-        };
-
+    getIndexList = async () => {
         try {
-            const res = await api("app.index/h5", {
-                start: opt.start,
-                size: opt.size
-            });
-            this.total = parseInt(res.total);
-            let arr = [];
-            if (opt.loadMore) {
-                arr = this.state.data.concat(res.list || []);
-            } else {
-                arr = res.list || [];
-            }
-            this.setState({data: arr})
+            const res = await api("app.index/h5");
+            console.log(res.banner, res.column)
+            this.setState({
+                data: res.content || [],
+                banners: res.banner || [],
+                column: res.column || []
+            })
         } catch (e) {
             console.log("首页获取列表出错：", e)
         }
-
     }
 
     componentDidMount() {
         if (process.env.TARO_ENV != 'h5') {
-            Taro.createSelectorQuery().select(".top-search").boundingClientRect((top_rect) => {
-                this.setState({
-                    centerPartyHeight: deviceInfo.windowHeight - top_rect.height
-                });
-            }).exec();
+            this.setState({
+                centerPartyHeight: deviceInfo.windowHeight
+            });
         }
         this.getIndexList();
 
-        // 获取首页banner
-        api("app.index/banner", {size: 10}).then(res => {
-            this.setState({banners: res || []})
-        }).catch(e => {
-            console.log("首页banner获取失败：", e)
-        })
 
         api("app.product/cate").then(res => {
             this.setState({cateInfo: [...res]})
@@ -149,17 +133,6 @@ class Index extends Component<any, IndexState> {
         }
     }
 
-    loadMore = () => {
-        const {data} = this.state;
-        if (this.total === data.length || this.total < 15) {
-            return
-        }
-        this.getIndexList({
-            start: data.length,
-            loadMore: true
-        })
-    }
-
     receiveCoupon = async item => {
         Taro.showLoading({title: "请稍后..."})
         try {
@@ -197,6 +170,14 @@ class Index extends Component<any, IndexState> {
         Taro.navigateTo({
             url: `/pages/order/pages/product/detail?id=${item.info.id}`
         })
+    }
+
+    onCoponColumnClick = (val) => {
+        if (val.info.jump_url) {
+            Taro.navigateTo({
+                url: val.info.jump_url
+            })
+        }
     }
 
     uncClose = () => {
@@ -251,92 +232,120 @@ class Index extends Component<any, IndexState> {
         })
     }
 
+    onScroll = (e) => {
+        console.log(e.detail)
+        const top = e.detail.scrollTop;
+        let scrolling = this.state.scrolling;
+        scrolling = top >= 30;
+        if (scrolling !== this.state.scrolling) {
+            this.setState({scrolling: top >= 30})
+        }
+
+    }
+
     render() {
-        const {data, centerPartyHeight, banners, showUnc} = this.state;
+        const {data, centerPartyHeight, banners, showUnc, column, scrolling} = this.state;
         return (
             <View className='index'>
                 <LoginModal isTabbar />
-                {
-                    showUnc
-                        ? <Uncultivated visible={showUnc} onClose={this.uncClose} />
-                        : null
-                }
-                <View className='top-search'
-                      style={{
-                          paddingTop: deviceInfo.statusBarHeight + 5 + "px",
-                          height: 52 + deviceInfo.statusBarHeight + "px"
-                      }}
-                >
-                    <View className='search-box'
-                          style={{
-                              width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
-                              height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`
-                          }}
-                          onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
-                        <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
-                        <Text className='placeholders'>搜索海量模板</Text>
-                    </View>
-                </View>
                 <ScrollView scrollY
-                            style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 102} : `height:${centerPartyHeight}px`}
-                            onScrollToLower={this.loadMore}>
+                            onScroll={this.onScroll}
+                            className="index_container_scroll"
+                            style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 50} : `height:${centerPartyHeight}px`}>
+                    <Image src={require("../../../source/ibg.png")} className="index_fixed_top_img" />
+                    {
+                        showUnc
+                            ? <Uncultivated visible={showUnc} onClose={this.uncClose} />
+                            : null
+                    }
+                    <View className='top-search'
+                          style={{
+                              paddingTop: deviceInfo.statusBarHeight + 5 + "px",
+                              height: 52 + deviceInfo.statusBarHeight + "px",
+                              background: scrolling ? "#fff" : "transparent",
+                              boxShadow: scrolling ? "0px 3px 11px 1px #f1f1f1" : "none"
+                          }}
+                    >
+                        <View className='search-box'
+                              style={{
+                                  width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
+                                  height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
+                                  background: scrolling ? "#f5f5f5" : "#fff"
+                              }}
+                              onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
+                            <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
+                            <Text className='placeholders'>搜索海量模板</Text>
+                        </View>
+                    </View>
                     <View className='inde_page_container'>
                         {
                             banners.length > 0
-                                ? <View className="index_banner_container">
-                                    <Swiper
-                                        className='index_banner_swiper'
-                                        indicatorColor='#00000050'
-                                        indicatorActiveColor='#fff'
-                                        circular
-                                        interval={3000}
-                                        indicatorDots autoplay>
-                                        {
-                                            banners.map((value: any, index) => (
-                                                <SwiperItem key={index}>
-                                                    <View className='index_banner_swiper_item'>
-                                                        <Image src={value.image} className="index_banner_swiper_item_img" />
-                                                    </View>
-                                                </SwiperItem>
-                                            ))
-                                        }
-                                    </Swiper>
-                                </View>
+                                ? banners.map((value: any, index) => (
+                                    <View className="index_banner_container" key={`${index}`}>
+                                        <BannerSwiper banners={value.clist} />
+                                    </View>
+                                ))
                                 : null
                         }
-                        <View className="index_fast_link_view">
-                            <View className="read_fast_link" onClick={this.uncShow}>
-                                <Image src={require("../../../source/il.svg")} className="fast_img" />
-                                <View className="info">
-                                    <Text className="h2">当面冲印照片</Text>
-                                    <Text className="txt">高清冲印照片</Text>
+                        <View className="index_fast_link_view" style={{
+                            padding: `0 6.5px 0 6.5px`
+                        }}>
+                            <View className="read_fast_link_wrap">
+                                <View className="read_fast_link" onClick={this.uncShow}>
+                                    <Image src={require("../../../source/il.svg")} className="fast_img" mode="widthFix" />
+                                    <View className="info">
+                                        <Text className="h2">当面冲印照片</Text>
+                                        <Text className="txt">高清冲印照片</Text>
+                                    </View>
                                 </View>
                             </View>
-                            <View className="read_fast_link" onClick={this.uncShow}>
-                                <Image src={require("../../../source/cnxh.svg")} className="fast_img" />
-                                <View className="info">
-                                    <Text className="h2">当面冲印文档</Text>
-                                    <Text className="txt">极速打印文档</Text>
+                            <View className="read_fast_link_wrap">
+                                <View className="read_fast_link" onClick={this.uncShow}>
+                                    <Image src={require("../../../source/cnxh.svg")} className="fast_img" mode="widthFix" />
+                                    <View className="info">
+                                        <Text className="h2">当面冲印文档</Text>
+                                        <Text className="txt">极速打印文档</Text>
+                                    </View>
                                 </View>
                             </View>
                         </View>
-                        <View className="index_fast_link_view">
-                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
-                                <Image src={require("../../../source/pz.svg")} className="fast_img" />
-                                <Text className="h2">照片冲印</Text>
-                                <Text className="info">高清盐印冲印</Text>
+                        <View className="index_fast_link_view fixed_padding">
+                            <View className="fast_order_link_wrap">
+                                <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
+                                    <Image src={require("../../../source/pz.svg")} className="fast_img" />
+                                    <Text className="h2">照片冲印</Text>
+                                    <Text className="info">高清盐印冲印</Text>
+                                </View>
                             </View>
-                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(2)}>
-                                <Image src={require("../../../source/az.svg")} className="fast_img" />
-                                <Text className="h2">手机壳定制</Text>
-                                <Text className="info">多种精美模板</Text>
+                            <View className="fast_order_link_wrap">
+                                <View className="fast_order_link" onClick={() => this.jumpToTemplate(2)}>
+                                    <Image src={require("../../../source/az.svg")} className="fast_img" />
+                                    <Text className="h2">手机壳定制</Text>
+                                    <Text className="info">多种精美模板</Text>
+                                </View>
                             </View>
-                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(3)}>
-                                <Image src={require("../../../source/iall.svg")} className="fast_img" />
-                                <Text className="h2">更多定制</Text>
-                                <Text className="info">各种惊喜不断</Text>
+                            <View className="fast_order_link_wrap">
+                                <View className="fast_order_link" onClick={() => this.jumpToTemplate(3)}>
+                                    <Image src={require("../../../source/iall.svg")} className="fast_img" />
+                                    <Text className="h2">更多定制</Text>
+                                    <Text className="info">各种惊喜不断</Text>
+                                </View>
                             </View>
                         </View>
+                        {
+                            column.map((parentCol, pIdx) => (
+                                <View className="index_spacial_column" key={`${pIdx}`}>
+                                    {
+                                        parentCol.clist.map((colItem, colIdx) => (
+                                            <View className="index_coupon_main" key={`${colIdx}_${pIdx}`}
+                                                  onClick={() => this.onCoponColumnClick(colItem)} >
+                                                <Image src={ossUrl(colItem.thumb_image, 1)} className="coupon_img" mode="widthFix" />
+                                            </View>
+                                        ))
+                                    }
+                                </View>
+                            ))
+                        }
                         <View className="remmond_your_love">
                             <Image src={require("../../../source/ir.svg")} className="love" />
                         </View>
@@ -574,12 +583,12 @@ class Index extends Component<any, IndexState> {
                                                 <View className="index_coupon_main" key={`${index}_${cIndex}`}
                                                       onClick={() => this.receiveCoupon(coupon)}>
                                                     <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" mode="widthFix" />
-                                                    {/*<View className="receive_btn">*/}
-                                                    {/*    <View className="anim_btn_receive">*/}
-                                                    {/*        <Text className="txt">立即领取</Text>*/}
-                                                    {/*        <View className="icon"><IconFont name="16_xiayiye" color="#fff" size={32}/></View>*/}
-                                                    {/*    </View>*/}
-                                                    {/*</View>*/}
+                                                    <View className="receive_btn">
+                                                        <View className="anim_btn_receive">
+                                                            <Text className="txt">立即领取</Text>
+                                                            <View className="icon"><IconFont name="16_xiayiye" color="#fff" size={32}/></View>
+                                                        </View>
+                                                    </View>
                                                 </View>
                                             ))
                                             : null

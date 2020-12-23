@@ -5,6 +5,16 @@
 .index {
     height: 100%;
     background: #F5F6F9;
+    position: relative;
+    .index_fixed_top_img{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 1000px;
+        z-index: 0;
+        box-sizing: border-box;
+    }
 
     .nav-bar {
         display: flex;
@@ -41,16 +51,21 @@
 
     .top-search {
         height: 104px;
-        background: #FFFFFF;
+        //background: #FFFFFF;
         box-sizing: border-box;
         padding: 14px 32px;
+        position: fixed;
+        z-index: 3000;
+        left: 0;
+        width: 100%;
+        transition: all .2s ease;
 
         .search-box {
             display: flex;
             align-items: center;
             justify-content: center;
             height: 76px;
-            background: #F5F6F9;
+            background: #fff;
             border-radius: 38px;
 
             .placeholders {
@@ -65,6 +80,7 @@
         box-sizing: border-box;
         display: block;
         padding-bottom: 32px;
+        padding-top: 110px;
 
         .remmond_your_love{
             display: flex;
@@ -521,7 +537,8 @@
 }
 
 .index_banner_container, .index_fast_link_view{
-    background: #ffffff;
+    //background: #ffffff;
+    z-index: 10;
 }
 .index_banner_container {
     box-sizing: border-box;
@@ -529,28 +546,6 @@
     justify-content: center;
     align-items: center;
     padding: 40px 0;
-
-    .index_banner_swiper {
-        box-sizing: border-box;
-        width: 686px;
-        height: 262px;
-
-        .index_banner_swiper_item {
-            box-sizing: border-box;
-            width: 686px;
-            height: 262px;
-            border-radius: 8px;
-            overflow: hidden;
-
-            .index_banner_swiper_item_img {
-                box-sizing: border-box;
-                width: 686px;
-                height: 262px;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-        }
-    }
 }
 
 .index_fast_link_view {
@@ -560,11 +555,24 @@
     box-sizing: border-box;
     width: 100%;
     padding: 0 0 40px 0;
+    &:first-child{
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .read_fast_link_wrap{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        box-sizing: border-box;
+        padding: 16px;
+    }
 
     .read_fast_link {
         position: relative;
-        width: 324px;
-        height: 160px;
+        width: 100%;
+        //height: 160px;
 
         .fast_img {
             width: 100%;
@@ -588,6 +596,7 @@
                 font-size: 30px;
                 display: block;
                 color: #121314;
+                font-weight: 600;
             }
 
             .txt {
@@ -598,43 +607,55 @@
         }
     }
 
+    .fast_order_link_wrap{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 33.3333%;
+        box-sizing: border-box;
+        padding: 16px;
+        z-index: 10;
+        &:first-child .fast_order_link {
+            background: #E5F0FF;
+        }
+        &:nth-child(2) .fast_order_link {
+            background: #F2E9FE;
+        }
+        &:last-child .fast_order_link {
+            background: #FFEDDD;
+        }
+    }
     .fast_order_link {
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        width: 208px;
-        height: 264px;
+        width: 100%;
+        //height: 264px;
         border-radius: 24px;
-
-        &:first-child {
-            background: #E5F0FF;
-        }
-
-        &:nth-child(2) {
-            background: #F2E9FE;
-        }
-
-        &:last-child {
-            background: #FFEDDD;
-        }
 
         .fast_img {
             width: 96px;
             height: 96px;
+            margin-top: 40px;
         }
 
         .h2 {
             font-size: 28px;
             color: #121314;
             margin-top: 24px;
+            font-weight: 600;
         }
 
         .info {
             color: #9C9DA6;
             font-size: 22px;
+            margin-bottom: 22px;
         }
     }
+}
+.fixed_padding{
+    padding: 0 13px 40px 13px;
 }
 
 .single_index_product_item{
@@ -1050,4 +1071,24 @@
         width: 176px;
         height: 352px;
     }
+}
+
+.index_spacial_column{
+    display: flex;
+    justify-content: center;
+    //background: #fff;
+    box-sizing: border-box;
+    padding: 0 0 40px 0;
+    .index_coupon_main{
+        margin: 0;
+    }
+}
+
+.single_index_product_item,.temp-warp,.product_more_list_main,.phone_swiper_container{
+    position: relative;
+    z-index: 10;
+}
+
+.index_container_scroll{
+    position: relative;
 }
