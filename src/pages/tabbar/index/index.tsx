@@ -177,7 +177,7 @@ class Index extends Component<any, IndexState> {
             }
         }
         Taro.navigateTo({
-            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.id}`
+            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.info.id}`
         })
     }
 

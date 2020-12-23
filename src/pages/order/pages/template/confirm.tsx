@@ -121,7 +121,7 @@ export default class Confirm extends Component<any, {
             let data: any = {
                 sku_id: skuid,
                 quantity: total,
-                user_tpl_id: this.isPhoto ? -1 : tplid,
+                user_tpl_id: this.isPhoto ? -1 : (tplid?tplid:0),
             };
             if (!this.isPhoto) {
                 data = {

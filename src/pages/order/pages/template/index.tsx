@@ -4,7 +4,7 @@ import './index.less'
 import IconFont from '../../../../components/iconfont'
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from '../../../../utils/common'
+import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode,fixStatusBarHeight} from '../../../../utils/common'
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
@@ -179,7 +179,7 @@ export default class Template extends Component<any, {
     }
 
     calcDeviceRota = () => {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             const ww = deviceInfo.windowWidth;
             const query = Taro.createSelectorQuery;
             if (!query) {
@@ -194,15 +194,7 @@ export default class Template extends Component<any, {
                             if (t_rect.height > 0) {
                                 rect.forEach((l_rect) => {
                                     if (l_rect.width > 0) {
-                                        let otherHeight = 0;
-                                        if (deviceInfo.env !== "h5") {
-                                            otherHeight = vres.height - t_rect.height;
-                                        } else {
-                                            otherHeight = vres.height - t_rect.height - 50;
-                                        }
-                                        if (hiddenBar) {
-                                            otherHeight -= 50
-                                        }
+                                        let otherHeight = vres.height - t_rect.height;
                                         this.setState({
                                             topsHeight: t_rect.height,
                                             otherHeight,
@@ -385,21 +377,25 @@ export default class Template extends Component<any, {
                 <LoginModal/>
                 <View className='t_tops'
                       style={`padding-top:${deviceInfo.statusBarHeight}px;background: #FFF;`}>
+                    {/* @ts-ignore */}
+                    <View className='nav-bar'>
+                        <View className='left' onClick={() => {
+                            Taro.navigateBack();
+                        }}>
+                            <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                        </View>
+                    </View>
                     {
                         showAllCates
                             ? <View className='all-category-warp'
-                                    style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight + deviceInfo.menu.bottom}px;`}>
-                                <AtNavBar
-                                    onClickLeftIcon={() => Taro.navigateBack()}
-                                    color='#121314' title=" "
-                                    border fixed
-                                    customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
-                                    leftIconType={{
-                                        value: 'chevron-left',
-                                        color: '#121314',
-                                        size: 24
-                                    }}
-                                />
+                                    style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight}px;`}>
+                                <View className='nav-bar'>
+                                    <View className='left' onClick={() => {
+                                        Taro.navigateBack();
+                                    }}>
+                                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                                    </View>
+                                </View>
                                 {
                                     !hiddenBar
                                         ? <View className='all-category'>
@@ -428,22 +424,12 @@ export default class Template extends Component<any, {
                             </View>
                             : null
                     }
-                    <AtNavBar
-                        onClickLeftIcon={() => Taro.navigateBack()}
-                        color='#121314' title=" "
-                        border fixed
-                        customStyle={{paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"}}
-                        leftIconType={{
-                            value: 'chevron-left',
-                            color: '#121314',
-                            size: 24
-                        }}
-                    />
+
                     {
                         !hiddenBar
                             ? <View className='top-switch'
                                     style={{
-                                        marginTop: `${deviceInfo.env === "h5" ? 50 : (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0)}px`
+                                        // marginTop: `${deviceInfo.env === "h5" ? 50 : (deviceInfo.menu.height + deviceInfo.statusBarHeight || 0)}px`
                                     }}
                             >
                                 <ScrollView scrollX className='switch-scroll'>
@@ -471,7 +457,7 @@ export default class Template extends Component<any, {
 
                 <View className='main' style={{
                     height: otherHeight + "px",
-                    marginTop: (hiddenBar ? topsHeight + deviceInfo.statusBarHeight : 0) + "px"
+                    // marginTop: (hiddenBar ? topsHeight + deviceInfo.statusBarHeight : 0) + "px"
                 }}>
                     <View className='left-menu' id="template_left_menu"
                           style={`height:${otherHeight}px;background:#FFF`}>

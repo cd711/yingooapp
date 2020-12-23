@@ -1,10 +1,11 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text,Swiper, SwiperItem,ScrollView,Image,Button } from '@tarojs/components'
+import { View, Text,Swiper, SwiperItem,ScrollView,Image,Button,RichText } from '@tarojs/components'
 import IconFont from '../../../../components/iconfont';
 import { deviceInfo,fixStatusBarHeight, getTempDataContainer, notNull, ossUrl, setTempDataContainer } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
 import { PlaceOrder } from '../template/place';
+import WxParse from '../../../../components/wxParse/wxParse';
 
 export default class Login extends Component<{},{
     data:any,
@@ -13,7 +14,8 @@ export default class Login extends Component<{},{
     buyTotal:number,
     sku:any,
     skuName:Array<string>,
-    showOkButton:boolean
+    showOkButton:boolean,
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -29,14 +31,24 @@ export default class Login extends Component<{},{
             buyTotal:1,
             sku:null,
             skuName:[],
-            showOkButton:false
+            showOkButton:false,
+            centerPartyHeight:550
         }
     }
     private tempDataContainerData = null;
     private tempDataContainerKey = "";
+    private modalInit = false;
     componentDidMount(){
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
+                Taro.createSelectorQuery().select(".product_bottom_bar").boundingClientRect((status_react) => {
+                    this.setState({
+                        centerPartyHeight: Taro.getSystemInfoSync().windowHeight - nav_rect.height - status_react.height
+                    });
+                }).exec();
+            }).exec();
+        }
         const {id,pid} = this.$router.params;
-
         if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
             this.setState({
                 showOkButton:true
@@ -48,7 +60,7 @@ export default class Login extends Component<{},{
                 id
             }).then((res)=>{
                 Taro.hideLoading();
-
+                this.modalInit = true;
                 if(pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`,(value)=>{
                         if (value != null) {
@@ -83,6 +95,9 @@ export default class Login extends Component<{},{
                     this.setState({
                         data:res
                     })
+                }
+                if (deviceInfo.env != "h5") {
+                    WxParse.wxParse('article','html',res.content,this.$scope,0);
                 }
             }).catch((e)=>{
                 console.log(e);
@@ -121,12 +136,6 @@ export default class Login extends Component<{},{
 
     }
 
-    onSwiperChange = ({detail:{current}}) => {
-        this.setState({
-            currentPreImageIndex:current
-        })
-    }
-
     onAddCart= () => {
         this.setState({
             placeOrderShow: true
@@ -148,7 +157,6 @@ export default class Login extends Component<{},{
     }
     onOkButtonClick = () => {
         const {buyTotal,sku} = this.state;
-        console.log("asdhdhskjadhskjash",buyTotal,sku)
         if (sku != null && buyTotal>0) {
            
             this.setState({
@@ -173,18 +181,29 @@ export default class Login extends Component<{},{
         }
     }
     render() {
-        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton} = this.state;
+        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton,centerPartyHeight} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
         const flag_text:Array<any> = data && !notNull(data.flag_text) ? data.flag_text:[];
         const tags_text:Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0,4):[];
         const attrGroup:Array<any> = data && !notNull(data.attrGroup) ? data.attrGroup:[];
         console.log()
+        // @ts-ignore
         return (
             <View className='p_detail'>
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
-                        Taro.navigateBack();
+                        if (Taro.getCurrentPages().length > 1) {
+                            Taro.navigateBack();
+                        } else {
+                            if (deviceInfo.env == 'h5') {
+                                window.location.href = '/pages/tabbar/index/index'
+                            } else {
+                                Taro.switchTab({
+                                    url:'/pages/tabbar/index/index'
+                                });
+                            }
+                        }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
@@ -192,36 +211,45 @@ export default class Login extends Component<{},{
                         <Text className='title'>{this.config.navigationBarTitleText || '商品详情'}</Text>
                     </View>
                 </View>
-                <ScrollView scrollY className="p_detail_scroll">
+                <ScrollView scrollY className="p_detail_scroll" style={deviceInfo.env === 'h5' ? "flex:1" : `height:${centerPartyHeight}px`}>
                     <View className='pre_image_swiper'>
-                        <Swiper indicatorDots={false}
-                                className="pre_swiper"
-                                style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}
-                                onChange={this.onSwiperChange}
-                                current={currentPreImageIndex}>
-                            {
-                                image.map((item,index)=>(
-                                    <SwiperItem key={index+""}>
-                                        <Image lazyLoad src={ossUrl(item,2)} style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}/>
-                                    </SwiperItem>
-                                ))
-                            }
-                        </Swiper>
+                        {
+                            image.length>0?<Swiper indicatorDots={false}
+                                            autoplay = {false}
+                                            className="pre_swiper"
+                                            onChange={({detail:{current}}) => {
+                                                if (current != currentPreImageIndex) {
+                                                    this.setState({
+                                                        currentPreImageIndex:current
+                                                    })
+                                                }
+                                            }}
+                                            current = {currentPreImageIndex}
+                                            style={deviceInfo.env=='h5'?"":`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}
+                                            >
+                                        {
+                                            image.map((item,index)=>(
+                                                <SwiperItem key={index+""} style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}>
+                                                    <Image lazyLoad src={ossUrl(item,2)} style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`} onClick={()=>{
+                                                        Taro.previewImage({
+                                                            current:ossUrl(item,3),
+                                                            urls:image
+                                                        })
+                                                    }}/>
+                                                </SwiperItem>
+                                            ))
+                                        }
+                                    </Swiper>:null
+                        }
+                        
                         <View className="indicator">
                             <Text className='txt'>{`${currentPreImageIndex+1}/${image.length}`}</Text>
                         </View>                     
                     </View>
                     <View className="product_info">
                         <View className='title'>
-                            <Text className='txt'>{data.title}</Text>
-                            {
-                                flag_text.map((item,index)=>(
-                                    <View className='hot' key={index+""}>
-                                        <Image className='icon' src={require("../../../../source/hot.png")} />
-                                        <Text className='rx'>{item}</Text>
-                                    </View>
-                                ))
-                            }
+                            <Text className='txt'>{data && data.title?(data.title.length>30?`${data.title.substring(0,30)}...`:data.title):""}</Text>
+                            <Image className='icon' src={require("../../../../source/hot.png")} />
                         </View>
 
                         <View className='tags'>
@@ -237,13 +265,13 @@ export default class Login extends Component<{},{
                         <View className='price_line'>
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
-                                <Text className='num'>{data.price || "0.00"}</Text>
+                                <Text className='num'>{data && data.price?data.price:"0.00"}</Text>
                             </View>
                             <View className='ap'>
-                                <Text className='txt'>￥{data.market_price || "0.00"}</Text>
+                                <Text className='txt'>￥{data && data.market_price?data.market_price:"0.00"}</Text>
                             </View>
                             <View className='total'>
-                                <Text className='txt'>{data.sold_count || 0}人已抢</Text>
+                                <Text className='txt'>{data && data.sold_count?data.sold_count:0}人已抢</Text>
                             </View>
                         </View>
                     </View>
@@ -260,6 +288,13 @@ export default class Login extends Component<{},{
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
                     </View>
+                    {
+                        deviceInfo.env != "h5" ? <View>
+                            <import src='../../../../components/wxParse/wxParse.wxml' />
+                            {/* @ts-ignore */}
+                            <template is="wxParse" data="{{wxParseData:article.nodes}}"/>
+                        </View>:<View className='pic_txt_detail'><RichText nodes={data && data.content ?data.content:"" } /></View>
+                    }
                 </ScrollView>
                 <View className='product_bottom_bar'>
                     <View className='main'>
@@ -301,66 +336,69 @@ export default class Login extends Component<{},{
                         }
                     </View>
                 </View>
-                <PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0}  data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
-                    onBuyNumberChange={(n) => {
-                        console.log(n)
-                        this.setState({
-                            buyTotal:n
-                        })
-                    }} onAddCart={()=>{
-                        const {sku,skuName,data,buyTotal} = this.state;
-                        // const {attrGroup} = data;
-                        // console.log(sku,skuName,buyTotal)
-                        if (sku != null && buyTotal>0) {
-                            Taro.showLoading({title:"加载中"})
-                            api("app.cart/add",{
-                                sku_id:sku.id,
-                                user_tpl_id:0,
-                                quantity:buyTotal
-                            }).then(()=>{
-                                Taro.hideLoading();
-                                Taro.showToast({
-                                    title:"已添加到购物车!",
-                                    icon:"success",
-                                    duration:2000
-                                })
-                            }).catch((e)=>{
-                                Taro.hideLoading();
-                                Taro.showToast({
-                                    title:e,
-                                    icon:"none",
-                                    duration:2000
-                                })
-                            })
-                        } else {
-                            Taro.showToast({
-                                title:"请选择规格!",
-                                icon:"none",
-                                duration:2000
-                            });
-                        }
-                    }} onNowBuy={()=>{
-                        const {buyTotal,sku} = this.state;
-                        if (sku != null && buyTotal>0) {
-                            this.setState({
-                                placeOrderShow:false
-                            })
-                            Taro.navigateTo({
-                                url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}`
-                            })
-                        } else {
-                            Taro.showToast({
-                                title:"请选择规格!",
-                                icon:"none",
-                                duration:2000
-                            });
-                        }
-                    }} onSkuChange={(sku)=>{
-                        console.log("sku change",sku);
-                        this.setState({
-                            sku
-                        })
-                    }} onOkButtonClick={()=>this.onOkButtonClick()}/>
+                {
+                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0}  data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                                onBuyNumberChange={(n) => {
+                                    console.log(n)
+                                    this.setState({
+                                        buyTotal:n
+                                    })
+                                }} onAddCart={()=>{
+                                    const {sku,skuName,data,buyTotal} = this.state;
+                                    // const {attrGroup} = data;
+                                    // console.log(sku,skuName,buyTotal)
+                                    if (sku != null && buyTotal>0) {
+                                        Taro.showLoading({title:"加载中"})
+                                        api("app.cart/add",{
+                                            sku_id:sku.id,
+                                            user_tpl_id:0,
+                                            quantity:buyTotal
+                                        }).then(()=>{
+                                            Taro.hideLoading();
+                                            Taro.showToast({
+                                                title:"已添加到购物车!",
+                                                icon:"success",
+                                                duration:2000
+                                            })
+                                        }).catch((e)=>{
+                                            Taro.hideLoading();
+                                            Taro.showToast({
+                                                title:e,
+                                                icon:"none",
+                                                duration:2000
+                                            })
+                                        })
+                                    } else {
+                                        Taro.showToast({
+                                            title:"请选择规格!",
+                                            icon:"none",
+                                            duration:2000
+                                        });
+                                    }
+                                }} onNowBuy={()=>{
+                                    const {buyTotal,sku} = this.state;
+                                    if (sku != null && buyTotal>0) {
+                                        this.setState({
+                                            placeOrderShow:false
+                                        })
+                                        Taro.navigateTo({
+                                            url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}`
+                                        })
+                                    } else {
+                                        Taro.showToast({
+                                            title:"请选择规格!",
+                                            icon:"none",
+                                            duration:2000
+                                        });
+                                    }
+                                }} onSkuChange={(sku)=>{
+                                    console.log("sku change",sku);
+                                    this.setState({
+                                        sku
+                                    })
+                                }} onOkButtonClick={()=>this.onOkButtonClick()}/>:null
+                }
+                
             </View>
         )
     }

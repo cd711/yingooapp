@@ -1,5 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {Image, ScrollView, Text, View} from '@tarojs/components'
+import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import IconFont from '../../../components/iconfont';
 import Checkboxs from '../../../components/checkbox/checkbox';
 import Counter from '../../../components/counter/counter';
@@ -187,108 +187,131 @@ export default class Cart extends Component<{}, {
                         <Text className='title'>购物车</Text>
                     </View>
                 </View>
-                <ScrollView scrollY className='center'>
-                    <View className='list'>
-                        {
-                            list.map((item, index) => (
-                                <View className='item' key={item.id}>
-                                    <AtSwipeAction options={delOption} autoClose
-                                                   onClick={() => this.onDelItem(list, index)} isOpened={item.opened}
-                                                   onOpened={() => {
-                                                       source.list = list.map((iterator) => {
-                                                           if (iterator.id == item.id) {
-                                                               iterator.opened = true;
-                                                           } else {
-                                                               iterator.opened = false;
-                                                           }
-                                                           return iterator;
-                                                       });
-                                                       this.setState({
-                                                           source
-                                                       });
-                                                   }} onClosed={() => {
-                                        source.list = list.map((iterator) => {
-                                            iterator.opened = false
-                                            return iterator;
-                                        });
-                                        this.setState({
-                                            source
-                                        });
-                                    }}>
-                                        <View className='item_container'
-                                              onClick={this.onItemClick.bind(this, list, index)}>
-                                            <Checkboxs isChecked={item.checked} className='left' disabled/>
-                                            <View className='right'>
-                                                <View className='pre-image'>
-                                                    <Image src={ossUrl(item.thumb_image, 0)} className='img'
-                                                           mode='aspectFill'/>
-                                                    <View className='big'><IconFont name='20_fangdayulan'
-                                                                                    size={40}/></View>
-                                                </View>
-                                                <View className='party'>
-                                                    <View className='name'>
-                                                        <Text className='txt'>{item.product.title}</Text>
+                
+                    {
+                        list.length>0?<ScrollView scrollY className='center'>
+                            <View className='list'>
+                            {
+                                list.map((item, index) => (
+                                    <View className='item' key={item.id}>
+                                        <AtSwipeAction options={delOption} autoClose
+                                                    onClick={() => this.onDelItem(list, index)} isOpened={item.opened}
+                                                    onOpened={() => {
+                                                        source.list = list.map((iterator) => {
+                                                            if (iterator.id == item.id) {
+                                                                iterator.opened = true;
+                                                            } else {
+                                                                iterator.opened = false;
+                                                            }
+                                                            return iterator;
+                                                        });
+                                                        this.setState({
+                                                            source
+                                                        });
+                                                    }} onClosed={() => {
+                                            source.list = list.map((iterator) => {
+                                                iterator.opened = false
+                                                return iterator;
+                                            });
+                                            this.setState({
+                                                source
+                                            });
+                                        }}>
+                                            <View className='item_container'
+                                                onClick={this.onItemClick.bind(this, list, index)}>
+                                                <Checkboxs isChecked={item.checked} className='left' disabled/>
+                                                <View className='right'>
+                                                    <View className='pre-image'>
+                                                        <Image src={ossUrl(item.thumb_image, 0)} className='img'
+                                                            mode='aspectFill'/>
+                                                        <View className='big'><IconFont name='20_fangdayulan'
+                                                                                        size={40}/></View>
                                                     </View>
-                                                    <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
-                                                    <View className='np'>
-                                                        <View className='price'>
-                                                            <Text className='l'>¥</Text>
-                                                            <Text
-                                                                className='n'>{(parseFloat(item.sku.price) * parseFloat(item.quantity)).toFixed(2)}</Text>
+                                                    <View className='party'>
+                                                        <View className='name'>
+                                                            <Text className='txt'>{item.product.title}</Text>
                                                         </View>
-                                                        {
-                                                            item.opened ?
-                                                                <Text className='total'>x{item.quantity}</Text> :
-                                                                <Counter num={item.quantity} onButtonClick={(num) => {
-                                                                    list[index]["quantity"] = num;
-                                                                    const {source} = this.state;
-                                                                    source.list = list;
-                                                                    this.calcTotal(list);
-                                                                    this.setState({
-                                                                        source
-                                                                    })
-                                                                }}/>
-                                                        }
+                                                        <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
+                                                        <View className='np'>
+                                                            <View className='price'>
+                                                                <Text className='l'>¥</Text>
+                                                                <Text
+                                                                    className='n'>{(parseFloat(item.sku.price) * parseFloat(item.quantity)).toFixed(2)}</Text>
+                                                            </View>
+                                                            {
+                                                                item.opened ?
+                                                                    <Text className='total'>x{item.quantity}</Text> :
+                                                                    <Counter num={item.quantity} onButtonClick={(num) => {
+                                                                        list[index]["quantity"] = num;
+                                                                        const {source} = this.state;
+                                                                        source.list = list;
+                                                                        this.calcTotal(list);
+                                                                        this.setState({
+                                                                            source
+                                                                        })
+                                                                    }}/>
+                                                            }
+                                                        </View>
                                                     </View>
                                                 </View>
                                             </View>
-                                        </View>
-                                    </AtSwipeAction>
-                                </View>
-                            ))
-                        }
-                    </View>
-                </ScrollView>
-                <View className='bottom'>
-                    <View className="all" onClick={this.onAllSelect.bind(this, list, allSelected)}>
-                        <Checkboxs isChecked={allSelected} disabled/>
-                        <Text className='txt'>全选</Text>
-                    </View>
-                    <View className='ops'>
-                        <View className='left'>
-                            <CartLeftIcon width={366} height={88}/>
-                            <View className='total'>
-                                <Text className='name'>合计：</Text>
-                                <View className='price'>
-                                    <Text className='syn'>¥</Text>
-                                    <Text className='num'>{total.toFixed(2)}</Text>
+                                        </AtSwipeAction>
+                                    </View>
+                                ))
+                            }
+                        </View>
+                        </ScrollView>:<View className='blank'>
+                            <Image src={require("../../../source/nocart.svg")} className='img'/>
+                            <Text className='tip'>购物车是空的</Text>
+                            <Button className='go_gg_btn' onClick={()=>{
+                                if (userStore.isLogin) {
+                                    if (deviceInfo.env == "h5") {
+                                        window.location.href = '/pages/tabbar/index/index';
+                                    } else {
+                                        Taro.switchTab({
+                                            url:'/pages/tabbar/index/index'
+                                        })
+                                    }
+                                } else {
+                                    userStore.showLoginModal = true;
+                                }
+
+                            }}>去逛逛</Button>
+                        </View>
+                    }
+                    {
+                        list.length>0?<View className='bottom'>
+                        <View className="all" onClick={this.onAllSelect.bind(this, list, allSelected)}>
+                            <Checkboxs isChecked={allSelected} disabled/>
+                            <Text className='txt'>全选</Text>
+                        </View>
+                        <View className='ops'>
+                            <View className='left'>
+                                <CartLeftIcon width={366} height={88}/>
+                                <View className='total'>
+                                    <Text className='name'>合计：</Text>
+                                    <View className='price'>
+                                        <Text className='syn'>¥</Text>
+                                        <Text className='num'>{total.toFixed(2)}</Text>
+                                    </View>
                                 </View>
                             </View>
+                            <View className='right' onClick={() => {
+                                if (total > 0) {
+                                    // /pages/order/pages/template/confirm?skuid=379&total=1&tplid=166&model=343
+                                    const cartIds = selectIds.join(',');
+                                    Taro.navigateTo({
+                                        url: `/pages/order/pages/template/confirm?cartIds=${Base64.encode(cartIds, true)}`
+                                    })
+                                }
+                            }}>
+                                <CartRightIcon width={220} height={88} linght={total > 0}/>
+                                <Text className='txt'>结算</Text>
+                            </View>
                         </View>
-                        <View className='right' onClick={() => {
-                            if (total > 0) {
-                                // /pages/order/pages/template/confirm?skuid=379&total=1&tplid=166&model=343
-                                const cartIds = selectIds.join(',');
-                                Taro.navigateTo({
-                                    url: `/pages/order/pages/template/confirm?cartIds=${Base64.encode(cartIds, true)}`
-                                })
-                            }
-                        }}>
-                            <CartRightIcon width={220} height={88} linght={total > 0}/>
-                            <Text className='txt'>结算</Text>
-                        </View>
-                    </View>
-                </View>
+                    </View>:null
+                    }
+
                 <TipModal isShow={showDelTipModal} tip="是否删除？" cancelText="取消" okText="确定" onCancel={() => {
                     this.setState({showDelTipModal: false})
                 }} onOK={this.tipModalOkCallBack}/>

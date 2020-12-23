@@ -129,6 +129,38 @@
             }
         }
     }
+    .blank{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        flex: 1;
+        .img{
+            width: 400px;
+            height: 284px;
+            margin-bottom: 8px;
+        }
+        .tip{
+            font-size: 24px;
+            font-weight: 400;
+            color: #9C9DA6;
+            margin-bottom: 24px;
+        }
+        .go_gg_btn{
+            width: 180px;
+            height: 64px;
+            background: #FF4966;
+            border-radius: 48px;
+            line-height: 64px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 500;
+            color: #FFFFFF;
+        }
+    }
     .bottom{
         height: 120px;
         background: #FFFFFF;
@@ -137,8 +169,6 @@
         // box-sizing: border-box;
         align-items: center;
         padding: 0 32px;
-        padding-bottom: constant(safe-area-inset-bottom);
-        padding-bottom: env(safe-area-inset-bottom);
         .all{
             display: flex;
             flex-direction: column;

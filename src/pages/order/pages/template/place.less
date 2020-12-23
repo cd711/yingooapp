@@ -29,13 +29,10 @@
         bottom: 0;
         width: 100%;
         background-color: #FFF;
+        border-radius: 32px 32px 0px 0px;
         -webkit-transform: translate3d(0, 100%, 0);
         transform: translate3d(0, 100%, 0);
-        -webkit-transition: -webkit-transform 300ms cubic-bezier(0.36, 0.66, 0.04, 1);
-        transition: -webkit-transform 300ms cubic-bezier(0.36, 0.66, 0.04, 1);
-        -o-transition: transform 300ms cubic-bezier(0.36, 0.66, 0.04, 1);
         transition: transform 300ms cubic-bezier(0.36, 0.66, 0.04, 1);
-        transition: transform 300ms cubic-bezier(0.36, 0.66, 0.04, 1), -webkit-transform 300ms cubic-bezier(0.36, 0.66, 0.04, 1);
     }
     .float-layout--active {
         visibility: visible;
@@ -79,22 +76,33 @@
                 height: 440px;
             }
         }
-        .swiper-images-warp{
-            position: relative;
-            .close{
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                z-index: 999;
-            }
-        }
+
         .info-part{
-            padding: 32px 0 22px 40px;
+            height: 194px;
+            box-sizing: border-box;
+            padding: 0 32px;
             border-bottom: 1px solid #EDEDEF;
+            display: flex;
+            .pre_image{
+                width: 200px;
+                height: 200px;
+                background: #CCC;
+                margin-top: -48px;
+                border-radius: 16px;
+            }
+            .info{
+                display: flex;
+                flex-direction: column;
+                padding-left: 32px;
+                padding-top: 26px;
+                width: 400px;
+            }
             .name{
                 font-size: 32px;
                 font-weight: 500;
                 color: #121314;
+                margin-bottom: 12px;
+                
             }
             .price{
                 display: flex;
@@ -122,6 +130,11 @@
                     color: #9C9DA6;
                     text-decoration:line-through;
                 }
+            }
+            .close{
+                padding-top: 32px;
+                margin-left: auto;
+                margin-right: 0;
             }
         }
         .param-part{

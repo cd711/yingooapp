@@ -1,6 +1,9 @@
 .taro_page,page{
     background: #F5F6F9;
 }
+.swiper-container-wrapper {
+    height: unset;
+}
 .p_detail{
     display: flex;
     flex-direction: column;
@@ -8,6 +11,9 @@
     position: fixed;
     width: 100%;
     height: 100%;
+    .taro-img__mode-scaletofill {
+        object-fit: unset;
+    }
     .nav-bar{
         display: flex;
         align-items: center;
@@ -52,6 +58,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 20px;
+            z-index: 99;
             .txt{
                 font-size: 24px;
                 font-weight: 400;
@@ -65,38 +72,17 @@
         background: #FFF;
         margin-bottom: 16px;
         .title{
-            display: flex;
-            align-items: center;
             margin-bottom: 8px;
             .txt{
                 font-size: 36px;
                 font-weight: 500;
                 color: #121314; 
                 margin-right: 16px;
+                flex: 1;
             }
-
-            .hot{
-                width: 96px;
-                height: 42px;
-                background: #FF4966;
-                border-radius: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                
-                .icon{
-                    width: 32px;
-                    height: 32px;
-                }
-                .rx{
-                    font-size: 24px;
-                    font-weight: 400;
-                    color: #FFFFFF; 
-                    padding-left: 4px;
-                }
-            }
-            .hot+.hot{
-                margin-left: 16px;
+            .icon{
+                width: 32px;
+                height: 32px;
             }
         }
         .tags{
@@ -180,6 +166,12 @@
         }
         .item:last-child{
             border: 0;
+        }
+    }
+    .pic_txt_detail{
+        width: 100%;
+        img{
+            width: 100%;
         }
     }
     .product_bottom_bar{

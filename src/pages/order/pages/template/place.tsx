@@ -65,49 +65,87 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
         });
         setAttrItems(items);
     }
+    function recursionSku(arr, idArr) {
+        let tempArr = [];
+        const filterArr = (fnArr, idArr, current) => {
+            let c = current;
+            const id = idArr[c];
+            if (c === fnArr.length || !id) {
+                tempArr = fnArr;
+                return
+            } else {
+                const childArr = [];
+                for (let i = 0; i < fnArr.length; i++) {
+                    const obj = fnArr[i];
+                    if (obj.value.indexOf(id) > -1) {
+                        childArr.push(obj);
+                    }
+                }
+                c++;
+                filterArr(childArr, idArr, c)
+            }
+        }
+        filterArr(arr, idArr, 0);
+        return tempArr
+    }
+    let tempSkuValue = [];
     const onSelectItem = (itemIdx,tagIdx,state) => {
         onSkuChange && onSkuChange(null);
         const selectIds = [];
+        const itemIds = [];
         let items = attrItems;
         items[itemIdx].map((tag,idx)=>{
             tag["selected"] = false;
-            if (tagIdx == idx) {
-                tag["selected"] = state;
-            }
             return tag;
         });
-        for (const item of items) {
+
+        for (let i = 0;i<items.length;i++) {
+            const item = items[i];
             for (const tag of item) {
                 if (tag["selected"]) {
+                    itemIds.push(i);
                     selectIds.push(tag.id);
+                    tempSkuValue.push(tag.id);
                 }
             }
         }
         selectIds.sort(function(value1, value2) {
             return parseInt(value1) - parseInt(value2);
         });
-        const skuValue = selectIds.join(',');
+        
+        let tmp = [];
         const maybeSkus = skus.filter((obj)=>{
             if (selectIds.length>0) {
-                return selectIds.some((val)=>{
-                    return obj.value.indexOf(val)>-1
-                });
+                const vals:Array<any> = obj.value.split(",");
+                return selectIds.every(v=>vals.includes(v+""))
             }
             return true;
+        })
+        maybeSkus.filter((item)=> item.stock>0).map((item)=>{
+            const vs = item.value.split(",").filter((v)=>selectIds.indexOf(parseInt(v))==-1);
+            tmp = tmp.concat(vs);
+            return item.value
         });
-        items = items.map((item)=>{
-            return item.map((tag)=>{
+
+        const notOverSku = Array.from(new Set(tmp));
+        items = items.map((item,index)=>{
+            return item.map((tag,idx)=>{
                 tag["over"] = false;
-                if (!tag["selected"] && selectIds.length>0) {
-                    maybeSkus.map((sku)=>{
-                        if (sku.value.indexOf(tag.id)>-1 && parseInt(sku.stock+"")<=0) {
+                if (itemIds.indexOf(index)==-1) {
+                    if (!tag["selected"] && selectIds.length>1) {
+                        if (notOverSku.indexOf(tag.id+"")==-1) {
                             tag["over"] = true;
                         }
-                    })
+                    }
+                }
+                if (!tag["over"] && idx == tagIdx && itemIdx == index) {
+                    tag["selected"] = state;
+                    selectIds.push(tag.id);
                 }
                 return tag;
             });
         });
+        const skuValue = selectIds.join(',');
         setAttrItems(items);
         if (selectIds.length != items.length) {
             const prices = maybeSkus.map((item) => {
@@ -195,42 +233,30 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
     }
     return <View className='placeOrder'>
         <View className={isShow?'float-layout float-layout--active':'float-layout'}>
-            <View className='float-layout__overlay' />
+            <View className='float-layout__overlay' onClick={_onClose}/>
             <View className='float-layout__container'>
                 <View className='float-container'>
-                    <View className='swiper-images-warp'>
-                        {
-                            imgs && imgs.length > 0 ? <Swiper
-                                indicatorColor='#000000'
-                                indicatorActiveColor='#FF4966'
-                                circular
-                                indicatorDots
-                                style="height:440rpx;">
-                                {
-                                    imgs && imgs.map((item, index) => (
-                                        <SwiperItem className='swiper-item' key={index+""}>
-                                            <Image src={item} mode='aspectFill' className='pre-image'/>
-                                        </SwiperItem>
-                                    ))
-                                }
-                            </Swiper> : null
-                        }
-
-                        <View className='close' onClick={_onClose}>
-                            <IconFont name='32_guanbi' size={64} color='#333'/>
-                        </View>
-                    </View>
                     <View className='info-part'>
-                        <Text className='name'>{data.title}</Text>
-                        <View className='price'>
-                            <View className='folding'>
-                                <Text className='sym'>¥</Text>
-                                <Text className='n'>{price}</Text>
+                        <Image src={imgs && imgs.length > 0?imgs[0]:""} mode='aspectFill' className='pre_image' onClick={()=>{
+                            Taro.previewImage({
+                                current:imgs && imgs.length > 0?imgs[0]:"",
+                                urls:imgs && imgs.length > 0?imgs:[]
+                            })
+                        }}/>
+                        <View className='info'>
+                            <Text className='name'>{ data && data.title ? (data.title.length>10?`${data.title.substring(0,10)}...`:data.title):"商品名称"}</Text>
+                            <View className='price'>
+                                <View className='folding'>
+                                    <Text className='sym'>¥</Text>
+                                    <Text className='n'>{price}</Text>
+                                </View>
+                                {
+                                    marketPriceShow ? <Text className='actual'>￥{marketPrice}</Text> : null
+                                }
                             </View>
-                            {
-                                marketPriceShow ? <Text className='actual'>￥{marketPrice}</Text> : null
-                            }
-
+                        </View>
+                        <View className='close' onClick={_onClose}>
+                            <IconFont name={'20_guanbi'} size={40} color={'#000'}/>
                         </View>
                     </View>
                     <ScrollView scrollY className='scroll'>
@@ -251,7 +277,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                                                                     onSelectItem(index,idx,!tag.selected);
                                                                 }
                                                             }}>
-                                                            <Text className='txt'>{tag.name}</Text>
+                                                            <Text className='txt'>{tag.name+tag.id}</Text>
                                                         </View>
                                                     </Fragment>
                                                 ))

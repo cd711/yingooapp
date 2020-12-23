@@ -286,9 +286,12 @@ export default class OrderDetail extends Component<{},{
                     <View className='center'>
                         <Text className='title'>我的订单</Text>
                     </View>
-                    <View className='right' onClick={this.onServiceModalShow}>
-                        <IconFont name='24_kefu' size={48} color={navBarChange?'#121314':'#FFF'} />
-                    </View>
+                    {
+                        deviceInfo.env == "h5"?<View className='right' onClick={this.onServiceModalShow}>
+                            <IconFont name='24_kefu' size={48} color={navBarChange?'#121314':'#FFF'} />
+                        </View>:null
+                    }
+                    
                 </View>
                 <ScrollView scrollY className='order_content_page' onScroll={this.onScroll} style={deviceInfo.env === 'h5'?"":`height:${centerPartyHeight}px`}>
                 <View className='container'>
@@ -399,6 +402,12 @@ export default class OrderDetail extends Component<{},{
                         <Text className='pay-way'>支付方式：微信支付</Text>
                     </View>
                 </View>
+                {
+                    deviceInfo.env != "h5"?<View className='contact_service' onClick={this.onServiceModalShow}>
+                        <IconFont name='24_kefu' size={48} color={'#FF4966'} />
+                        <Text className='txt'>联系客服</Text>
+                    </View> :null
+                }
                 <Text className='order-tips'>如收到商品出现质量、错发、漏发，可申请售后退款</Text>
                 </View>
                 </ScrollView>

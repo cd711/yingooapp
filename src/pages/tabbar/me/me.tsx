@@ -346,7 +346,7 @@ export default class Me extends Component<any, MeState> {
     // @ts-ignore
     render() {
         const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;
-        const {nickname, avatar} = userStore;
+        const {nickname, avatar,bio,isLogin} = userStore;
         return (
             <View className='me'>
                 {
@@ -371,18 +371,36 @@ export default class Me extends Component<any, MeState> {
                 >
                     <View className='me_bg'/>
                     <View className='me_top'
-                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 1;transition: .8s opacity ease-out;` : `position: fixed;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;opacity: 0;transition: .3s opacity ease-in;`}>
-                                <Text className='me_txt'>我的</Text>
+                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;transition: .8s background ease-out;background:#FFF;` : `position: fixed;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                            {
+                                deviceInfo.env != "h5" ?<View className='left' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
+                                    <IconFont name='24_shezhi' size={48} color='#121314'/>
+                                </View>:null
+                            }
+                            <Text className='me_txt' style={pageScrollShowTop ?`opacity: 1;transition: .8s opacity ease-out;`:"opacity: 0;transition: .04s opacity ease-in;"}>我的</Text>
+                            {
+                                deviceInfo.env == "h5" ?<View className='right' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
+                                    <IconFont name='24_shezhi' size={48} color='#121314'/>
+                                </View>:null
+                            }
                     </View>
                     {/* @ts-ignore */}
                     <View className='topBox' style={fixStatusBarHeight()}>
-                        <View className='top_weapp'/>
-                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
+                        <View className='top_weapp' />
+                        <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/pages/me/profile')}>
                             <View className='avator'>
                                 <Image src={avatar.length > 0 ? avatar : require('../../../source/defaultAvatar.png')}
                                        className='avatarImg'/>
+                                {
+                                    isLogin?<View className='see'>
+                                        <Text className='txt'>查看</Text>
+                                    </View>:null
+                                }
                             </View>
-                            <Text className='nickname'>{nickname.length > 0 ? `Hi，${nickname}` : "Hi，未登录"}</Text>
+                            <View className='nb'>
+                                <Text className='nickname'>{nickname.length > 0 ? `Hi，${nickname}` : "Hi，未登录"}</Text>
+                                <Text className='bio'>{bio.length > 0 ?bio:"您未设置签名"}</Text>
+                            </View>
                         </View>
                         <View className='orderWarp'>
                             <View className='myorall'>
@@ -527,9 +545,17 @@ export default class Me extends Component<any, MeState> {
                                     {
                                         works.length === 0
                                             ? <Empty button="我要创作" onClick={() => {
-                                                Taro.switchTab({
-                                                    url: "/pages/order/pages/template/index"
-                                                })
+                                                if (userStore.isLogin) {
+                                                    if (deviceInfo.env == "h5") {
+                                                        window.location.href = '/pages/tabbar/index/index';
+                                                    } else {
+                                                        Taro.switchTab({
+                                                            url:'/pages/tabbar/index/index'
+                                                        })
+                                                    }
+                                                } else {
+                                                    userStore.showLoginModal = true;
+                                                }
                                             }}/>
                                             : <View className="more_View">
                                                 <LoadMore status={loadStatus} />
