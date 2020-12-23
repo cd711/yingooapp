@@ -55,7 +55,7 @@
         box-sizing: border-box;
         padding: 14px 32px;
         position: fixed;
-        z-index: 3000;
+        z-index: 200;
         left: 0;
         width: 100%;
         transition: all .2s ease;
@@ -90,6 +90,10 @@
             .love{
                 width: 238px;
                 height: 62px;
+            }
+            .txt{
+                font-size: 32px;
+                font-weight: 600;
             }
         }
 
@@ -1084,11 +1088,18 @@
     }
 }
 
-.single_index_product_item,.temp-warp,.product_more_list_main,.phone_swiper_container{
+.single_index_product_item,.temp-warp,.product_more_list_main,.phone_swiper_container, .remmond_your_love{
     position: relative;
     z-index: 10;
 }
 
 .index_container_scroll{
     position: relative;
+}
+
+.index_curtain_container{
+    display: block;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
 }
