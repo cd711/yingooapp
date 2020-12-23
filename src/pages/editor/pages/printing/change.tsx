@@ -15,6 +15,8 @@ import OrderModal from "./orederModal";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
+import LoginModal from "../../../../components/login/loginModal";
+import {userStore} from "../../../../store/user";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -162,6 +164,11 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     Taro.useDidShow(async () => {
+
+        if (notNull(userStore.id)) {
+            userStore.showLoginModal = true;
+            return
+        }
 
         Taro.showLoading({title: "初始化中..."});
         console.log(router)
@@ -493,6 +500,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     return (
         <View className="printing_container">
+            <LoginModal isTabbar />
             <AtNavBar onClickLeftIcon={onBackHandle}
                       customStyle={{
                           paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"

@@ -44,7 +44,8 @@ const PhoneSwiper: Taro.FC<PhoneSwiperProps> = props => {
                                     <View className="single_phone_shell_view">
                                         <View className="single_phone_shell"
                                               onClick={() => onItemClick(child)}>
-                                            <Image src={require("../../../source/ke.png")} className="shell_ke" />
+                                            <Image src={require("../../../source/sjk.png")} className="shell_ke" />
+                                            <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
                                             <Image src={ossUrl(child.thumb_image, 1)}
                                                    className='photo' mode='aspectFill'/>
                                         </View>

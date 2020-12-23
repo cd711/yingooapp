@@ -362,7 +362,7 @@ export default class Me extends Component<any, MeState> {
                         />
                         : null
                 }
-                <LoginModal isTabbar={true} />
+                <LoginModal isTabbar />
                 <ScrollView scrollY onScroll={this.onMeScroll}
                             className="me_content_scroll"
                             enable-flex="true"

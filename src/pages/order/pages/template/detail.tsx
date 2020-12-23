@@ -158,6 +158,18 @@ export default class Detail extends Component<{}, {
         }
     }
 
+    goBack = () => {
+        console.log(Taro.getCurrentPages())
+        const status = this.$router.params.back && this.$router.params.back === "t";
+        if (status) {
+            Taro.redirectTo({
+                url: "/pages/tabbar/index/index"
+            })
+        } else {
+            Taro.navigateBack()
+        }
+    }
+
     render() {
         const {isLike, likeList, currentItem, scrollTop, centerPartyHeight} = this.state;
         // @ts-ignore
@@ -165,9 +177,7 @@ export default class Detail extends Component<{}, {
             <View className='detail'>
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
-                    <View className='left' onClick={() => {
-                        Taro.navigateBack()
-                    }}>
+                    <View className='left' onClick={this.goBack}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
                     <View className='center'>

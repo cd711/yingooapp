@@ -5,24 +5,26 @@ import IconFont from "../../../../components/iconfont";
 import UploadFile from "../../../../components/Upload/Upload";
 import "./feedback.less";
 import {deviceInfo} from "../../../../utils/common";
+import {api} from "../../../../utils/net";
 
 const Feedback: Taro.FC<any> = (_) => {
 
     const feedBackArr = [
-        {name: "页面闪退", icon: "24_yemianshantui"},
-        {name: "网络传输", icon: "24_chuanshuwenti"},
-        {name: "操作体验", icon: "24_caozuotiyan"},
-        {name: "界面审美", icon: "24_jiemianshenmei"},
-        {name: "功能建议", icon: "24_gongnengjianyi"},
-        {name: "其他反馈", icon: "24_qitajianyi"},
+        {key: 1, name: "页面闪退", icon: "24_yemianshantui"},
+        {key: 2, name: "网络传输", icon: "24_chuanshuwenti"},
+        {key: 3, name: "操作体验", icon: "24_caozuotiyan"},
+        {key: 4, name: "界面审美", icon: "24_jiemianshenmei"},
+        {key: 5, name: "功能建议", icon: "24_gongnengjianyi"},
+        {key: 6, name: "其他反馈", icon: "24_qitajianyi"},
     ];
 
-    const [formData, setFormData] = useState({
-        reason: 0,
+    const initObj = {
+        reason: 1,
         remark: "",
         tel: "",
         imgs: []
-    });
+    }
+    const [formData, setFormData] = useState({...initObj});
 
     const onUpload = (data) => {
         if (data) {
@@ -45,9 +47,32 @@ const Feedback: Taro.FC<any> = (_) => {
         setFormData(prev => ({...prev, imgs: [...arr]}))
     }
 
-    const onSubmit = () => {
-        if (!formData.remark) {
+    const onSubmit = async () => {
+        if (!formData.remark || !formData.tel) {
+            Taro.showToast({
+                title: "必填项不能为空",
+                icon: "none"
+            })
             return
+        }
+        console.log(console.log(formData))
+        Taro.showLoading({title: "请稍后..."});
+        try {
+            await api("app.feedback/add", {
+                classify: formData.reason,
+                intro: formData.reason,
+                images: formData.imgs.join(","),
+                phone: formData.tel
+            });
+            Taro.hideLoading();
+            Taro.showToast({
+                title: "提交成功",
+                icon: "success"
+            });
+            setFormData({...initObj})
+        }catch (e) {
+            Taro.hideLoading();
+            console.log("提交出错：", e)
         }
 
     }
@@ -74,12 +99,12 @@ const Feedback: Taro.FC<any> = (_) => {
                     {
                         feedBackArr.map((value, index) => (
                             <View className="feedback_item_wrap" key={index + ""}>
-                                <View className={`feedback_item ${Number(formData.reason) === index ? "active" : ""}`}
-                                      onClick={() => setFormData(prev => ({...prev, reason: index}))}
+                                <View className={`feedback_item ${Number(formData.reason) === Number(value.key) ? "active" : ""}`}
+                                      onClick={() => setFormData(prev => ({...prev, reason: Number(value.key)}))}
                                 >
                                     {/* @ts-ignore */}
                                     <IconFont name={value.icon} size={48}
-                                              color={Number(formData.reason) === index ? "#fff" : "#999"}/>
+                                              color={Number(formData.reason) === Number(value.key) ? "#fff" : "#999"}/>
                                     <Text className="txt">{value.name}</Text>
                                 </View>
                             </View>
@@ -88,7 +113,7 @@ const Feedback: Taro.FC<any> = (_) => {
                 </View>
                 <View className="feedback_actions">
                     <View className="action_row">
-                        <Text className="title">我要反馈</Text>
+                        <Text className="title important">我要反馈</Text>
                         <AtTextarea className="text_area" maxLength={200} height={150} placeholder="您想说点什么？"
                                     value={formData.remark}
                                     onChange={(remark, _) => setFormData(prev => ({...prev, remark}))}
@@ -112,35 +137,39 @@ const Feedback: Taro.FC<any> = (_) => {
                                     </View>
                                 ))
                             }
-                            <View className="imgs_item_wrap">
-                                <View className="img_item">
-                                    <UploadFile uploadType="image" extraType={1} className="upload_box"
-                                                onChange={onUpload} style={getWidth()}>
-                                        <View className="upload_view" style={{
-                                            ...getWidth(),
-                                            borderRadius: "6px",
-                                            border: "1px dashed #eee",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            background: "#F5F6F9",
-                                        }}>
-                                            <IconFont name="24_jiahao" size={48} color="#999"/>
+                            {
+                                formData.imgs.length < 4
+                                    ? <View className="imgs_item_wrap">
+                                        <View className="img_item">
+                                            <UploadFile uploadType="image" extraType={1} count={3} className="upload_box"
+                                                        onChange={onUpload} style={getWidth()}>
+                                                <View className="upload_view" style={{
+                                                    ...getWidth(),
+                                                    borderRadius: "6px",
+                                                    border: "1px dashed #eee",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    background: "#F5F6F9",
+                                                }}>
+                                                    <IconFont name="24_jiahao" size={48} color="#999"/>
+                                                </View>
+                                            </UploadFile>
                                         </View>
-                                    </UploadFile>
-                                </View>
-                            </View>
+                                    </View>
+                                    : null
+                            }
                         </View>
                     </View>
                     <View className="action_row">
-                        <Text className="title">联系方式</Text>
+                        <Text className="title important">联系方式</Text>
                         <AtInput placeholder="请留下您的联系方式" className="account_number"
                                  name="tel"
                                  value={formData.tel}
                                  onChange={(tel: any, _) => setFormData(prev => ({...prev, tel}))}/>
                     </View>
                     <View className="submit_view">
-                        <View className={`submit ${!formData.remark ? "disable" : ""}`} onClick={onSubmit}>
+                        <View className={`submit ${!formData.remark || !formData.tel ? "disable" : ""}`} onClick={onSubmit}>
                             <Text className="txt">提交</Text>
                         </View>
                     </View>

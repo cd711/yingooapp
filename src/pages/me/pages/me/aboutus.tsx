@@ -33,7 +33,7 @@ export default class Aboutus extends Component<any, any> {
                 />
                 <View className="about_content">
                     <View className="logo">
-                        <Image src={require("../../../../source/logo.png")} className="img" />
+                        <Image src={require("../../../../source/logo.png")} className="img" mode={deviceInfo.env !== "h5" ? "widthFix" : "scaleToFill"} />
                     </View>
                     <View className="action_row" onClick={() => this.setState({visible: true})}>
                         <Text className="txt">联系我们</Text>
