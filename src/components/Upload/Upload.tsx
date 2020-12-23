@@ -161,10 +161,15 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                 console.log(i, files.length)
                 if (i === files.length) {
                     Taro.hideLoading();
-                    Taro.showToast({title: "上传成功", icon: "none"})
                     console.log("多图上传---成功：", _success, "  失败：", _fail)
-                    onChange && onChange(this.state.files);
-                    this.setState({files: []})
+                    if (files.length === _fail) {
+                        Taro.showToast({title: "上传失败", icon: "none"})
+                    }
+                    if (files.length === _success) {
+                        Taro.showToast({title: "上传成功", icon: "none"})
+                        onChange && onChange(this.state.files);
+                        this.setState({files: []})
+                    }
                 } else {
                     that.uploadMultipleFile(files, i, _success, _fail)
                 }
