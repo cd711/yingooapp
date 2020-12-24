@@ -214,14 +214,14 @@ class Index extends Component<any, IndexState> {
             }
         }
         Taro.navigateTo({
-            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.info.id}`
+            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}`
         })
     }
 
     jumpToDetail = item => {
         console.log(item)
         Taro.navigateTo({
-            url: `/pages/order/pages/product/detail?id=${item.info.id}`
+            url: `/pages/order/pages/product/detail?id=${item.info.id}&rid=${item.id}`
         })
     }
 
@@ -326,7 +326,7 @@ class Index extends Component<any, IndexState> {
         }
 
         Taro.navigateTo({
-            url: data.info.jump_url || `/pages/order/pages/product/detail?id=${data.info.id}`
+            url: data.info.jump_url || `/pages/order/pages/product/detail?id=${data.info.id}&rid=${data.id}`
         })
     }
 
