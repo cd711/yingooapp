@@ -393,7 +393,9 @@ class Index extends Component<any, IndexState> {
                             <Text className='placeholders'>搜索海量模板</Text>
                         </View>
                     </View>
-                    <View className='inde_page_container'>
+                    <View className='inde_page_container' style={{
+                        paddingTop: `${deviceInfo.env === "h5" ? 55 : deviceInfo.menu.bottom + 10}px`
+                    }}>
                         {
                             data.map((item, index) => {
                                 let list = item.clist;
