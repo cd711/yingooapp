@@ -206,7 +206,7 @@ export default class Login extends Component<{}, {
                                                             item.status_tip.value == 1 ?
                                                                 <Button className='use_button' onClick={() => {
                                                                     if (item.coupon.use_url && item.coupon.use_url.length > 0) {
-                                                                        Taro.reLaunch({
+                                                                        Taro.navigateTo({
                                                                             url: item.coupon.use_url
                                                                         });
                                                                     }
