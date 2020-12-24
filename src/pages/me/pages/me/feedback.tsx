@@ -1,10 +1,10 @@
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import {AtInput, AtNavBar, AtTextarea} from 'taro-ui'
-import Taro, {useState} from "@tarojs/taro";
+import Taro, {useEffect, useState} from "@tarojs/taro";
 import IconFont from "../../../../components/iconfont";
 import UploadFile from "../../../../components/Upload/Upload";
 import "./feedback.less";
-import {deviceInfo} from "../../../../utils/common";
+import {deviceInfo,fixStatusBarHeight} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 
 const Feedback: Taro.FC<any> = (_) => {
@@ -25,7 +25,7 @@ const Feedback: Taro.FC<any> = (_) => {
         imgs: []
     }
     const [formData, setFormData] = useState({...initObj});
-
+    const [centerPartyHeight,setCenterPartyHeight] = useState(560);
     const onUpload = (data) => {
         if (data) {
             const arr = [...formData.imgs];
@@ -77,24 +77,28 @@ const Feedback: Taro.FC<any> = (_) => {
 
     }
 
-    function getHeight() {
-        return deviceInfo.env === "h5"
-            ? deviceInfo.windowHeight - 50 + "px"
-            : deviceInfo.windowHeight - 50 - deviceInfo.statusBarHeight + "px"
-    }
 
+    useEffect(()=>{
+        if (process.env.TARO_ENV != 'h5') {
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+                setCenterPartyHeight(Taro.getSystemInfoSync().windowHeight-nav_rect.height);
+            }).exec();
+        }
+    },[])
     return (
         <View className="feedback_container">
-            <View className="top_bar">
-                <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
-                          color='#121314' title="问题反馈" border
-                          customStyle={{
-                              paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
-                          }}
-                          leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
-                />
+            {/* @ts-ignore */}
+            <View className='nav-bar' style={fixStatusBarHeight()}>
+                <View className='left' onClick={() => {
+                    Taro.navigateBack();
+                }}>
+                    <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                </View>
+                <View className='center'>
+                    <Text className='title'>问题反馈</Text>
+                </View>
             </View>
-            <ScrollView scrollY style={{height: getHeight()}}>
+            <ScrollView scrollY style={`height: ${centerPartyHeight}px`}>
                 <View className="feedback_selector">
                     {
                         feedBackArr.map((value, index) => (
