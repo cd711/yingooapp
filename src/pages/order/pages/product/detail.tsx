@@ -1,7 +1,7 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Swiper, SwiperItem,ScrollView,Image,Button,RichText } from '@tarojs/components'
 import IconFont from '../../../../components/iconfont';
-import { deviceInfo,fixStatusBarHeight, getTempDataContainer, notNull, ossUrl, setTempDataContainer } from '../../../../utils/common';
+import { deviceInfo,fixStatusBarHeight, getTempDataContainer, jumpToEditor, jumpToPrintEditor, notNull, ossUrl, setTempDataContainer } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
 import { PlaceOrder } from '../template/place';
@@ -223,6 +223,15 @@ export default class Login extends Component<{},{
             });
         }
     }
+    goUrl = (url) => {
+        if (deviceInfo.env == 'h5') {
+            window.location.href = url;
+        } else {
+            Taro.navigateTo({
+                url
+            })
+        }
+    }
     render() {
         const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton,centerPartyHeight,defalutSkuIds} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
@@ -342,10 +351,10 @@ export default class Login extends Component<{},{
                 <View className='product_bottom_bar'>
                     <View className='main'>
                         {
-                            showOkButton?null:<View className='cart' onClick={()=>Taro.switchTab({url:'/pages/tabbar/cart/index'})}>
+                            showOkButton?null:(data && data.product_type && data.product_type=="customized"?null:<View className='cart' onClick={()=>Taro.switchTab({url:'/pages/tabbar/cart/index'})}>
                                 <IconFont name="24_gouwuche" size={48} color="#707177" />
                                 <Text className='txt'>购物车</Text>
-                            </View>
+                            </View>)
                         }
                         {
                             showOkButton?<View className='ops'>
@@ -372,15 +381,41 @@ export default class Login extends Component<{},{
                                         });
                                     }
                                 }}>确定</Button>
-                            </View>:<View className='ops'>
-                                <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
-                                <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
-                            </View>
+                            </View>:(data && data.product_type && data.product_type=="customized"?<View className='ops'>
+                                    <Button className='red-ok-btn' onClick={()=>{
+                                        const {sku,data} = this.state;
+                                        if (sku != null) {
+                                            // let url = ""
+                                            if (data.tpl_product_type == "phone") {
+                                                jumpToEditor({
+                                                    cid:data.tpl_category_id,
+                                                    tpl_id:0
+                                                });
+                                            }
+                                            if (data.tpl_product_type == "photo") {
+                                                jumpToPrintEditor({
+                                                    id:data.id,
+                                                    cid:data.tpl_category_id,
+                                                    sku_id:sku.id,
+                                                    init:"t"
+                                                });
+                                            }
+                                            // this.goUrl(url);
+                                        } else {
+                                            this.setState({
+                                                placeOrderShow: true
+                                            });
+                                        }
+                                    }}>立即制作</Button>
+                                </View>:<View className='ops'>
+                                    <Button className='add-cart-btn' onClick={this.onAddCart}>加入购物车</Button>
+                                    <Button className='now-buy-btn' onClick={this.onNowBuy}>立即购买</Button>
+                                </View>)
                         }
                     </View>
                 </View>
                 {
-                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0} defalutSelectIds={defalutSkuIds} data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0} productType={data.product_type} defalutSelectIds={defalutSkuIds} data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                                 onBuyNumberChange={(n) => {
                                     console.log(n)
                                     this.setState({
@@ -442,7 +477,33 @@ export default class Login extends Component<{},{
                                         sku,
                                         defalutSkuIds:[]
                                     })
-                                }} onOkButtonClick={()=>this.onOkButtonClick()}/>:null
+                                }} onOkButtonClick={()=>this.onOkButtonClick()} onNowButtonClick={()=>{
+                                    const {sku,data} = this.state;
+                                    if (sku != null) {
+                                        // let url = ""
+                                        if (data.tpl_product_type == "phone") {
+                                            jumpToEditor({
+                                                cid:data.tpl_category_id,
+                                                tpl_id:0
+                                            });
+                                        }
+                                        if (data.tpl_product_type == "photo") {
+                                            jumpToPrintEditor({
+                                                id:data.id,
+                                                cid:data.tpl_category_id,
+                                                sku_id:sku.id,
+                                                init:"t"
+                                            });
+                                        }
+                                        // this.goUrl(url);
+                                    } else {
+                                        Taro.showToast({
+                                            title:"请选择规格!",
+                                            icon:"none",
+                                            duration:2000
+                                        });
+                                    }
+                                }}/>:null
                 }
                 
             </View>

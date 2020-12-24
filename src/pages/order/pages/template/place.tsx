@@ -7,7 +7,7 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, productType = "",isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
@@ -296,17 +296,22 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                             }
                         </View>
                     </ScrollView>
-                    <View className='buy-number'>
-                        <Text className='title'>购买数量</Text>
-                        <Counter num={1} onCounterChange={onBuyNumberChange}/>
-                    </View>
+                    {
+                        productType == "customized"?null:<View className='buy-number'>
+                            <Text className='title'>购买数量</Text>
+                            <Counter num={1} onCounterChange={onBuyNumberChange}/>
+                        </View>
+                    }
+                    
                     {
                         showOkButton ?<View className='ops'>
                             <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
+                        </View>:(productType=="customized"?<View className='ops'>
+                            <Button className='red-ok-btn' onClick={onNowButtonClick}>立即制作</Button>
                         </View>:<View className='ops'>
                             <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
                             <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
-                        </View>
+                        </View>)
                     }
                 </View>
             </View>
