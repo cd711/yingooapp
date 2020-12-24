@@ -4,11 +4,17 @@ import './index.less'
 import IconFont from '../../../../components/iconfont'
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode,fixStatusBarHeight} from '../../../../utils/common'
+import {
+    deviceInfo,
+    getURLParamsStr,
+    notNull,
+    ossUrl,
+    urlEncode,
+    getSpecialRouter
+} from '../../../../utils/common'
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
-import {AtNavBar} from "taro-ui";
 
 interface TagData {
     list: Array<any>,
@@ -186,7 +192,6 @@ export default class Template extends Component<any, {
                 reject();
                 return;
             }
-            const {hiddenBar} = this.state;
             query().selectViewport().boundingClientRect((vres) => {
                 query().selectAll(".t_tops").boundingClientRect((res: any) => {
                     query().selectAll('.left-menu').boundingClientRect((rect: any) => {
@@ -194,7 +199,7 @@ export default class Template extends Component<any, {
                             if (t_rect.height > 0) {
                                 rect.forEach((l_rect) => {
                                     if (l_rect.width > 0) {
-                                        let otherHeight = vres.height - t_rect.height;
+                                        const otherHeight = vres.height - t_rect.height;
                                         this.setState({
                                             topsHeight: t_rect.height,
                                             otherHeight,
@@ -324,8 +329,12 @@ export default class Template extends Component<any, {
 
     onTagItemClick = (item, cid, tpl_type) => {
         if (tpl_type == "phone") {
+            const str = getURLParamsStr(urlEncode({
+                id: item.id,
+                cid,
+            }))
             Taro.navigateTo({
-                url: `/pages/order/pages/template/detail?id=${item.id}&cid=${cid}`
+                url: `/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`
             });
         }
         if (tpl_type == "photo") {
@@ -352,6 +361,12 @@ export default class Template extends Component<any, {
         });
     }
 
+    routerBack = () => {
+        Taro.reLaunch({
+            url: "/pages/tabbar/index/index"
+        })
+    }
+
     render() {
         const {
             switchActive,
@@ -363,7 +378,6 @@ export default class Template extends Component<any, {
             showAllCates,
             loadStatus,
             colHeight,
-            topsHeight,
             hiddenBar
         } = this.state;
         const tags = cates && cates[switchActive] ? cates[switchActive].tags : [];
@@ -377,11 +391,8 @@ export default class Template extends Component<any, {
                 <LoginModal/>
                 <View className='t_tops'
                       style={`padding-top:${deviceInfo.statusBarHeight}px;background: #FFF;`}>
-                    {/* @ts-ignore */}
                     <View className='nav-bar'>
-                        <View className='left' onClick={() => {
-                            Taro.navigateBack();
-                        }}>
+                        <View className='left' onClick={this.routerBack}>
                             <IconFont name='24_shangyiye' size={48} color='#121314'/>
                         </View>
                     </View>
@@ -390,9 +401,7 @@ export default class Template extends Component<any, {
                             ? <View className='all-category-warp'
                                     style={process.env.TARO_ENV === 'h5' ? "" : `top:${deviceInfo.statusBarHeight}px;`}>
                                 <View className='nav-bar'>
-                                    <View className='left' onClick={() => {
-                                        Taro.navigateBack();
-                                    }}>
+                                    <View className='left' onClick={this.routerBack}>
                                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                                     </View>
                                 </View>

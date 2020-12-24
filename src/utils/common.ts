@@ -211,6 +211,17 @@ export function urlDeCode(params) {
 }
 
 /**
+ * 处理跳转到模板详情需要的路由cp参数
+ * @param router 传入当前页面的router
+ */
+export function getSpecialRouter(router: {path?: string, params?: {[key: string] : any}} = {}) {
+    const path = router.path || "/";
+    const params = router.params || {};
+
+    return `${path}${Object.keys(params).length > 0 ? "?" : ""}${getURLParamsStr(urlEncode(params))}`
+}
+
+/**
  * 二分法，求区间
  * @param arr {array}  原数组
  * @param findVal  {any}  要找的值

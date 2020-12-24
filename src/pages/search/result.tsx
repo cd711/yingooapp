@@ -4,7 +4,7 @@ import {View, Image, ScrollView} from "@tarojs/components";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
-import {deviceInfo, fixStatusBarHeight, getURLParamsStr, ossUrl, urlEncode} from "../../utils/common";
+import {deviceInfo, fixStatusBarHeight, getSpecialRouter, getURLParamsStr, ossUrl, urlEncode} from "../../utils/common";
 
 const SearchResult:Taro.FC<any> = () => {
 
@@ -64,8 +64,12 @@ const SearchResult:Taro.FC<any> = () => {
     const onItemClick = (item) => {
         switch (item.category.type) {
             case "phone":
+                const phoneStr = getURLParamsStr(urlEncode({
+                    id: item.id,
+                    cid: item.category.id,
+                }))
                 Taro.navigateTo({
-                    url: `/pages/order/pages/template/detail?id=${item.id}&cid=${item.category.id}`
+                    url: `/pages/order/pages/template/detail?${phoneStr}&cp=${getSpecialRouter(router)}`
                 });
                 break;
             case "photo":
