@@ -1608,7 +1608,6 @@ export default class Shell extends Component<{}, {
 
         const params = this.$router.params;
 
-        alert(params.workid)
         if (!notNull(params.workid) && params.workid !== "f") {
             wx.miniProgram.navigateTo({
                 url: `/pages/order/pages/template/preview?workid=${params.workid}`,
@@ -1651,7 +1650,13 @@ export default class Shell extends Component<{}, {
         });
         try {
             const doc = await callEditor("getDoc");
-            const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
+            const obj = {
+                doc: JSON.stringify(doc)
+            }
+            if (params.id) {
+                Object.assign(obj, {id: params.id})
+            }
+            const res = await api("editor.user_tpl/add",obj);
             Taro.setStorageSync("doc_draft", {
                 tplId: this.tplId,
                 docId: this.docId,

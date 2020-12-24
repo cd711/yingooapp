@@ -57,11 +57,15 @@ class Index extends Component<any, IndexState> {
     }
 
     getIndexList = async () => {
-        let local = null;
-        try {
-            local = Taro.getStorageSync(`${userStore.id}_local_coupon`);
-        } catch (e) {
-            console.log("获取本地coupon出错：", e)
+
+        let cIds = [];
+        if (userStore.id) {
+            try {
+                const res = await api("app.coupon/receiveCoupinId");
+                cIds = res || []
+            } catch (e) {
+                console.log(e)
+            }
         }
         try {
             const res = await api("app.index/h5");
@@ -76,14 +80,14 @@ class Index extends Component<any, IndexState> {
 
             // 如果优惠券已经领取就不显示了
             let current = {};
+            let showCoupon = false;
             if (popArr.length > 1) {
                 const idx = Math.floor(Math.random() * popArr.length + 1) - 1;
                 console.log("活动弹窗随机的下标：", idx);
 
-                let showCoupon = false;
-                if (local) {
-                    const matchIdx = local.findIndex(v => v == popArr[idx].id );
-                    showCoupon = matchIdx > -1
+                if (cIds.length > 0) {
+                    const matchIdx = cIds.findIndex(v => v == popArr[idx].info.id );
+                    showCoupon = matchIdx === -1
                 }
 
                 if (showCoupon) {
@@ -91,7 +95,12 @@ class Index extends Component<any, IndexState> {
                 }
             } else {
                 if (popArr.length > 0) {
-                    current = popArr[0];
+                    const matchIdx = cIds.findIndex(v => v == popArr[0].info.id );
+                    showCoupon = matchIdx === -1
+                }
+
+                if (showCoupon) {
+                    current = popArr[0]
                 }
             }
 
