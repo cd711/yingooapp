@@ -34,7 +34,7 @@ const AddBuy: Taro.FC<{
             <View className='xy_add_buy_center'>
                 <View className='xy_p_title'>
                     <View className='xy_top'>
-                        <Text className='xy_txt'>{product.title}</Text>
+                        <Text className='xy_txt'>{product && product.title?(product.title.length>6?product.title.substring(0,6)+"...":product.title):""}</Text>
                     </View>
                     <View className='xy_detail' onClick={(e)=>{
                         e.stopPropagation();

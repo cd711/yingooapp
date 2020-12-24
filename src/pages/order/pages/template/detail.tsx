@@ -160,15 +160,24 @@ export default class Detail extends Component<{}, {
     }
 
     goBack = () => {
-        console.log(Taro.getCurrentPages())
-        const status = !notNull(this.$router.params.cp);
-        const {cp}: any = urlDeCode(this.$router.params);
-        if (status) {
-            Taro.redirectTo({
-                url: cp
-            })
+        // console.log(Taro.getCurrentPages())
+        // const status = !notNull(this.$router.params.cp);
+        // const {cp}: any = urlDeCode(this.$router.params);
+        // if (status) {
+        //     Taro.redirectTo({
+        //         url: cp
+        //     })
+        // } else {
+        //     Taro.navigateBack()
+        // }
+        if (Taro.getCurrentPages().length > 1) {
+            Taro.navigateBack();
         } else {
-            Taro.navigateBack()
+            if (process.env.TARO_ENV == "h5") {
+                window.location.href = "/";
+            } else {
+                Taro.switchTab({url: "/pages/tabbar/index/index"});
+            }
         }
     }
 

@@ -15,7 +15,8 @@ export default class Login extends Component<{},{
     sku:any,
     skuName:Array<string>,
     showOkButton:boolean,
-    centerPartyHeight:number
+    centerPartyHeight:number,
+    defalutSkuIds:Array<number>
 }> {
 
     config: Config = {
@@ -32,7 +33,8 @@ export default class Login extends Component<{},{
             sku:null,
             skuName:[],
             showOkButton:false,
-            centerPartyHeight:550
+            centerPartyHeight:550,
+            defalutSkuIds:[]
         }
     }
     private tempDataContainerData = null;
@@ -48,7 +50,7 @@ export default class Login extends Component<{},{
                 }).exec();
             }).exec();
         }
-        const {id,pid} = this.$router.params;
+        const {id,pid,rid} = this.$router.params;
         if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
             this.setState({
                 showOkButton:true
@@ -92,9 +94,34 @@ export default class Login extends Component<{},{
                         }
                     })
                 } else {
-                    this.setState({
-                        data:res
-                    })
+                    if (!notNull(rid)) {
+                        this.getProductConfig(rid,(result)=>{
+                            // console.log(result);
+                            // result.attr_ids = [58,59,60,64,66,67,70];
+                            // result.defalut_attr_ids = [59,64];
+                            if (result.attr_ids.length>0) {
+                                res.attrItems=res.attrItems.map((item)=>{
+                                    return item.filter((val)=>{
+                                        return result.attr_ids.indexOf(parseInt(val.id+""))!=-1
+                                    })
+                                });
+                                res.skus = res.skus.filter((item)=>{
+                                    const vals = item.value.split(",");
+                                    return vals.every(v=>result.attr_ids.includes(parseInt(v+"")))
+                                })
+                                console.log(res.attrItems,res.skus)
+                            }
+                            this.setState({
+                                data:res,
+                                defalutSkuIds:result.defalut_attr_ids
+                            })
+                        })
+                    } else {
+                        this.setState({
+                            data:res
+                        })
+                    }
+
                 }
                 if (deviceInfo.env != "h5") {
                     WxParse.wxParse('article','html',res.content,this.$scope,0);
@@ -111,9 +138,13 @@ export default class Login extends Component<{},{
                     if (Taro.getCurrentPages().length>1) {
                         Taro.navigateBack();
                     } else {
-                        Taro.switchTab({
-                            url:'/pages/tabbar/index/index'
-                        })
+                        if (deviceInfo.env == 'h5') {
+                            window.location.href = '/pages/tabbar/index/index'
+                        } else {
+                            Taro.switchTab({
+                                url:'/pages/tabbar/index/index'
+                            })
+                        }
                     }
                 }, 2001);
             })
@@ -127,15 +158,27 @@ export default class Login extends Component<{},{
                 if (Taro.getCurrentPages().length>1) {
                     Taro.navigateBack();
                 } else {
-                    Taro.switchTab({
-                        url:'/pages/tabbar/index/index'
-                    })
+                    if (deviceInfo.env == 'h5') {
+                        window.location.href = '/pages/tabbar/index/index'
+                    } else {
+                        Taro.switchTab({
+                            url:'/pages/tabbar/index/index'
+                        })
+                    }
                 }
             }, 2001);
         }
 
     }
-
+    getProductConfig = (id:string,callback:(r:any)=>void) => {
+        api("app.index/indexConfig",{
+            id
+        }).then((res)=>{
+            if (res) {
+               callback(res) 
+            }
+        })
+    }
     onAddCart= () => {
         this.setState({
             placeOrderShow: true
@@ -181,7 +224,7 @@ export default class Login extends Component<{},{
         }
     }
     render() {
-        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton,centerPartyHeight} = this.state;
+        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton,centerPartyHeight,defalutSkuIds} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
         const flag_text:Array<any> = data && !notNull(data.flag_text) ? data.flag_text:[];
         const tags_text:Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0,4):[];
@@ -337,11 +380,12 @@ export default class Login extends Component<{},{
                     </View>
                 </View>
                 {
-                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0}  data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0} defalutSelectIds={defalutSkuIds} data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                                 onBuyNumberChange={(n) => {
                                     console.log(n)
                                     this.setState({
-                                        buyTotal:n
+                                        buyTotal:n,
+                                        defalutSkuIds:[]
                                     })
                                 }} onAddCart={()=>{
                                     const {sku,skuName,data,buyTotal} = this.state;
@@ -391,10 +435,12 @@ export default class Login extends Component<{},{
                                             duration:2000
                                         });
                                     }
+
                                 }} onSkuChange={(sku)=>{
                                     console.log("sku change",sku);
                                     this.setState({
-                                        sku
+                                        sku,
+                                        defalutSkuIds:[]
                                     })
                                 }} onOkButtonClick={()=>this.onOkButtonClick()}/>:null
                 }

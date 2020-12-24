@@ -434,9 +434,14 @@ export default class Confirm extends Component<any, {
         }
         setTimeout(() => {
             if (res.code == 2) {
-                Taro.switchTab({
-                    url
-                });
+                if (process.env.TARO_ENV == 'h5') {
+                    window.location.href = url;
+                } else {
+                    Taro.switchTab({
+                        url
+                    });
+                }
+
             } else {
                 Taro.navigateTo({
                     url

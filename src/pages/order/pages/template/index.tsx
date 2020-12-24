@@ -362,9 +362,17 @@ export default class Template extends Component<any, {
     }
 
     routerBack = () => {
-        Taro.reLaunch({
-            url: "/pages/tabbar/index/index"
-        })
+        if (Taro.getCurrentPages().length>1) {
+            Taro.navigateBack();
+        } else {
+            if (deviceInfo.env == 'h5') {
+                window.location.href = '/pages/tabbar/index/index'
+            } else {
+                Taro.switchTab({
+                    url:'/pages/tabbar/index/index'
+                })
+            }
+        }
     }
 
     render() {

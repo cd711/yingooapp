@@ -7,7 +7,7 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
@@ -39,9 +39,9 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
             if (selectedSkuId && parseInt(skuItem.id+"") == parseInt(selectedSkuId+"")) {
                 currentSku = skuItem;
             }
-            // if (currentValue.length>0 && currentValue == skuItem.value) {
-            //     currentSku = skuItem;
-            // }
+            if (currentValue.length>0 && currentValue == skuItem.value) {
+                currentSku = skuItem;
+            }
         }
         setSkus(skus);
     }
@@ -51,48 +51,41 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
             return value.map((val)=>{
                 val["selected"] = false;
                 val["over"] = false;
-                if (sku && sku.value && sku.value.indexOf(val.id)>-1) {
-                    val["selected"] = true;
-                    if (parseInt(sku.stock+"")>0) {
-                        val["over"] = false;
-                    } else {
-                        val["over"] = true;
-                        val["selected"] = false;
+                if (defalutSelectIds.length==0) {
+                    if (sku && sku.value && sku.value.indexOf(val.id)>-1) {
+                        val["selected"] = true;
+                        if (parseInt(sku.stock+"")>0) {
+                            val["over"] = false;
+                        } else {
+                            val["over"] = true;
+                            val["selected"] = false;
+                        }
                     }
                 }
                 return val;
             });
         });
         setAttrItems(items);
-    }
-    function recursionSku(arr, idArr) {
-        let tempArr = [];
-        const filterArr = (fnArr, idArr, current) => {
-            let c = current;
-            const id = idArr[c];
-            if (c === fnArr.length || !id) {
-                tempArr = fnArr;
-                return
-            } else {
-                const childArr = [];
-                for (let i = 0; i < fnArr.length; i++) {
-                    const obj = fnArr[i];
-                    if (obj.value.indexOf(id) > -1) {
-                        childArr.push(obj);
+        if (defalutSelectIds.length>0) {
+            for (let i = 0;i<data.attrItems.length;i++) {
+                const item = data.attrItems[i];
+                for (let j = 0;j<item.length;j++) {
+                    const tag = item[j];
+                    if (defalutSelectIds.indexOf(tag.id)!=-1) {
+                        onSelectItem(i,j,true,items);
                     }
                 }
-                c++;
-                filterArr(childArr, idArr, c)
             }
+            let names = getNames(items);
+            onClose && onClose(names)
         }
-        filterArr(arr, idArr, 0);
-        return tempArr
     }
+
     let tempSkuValue = [];
-    const onSelectItem = (itemIdx,tagIdx,state) => {
+    const onSelectItem = (itemIdx,tagIdx,state,aItems) => {
         onSkuChange && onSkuChange(null);
         const selectIds = [];
-        let items = attrItems;
+        let items = aItems;
         let selectItemIdxs = [];
         items[itemIdx].map((tag,idx)=>{
             tag["selected"] = false;
@@ -112,26 +105,31 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                 }
             }
         }
-        selectIds.sort(function(value1, value2) {
-            return parseInt(value1) - parseInt(value2);
-        });
-        
+
+        const tempSelectIds = selectIds.concat();
+        if (tempSelectIds.length == items.length) {
+            tempSelectIds.splice(itemIdx, 1);
+            selectItemIdxs.splice(itemIdx, 1)
+        }
         let tmp = [];
         const maybeSkus = skus.filter((obj)=>{
-            if (selectIds.length>0) {
+            if (tempSelectIds.length>0) {
                 const vals:Array<any> = obj.value.split(",");
-                return selectIds.every(v=>vals.includes(v+""))
+                return tempSelectIds.every(v=>vals.includes(v+""))
             }
             return true;
         })
         maybeSkus.filter((item)=> item.stock>0).map((item)=>{
-            const vs = item.value.split(",").filter((v)=>selectIds.indexOf(parseInt(v))==-1);
+            const vs = item.value.split(",").filter((v)=>tempSelectIds.indexOf(parseInt(v))==-1);
             tmp = tmp.concat(vs);
             return item.value
         });
 
         const notOverSku = Array.from(new Set(tmp));
-        console.log(notOverSku);
+        selectIds.sort(function(value1, value2) {
+            return parseInt(value1) - parseInt(value2);
+        });
+        console.log(tmp,notOverSku,selectIds,tempSelectIds);
         items = items.map((item,index)=>{
             return item.map((tag,idx)=>{
                 tag["over"] = false;
@@ -139,6 +137,10 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                     if (selectIds.length>1) {
                         if (notOverSku.indexOf(tag.id+"")==-1) {
                             tag["over"] = true;
+                            if (tag["selected"]) {
+                                selectIds.splice(index, 1);
+                            }
+                            tag["selected"] = false;
                         }
                     }
                 }
@@ -199,9 +201,11 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
             });
             data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
             data.image && setImgs(data.image);
+
+
         }
     }, [data]);
-    const _onClose = () => {
+    const getNames = (attrItems:Array<any>) => {
         let names = [];
         for (let i = 0; i<attrItems.length; i++) {
             const element = attrItems[i];
@@ -229,6 +233,10 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
         if (n>0 && n<attrItems.length) {
             names = ns;
         }
+        return names;
+    }
+    const _onClose = () => {
+        let names = getNames(attrItems);
         onClose && onClose(names)
     }
     return <View className='placeOrder'>
@@ -274,10 +282,10 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
                                                             onClick={() => {
                                                                 if (!tag.over) {
                                                                     // onItemSelect(index, item.id, tag.id);
-                                                                    onSelectItem(index,idx,!tag.selected);
+                                                                    onSelectItem(index,idx,!tag.selected,attrItems);
                                                                 }
                                                             }}>
-                                                            <Text className='txt'>{tag.name+tag.id}</Text>
+                                                            <Text className='txt'>{tag.name}</Text>
                                                         </View>
                                                     </Fragment>
                                                 ))
