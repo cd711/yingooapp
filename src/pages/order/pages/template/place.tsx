@@ -92,10 +92,13 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
     const onSelectItem = (itemIdx,tagIdx,state) => {
         onSkuChange && onSkuChange(null);
         const selectIds = [];
-        const itemIds = [];
         let items = attrItems;
+        let selectItemIdxs = [];
         items[itemIdx].map((tag,idx)=>{
             tag["selected"] = false;
+            if (tagIdx == idx) {
+                tag["selected"] = state;
+            }
             return tag;
         });
 
@@ -103,7 +106,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
             const item = items[i];
             for (const tag of item) {
                 if (tag["selected"]) {
-                    itemIds.push(i);
+                    selectItemIdxs.push(i);
                     selectIds.push(tag.id);
                     tempSkuValue.push(tag.id);
                 }
@@ -128,19 +131,16 @@ export const PlaceOrder: Taro.FC<any> = ({data, isShow = false, showOkButton = f
         });
 
         const notOverSku = Array.from(new Set(tmp));
+        console.log(notOverSku);
         items = items.map((item,index)=>{
             return item.map((tag,idx)=>{
                 tag["over"] = false;
-                if (itemIds.indexOf(index)==-1) {
-                    if (!tag["selected"] && selectIds.length>1) {
+                if (selectItemIdxs.indexOf(index)==-1) {
+                    if (selectIds.length>1) {
                         if (notOverSku.indexOf(tag.id+"")==-1) {
                             tag["over"] = true;
                         }
                     }
-                }
-                if (!tag["over"] && idx == tagIdx && itemIdx == index) {
-                    tag["selected"] = state;
-                    selectIds.push(tag.id);
                 }
                 return tag;
             });
