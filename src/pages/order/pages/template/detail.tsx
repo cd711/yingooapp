@@ -4,7 +4,7 @@ import './detail.less';
 import IconFont from '../../../../components/iconfont';
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx';
-import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl} from '../../../../utils/common'
+import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl, urlDeCode} from '../../../../utils/common'
 
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from '../../../../store/user';
@@ -73,7 +73,7 @@ export default class Detail extends Component<{}, {
         Taro.showLoading({title: "加载中..."});
         api('app.product_tpl/info', {id}).then((res) => {
             if (this.$router.params.id != res.id && process.env.TARO_ENV === 'h5') {
-                window.history.replaceState(null, null, `/pages/order/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
+                // window.history.replaceState(null, null, `/pages/order/pages/template/detail?id=${res.id}&cid=${this.$router.params.cid}`)
             }
             this.setState({
                 currentItem: res,
@@ -160,10 +160,11 @@ export default class Detail extends Component<{}, {
 
     goBack = () => {
         console.log(Taro.getCurrentPages())
-        const status = this.$router.params.back && this.$router.params.back === "t";
+        const status = !notNull(this.$router.params.cp);
+        const {cp}: any = urlDeCode(this.$router.params);
         if (status) {
             Taro.redirectTo({
-                url: "/pages/tabbar/index/index"
+                url: cp
             })
         } else {
             Taro.navigateBack()

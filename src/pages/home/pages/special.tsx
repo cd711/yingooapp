@@ -5,7 +5,7 @@ import IconFont from "../../../components/iconfont";
 import {
     cutString,
     deviceInfo,
-    fixStatusBarHeight,
+    fixStatusBarHeight, getSpecialRouter,
     getURLParamsStr,
     notNull,
     ossUrl,
@@ -113,9 +113,12 @@ const Special: Taro.FC<any> = () => {
         }
 
         if (type === "phone") {
-
+            const str = getURLParamsStr(urlEncode({
+                id: item.info.id,
+                cid: item.info.category.id,
+            }))
             Taro.navigateTo({
-                url: `/pages/order/pages/template/detail?id=${item.info.id}&cid=${item.info.category.id}`
+                url: `/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(router)}`
             })
         } else {
             const str = getURLParamsStr(urlEncode({

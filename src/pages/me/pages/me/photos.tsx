@@ -5,28 +5,15 @@ import IconFont from '../../../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api} from "../../../../utils/net";
 import UploadFile from "../../../../components/Upload/Upload";
-import {ossUrl, deviceInfo, notNull} from "../../../../utils/common";
+import {ossUrl, deviceInfo} from "../../../../utils/common";
 import LoadMore from "../../../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
-import {templateStore} from "../../../../store/template";
 import {userStore} from "../../../../store/user";
 import moment from "moment";
 
 
-interface PhotosProps {
-    editSelect?: boolean;
-    onPhotoSelect?: ({ids: [], imgs: [], attrs: []}) => void;
-    defaultSelect?: Array<{id: string | number, img: string}>;
-    onClose?: () => void;
-    // 选择图片必选多少张
-    count?: number;
-    // 选择图片最大多少张
-    max?: number;
-    // 小程序专用字段
-    extraProps?: {[key: string] : any}
-}
 interface PhotosState {
     navSwitchActive:number;
     loading: boolean;
@@ -40,25 +27,13 @@ interface PhotosState {
     editSelectImgs: string[];
     editSelectImgIds: any[];
     editSelectAttr: string[];
-    _editSelect: boolean;
-    _count: number;
-    _max: number;
 }
 @observer
-export default class Photos extends Component<PhotosProps, PhotosState> {
-
-    static defaultProps = {
-        editSelect: false,
-        count: 0,
-        max: 100
-    }
+export default class Photos extends Component<{ }, PhotosState> {
 
     config: Config = {
         navigationBarTitleText: '首页'
     }
-
-    // 小程序专用props,解析extraProps的内容,详情：https://nervjs.github.io/taro/docs/miniprogram-plugin#taro-v13-%E7%BB%84%E4%BB%B6%E6%8F%92%E4%BB%B6%E6%8E%A5%E5%8F%97%E5%A4%96%E9%83%A8-props-%E7%9A%84%E9%97%AE%E9%A2%98
-    private _props: any = {};
 
     private scrollView: ScrollViewProps;
     constructor(props){
@@ -76,15 +51,10 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
             editSelectImgs: [],
             editSelectImgIds: [],
             editSelectAttr: [],
-            _editSelect: false,
-            _count: 0,
-            _max: 100
         }
     }
 
     private total: number = 0;
-    private notComponent: boolean = false;
-    private setLocal: boolean = false;
 
     async getList(data) {
 
@@ -123,78 +93,9 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
         this.setState({loading: false})
     }
 
-    initPropsToState = () => {
-        let _props: any = {};
-        if (deviceInfo.env === "h5") {
-            _props = {...this.props}
-        } else {
-            _props = {...this.props.extraProps};
-        }
-        console.log(this.props)
-        if (deviceInfo.env === "weapp") {
-            this.notComponent = true;
-        }
-        const {editSelect, count, max, extraProps} = _props;
-        // 读取router的参数是因为小程序是页面跳转
-        const router = this.$router;
-        const {edit, c, m, l} = router.params;
-        const _editSelect = templateStore.printStatus || (edit && edit === "t") || editSelect || false;
-        const _count = count || (!notNull(c) && parseInt(c)) || 0;
-        const _max = max || (!notNull(m) && parseInt(m)) || 100;
-        this.setLocal = !notNull(l) && l === "t"
-        this.setState({
-            _editSelect,
-            _count,
-            _max
-        });
-        this._props = {...extraProps}
-    }
-
-    componentWillMount() {
-        if (deviceInfo.env === "weapp") {
-            this.initPropsToState()
-            this.getList({start: 0}).then(() => {
-                const {defaultSelect} = this._props;
-                const {navSwitchActive} = this.state;
-
-                if (defaultSelect && navSwitchActive === 0) {
-                    // const editSelectImgs = this.state.editSelectImgs;
-                    // const editSelectImgIds = this.state.editSelectImgIds;
-                    // for (const p of imageList) {
-                    //     for (const c of defaultSelect) {
-                    //         if (c.id == p.id) {
-                    //             editSelectImgIds.push(c.id);
-                    //             editSelectImgs.push(c.img);
-                    //         }
-                    //     }
-                    // }
-                    // this.setState({editSelectImgs, editSelectImgIds})
-                }
-            })
-        }
-    }
-
 
     componentDidMount() {
-        this.initPropsToState()
-        this.getList({start: 0}).then(() => {
-            const {defaultSelect} = this._props;
-            const {navSwitchActive} = this.state;
-
-            if (defaultSelect && navSwitchActive === 0) {
-                // const editSelectImgs = this.state.editSelectImgs;
-                // const editSelectImgIds = this.state.editSelectImgIds;
-                // for (const p of imageList) {
-                //     for (const c of defaultSelect) {
-                //         if (c.id == p.id) {
-                //             editSelectImgIds.push(c.id);
-                //             editSelectImgs.push(c.img);
-                //         }
-                //     }
-                // }
-                // this.setState({editSelectImgs, editSelectImgIds})
-            }
-        })
+        this.getList({start: 0})
     }
 
     uploadFile = async files => {
@@ -202,35 +103,7 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
         this.getList({start: 0})
     }
 
-    imageSelect = (id: any, url, attr) => {
-        const {_editSelect, _count} = this.state;
-
-        if (_editSelect) {
-            const editSelectImgs = this.state.editSelectImgs;
-            const editSelectImgIds = this.state.editSelectImgIds;
-            const editSelectAttr = this.state.editSelectAttr;
-            const idx = editSelectImgIds.findIndex(v => v == id);
-            if (idx > -1) {
-                editSelectImgs.splice(idx, 1);
-                editSelectImgIds.splice(idx, 1);
-                editSelectAttr.splice(idx, 1)
-            } else {
-                if (_count > 0 && editSelectImgs.length === _count) {
-                    Taro.showToast({title: `只能选择${_count}张`, icon: "none"})
-                    return;
-                }
-                if (editSelectImgIds.length >= 100) {
-                    Taro.showToast({title: `最多选择100张`, icon: "none"})
-                    return;
-                }
-                editSelectImgs.push(url);
-                editSelectImgIds.push(id);
-                editSelectAttr.push(attr)
-            }
-            this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
-            return
-        }
-
+    imageSelect = (id: any) => {
         const selects = this.state.selects;
         const idx = selects.indexOf(Number(id));
         if (idx > -1) {
@@ -239,70 +112,6 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
             selects.push(Number(id))
         }
         this.setState({selects})
-    }
-
-    delEditSelectImg = idx => {
-        const {_max, _editSelect} = this.state;
-        const editSelectImgs = this.state.editSelectImgs;
-        const editSelectImgIds = this.state.editSelectImgIds;
-        const editSelectAttr = this.state.editSelectAttr;
-
-        if (_editSelect && editSelectImgIds.length >= _max) {
-            Taro.showToast({
-                title: `最多选择${_max}张`
-            })
-            return
-        }
-
-        editSelectImgs.splice(idx, 1);
-        editSelectImgIds.splice(idx, 1);
-        editSelectAttr.splice(idx, 1);
-        this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
-    }
-
-    submitEditSelect = () => {
-        const {_count} = this.state;
-        const {editSelectImgs, editSelectImgIds, editSelectAttr} = this.state;
-        const {onPhotoSelect} = this._props;
-        if (editSelectImgs.length === 0 || editSelectImgIds.length === 0) {
-            Taro.showToast({title: "未选择素材", icon: "none"})
-            return
-        }
-        if (_count > 0 && _count !== editSelectImgs.length) {
-            Taro.showToast({title: `必须选择${_count}张`, icon: "none"})
-            return;
-        }
-
-        const data = {
-            ids: editSelectImgIds,
-            imgs: editSelectImgs,
-            attrs: editSelectAttr
-        }
-
-        templateStore.printStatus = false
-        templateStore.printWxPhotoData = data as any;
-
-        if (this.setLocal) {
-            const path = [];
-            for (let i = 0; i < data.ids.length; i++) {
-                path.push({
-                    id: data.ids[i],
-                    url: data.imgs[i],
-                    attr: data.attrs[i],
-                    edited: false,
-                    doc: ""
-                })
-            }
-            this.updateLocalPhotos(path)
-        }
-
-        setTimeout(() => {
-            if (this.notComponent) {
-                Taro.navigateBack()
-            } else {
-                onPhotoSelect && onPhotoSelect(data)
-            }
-        }, 100)
     }
 
     updateLocalPhotos = (arr = []) => {
@@ -452,32 +261,23 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
     ]
 
     getScrollHeight = () => {
-        const {_editSelect} = this.state;
         const {editSelectImgIds, imageList, videoList,navSwitchActive} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
-        const h = _editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
-        return deviceInfo.env === "h5" ? h : h + deviceInfo.statusBarHeight + deviceInfo.menu.height
+        const h = (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
+        return deviceInfo.env === "h5" ? h : h + deviceInfo.menu.height + 5
     }
 
     render() {
-        const {onClose} = this._props;
-        const {_editSelect, _count} = this.state;
-        const { navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened, editSelectImgs, editSelectImgIds} = this.state;
+        const { navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片","视频"];
         return (
             <View className='photos'>
-                <View className='photos_nav_bar' style={
-                    deviceInfo.env === "weapp"
-                        ? `padding-top: ${deviceInfo.statusBarHeight}px;height: 64px`
-                        : ""
-                }>
-                    <View className='left' onClick={()=>{
-                        if (!_editSelect || this.notComponent) {
-                            Taro.navigateBack()
-                        } else {
-                            onClose && onClose()
-                        }
+                <View className='photos_nav_bar' style={{
+                    paddingTop: `${deviceInfo.env === "weapp" ? deviceInfo.menu.top + (deviceInfo.menu.height / 5) : 10}px`,
+                }}>
+                    <View className='left' onClick={() => {
+                        Taro.navigateBack()
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
@@ -494,15 +294,9 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
                     </View>
                     {
                         list.length > 0 && deviceInfo.env === "h5"
-                            ? _editSelect
-                                ? <View className="right">
-                                    <Popover popoverItem={this.popoverItem}>
-                                        <View><IconFont size={48} name="24_tupianpaixu"/></View>
-                                    </Popover>
-                                </View>
-                                : <View className="right" onClick={() => this.onEdit(!isEdit)}>
-                                    <Text>{isEdit ? "完成" : "编辑"}</Text>
-                                </View>
+                            ? <View className="right" onClick={() => this.onEdit(!isEdit)}>
+                                <Text>{isEdit ? "完成" : "编辑"}</Text>
+                            </View>
                             : <View className="right"/>
                     }
                 </View>
@@ -530,23 +324,21 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
                                 : <View className="list_container">
                                     {
                                         deviceInfo.env === "weapp"
-                                            ? !_editSelect
-                                                ? <View className="list_filter">
-                                                    <Text className="tit" onClick={() => this.onEdit(!isEdit)}>{isEdit ? "完成" : "管理"}</Text>
-                                                    {
-                                                        isEdit
-                                                            ? <View className="weapp_list_filter_act">
-                                                                <Text onClick={() => this.onEdit(!isEdit)}>取消</Text>
+                                            ? <View className="list_filter">
+                                                <Text className="tit" onClick={() => this.onEdit(!isEdit)}>{isEdit ? "完成" : "管理"}</Text>
+                                                {
+                                                    isEdit
+                                                        ? <View className="weapp_list_filter_act">
+                                                            <Text onClick={() => this.onEdit(!isEdit)}>取消</Text>
+                                                        </View>
+                                                        : <Popover popoverItem={this.popoverItem}>
+                                                            <View className="weapp_list_filter_act">
+                                                                <Text className="txt">排序</Text>
+                                                                <IconFont size={48} name="24_tupianpaixu"/>
                                                             </View>
-                                                            : <Popover popoverItem={this.popoverItem}>
-                                                                <View className="weapp_list_filter_act">
-                                                                    <Text className="txt">排序</Text>
-                                                                    <IconFont size={48} name="24_tupianpaixu"/>
-                                                                </View>
-                                                            </Popover>
-                                                    }
-                                                </View>
-                                                : null
+                                                        </Popover>
+                                                }
+                                            </View>
                                             : <View className="list_filter">
                                                 <Text className="tit">排序</Text>
                                                 <Popover popoverItem={this.popoverItem}>
@@ -561,23 +353,18 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
                                                 type="card"
                                                 count={9}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
-                                                style={"width: 248rpx"}
+                                                style={{width: "248rpx"}}
                                                 onChange={this.uploadFile}/>
                                         </View>
                                         {
                                             list.map((item, idx) => {
                                                 return <View className="list_item" key={idx+""}>
                                                     <View className="img_item" key={idx+""}
-                                                          onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
+                                                          onClick={() => this.imageSelect(item.id)}>
                                                         <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)}
                                                                mode="aspectFill"
                                                                className="img"/>
                                                     </View>
-                                                    {_editSelect && editSelectImgIds.indexOf(item.id) > -1
-                                                        ? <View className="edit_select_index" onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
-                                                            <Text className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
-                                                        </View>
-                                                        : null}
                                                     {
                                                         isEdit
                                                             ? <View className="act_btn">
@@ -594,37 +381,6 @@ export default class Photos extends Component<PhotosProps, PhotosState> {
                         }
                         {list.length > 0 ? <LoadMore status={loadStatus} /> : null}
                     </ScrollView>
-                    {
-                        _editSelect && list.length > 0 && editSelectImgIds.length > 0
-                            ? <View className="photo_edit_selector_container">
-                                <View className="select_head">
-                                    <View className="left">
-                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材{_count > 0 ? `，需选择${_count}张` : null}</Text>
-                                        {/*<Text className="ext">长按拖动排序</Text>*/}
-                                    </View>
-                                    <View className="right">
-                                        <View className="submit" onClick={this.submitEditSelect}>
-                                            <Text className="txt">使用</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                                <ScrollView scrollX className="select_items_scroll_view">
-                                    <View className="select_items">
-                                        {
-                                            editSelectImgs.map((value, index) => (
-                                                <View className="select_items_wrap" key={index+""}>
-                                                    <View className="clear" onClick={() => this.delEditSelectImg(index)}>
-                                                        <IconFont name="16_qingkong" size={32} />
-                                                    </View>
-                                                    <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img" />
-                                                </View>
-                                            ))
-                                        }
-                                    </View>
-                                </ScrollView>
-                            </View>
-                            : null
-                    }
                     {loading ? <AtActivityIndicator mode='center' /> : null}
                     {
                         isEdit

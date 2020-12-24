@@ -5,7 +5,16 @@ import {inject, observer} from '@tarojs/mobx'
 import './index.less'
 import IconFont from '../../../components/iconfont'
 import {api} from "../../../utils/net";
-import {deviceInfo, getEvenArr, getURLParamsStr, notNull, ossUrl, sleep, urlEncode} from "../../../utils/common";
+import {
+    deviceInfo,
+    getEvenArr,
+    getSpecialRouter,
+    getURLParamsStr,
+    notNull,
+    ossUrl,
+    sleep,
+    urlEncode
+} from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
 import PhotoSwiper from "./photoSwiper";
@@ -119,7 +128,7 @@ class Index extends Component<any, IndexState> {
             return;
         }
         if (item.info.jump_url) {
-            Taro.navigateTo({url: `${item.info.jump_url}&back=${deviceInfo.env === "h5" ? "t" : "f"}`});
+            Taro.navigateTo({url: `${item.info.jump_url}&cp=${getSpecialRouter(this.$router)}`});
             return
         }
         if (item.info.category.type === "photo") {
@@ -138,10 +147,9 @@ class Index extends Component<any, IndexState> {
             const str = getURLParamsStr(urlEncode({
                 id: item.info.id,
                 cid: item.info.category.id,
-                back: deviceInfo.env === "h5" ? "t" : "f"
             }))
             Taro.navigateTo({
-                url: `/pages/order/pages/template/detail?${str}`
+                url: `/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`
             });
         }
     }
@@ -385,7 +393,9 @@ class Index extends Component<any, IndexState> {
                             <Text className='placeholders'>搜索海量模板</Text>
                         </View>
                     </View>
-                    <View className='inde_page_container'>
+                    <View className='inde_page_container' style={{
+                        paddingTop: `${deviceInfo.env === "h5" ? 55 : deviceInfo.menu.bottom + 10}px`
+                    }}>
                         {
                             data.map((item, index) => {
                                 let list = item.clist;

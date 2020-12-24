@@ -357,11 +357,11 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         const tabs = ["图片","视频"];
         return (
             <View className='photos'>
-                <View className='photos_nav_bar' style={
-                    deviceInfo.env === "weapp"
-                        ? `padding-top: ${deviceInfo.statusBarHeight}px;height: 64px`
-                        : ""
-                }>
+                <View className='photos_nav_bar' style={{
+                    marginTop: `${deviceInfo.env === "weapp" ? deviceInfo.menu.top + (deviceInfo.menu.height / 5) : 0}px`,
+                    height: `${deviceInfo.env === "weapp" ? deviceInfo.menu.height : 44}px`,
+                    paddingTop: `${deviceInfo.env === "h5" ? 10 : 0}px`
+                }}>
                     <View className='left' onClick={onClose}>
                         <Text className="cl_t">关闭</Text>
                     </View>

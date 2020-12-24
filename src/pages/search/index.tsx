@@ -4,11 +4,12 @@ import {View, Text, Image, ScrollView} from "@tarojs/components";
 import IconFont from "../../components/iconfont";
 import {AtInput} from "taro-ui";
 import Empty from "../../components/empty";
-import {debounce, deviceInfo, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
+import {debounce, deviceInfo, getSpecialRouter, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
 import {api} from "../../utils/net";
 import searchStore from "../../store/search";
 
 const Search:Taro.FC<any> = () => {
+    const router = Taro.useRouter();
 
     const [touched, setTouched] = useState(false);
     const [searchList, setSearchList] = useState([]);
@@ -48,8 +49,12 @@ const Search:Taro.FC<any> = () => {
     const onItemClick = (item) => {
         switch (item.category.type) {
             case "phone":
+                const phoneStr = getURLParamsStr(urlEncode({
+                    id: item.id,
+                    cid: item.category.id,
+                }))
                 Taro.navigateTo({
-                    url: `/pages/order/pages/template/detail?id=${item.id}&cid=${item.category.id}`
+                    url: `/pages/order/pages/template/detail?${phoneStr}&cp=${getSpecialRouter(router)}`
                 });
                 break;
             case "photo":
