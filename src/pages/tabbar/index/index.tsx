@@ -97,7 +97,7 @@ class Index extends Component<any, IndexState> {
 
             if (Object.keys(current).length > 0) {
                 this.setState({curtain: current});
-                Taro.hideTabBar()
+                // Taro.hideTabBar()
             }
 
         } catch (e) {
@@ -244,12 +244,12 @@ class Index extends Component<any, IndexState> {
 
     uncClose = () => {
         this.setState({showUnc: false});
-        Taro.showTabBar()
+        // Taro.showTabBar()
     }
 
     uncShow = () => {
         this.setState({showUnc: true});
-        Taro.hideTabBar()
+        // Taro.hideTabBar()
     }
 
     jumpToTemplate = type => {
@@ -340,7 +340,7 @@ class Index extends Component<any, IndexState> {
 
     closeCurtain = () => {
         this.setState({curtain: {}});
-        Taro.showTabBar();
+        // Taro.showTabBar();
     }
 
     render() {

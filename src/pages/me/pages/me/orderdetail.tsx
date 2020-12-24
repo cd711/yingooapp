@@ -274,9 +274,14 @@ export default class OrderDetail extends Component<{},{
                 <View className={navBarChange?'nav-bar':(state==-1?'nav-bar bar-gray':'nav-bar bar-active')} style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (Taro.getCurrentPages().length==1) {
-                            Taro.navigateTo({
-                                url:"/pages/tabbar/order/order?tab=0"
-                            })
+                            if (deviceInfo.env == "h5") {
+                                window.location.href = "/pages/tabbar/order/order?tab=0";
+                            } else {
+                                Taro.switchTab({
+                                    url:"/pages/tabbar/order/order?tab=0"
+                                })
+                            }
+
                         }else{
                             Taro.navigateBack();
                         }

@@ -51,9 +51,11 @@ export default class Editor extends Component<any,{
 
     componentDidMount() {
         if (!userStore.isLogin) {
-            Taro.switchTab({
-                url:'/pages/tabbar/index/index'
-            })
+            if (process.env.TARO_ENV == "h5") {
+                window.location.href = "/pages/tabbar/index/index";
+            } else {
+                Taro.switchTab({url: "/pages/tabbar/index/index"});
+            }
         }
         this.getRegion()
 

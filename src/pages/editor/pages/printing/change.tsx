@@ -484,11 +484,13 @@ const PrintChange: Taro.FC<any> = () => {
     const onBackHandle = async () => {
         photoStore.updateServerParams(getUserKey(), new PhotoParams())
         if (Taro.getCurrentPages().length > 1) {
-            Taro.navigateBack()
+            Taro.navigateBack();
         } else {
-            Taro.switchTab({
-                url: "/pages/tabbar/index/index"
-            })
+            if (process.env.TARO_ENV == "h5") {
+                window.location.href = "/";
+            } else {
+                Taro.switchTab({url: "/pages/tabbar/index/index"});
+            }
         }
     }
 

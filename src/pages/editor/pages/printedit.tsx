@@ -1510,7 +1510,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             if (process.env.TARO_ENV == "h5") {
                 window.location.href = "/";
             } else {
-                Taro.reLaunch({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: "/pages/tabbar/index/index"});
             }
         }
     }

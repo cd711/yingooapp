@@ -40,9 +40,11 @@ const LoginFooter: Taro.FC<any> = () => {
                                                                 duration: 2000
                                                             });
                                                             setTimeout(() => {
-                                                                Taro.switchTab({
-                                                                    url: '/pages/tabbar/me/me'
-                                                                })
+                                                                if (process.env.TARO_ENV == "h5") {
+                                                                    window.location.href = "/pages/tabbar/me/me";
+                                                                } else {
+                                                                    Taro.switchTab({url: "/pages/tabbar/me/me"});
+                                                                }
                                                             }, 2001);
                                                         }).catch((e) => {
                                                             Taro.hideLoading();

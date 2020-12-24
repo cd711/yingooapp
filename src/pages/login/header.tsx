@@ -8,9 +8,13 @@ const HeaderTop: Taro.FC<any> = ({rightText,url}) => {
     return <View className={convertClassName("tops")} style={deviceInfo.env === 'h5'?`padding-top:${Taro.pxTransform(40)}`:fixStatusBarHeight()}>
         <View className={convertClassName('close')} onClick={()=>{
             if (Taro.getCurrentPages().length==1) {
-                Taro.reLaunch({
-                    url:'/pages/tabbar/index/index'
-                });
+                if (deviceInfo.env=="h5") {
+                    window.location.href = "/"
+                } else {
+                    Taro.switchTab({
+                        url:'/pages/tabbar/index/index'
+                    });
+                }
             }else{
                 Taro.navigateBack();
             }

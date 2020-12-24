@@ -138,9 +138,13 @@ export default class Login extends Component<{},{
                     if (Taro.getCurrentPages().length>1) {
                         Taro.navigateBack();
                     } else {
-                        Taro.switchTab({
-                            url:'/pages/tabbar/index/index'
-                        })
+                        if (deviceInfo.env == 'h5') {
+                            window.location.href = '/pages/tabbar/index/index'
+                        } else {
+                            Taro.switchTab({
+                                url:'/pages/tabbar/index/index'
+                            })
+                        }
                     }
                 }, 2001);
             })
@@ -154,9 +158,13 @@ export default class Login extends Component<{},{
                 if (Taro.getCurrentPages().length>1) {
                     Taro.navigateBack();
                 } else {
-                    Taro.switchTab({
-                        url:'/pages/tabbar/index/index'
-                    })
+                    if (deviceInfo.env == 'h5') {
+                        window.location.href = '/pages/tabbar/index/index'
+                    } else {
+                        Taro.switchTab({
+                            url:'/pages/tabbar/index/index'
+                        })
+                    }
                 }
             }, 2001);
         }
