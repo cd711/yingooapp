@@ -48,6 +48,12 @@ class Index extends Component<any, IndexState> {
     }
 
     getIndexList = async () => {
+        let local = null;
+        try {
+            local = Taro.getStorageSync(`${userStore.id}_local_coupon`);
+        } catch (e) {
+            console.log("获取本地coupon出错：", e)
+        }
         try {
             const res = await api("app.index/h5");
             this.setState({data: [...res]})
@@ -59,23 +65,32 @@ class Index extends Component<any, IndexState> {
                 }
             }
 
+            // 如果优惠券已经领取就不显示了
+            let current = {};
             if (popArr.length > 1) {
                 const idx = Math.floor(Math.random() * popArr.length + 1) - 1;
                 console.log("活动弹窗随机的下标：", idx);
-                this.setState({curtain: popArr[idx]})
+
+                let showCoupon = false;
+                if (local) {
+                    const matchIdx = local.findIndex(v => v == popArr[idx].id );
+                    showCoupon = matchIdx > -1
+                }
+
+                if (showCoupon) {
+                    current = popArr[idx]
+                }
             } else {
                 if (popArr.length > 0) {
-                    this.setState({
-                        curtain: popArr[0]
-                    })
+                    current = popArr[0];
                 }
             }
 
-            // this.setState({
-            //     data: res.content || [],
-            //     banners: res.banner || [],
-            //     column: res.column || []
-            // })
+            if (Object.keys(current).length > 0) {
+                this.setState({curtain: current});
+                Taro.hideTabBar()
+            }
+
         } catch (e) {
             console.log("首页获取列表出错：", e)
         }
@@ -299,7 +314,7 @@ class Index extends Component<any, IndexState> {
 
         this.receiveCoupon(data)
         await sleep(500);
-        this.setState({curtain: {}})
+        this.closeCurtain()
     }
 
     onBannerClick = (data, idx) => {
@@ -313,6 +328,11 @@ class Index extends Component<any, IndexState> {
         Taro.navigateTo({
             url: data.info.jump_url || `/pages/order/pages/product/detail?id=${data.info.id}`
         })
+    }
+
+    closeCurtain = () => {
+        this.setState({curtain: {}});
+        Taro.showTabBar();
     }
 
     render() {
@@ -329,7 +349,7 @@ class Index extends Component<any, IndexState> {
                         Object.keys(curtain).length > 0
                             ? <AtCurtain
                                 isOpened={Object.keys(curtain).length > 0}
-                                onClose={() => this.setState({curtain: {}})}
+                                onClose={this.closeCurtain}
                             >
                                 <View className="index_curtain_container" onClick={this.onCurtainClick}>
                                     <Image
