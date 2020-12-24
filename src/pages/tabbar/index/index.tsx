@@ -432,7 +432,7 @@ class Index extends Component<any, IndexState> {
                                                     <View className="prod_bugs">
                                                         <View className="left">
                                                             <Text className="red">￥<Text className="price">{list[0].info.price}</Text></Text>
-                                                            <Text className="p_price">￥{list[0].info.cost_price}</Text>
+
                                                         </View>
                                                         <View className="right">
                                                             <Text className="txt">{list[0].info.sold_count}人已抢</Text>
@@ -481,7 +481,6 @@ class Index extends Component<any, IndexState> {
                                                                         <View className="prod_bugs">
                                                                             <View className="left">
                                                                                 <Text className="red">￥<Text className="price">{product.info.price}</Text></Text>
-                                                                                <Text className="p_price">￥{product.info.cost_price}</Text>
                                                                             </View>
                                                                             <View className="right">
                                                                                 <Text className="txt">{product.info.sold_count}人已抢</Text>
