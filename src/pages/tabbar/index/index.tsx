@@ -248,7 +248,9 @@ class Index extends Component<any, IndexState> {
             Taro.navigateTo({
                 url: val.info.jump_url
             })
+            return
         }
+        this.receiveCoupon(val)
     }
 
     uncClose = () => {
