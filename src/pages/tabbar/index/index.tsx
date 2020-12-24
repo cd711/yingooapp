@@ -57,11 +57,15 @@ class Index extends Component<any, IndexState> {
     }
 
     getIndexList = async () => {
-        let local = null;
-        try {
-            local = Taro.getStorageSync(`${userStore.id}_local_coupon`);
-        } catch (e) {
-            console.log("获取本地coupon出错：", e)
+
+        let cIds = [];
+        if (userStore.id) {
+            try {
+                const res = await api("app.coupon/receiveCoupinId");
+                cIds = res || []
+            } catch (e) {
+                console.log(e)
+            }
         }
         try {
             const res = await api("app.index/h5");
@@ -76,14 +80,14 @@ class Index extends Component<any, IndexState> {
 
             // 如果优惠券已经领取就不显示了
             let current = {};
+            let showCoupon = false;
             if (popArr.length > 1) {
                 const idx = Math.floor(Math.random() * popArr.length + 1) - 1;
                 console.log("活动弹窗随机的下标：", idx);
 
-                let showCoupon = false;
-                if (local) {
-                    const matchIdx = local.findIndex(v => v == popArr[idx].id );
-                    showCoupon = matchIdx > -1
+                if (cIds.length > 0) {
+                    const matchIdx = cIds.findIndex(v => v == popArr[idx].info.id );
+                    showCoupon = matchIdx === -1
                 }
 
                 if (showCoupon) {
@@ -91,7 +95,12 @@ class Index extends Component<any, IndexState> {
                 }
             } else {
                 if (popArr.length > 0) {
-                    current = popArr[0];
+                    const matchIdx = cIds.findIndex(v => v == popArr[0].info.id );
+                    showCoupon = matchIdx === -1
+                }
+
+                if (showCoupon) {
+                    current = popArr[0]
                 }
             }
 
@@ -413,7 +422,7 @@ class Index extends Component<any, IndexState> {
                                         {
                                             item.model === "product"
                                                 ? len === 1
-                                                ? <View className="single_index_product_item">
+                                                ? <View className="single_index_product_item fix_all_margin">
                                                     <View className="single_img_view">
                                                         <Image src={list[0].info.thumb_image} className="single_img" mode="widthFix" />
                                                     </View>
@@ -423,7 +432,7 @@ class Index extends Component<any, IndexState> {
                                                     <View className="prod_bugs">
                                                         <View className="left">
                                                             <Text className="red">￥<Text className="price">{list[0].info.price}</Text></Text>
-                                                            <Text className="p_price">￥{list[0].info.cost_price}</Text>
+
                                                         </View>
                                                         <View className="right">
                                                             <Text className="txt">{list[0].info.sold_count}人已抢</Text>
@@ -455,7 +464,7 @@ class Index extends Component<any, IndexState> {
                                                         <Text className="txt">立即购买</Text>
                                                     </View>
                                                 </View>
-                                                : <View className="product_more_list_main" key={index + ""}>
+                                                : <View className="product_more_list_main fix_all_margin" key={index + ""}>
                                                     <View className="title">{item.title || " "}</View>
                                                     <View className="sub_tit">{item.subtitle}</View>
                                                     <View className="product_more_list">
@@ -472,7 +481,6 @@ class Index extends Component<any, IndexState> {
                                                                         <View className="prod_bugs">
                                                                             <View className="left">
                                                                                 <Text className="red">￥<Text className="price">{product.info.price}</Text></Text>
-                                                                                <Text className="p_price">￥{product.info.cost_price}</Text>
                                                                             </View>
                                                                             <View className="right">
                                                                                 <Text className="txt">{product.info.sold_count}人已抢</Text>
@@ -628,7 +636,7 @@ class Index extends Component<any, IndexState> {
                                         {
                                             item.model === "coupon"
                                                 ? item.clist.map((coupon, cIndex) => (
-                                                    <View className="index_coupon_main" key={`${index}_${cIndex}`}
+                                                    <View className="index_coupon_main fix_all_margin" key={`${index}_${cIndex}`}
                                                           onClick={() => this.receiveCoupon(coupon)}>
                                                         <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" mode="widthFix" />
                                                         <View className="receive_btn">
@@ -644,7 +652,7 @@ class Index extends Component<any, IndexState> {
                                     </Fragment>
                                     : item.area_type === "column"
                                     ?  <Fragment>
-                                        <View className="index_fast_link_view" style={{padding: `0 6.5px 0 6.5px`}}>
+                                        <View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
                                             <View className="read_fast_link_wrap">
                                                 <View className="read_fast_link" onClick={this.uncShow}>
                                                     <Image src={require("../../../source/il.svg")} className="fast_img" mode="widthFix" />
@@ -664,7 +672,9 @@ class Index extends Component<any, IndexState> {
                                                 </View>
                                             </View>
                                         </View>
-                                        <View className="index_fast_link_view fixed_padding">
+                                        <View className="index_fast_link_view fixed_padding" style={{
+                                            paddingBottom: "0px"
+                                        }}>
                                                 <View className="fast_order_link_wrap">
                                                     <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
                                                         <Image src={require("../../../source/pz.svg")} className="fast_img" />
@@ -689,7 +699,7 @@ class Index extends Component<any, IndexState> {
                                             </View>
                                     </Fragment>
                                     : item.area_type === "ad"
-                                    ? <View className="index_spacial_column" key={`${item.area_type}_${index}`}>
+                                    ? <View className="index_spacial_column fix_all_margin" key={`${item.area_type}_${index}`}>
                                         {
                                             list.map((colItem, colIdx) => (
                                                 <View className="index_coupon_main" key={`${colIdx}_${index}`}
@@ -700,13 +710,13 @@ class Index extends Component<any, IndexState> {
                                         }
                                     </View>
                                     : item.area_type === "title"
-                                    ? <View className="remmond_your_love">
+                                    ? <View className="remmond_your_love fix_all_margin">
                                         {item.clist[0].thumb_image
                                             ? <Image src={item.clist[0].thumb_image} className="love" />
                                             : <Text className="txt">{item.clist[0].title}</Text>}
                                     </View>
                                     : item.area_type === "banner"
-                                    ? <View className="index_banner_container" key={`${index}`}>
+                                    ? <View className="index_banner_container fix_all_margin" key={`${index}`}>
                                         <BannerSwiper banners={item.clist} onItemClick={this.onBannerClick} />
                                     </View>
                                     : null
