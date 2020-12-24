@@ -130,6 +130,7 @@ export default class Detail extends Component<{}, {
     // }
 
     onEditor = () => {
+        Taro.getApp().finishId = null;
         if (userStore.isLogin) {
             const {currentItem} = this.state;
             jumpToEditor({

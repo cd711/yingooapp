@@ -237,7 +237,12 @@ export default class Preview extends Component<any, {
     onEditor = () => {
         const { workId,workInfo, doc} = this.state;
         console.log(workId, workInfo)
-        window.location.replace(`/editor/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`);
+        Taro.getApp().finishId =  workInfo.id && workInfo.id || workId;
+        if (deviceInfo.env === "h5") {
+            window.location.replace(`/pages/editor/pages/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`);
+        } else {
+            Taro.navigateBack()
+        }
     }
 
     onOrderIng = () => {
@@ -266,16 +271,15 @@ export default class Preview extends Component<any, {
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
-                        let uri = '/editor/shell';
+                        let uri = '/pages/editor/pages/shell';
                         if (workId) {
-                            uri = `/editor/shell?id=${workId}`;
+                            uri = `/pages/editor/pages/shell?id=${workId}`;
                         }
                         if (deviceInfo.env == 'h5') {
                             window.location.replace(uri);
                         } else {
-                            Taro.navigateTo({
-                                url:uri
-                            })
+                            Taro.getApp().finishId =  workid;
+                            Taro.navigateBack()
                         }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />

@@ -1390,7 +1390,6 @@ export default class Shell extends Component<{}, {
 
     constructor(p) {
         super(p);
-        // console.log(this.$router.params);
         this.tplId = this.$router.params['tpl_id'] || 0;
         this.docId = this.$router.params['id'] || 0;
 
@@ -1421,7 +1420,7 @@ export default class Shell extends Component<{}, {
     }
 
     async componentDidMount() {
-        // Taro.showLoading({title: "请稍候"});
+
         // @ts-ignore
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
@@ -1552,7 +1551,6 @@ export default class Shell extends Component<{}, {
                     break;
 
                 case "onload":
-                    console.log(5555555)
                     this.setState({
                         loadingTemplate: false
                     });
@@ -1608,6 +1606,16 @@ export default class Shell extends Component<{}, {
             title: "请稍候"
         });
 
+        const params = this.$router.params;
+
+        alert(params.workid)
+        if (!notNull(params.workid) && params.workid !== "f") {
+            wx.miniProgram.navigateTo({
+                url: `/pages/order/pages/template/preview?workid=${params.workid}`,
+            })
+            return
+        }
+
         try{
 
             const doc = await callEditor("getDoc");
@@ -1631,20 +1639,34 @@ export default class Shell extends Component<{}, {
             return
         }
 
+        const params = this.$router.params;
+
+        if (!notNull(params.workid) && params.workid !== "f") {
+            window.location.replace(`/pages/order/pages/template/preview?workid=${params.workid}`);
+            return
+        }
+
         Taro.showLoading({
             title: "请稍候"
         });
-        // await callEditor("saveDraft");
-        const doc = await callEditor("getDoc");
-        const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
-        Taro.setStorageSync("doc_draft", {
-            tplId: this.tplId,
-            docId: this.docId,
-            modelId: this.defaultModel.id,
-            doc: doc
-        });
-        Taro.hideLoading();
-        window.location.replace(`/pages/order/pages/template/preview?workid=${res.id}`);
+        try {
+            const doc = await callEditor("getDoc");
+            const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
+            Taro.setStorageSync("doc_draft", {
+                tplId: this.tplId,
+                docId: this.docId,
+                modelId: this.defaultModel.id,
+                doc: doc
+            });
+            Taro.hideLoading();
+            window.location.replace(`/pages/order/pages/template/preview?workid=${res.id}`);
+        } catch (e) {
+            Taro.hideLoading();
+            Taro.showToast({
+                title: e,
+                icon: "none"
+            })
+        }
     }
 
 
@@ -1725,12 +1747,6 @@ export default class Shell extends Component<{}, {
                     </View>
                     <Text className='txt'>透明度</Text>
                 </View>
-                {/*<View className='btn'>*/}
-                {/*    <View className='icon'>*/}
-                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                {/*    </View>*/}
-                {/*    <Text className='txt'>删除</Text>*/}
-                {/*</View>*/}
             </View>
         }
         if (tool == 2) {
@@ -1747,12 +1763,6 @@ export default class Shell extends Component<{}, {
                     <IconFont name='24_bianjiqi_yangshi' size={48}/>
                     <Text className='txt'>样式</Text>
                 </View>
-                {/*<View className='btn'>*/}
-                {/*    <View className='icon'>*/}
-                {/*        <IconFont name='24_bianjiqi_shanchu' size={48}/>*/}
-                {/*    </View>*/}
-                {/*    <Text className='txt'>删除</Text>*/}
-                {/*</View>*/}
             </View>
         }
         if (tool == 4) {
@@ -1806,13 +1816,10 @@ export default class Shell extends Component<{}, {
                 <View onClick={this.next} className='right'>保存</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
-                {/* eslint-disable-next-line react/forbid-elements */}
-                <iframe className="editor_frame" style={{
-                    // height: deviceInfo.windowHeight - deviceInfo.menu.bottom + 50 +"px",
-                    // marginTop: deviceInfo.windowHeight - deviceInfo.menu.bottom + 50 +"px",
-                }} src={this.getUrl()}/>
+                <iframe className="editor_frame" src={this.getUrl()}/>
                 {loadingTemplate ?
-                    <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
+                    <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
+                    : null}
             </View>
 
             {this.switchRender(tool)}

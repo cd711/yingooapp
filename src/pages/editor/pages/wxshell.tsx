@@ -6,8 +6,8 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {deviceInfo, getURLParamsStr, urlEncode} from "../../../utils/common";
-import {getToken} from "../../../utils/net";
+import {getURLParamsStr, urlEncode} from "../../../utils/common";
+import {api, getToken} from "../../../utils/net";
 import moment from "moment";
 
 
@@ -26,7 +26,8 @@ export default class Shell extends Component<{}, {
     size?: { width: string | number; height: string | number };
     data?: number;
     loadingTemplate?: boolean;
-    textInfo: any
+    textInfo: any;
+    url: string
 }> {
 
     config: Config = {
@@ -44,8 +45,23 @@ export default class Shell extends Component<{}, {
 
         this.state = {
             loadingTemplate: true,
-            textInfo: null
+            textInfo: null,
+            url: ""
         };
+    }
+
+    async componentDidShow() {
+        const finishId = Taro.getApp().finishId;
+        console.log("finishId：", finishId)
+        if (finishId) {
+            try {
+                const res = await api("editor.user_tpl/info", {id: finishId});
+                this.tplId = res.tpl_product_id
+            } catch (e) {
+
+            }
+        }
+        this.setState({url: this.getUrl()})
     }
 
 
@@ -61,10 +77,6 @@ export default class Shell extends Component<{}, {
         }
     }
 
-    next = async () => {
-
-        window.location.replace(`/pages/order/pages/template/preview`);
-    }
 
     getUrl = () => {
         const str = getURLParamsStr(urlEncode({
@@ -73,6 +85,7 @@ export default class Shell extends Component<{}, {
             tpl_id: this.tplId,
             cid: this.$router.params.cid,
             hidden: "t",
+            workid: Taro.getApp().finishId || "f"
         }))
         return process.env.NODE_ENV == 'production'
             ? `${config.weappUrl}/pages/editor/pages/shell?${str}`
@@ -81,23 +94,17 @@ export default class Shell extends Component<{}, {
 
 
     render() {
-        const {loadingTemplate, size} = this.state;
+        const {loadingTemplate, size, url} = this.state;
 
         return (
             <View className='editor-page'>
-                <View className='wx_editor-page_header'
-                      style={{
-                          marginTop: `${deviceInfo.menu.bottom}px`
-                      }}
-                >
-                    <View onClick={this.next} className='right'>下一步</View>
-                </View>
                 <View className="editor" style={size ? {height: size.height} : undefined}>
-                    <WebView src={this.getUrl()} onLoad={(e) => {
-                        console.log("加载完成：", e)
-                    }} />
-                    {loadingTemplate ?
-                        <View className='loading'><AtActivityIndicator size={64} mode='center'/></View> : null}
+                    <WebView src={url} />
+                    {
+                        loadingTemplate ?
+                        <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
+                        : null
+                    }
                 </View>
             </View>
         )
