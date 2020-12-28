@@ -1,5 +1,5 @@
 const config = {
-    apiUrl: process.env.TARO_ENV === 'h5' ? "/api/" : `https://${process.env.NODE_ENV !== 'production' ? "test" : "m"}.playbox.yingoo.com/api/`,
+    apiUrl: `https://${process.env.NODE_ENV !== 'production' ? "test" : "m"}.playbox.yingoo.com/api/`,
     // 静态资源地址
     sourceUrl: "",
     // 编辑器本地地址

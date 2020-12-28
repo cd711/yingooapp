@@ -175,7 +175,7 @@ export default class Login extends Component<{},{
             id
         }).then((res)=>{
             if (res) {
-               callback(res) 
+               callback(res)
             }
         })
     }
@@ -293,7 +293,7 @@ export default class Login extends Component<{},{
                                         }
                                     </Swiper>:null
                         }
-                        
+
                         <View className="indicator">
                             <Text className='txt'>{`${currentPreImageIndex+1}/${image.length}`}</Text>
                         </View>
@@ -489,8 +489,8 @@ export default class Login extends Component<{},{
                                         }
                                         if (data.tpl_product_type == "photo") {
                                             jumpToPrintEditor({
-                                                id:data.id,
-                                                cid:data.tpl_category_id,
+                                                cid:data.id,
+                                                tplid:data.tpl_category_id,
                                                 sku_id:sku.id,
                                                 init:"t"
                                             });
@@ -505,7 +505,7 @@ export default class Login extends Component<{},{
                                     }
                                 }}/>:null
                 }
-                
+
             </View>
         )
     }
