@@ -291,7 +291,7 @@ export default class Login extends Component<{},{
                                                 </SwiperItem>
                                             ))
                                         }
-                                    </Swiper>:null
+                                    </Swiper>:<View style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}/>
                         }
 
                         <View className="indicator">

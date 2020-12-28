@@ -484,7 +484,7 @@ export default class Confirm extends Component<any, {
             mainProduct: mainProduct,
             currentAddBuyItem: item,
             hasOldSku: item.sku != null,
-            selectSku: subItem && subItem.sku ? subItem.sku : null
+            selectSku: subItem && subItem.sku ? subItem.sku : item.sku
         }, (is) => {
             this.tempContainerKey = `${item.id}_${mainProductId}`;
             if (is) {
@@ -644,7 +644,12 @@ export default class Confirm extends Component<any, {
                                                 <View className='pre-image'>
                                                     <Image src={ossUrl(product.product.thumb_image, 0)} className='img'
                                                            mode='aspectFill'/>
-                                                    <View className='big'><IconFont name='20_fangdayulan'
+                                                    <View className='big' onClick={()=>{
+                                                        Taro.previewImage({
+                                                            current:product.product.thumb_image,
+                                                            urls:[product.product.thumb_image]
+                                                        })
+                                                    }}><IconFont name='20_fangdayulan'
                                                                                     size={40}/></View>
                                                 </View>
                                                 <View className='center'>
@@ -808,7 +813,9 @@ export default class Confirm extends Component<any, {
                                             <Ticket key={index + ""}
                                                     isSelected={value.checked}
                                                     ticket={value.coupon}
-                                                    onChange={() => this.onSelectTicket(tickets, value.id)}/>
+                                                    onChange={() => this.onSelectTicket(tickets, value.id)} hasCheckBox={true}>
+                                                        {/* <View ></View> */}
+                                                    </Ticket>
                                         ))
                                     }
                                 </View>
