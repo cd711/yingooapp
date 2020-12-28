@@ -59,7 +59,7 @@ class Index extends Component<any, IndexState> {
     getIndexList = async () => {
 
         let cIds = [];
-        if (userStore.id) {
+        if (userStore.isLogin) {
             try {
                 const res = await api("app.coupon/receiveCoupinId");
                 cIds = res || []

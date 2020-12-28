@@ -397,7 +397,7 @@ export default class Template extends Component<any, {
 
         return (
             <View className='template'>
-                <LoginModal/>
+                <LoginModal isTabbar={false}/>
                 <View className='t_tops'
                       style={`padding-top:${deviceInfo.statusBarHeight}px;background: #FFF;`}>
                     <View className='nav-bar'>

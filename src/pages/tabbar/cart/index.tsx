@@ -175,7 +175,7 @@ export default class Cart extends Component<{}, {
         }];
         return (
             <View className='cart'>
-                <LoginModal isTabbar={true} />
+                <LoginModal isTabbar />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     {/* <View className='left' onClick={() => {

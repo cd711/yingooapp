@@ -139,7 +139,7 @@ const Special: Taro.FC<any> = () => {
 
     return (
         <View className="special_container">
-            <LoginModal isTabbar />
+            <LoginModal isTabbar={false} />
             <ScrollView className="special_scroll"
                         scrollY
                         style={{
