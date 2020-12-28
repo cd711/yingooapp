@@ -5,11 +5,13 @@ import './Ticket.less';
 import IconFont from '../iconfont';
 import Checkboxs from '../checkbox/checkbox';
 import moment from "moment";
+import { convertClassName } from '../../utils/common';
 
-const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,children}) => {
+const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, ticket,children}) => {
     const [showDes,setShowDes] = useState(false)
     useEffect(() => {
         // console.log(ticket)
+
     }, [])
 
 
@@ -49,7 +51,10 @@ const Ticket: Taro.FC<any> = ({isNew, isSelected, onChange, ticket,children}) =>
                 </View>
             </View>
             {
-                children?children:<Checkboxs className='checkbox' isChecked={isSelected} />
+                hasCheckBox ? <View className='checkbox'><Checkboxs isChecked={isSelected} disabled /></View> : null
+            }
+            {
+                children ? children : null
             }
 
         </View>
