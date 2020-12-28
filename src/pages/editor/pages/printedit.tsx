@@ -1347,8 +1347,10 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         // 再次编辑时使用存储的图片数据
         if (!notNull(this.routerParams.local) && this.routerParams.local == "t") {
             const idx = parseInt(this.routerParams.idx);
-            photoStore.editorPhotos = [...photoStore.photoProcessParams.photo.path[idx].originalData]
-
+            const current = photoStore.photoProcessParams.photo.path[idx];
+            if (current) {
+                photoStore.editorPhotos = [...current.originalData]
+            }
         }
     }
 
@@ -1594,7 +1596,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             if (this.state.hiddenBar) {
                 if (fastJump) {
                     // 小程序跳转到照片冲印列表页
-                    wx.miniProgram.navigateTo({
+                    wx.miniProgram.redirectTo({
                         url: `/pages/editor/pages/printing/change?${str}`
                     })
                 } else {
@@ -1604,7 +1606,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             } else {
                 // 网页跳转到照片冲印列表页
                 if (fastJump) {
-                    Taro.navigateTo({
+                    Taro.redirectTo({
                         url: `/pages/editor/pages/printing/change?${str}`
                     })
                 } else {

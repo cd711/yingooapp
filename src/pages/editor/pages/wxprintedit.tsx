@@ -46,10 +46,6 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         navigationBarTitleText: '编辑中',
     }
 
-    componentDidMount() {
-
-    }
-
 
     getUrl = () => {
         const str = getURLParamsStr(urlEncode({
