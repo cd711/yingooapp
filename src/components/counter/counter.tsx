@@ -40,6 +40,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             e.stopPropagation();
             // console.log(num,max)
             if (!notNull(max) && number >= parseInt(max+"")) {
+                
                 return
             }
             if (disabled) {

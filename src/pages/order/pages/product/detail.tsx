@@ -16,7 +16,8 @@ export default class Login extends Component<{},{
     skuName:Array<string>,
     showOkButton:boolean,
     centerPartyHeight:number,
-    defalutSkuIds:Array<number>
+    defalutSkuIds:Array<number>,
+    maxBuyNum:number
 }> {
 
     config: Config = {
@@ -34,7 +35,8 @@ export default class Login extends Component<{},{
             skuName:[],
             showOkButton:false,
             centerPartyHeight:550,
-            defalutSkuIds:[]
+            defalutSkuIds:[],
+            maxBuyNum:0
         }
     }
     private tempDataContainerData = null;
@@ -89,6 +91,7 @@ export default class Login extends Component<{},{
                                     }
                                     return item;
                                 }):[],
+                                maxBuyNum:value && value.currentAddBuyItem && value.currentAddBuyItem.max_quantity?parseInt(value.currentAddBuyItem.max_quantity+""):0,
                                 data:res
                             })
                         }
@@ -233,7 +236,7 @@ export default class Login extends Component<{},{
         }
     }
     render() {
-        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton,centerPartyHeight,defalutSkuIds} = this.state;
+        const {data,currentPreImageIndex,placeOrderShow,skuName,showOkButton,centerPartyHeight,defalutSkuIds,maxBuyNum} = this.state;
         const image:Array<any> = data && data.image && data.image.length>0?data.image:[];
         const flag_text:Array<any> = data && !notNull(data.flag_text) ? data.flag_text:[];
         const tags_text:Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0,4):[];
@@ -415,7 +418,7 @@ export default class Login extends Component<{},{
                     </View>
                 </View>
                 {
-                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0} productType={data.product_type} defalutSelectIds={defalutSkuIds} data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                    this.modalInit?<PlaceOrder selectedSkuId={this.state.sku?this.state.sku.id:0} maxBuyNum={maxBuyNum} productType={data && data.product_type ? data.product_type : ""} defalutSelectIds={defalutSkuIds} data={data}  showOkButton={showOkButton} isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                                 onBuyNumberChange={(n) => {
                                     console.log(n)
                                     this.setState({

@@ -7,7 +7,7 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, productType = "",isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
@@ -299,7 +299,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",isShow = false,
                     {
                         productType == "customized"?null:<View className='buy-number'>
                             <Text className='title'>购买数量</Text>
-                            <Counter num={1} onCounterChange={onBuyNumberChange}/>
+                            <Counter num={1} max={maxBuyNum==0?999:maxBuyNum} onCounterChange={onBuyNumberChange}/>
                         </View>
                     }
                     
