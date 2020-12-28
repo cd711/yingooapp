@@ -12,7 +12,7 @@ import {
     debounce,
     deviceInfo,
     getNextPage,
-    getURLParamsStr,
+    getURLParamsStr, getUserKey,
     notNull,
     ossUrl,
     pageTotal, sleep,
@@ -1284,10 +1284,15 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     public editorProxy: WindowProxy | null | undefined;
     public routerParams = this.$router.params;
-    public userKey: string = this.routerParams.key;
+
+    userKey() {
+        if (this.routerParams.key) {
+            return this.routerParams.key
+        }
+        return getUserKey()
+    }
 
     async componentDidShow() {
-        this.userKey = this.routerParams.key;
 
         // 当为小程序直接跳转时执行
         if (this.routerParams.hidden && this.routerParams.hidden == "t") {
@@ -1295,7 +1300,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             console.log("是否隐藏返回按钮：", this.routerParams.hidden == "t")
             this.setState({hiddenBar: true})
 
-            await photoStore.getServerParams({key: this.userKey, setLocal: true});
+            await photoStore.getServerParams({key: this.userKey(), setLocal: true});
 
             if (this.routerParams.key) {
                 const accessToken = {
@@ -1315,7 +1320,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     async componentWillMount() {
 
-        if (this.userKey) {
+        if (this.routerParams.key) {
             const accessToken = {
                 token: this.routerParams.tok,
                 expires: 9999999999.999
@@ -1323,7 +1328,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             Taro.setStorageSync("token", accessToken);
         }
 
-        await photoStore.getServerParams({key: this.userKey, setLocal: true});
+        await photoStore.getServerParams({key: this.userKey(), setLocal: true});
         if (this.routerParams.init && this.routerParams.init == "t") {
             photoStore.editorPhotos = [...photoStore.photoProcessParams.editPhotos]
         }
@@ -1350,9 +1355,11 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     getCurrentToken = () => {
-        if (this.userKey) {
+        console.log(22222222, this.userKey, this.routerParams.tok)
+        if (this.routerParams.key) {
             return this.routerParams.tok
         }
+        console.log(11111, getToken())
         return getToken()
     }
 
@@ -1569,7 +1576,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
             console.log("更新后的params：", JSON.parse(JSON.stringify(temp)));
 
-            await photoStore.updateServerParams(this.userKey, {
+            await photoStore.updateServerParams(this.userKey(), {
                 photo: temp,
                 imageCount: 0
             })
