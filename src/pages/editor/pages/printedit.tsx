@@ -1121,11 +1121,8 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         Taro.showLoading({title: "正在为您设置..."})
         try {
             const res = await api("editor.tpl/one", {id});
-            console.log("修改前：",res)
-            const temp = {...res};
-            // temp.pages[0].thumbnail = "";
-            console.log("修改后：", temp)
-            await callEditor("setDoc", temp, photoStore.editorPhotos.map(v => v.url))
+            console.log("将要设置的图片：", JSON.parse(JSON.stringify(photoStore.editorPhotos)))
+            await callEditor("setDoc", res, photoStore.editorPhotos.map(v => v.url))
         }catch (e) {
             console.log("设置DOC出错：", e)
         }
@@ -1139,6 +1136,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 num: params.num || 1,
             }
             try {
+                // await photoStore.getServerParams({key: getUserKey(), setLocal: true})
                 const res = await api("editor.tpl/index", {
                     cid: opt.cid,
                     num: opt.num,
@@ -1154,6 +1152,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     }
 
     useEffect(() => {
+        console.log("编辑图片的长度：", photoStore.editorPhotos.length)
         getTemplateForPhotoNum({num: photoStore.editorPhotos.length}).then(res => {
             setTemplateList([...res])
         })
@@ -1293,22 +1292,21 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     async componentDidShow() {
-
         // 当为小程序直接跳转时执行
         if (this.routerParams.hidden && this.routerParams.hidden == "t") {
 
             console.log("是否隐藏返回按钮：", this.routerParams.hidden == "t")
             this.setState({hiddenBar: true})
 
-            await photoStore.getServerParams({key: this.userKey(), setLocal: true});
-
             if (this.routerParams.key) {
-                const accessToken = {
+                const tok = {
                     token: this.routerParams.tok,
-                    expires: 9999999999.999
+                    expires: 9999999999
                 };
-                Taro.setStorageSync("token", accessToken);
+                Taro.setStorageSync("token", tok)
             }
+
+            await photoStore.getServerParams({key: this.userKey(), setLocal: true});
 
             if (this.routerParams.init && this.routerParams.init == "t") {
                 photoStore.editorPhotos = [...photoStore.photoProcessParams.editPhotos]
@@ -1319,47 +1317,45 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     async componentWillMount() {
-
         if (this.routerParams.key) {
-            const accessToken = {
+            const tok = {
                 token: this.routerParams.tok,
-                expires: 9999999999.999
+                expires: 9999999999
             };
-            Taro.setStorageSync("token", accessToken);
+            Taro.setStorageSync("token", tok)
         }
 
         await photoStore.getServerParams({key: this.userKey(), setLocal: true});
+        console.log(89898989898, photoStore.photoProcessParams.originalData)
         if (this.routerParams.init && this.routerParams.init == "t") {
             photoStore.editorPhotos = [...photoStore.photoProcessParams.editPhotos]
+        }
+
+        if (notNull(this.routerParams.init)) {
+            const {img}: any = urlDeCode(this.$router.params);
+            photoStore.editorPhotos = [{id: "", url: img}];
         }
     }
 
     async componentDidMount() {
-
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
 
         window.addEventListener("message", this.onMsg);
 
 
-        if (notNull(this.routerParams.init)) {
-            const {img}: any = urlDeCode(this.$router.params);
-            photoStore.editorPhotos = [{id: "", url: img}];
-        }
-
         // 再次编辑时使用存储的图片数据
         if (!notNull(this.routerParams.local) && this.routerParams.local == "t") {
-            photoStore.editorPhotos = [...photoStore.photoProcessParams.originalData]
+            const idx = parseInt(this.routerParams.idx);
+            photoStore.editorPhotos = [...photoStore.photoProcessParams.photo.path[idx].originalData]
 
         }
     }
 
     getCurrentToken = () => {
-        console.log(22222222, this.userKey, this.routerParams.tok)
         if (this.routerParams.key) {
             return this.routerParams.tok
         }
-        console.log(11111, getToken())
         return getToken()
     }
 
@@ -1375,6 +1371,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         try {
 
             const res = await api("editor.tpl/index", {cid: routerParams.tplid, num: photoStore.editorPhotos.length});
+            console.log("查询结果：", res)
             const pictureSize = photoStore.photoProcessParams.pictureSize;
 
             const proId = photoStore.photoProcessParams.photoTplId;
@@ -1394,11 +1391,14 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 if (current && current.edited && current.edited == true && !notNull(current.doc)) {
                     data = current.doc;
                     console.log("已编辑过的模板：", data)
-                    imgArr = photoStore.editorPhotos.map(v => v.url)
+                    console.log("当前照片曾经使用的图片", JSON.parse(JSON.stringify(current.originalData)))
+                    photoStore.editorPhotos = [...current.originalData]
+                    imgArr = current.originalData.map(v => v.url)
                 } else {
                     console.log("没有编辑过的模板")
 
                     imgArr = [img]
+                    photoStore.editorPhotos = [{id: "", url: img}]
                 }
 
                 console.log("最终传递的值：", JSON.parse(JSON.stringify(data)), imgArr, pictureSize)
@@ -1514,7 +1514,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         if (Taro.getCurrentPages().length > 1) {
             Taro.navigateBack();
         } else {
-            if (process.env.TARO_ENV == "h5") {
+            if (deviceInfo.env == "h5") {
                 window.location.href = "/";
             } else {
                 Taro.switchTab({url: "/pages/tabbar/index/index"});
@@ -1578,7 +1578,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
             await photoStore.updateServerParams(this.userKey(), {
                 photo: temp,
-                imageCount: 0
+                imageCount: 0,
+                photoTplId: ""
             })
             await sleep(300)
             Taro.hideLoading()

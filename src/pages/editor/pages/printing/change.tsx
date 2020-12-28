@@ -462,14 +462,15 @@ const PrintChange: Taro.FC<any> = () => {
             idx: index,
             cid: router.params.id,
             tplid: router.params.cid,
+            key: photoStore.printKey,
             local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
             img: item.url,
         };
 
-        if (deviceInfo.env === "weapp") {
-            Object.assign(obj, {key: photoStore.printKey})
-        }
+        // if (deviceInfo.env === "weapp") {
+        //     Object.assign(obj, {key: photoStore.printKey})
+        // }
 
         try {
             if (!notNull(item.readLocal) && item.readLocal === true) {
