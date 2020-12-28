@@ -2,7 +2,6 @@ import Taro, {useEffect, useState} from '@tarojs/taro'
 import {ScrollView, Text, View} from '@tarojs/components'
 import "./orderModal.less"
 import {AtFloatLayout} from "taro-ui"
-import IconFont from '../../../../components/iconfont'
 import isEmpty from 'lodash/isEmpty';
 
 const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], onSkuChange, onNowBuy}) => {
@@ -159,13 +158,8 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
     }
 
     return <View className='placeOrder'>
-        <AtFloatLayout isOpened={isShow}>
+        <AtFloatLayout isOpened={isShow} onClose={onClose}>
             <View className='float-container'>
-                <View className='swiper-images-warp'>
-                    <View className='close' onClick={onClose}>
-                        <IconFont name='20_guanbi' size={40} color='#333'/>
-                    </View>
-                </View>
                 <View className='info-part'>
                     <Text className='name'>{data.title}</Text>
                     <View className='price'>
