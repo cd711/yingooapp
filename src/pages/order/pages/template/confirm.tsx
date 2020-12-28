@@ -11,6 +11,7 @@ import Counter from '../../../../components/counter/counter';
 import FloatModal from '../../../../components/floatModal/FloatModal';
 import Ticket from '../../../../components/ticket/Ticket';
 import {
+    convertClassName,
     deviceInfo,
     fixStatusBarHeight,
     getTempDataContainer,
@@ -191,7 +192,14 @@ export default class Confirm extends Component<any, {
         const {data: {address}} = this.state;
         if (this.tempContainerKey != "") {
             getTempDataContainer(this.tempContainerKey, (value) => {
+                console.log("加购回来",value)
                 if (value != null && value.isOk) {
+                    if (value.currentAddBuyItem.sku != null && value.sku && value.sku != null) {
+                        if (value.currentAddBuyItem.sku.id == value.sku.id) {
+                           
+                            return
+                        }
+                    }
                     this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
                 }
             })
