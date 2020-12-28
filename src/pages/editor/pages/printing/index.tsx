@@ -207,7 +207,7 @@ const Index: Taro.FC<any> = () => {
 
     return (
         <View className="printing_container">
-            <LoginModal isTabbar />
+            <LoginModal isTabbar={false} />
             <AtNavBar onClickLeftIcon={onBackHandle}
                       color='#121314' title="选择尺寸" border fixed
                       customStyle={{

@@ -30,6 +30,7 @@ class LoginModal extends Component<{
         const {showLoginModal} = userStore;
         if (showLoginModal) {
             if (this.props.isTabbar) {
+                
                 Taro.showTabBar();
             }
             
@@ -38,7 +39,6 @@ class LoginModal extends Component<{
     }
     render(){
         const {show} = this.state;
-
         return <Fragment>
             <Logins isShow={show} isTabBar={this.props.isTabbar || false} onClose={(is)=>{
                 if (userStore.showLoginModal != is) {

@@ -502,7 +502,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     return (
         <View className="printing_container">
-            <LoginModal isTabbar />
+            <LoginModal isTabbar={false} />
             <AtNavBar onClickLeftIcon={onBackHandle}
                       customStyle={{
                           paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"

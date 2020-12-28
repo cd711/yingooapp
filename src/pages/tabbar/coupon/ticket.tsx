@@ -154,7 +154,7 @@ export default class Login extends Component<{}, {
 
         return (
             <View className='ticket_page'>
-                <LoginModal isTabbar={true}/>
+                <LoginModal isTabbar/>
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     {/* <View className='left' onClick={() => {

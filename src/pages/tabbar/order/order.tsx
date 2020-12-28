@@ -231,7 +231,7 @@ export default class Order extends Component<any,{
         //
         return (
             <View className='order'>
-                <LoginModal isTabbar={true} />
+                <LoginModal isTabbar />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     {/* <View className='left' onClick={() => {
