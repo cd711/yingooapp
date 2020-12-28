@@ -468,6 +468,10 @@ const PrintChange: Taro.FC<any> = () => {
             img: item.url,
         };
 
+        // if (deviceInfo.env === "weapp") {
+        //     Object.assign(obj, {key: photoStore.printKey})
+        // }
+
         try {
             if (!notNull(item.readLocal) && item.readLocal === true) {
                 await photoStore.updateServerParams(photoStore.printKey, {

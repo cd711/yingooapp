@@ -1,6 +1,6 @@
 import Taro, {useEffect, useState} from '@tarojs/taro'
 import {ScrollView, Text, View} from '@tarojs/components'
-import "../../../order/pages/template/place.less"
+import "./orderModal.less"
 import {AtFloatLayout} from "taro-ui"
 import IconFont from '../../../../components/iconfont'
 import isEmpty from 'lodash/isEmpty';

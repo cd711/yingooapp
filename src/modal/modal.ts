@@ -1,7 +1,15 @@
 import {notNull} from "../utils/common";
 
+interface PhotoParamsPathArray {
+    id: string | number;
+    url: string;
+    attr: string;
+    doc: string;
+    edited: boolean;
+    originalData: Array<{ id: string | number, url: string }>
+}
 export interface PhotoParamsPath {
-    path: Array<any>;
+    path: Array<PhotoParamsPathArray>;
     sku: string | number;
     id: number | string;
 }
