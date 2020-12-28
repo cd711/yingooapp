@@ -194,12 +194,7 @@ export default class Confirm extends Component<any, {
             getTempDataContainer(this.tempContainerKey, (value) => {
                 console.log("加购回来",value)
                 if (value != null && value.isOk) {
-                    if (value.currentAddBuyItem.sku != null && value.sku && value.sku != null) {
-                        if (value.currentAddBuyItem.sku.id == value.sku.id) {
-                           
-                            return
-                        }
-                    }
+
                     this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
                 }
             })
