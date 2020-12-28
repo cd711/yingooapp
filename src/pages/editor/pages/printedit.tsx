@@ -1570,7 +1570,8 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             console.log("更新后的params：", JSON.parse(JSON.stringify(temp)));
 
             await photoStore.updateServerParams(this.userKey, {
-                photo: temp
+                photo: temp,
+                imageCount: 0
             })
             await sleep(300)
             Taro.hideLoading()

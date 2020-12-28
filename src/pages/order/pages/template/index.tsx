@@ -341,6 +341,7 @@ export default class Template extends Component<any, {
             const str = getURLParamsStr(urlEncode({
                 id: 34,
                 tplid: item.id,
+                limit: "t"
             }))
             Taro.navigateTo({
                 url: `/pages/editor/pages/printing/index?${str}`

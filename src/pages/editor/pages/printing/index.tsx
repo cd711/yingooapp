@@ -1,4 +1,4 @@
-import Taro, {useEffect, useState, useRef} from "@tarojs/taro";
+import Taro, {useState, useRef} from "@tarojs/taro";
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
@@ -81,17 +81,25 @@ const Index: Taro.FC<any> = () => {
             }
         }
 
+        // 如果是从模板选择进来的, 会有一个数量限制
+        if (!notNull(router.params.limit) && router.params.limit === "t") {
+            params = {
+                ...params,
+                limit: true
+            }
+        }
+
         console.log("初始化的参数 getBasicInfo：", params)
 
-        await photoStore.setActionParamsToServer(getUserKey(), params)
+        await photoStore.setActionParamsToServer(getUserKey(), new PhotoParams(params))
 
     }
 
-    useEffect(() => {
+    Taro.useDidShow(() => {
 
         getBasicInfo()
 
-    }, [])
+    })
 
     const selectSize = (id, attr) => {
         setChecked(Number(id));

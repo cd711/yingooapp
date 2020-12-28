@@ -13,6 +13,7 @@ export class PhotoParams {
     public originalData: any[] = [];
     public index: number;
     public numIdx: number;
+    // 照片冲印当前模板的照片数量
     public imageCount: number = 0;
     // 在照片冲印列表需要使用的路由参数
     public changeUrlParams: any = {};
@@ -22,6 +23,8 @@ export class PhotoParams {
     public photoTplId: string = "";
     // 照片冲印列表最多允许增加的数量
     public max: number;
+    // 照片冲印模板是否有数量限制
+    public limit: boolean = false;
 
     constructor(json?: any) {
         if (!json) {
@@ -39,5 +42,6 @@ export class PhotoParams {
         this.photoStyle = json.photoStyle || "";
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
+        this.limit = json.limit || false
     }
 }
