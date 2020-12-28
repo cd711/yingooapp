@@ -289,8 +289,8 @@ class Index extends Component<any, IndexState> {
 
 
         switch (type) {
-            case 1: url = `c=${picID}&t=${firstPicID}&j=t`; break;  // 照片
-            case 2: url = `c=${phoneID}&t=${firstPhoneID}&j=t`; break;  // 手机壳
+            case 1: url = `c=${picID}&t=${firstPicID}&j=t&title=${encodeURIComponent("照片冲印")}`; break;  // 照片
+            case 2: url = `c=${phoneID}&t=${firstPhoneID}&j=t&title=${encodeURIComponent("手机壳定制")}`; break;  // 手机壳
             case 3: url = `c=${cateInfo[0].tpl_category_id}&t=${cateInfo[0].tags[0].id}`; break;  // 全部
         }
 

@@ -377,6 +377,7 @@ export default class Template extends Component<any, {
     }
 
     render() {
+        const router = this.$router;
         const {
             switchActive,
             cates,
@@ -404,6 +405,8 @@ export default class Template extends Component<any, {
                         <View className='left' onClick={this.routerBack}>
                             <IconFont name='24_shangyiye' size={48} color='#121314'/>
                         </View>
+                        <View className="center"><View className="title">{router.params.title && decodeURIComponent(router.params.title) || ""}</View></View>
+                        <View className="right"/>
                     </View>
                     {
                         showAllCates
@@ -413,6 +416,8 @@ export default class Template extends Component<any, {
                                     <View className='left' onClick={this.routerBack}>
                                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                                     </View>
+                                    <View className="center"><View className="title">{router.params.title && decodeURIComponent(router.params.title) || ""}</View></View>
+                                    <View className="right"/>
                                 </View>
                                 {
                                     !hiddenBar

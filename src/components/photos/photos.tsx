@@ -446,7 +446,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             ? <View className="photo_edit_selector_container">
                                 <View className="select_head">
                                     <View className="left">
-                                        <Text className="txt">已选择<Text className="red">{editSelectImgs.length}</Text>个素材{_count > 0 ? `，需选择${_count}张` : null}</Text>
+                                        <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text className="txt">个素材</Text><Text className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
                                         {/*<Text className="ext">长按拖动排序</Text>*/}
                                     </View>
                                     <View className="right">
