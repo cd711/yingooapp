@@ -44,74 +44,76 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
         setAttrItems(items);
     }
 
-    function recursionSku(arr, idArr) {
-        let tempArr = [];
-        const filterArr = (fnArr, idArr, current) => {
-            let c = current;
-            const id = idArr[c];
-            if (c === fnArr.length || !id) {
-                tempArr = fnArr;
-                return
-            } else {
-                const childArr = [];
-                for (let i = 0; i < fnArr.length; i++) {
-                    const obj = fnArr[i];
-                    if (obj.value.indexOf(id) > -1) {
-                        childArr.push(obj);
-                    }
-                }
-                c++;
-                filterArr(childArr, idArr, c)
-            }
-        }
-        filterArr(arr, idArr, 0);
-        return tempArr
-    }
-
+    const tempSkuValue = [];
     const onItemSelect = (itemIdx, tagIdx, state) => {
 
-        onSkuChange && onSkuChange({});
+
+        onSkuChange && onSkuChange(null);
         const selectIds = [];
-        let items = [...attrItems];
-        items[itemIdx].map((tag, idx) => {
+        let items = attrItems;
+        const selectItemIdxs = [];
+        items[itemIdx].map((tag,idx)=>{
             tag["selected"] = false;
             if (tagIdx == idx) {
                 tag["selected"] = state;
             }
             return tag;
         });
-        for (const item of items) {
+
+        for (let i = 0;i<items.length;i++) {
+            const item = items[i];
             for (const tag of item) {
                 if (tag["selected"]) {
+                    selectItemIdxs.push(i);
                     selectIds.push(tag.id);
+                    tempSkuValue.push(tag.id);
                 }
             }
         }
-        selectIds.sort(function (value1, value2) {
+
+        const tempSelectIds = selectIds.concat();
+        if (tempSelectIds.length == items.length) {
+            tempSelectIds.splice(itemIdx, 1);
+            selectItemIdxs.splice(itemIdx, 1)
+        }
+        let tmp = [];
+        const maybeSkus = skus.filter((obj)=>{
+            if (tempSelectIds.length>0) {
+                const vals:Array<any> = obj.value.split(",");
+                return tempSelectIds.every(v=>vals.includes(v+""))
+            }
+            return true;
+        })
+        maybeSkus.filter((item)=> item.stock>0).map((item)=>{
+            const vs = item.value.split(",").filter((v)=>tempSelectIds.indexOf(parseInt(v))==-1);
+            tmp = tmp.concat(vs);
+            return item.value
+        });
+
+        const notOverSku = Array.from(new Set(tmp));
+        selectIds.sort(function(value1, value2) {
             return parseInt(value1) - parseInt(value2);
         });
-        const skuValue = selectIds.join(',');
-
-        let maybeSkus = [];
-
-        maybeSkus = recursionSku(skus, selectIds )
-
-        console.log("maybeSkus", maybeSkus)
-        items = items.map((item) => {
-            return item.map((tag) => {
+        console.log(tmp,notOverSku,selectIds,tempSelectIds);
+        items = items.map((item,index)=>{
+            return item.map((tag)=>{
                 tag["over"] = false;
-                if (!tag["selected"] && selectIds.length > 0) {
-                    maybeSkus.map((sku) => {
-                        if (sku.value.indexOf(tag.id) > -1 && parseInt(sku.stock + "") < 1) {
+                if (selectItemIdxs.indexOf(index)==-1) {
+                    if (selectIds.length>1) {
+                        if (notOverSku.indexOf(tag.id+"")==-1) {
                             tag["over"] = true;
+                            if (tag["selected"]) {
+                                selectIds.splice(index, 1);
+                            }
+                            tag["selected"] = false;
                         }
-                    })
+                    }
                 }
                 return tag;
             });
         });
+        const skuValue = selectIds.join(',');
         setAttrItems(items);
-        console.log(selectIds)
         if (selectIds.length != items.length) {
             const prices = maybeSkus.map((item) => {
                 return item.price;
@@ -122,7 +124,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
             setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
             setMarketPriceShow(false);
         } else {
-            for (let i = 0; i < maybeSkus.length; i++) {
+            for (let i = 0; i<maybeSkus.length; i++) {
                 const sku = maybeSkus[i];
                 if (sku.value == skuValue) {
                     setPrice(sku.price);
