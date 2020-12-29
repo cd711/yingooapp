@@ -107,18 +107,15 @@ export default class Confirm extends Component<any, {
                 params = photoStore.photoProcessParams.changeUrlParams
             } catch (e) {
                 console.log("读取参数出错：", e)
-
+                
             }
         } else {
             params = this.$router.params
         }
-        console.log("得到的参数：", params)
         const {tplid, model, orderid, cartIds, parintImges}: any = params;
-
         if (orderid) {
             this.checkOrder(orderid);
         } else {
-
             let data: any = {
                 sku_id: skuid,
                 quantity: total,
@@ -139,15 +136,15 @@ export default class Confirm extends Component<any, {
                 templateStore.address = userStore.address;
                 data["address_id"] = userStore.address.id;
             }
-
             if (this.isPhoto && parintImges) {
                 data = {...data, print_images: JSON.stringify(parintImges)}
             }
 
             console.log("组合的数据：", data)
-
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/add", data).then((res) => {
+                console.log("生成的临时订单",res);
+
                 Taro.hideLoading();
                 if (deviceInfo.env == 'h5') {
                     window.history.replaceState(null, null, `/pages/order/pages/template/confirm?orderid=${res.prepay_id}`);
@@ -186,7 +183,10 @@ export default class Confirm extends Component<any, {
         }
         return temp
     }
-
+    //加购信息
+    setABCacheData = (res: any) => {
+        // setTempDataContainer()
+    }
     componentDidShow() {
         console.log("componentDidShow")
         const {data: {address}} = this.state;
