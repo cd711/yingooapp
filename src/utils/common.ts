@@ -5,6 +5,7 @@ import ENV_TYPE = Taro.ENV_TYPE;
 import {userStore} from "../store/user";
 import moment from "moment";
 import { api } from "./net";
+import {LocalCoupon} from "../modal/modal";
 
 export function ossUrl(url: string, type: number) {
     if (!url) {
@@ -469,4 +470,71 @@ export function getFirstTemplateDoc(cid) {
             console.log("获取商品分类出错：", e)
         })
     })
+}
+
+
+export function getLocalCoupon() {
+    return new Promise<LocalCoupon>((resolve, reject) => {
+        try {
+            const local = Taro.getStorageSync(`${userStore.id}_local_coupon`);
+            if (local) {
+                resolve(new LocalCoupon(local))
+            } else {
+                resolve(new LocalCoupon())
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+export function updateLocalCoupon(params: {[key: string] : any} = {}) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const local = await getLocalCoupon();
+            const data = {...local, ...params};
+            Taro.setStorageSync(`${userStore.id}_local_coupon`, new LocalCoupon(data));
+            resolve()
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+export function allowShowCoupon(couponId: string | number, couponType: string, historyCouponArr: LocalCoupon = new LocalCoupon()) {
+    if (notNull(couponId) || historyCouponArr.fixedTime.length === 0 || historyCouponArr.everyTime.length === 0 || historyCouponArr.onlyOnce.length === 0) {
+        return true
+    }
+    let status = true;
+
+    if (couponType === "only_one") {
+        for (const item of historyCouponArr.onlyOnce) {
+            if (couponId == item) {
+                status = false;
+                break;
+            }
+        }
+    } else if (couponType === "every_time") {
+        for (const item of historyCouponArr.everyTime) {
+            if (couponId == item) {
+                status = true;
+                break;
+            }
+        }
+    } else {
+        // every_other
+        for (const item of historyCouponArr.fixedTime) {
+            if (item.expirationTime) {
+                if (moment().valueOf() > item.expirationTime) {
+                    status = true;
+                    break
+                } else {
+                    status = false;
+                    break
+                }
+            }
+        }
+    }
+
+    return status
 }
