@@ -1,5 +1,23 @@
 import {notNull} from "../utils/common";
 
+interface FixedTimeProps {
+    time: string,
+    type: string,
+    unit: string,
+    expirationTime: number
+}
+export class LocalCoupon {
+    public onlyOnce: Array<string> = new Array<string>();
+    public everyTime: Array<string> = new Array<string>();
+    public fixedTime: Array<FixedTimeProps> = new Array<FixedTimeProps>();
+    constructor(json?: any) {
+        console.log(json)
+        this.onlyOnce = json && json.onlyOnce || [];
+        this.everyTime = json && json.everyTime || [];
+        this.fixedTime = json && json.fixedTime || new Array<FixedTimeProps>();
+    }
+}
+
 interface PhotoParamsPathArray {
     id: string | number;
     url: string;

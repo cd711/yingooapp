@@ -1,0 +1,41 @@
+.curtain_container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    z-index: 3000;
+    .curtain_main{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
+        z-index: 3000;
+        .curtain_img{
+            width: auto;
+            height: auto;
+            .img{
+
+            }
+        }
+        .icon{
+            margin-top: 20px;
+        }
+    }
+    .mask{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        background: #00000070;
+        z-index: 2999;
+    }
+}

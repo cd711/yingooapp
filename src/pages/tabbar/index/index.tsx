@@ -6,8 +6,9 @@ import './index.less'
 import IconFont from '../../../components/iconfont'
 import {api} from "../../../utils/net";
 import {
+    allowShowCoupon,
     deviceInfo,
-    getEvenArr,
+    getEvenArr, getLocalCoupon,
     getSpecialRouter,
     getURLParamsStr, jumpToEditor,
     notNull,
@@ -15,6 +16,8 @@ import {
     sleep,
     urlEncode,
     setTempDataContainer
+    updateLocalCoupon,
+
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -23,7 +26,9 @@ import PhoneSwiper from "./phoneSwiper";
 import LoginModal from "../../../components/login/loginModal";
 import {userStore} from "../../../store/user";
 import BannerSwiper from "./bannerSwiper";
-import { AtCurtain } from 'taro-ui'
+import Curtain from "../../../components/curtain";
+import {LocalCoupon} from "../../../modal/modal";
+import moment from "moment";
 
 
 interface IndexState {
@@ -68,6 +73,15 @@ class Index extends Component<any, IndexState> {
                 console.log(e)
             }
         }
+        let localCoupon = new LocalCoupon();
+        try {
+            if (!notNull(userStore.id)) {
+                const res = await getLocalCoupon();
+                localCoupon = {...res};
+            }
+        } catch (e) {
+            console.log(e)
+        }
         try {
             const res = await api("app.index/h5");
             this.setState({data: [...res]})
@@ -80,7 +94,7 @@ class Index extends Component<any, IndexState> {
             }
 
             // 如果优惠券已经领取就不显示了
-            let current = {};
+            let current: any = {};
             let showCoupon = false;
             if (popArr.length > 1) {
                 const idx = Math.floor(Math.random() * popArr.length + 1) - 1;
@@ -106,8 +120,26 @@ class Index extends Component<any, IndexState> {
             }
 
             if (Object.keys(current).length > 0) {
-                this.setState({curtain: current});
-                // Taro.hideTabBar()
+
+                const type = current.popup_config.type;
+                const status = allowShowCoupon(current.info.id, type, localCoupon);
+                if (status) {
+                    const obj = {...localCoupon};
+                    if (type === "only_one") {
+                        obj.onlyOnce.push(current.info.id)
+                    } else if (type === "every_time") {
+                        obj.everyTime.push(current.info.id)
+                    } else {
+                        const expirationTime = moment().add(Number(current.popup_config.time) * Number(current.popup_config.unit), "seconds").valueOf()
+                        obj.fixedTime.push({
+                            ...current.popup_config,
+                            expirationTime
+                        })
+                    }
+                    console.log(obj)
+                    updateLocalCoupon(obj)
+                    this.setState({curtain: current});
+                }
             }
 
         } catch (e) {
@@ -388,18 +420,7 @@ class Index extends Component<any, IndexState> {
                     <Image src={require("../../../source/ibg.png")} className="index_fixed_top_img" />
                     {
                         Object.keys(curtain).length > 0
-                            ? <AtCurtain
-                                isOpened={Object.keys(curtain).length > 0}
-                                onClose={this.closeCurtain}
-                            >
-                                <View className="index_curtain_container" onClick={this.onCurtainClick}>
-                                    <Image
-                                        style='width:100%;height:250px'
-                                        src={curtain.thumb_image}
-                                        mode={deviceInfo.env === "h5" ? "scaleToFill" : "heightFix"}
-                                    />
-                                </View>
-                            </AtCurtain>
+                            ? <Curtain src={curtain.thumb_image} onCurtainClick={this.onCurtainClick} onClose={this.closeCurtain} />
                             : null
                     }
                     {

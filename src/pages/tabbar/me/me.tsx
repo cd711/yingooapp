@@ -6,7 +6,8 @@ import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../../components/empty";
 import {api} from '../../../utils/net';
-import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,setTempDataContainer} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,setTempDataContainer,urlEncode,getURLParamsStr} from '../../../utils/common';
+
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import moment from "moment";
 import Popover, {PopoverItemClickProps} from "../../../components/popover";
@@ -308,8 +309,12 @@ export default class Me extends Component<any, MeState> {
     // 跳转预览页
     previewOrder = (item: WorksProps) => {
         console.log(item.id)
+        const str = getURLParamsStr(urlEncode({
+            workid: item.id,
+            self: "t"
+        }))
         Taro.navigateTo({
-            url: `/pages/order/pages/template/preview?workid=${item.id}`
+            url: `/pages/order/pages/template/preview?${str}`
         })
     }
 
