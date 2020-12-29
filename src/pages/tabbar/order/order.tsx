@@ -6,7 +6,7 @@ import {userStore} from "../../../store/user";
 import {templateStore} from "../../../store/template";
 import { observer, inject } from '@tarojs/mobx'
 import { api } from '../../../utils/net';
-import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl } from '../../../utils/common';
+import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl,setTempDataContainer } from '../../../utils/common';
 
 import PayWayModal from '../../../components/payway/PayWayModal';
 import copy from 'copy-to-clipboard';
@@ -93,6 +93,7 @@ export default class Order extends Component<any,{
         }
     }
     componentDidShow(){
+        setTempDataContainer("product_preview_sku",null,()=>{});
         console.log(Taro.getApp().tab,this.$router.params);
         const {tab} = Taro.getApp();
         if (tab>=0) {
@@ -102,6 +103,7 @@ export default class Order extends Component<any,{
         }
         Taro.getApp().tab = -1;
     }
+
     componentWillUpdate(_, nextState) {
         const {switchTabActive} = this.state;
         if (switchTabActive != nextState.switchTabActive) {

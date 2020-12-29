@@ -40,7 +40,6 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             e.stopPropagation();
             // console.log(num,max)
             if (!notNull(max) && number >= parseInt(max+"")) {
-                
                 return
             }
             if (disabled) {
@@ -52,7 +51,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             }
             setNumber(number + 1);
         }}>
-            <Image src={require("../../source/add.png")} className='img'/>
+            <Image src={!notNull(max) && number >= parseInt(max+"")?require("../../source/disable_add.png"):require("../../source/add.png")} className='img'/>
         </View>
     </View>
 }

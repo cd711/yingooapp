@@ -6,7 +6,7 @@ import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../../components/empty";
 import {api} from '../../../utils/net';
-import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,setTempDataContainer} from '../../../utils/common';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import moment from "moment";
 import Popover, {PopoverItemClickProps} from "../../../components/popover";
@@ -343,6 +343,9 @@ export default class Me extends Component<any, MeState> {
             onClick: this.confirmDelete,
         }
     ];
+    componentDidShow(){
+        setTempDataContainer("product_preview_sku",null,()=>{});
+    }
     // @ts-ignore
     render() {
         const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;

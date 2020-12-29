@@ -7,7 +7,8 @@ import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
 import { PlaceOrder } from './place';
 import {userStore} from "../../../../store/user";
-import { deviceInfo,fixStatusBarHeight } from '../../../../utils/common';
+import { deviceInfo,fixStatusBarHeight, getTempDataContainer } from '../../../../utils/common';
+import LoginModal from '../../../../components/login/loginModal';
 
 
 let editorProxy: WindowProxy | null | undefined;
@@ -45,7 +46,8 @@ export default class Preview extends Component<any, {
     modalId:number;
     isOpened: boolean,
     workInfo:any,
-    doc: any
+    doc: any,
+    defalutSelectIds:Array<any>
 }> {
 
     config: Config = {
@@ -63,7 +65,8 @@ export default class Preview extends Component<any, {
             isOpened: false,
             modalId:0,
             workInfo:{},
-            doc: {}
+            doc: {},
+            defalutSelectIds:[]
         }
     }
     componentDidMount() {
@@ -89,6 +92,7 @@ export default class Preview extends Component<any, {
             if (deviceInfo.env == 'h5') {
                 window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${res.id}`);
             }
+            this.getShellInfo();
             this.setState({
                 workInfo:res
             })
@@ -228,10 +232,33 @@ export default class Preview extends Component<any, {
             id:30
         }).then((res)=>{
             // console.log("aaa",res);
-            this.setState({
-                productInfo:res,
-                placeOrderShow: true
+            getTempDataContainer("product_preview_sku",(val)=>{
+                if (val && val != null && val.id) {
+                    const temp = parseInt(val.id+"")
+                    res.skus = res.skus.filter((item) => {
+                        return temp==parseInt(item.id+"")
+                    });
+                    let ids:Array<any> = val.value.split(",");
+                    ids = ids.map((item)=>{
+                       return parseInt(item+"");
+                    })
+                    res.attrItems = res.attrItems.map((item) => {
+                        return item.filter((val) => {
+                            return ids.indexOf(parseInt(val.id + "")) != -1
+                        })
+                    });
+
+                    this.setState({
+                        productInfo:res,
+                        defalutSelectIds:ids
+                    });
+                } else {
+                    this.setState({
+                        productInfo:res
+                    })
+                }
             })
+
         })
     }
     onEditor = () => {
@@ -246,28 +273,37 @@ export default class Preview extends Component<any, {
     }
 
     onOrderIng = () => {
-        const {workId} = this.state;
-        const {id} = userStore;
+        // const {workId} = this.state;
+        const {isLogin} = userStore;
         this.initModalShow = true;
-        if (!id) {
-            this.setState({isOpened: true})
-            return
-        }
-        if (parseInt(workId+'')>0) {
-            this.getShellInfo()
+        if (isLogin) {
+            this.setState({
+                placeOrderShow: true
+            })
         } else {
-            this.onSave(null,()=>{
-                this.getShellInfo()
-            });
+            userStore.showLoginModal = true;
         }
+
+        // if (!id) {
+        //     this.setState({isOpened: true})
+        //     return
+        // }
+        // if (parseInt(workId+'')>0) {
+        //     this.getShellInfo()
+        // } else {
+        //     this.onSave(null,()=>{
+        //         this.getShellInfo()
+        //     });
+        // }
     }
 
     render() {
-        const { placeOrderShow,workId,productInfo,workInfo} = this.state;
+        const { placeOrderShow,workId,productInfo,workInfo,defalutSelectIds} = this.state;
         const workid = workInfo && workInfo.id ? workInfo.id : workId;
         // @ts-ignore
         return (
             <View className='preview'>
+                <LoginModal isTabbar={false} />
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
@@ -310,7 +346,7 @@ export default class Preview extends Component<any, {
                     <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
                 {
-                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
+                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         this.setState({
                             buyTotal:n

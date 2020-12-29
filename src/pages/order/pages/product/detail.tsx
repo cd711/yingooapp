@@ -17,6 +17,8 @@ import {PlaceOrder} from '../template/place';
 import WxParse from '../../../../components/wxParse/wxParse';
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
+import LoginModal from '../../../../components/login/loginModal';
+import {userStore} from "../../../../store/user";
 
 export default class Login extends Component<{}, {
     data: any,
@@ -58,6 +60,7 @@ export default class Login extends Component<{}, {
     private modalInit = false;
 
     componentDidMount() {
+        setTempDataContainer("product_preview_sku",null,()=>{});
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".product_bottom_bar").boundingClientRect((status_react) => {
@@ -199,11 +202,19 @@ export default class Login extends Component<{}, {
         })
     }
     onAddCart = () => {
+        if (!userStore.isLogin) {
+            userStore.showLoginModal = true;
+            return;
+        }
         this.setState({
             placeOrderShow: true
         });
     }
     onNowBuy = () => {
+        if (!userStore.isLogin) {
+            userStore.showLoginModal = true;
+            return;
+        }
         this.setState({
             placeOrderShow: true
         });
@@ -218,6 +229,10 @@ export default class Login extends Component<{}, {
         });
     }
     onOkButtonClick = () => {
+        if (!userStore.isLogin) {
+            userStore.showLoginModal = true;
+            return;
+        }
         const {buyTotal, sku} = this.state;
         if (sku != null && buyTotal > 0) {
 
@@ -293,14 +308,6 @@ export default class Login extends Component<{}, {
             Taro.hideLoading()
             Taro.showToast({title: "出错啦~，稍后试试吧"})
         }
-
-        // jumpToPrintEditor({
-        //     cid: data.id,
-        //     tplid: data.tpl_category_id,
-        //     sku_id: sku.id,
-        //     init: "t"
-        // });
-
     }
 
     render() {
@@ -344,6 +351,7 @@ export default class Login extends Component<{}, {
                         <Text className='title'>{this.config.navigationBarTitleText || '商品详情'}</Text>
                     </View>
                 </View>
+                <LoginModal isTabbar={false}/>
                 <ScrollView scrollY className="p_detail_scroll"
                             style={deviceInfo.env === 'h5' ? "flex:1" : `height:${centerPartyHeight}px`}>
                     <View className='pre_image_swiper'>
@@ -450,16 +458,16 @@ export default class Login extends Component<{}, {
                         {
                             showOkButton ? <View className='ops'>
                                 <Button className='red-ok-btn' onClick={() => {
+                                    
+                                    if (!userStore.isLogin) {
+                                        userStore.showLoginModal = true;
+                                        return;
+                                    }
                                     const {buyTotal, sku, data} = this.state;
                                     if (sku != null && buyTotal > 0) {
                                         this.setState({
                                             placeOrderShow: false
                                         });
-                                        // let is = false;
-                                        // if (sku.id == ) {
-                                            
-                                        // }
-                                        console.log("tempDataContainerData",this.tempDataContainerData)
                                         setTempDataContainer(this.tempDataContainerKey, {
                                             ...this.tempDataContainerData,
                                             buyTotal,
@@ -483,17 +491,30 @@ export default class Login extends Component<{}, {
                                         const {sku, data} = this.state;
                                         console.log("当前类型：", data.tpl_product_type)
                                         if (sku != null) {
-                                            // let url = ""
-                                            if (data.tpl_product_type == "phone") {
-                                                jumpToEditor({
-                                                    cid: data.tpl_category_id,
-                                                    tpl_id: 0
-                                                });
+                                            if (!userStore.isLogin) {
+                                                userStore.showLoginModal = true;
+                                                return;
                                             }
-                                            if (data.tpl_product_type == "photo") {
-                                                this.modalInit = false
-                                                this.setState({showPicSelector: true})
-                                            }
+                                            setTempDataContainer("product_preview_sku",sku,(is)=>{
+                                                if (is) {
+                                                    if (data.tpl_product_type == "phone") {
+                                                        jumpToEditor({
+                                                            cid: data.tpl_category_id,
+                                                            tpl_id: 0
+                                                        });
+                                                    }
+                                                    if (data.tpl_product_type == "photo") {
+                                                        this.modalInit = false
+                                                        this.setState({showPicSelector: true})
+                                                    }
+                                                } else {
+                                                    Taro.showToast({
+                                                        title:'服务器走丢啦,请稍后再试~',
+                                                        icon:'none',
+                                                        duration:1500
+                                                    });
+                                                }
+                                            })
                                             // this.goUrl(url);
                                         } else {
                                             this.setState({
@@ -521,6 +542,10 @@ export default class Login extends Component<{}, {
                                             defalutSkuIds: []
                                         })
                                     }} onAddCart={() => {
+                                        if (!userStore.isLogin) {
+                                            userStore.showLoginModal = true;
+                                            return;
+                                        }
                             const {sku, skuName, data, buyTotal} = this.state;
                             // const {attrGroup} = data;
                             // console.log(sku,skuName,buyTotal)
@@ -553,6 +578,10 @@ export default class Login extends Component<{}, {
                                 });
                             }
                         }} onNowBuy={() => {
+                            if (!userStore.isLogin) {
+                                userStore.showLoginModal = true;
+                                return;
+                            }
                             const {buyTotal, sku} = this.state;
                             if (sku != null && buyTotal > 0) {
                                 this.setState({
@@ -576,20 +605,36 @@ export default class Login extends Component<{}, {
                                 defalutSkuIds: []
                             })
                         }} onOkButtonClick={() => this.onOkButtonClick()} onNowButtonClick={() => {
+
                             const {sku, data} = this.state;
                             console.log("当前类型：", data.tpl_product_type)
+
                             if (sku != null) {
                                 // let url = ""
-                                if (data.tpl_product_type == "phone") {
-                                    jumpToEditor({
-                                        cid: data.tpl_category_id,
-                                        tpl_id: 0
-                                    });
+                                if (!userStore.isLogin) {
+                                    userStore.showLoginModal = true;
+                                    return;
                                 }
-                                if (data.tpl_product_type == "photo") {
-                                    this.modalInit = false
-                                    this.setState({showPicSelector: true})
-                                }
+                                setTempDataContainer("product_preview_sku",sku,(is)=>{
+                                    if (is) {
+                                        if (data.tpl_product_type == "phone") {
+                                            jumpToEditor({
+                                                cid: data.tpl_category_id,
+                                                tpl_id: 0
+                                            });
+                                        }
+                                        if (data.tpl_product_type == "photo") {
+                                            this.modalInit = false
+                                            this.setState({showPicSelector: true})
+                                        }
+                                    } else {
+                                        Taro.showToast({
+                                            title:'服务器走丢啦,请稍后再试~',
+                                            icon:'none',
+                                            duration:1500
+                                        });
+                                    }
+                                })
                                 // this.goUrl(url);
                             } else {
                                 Taro.showToast({
