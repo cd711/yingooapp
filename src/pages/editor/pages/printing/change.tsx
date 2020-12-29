@@ -297,8 +297,8 @@ const PrintChange: Taro.FC<any> = () => {
         if (detailStatus) {
             return
         }
-        const arr = [];
-        arr.push(photoStore.photoProcessParams.photo.sku);
+        let arr = [];
+        arr = String(photoStore.photoProcessParams.photo.sku).split(",")
         arr.push(id);
 
         console.log("追加的skuID：", arr)

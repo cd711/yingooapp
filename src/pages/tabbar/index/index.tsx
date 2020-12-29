@@ -9,7 +9,7 @@ import {
     deviceInfo,
     getEvenArr,
     getSpecialRouter,
-    getURLParamsStr,
+    getURLParamsStr, jumpToEditor,
     notNull,
     ossUrl,
     sleep,
@@ -289,14 +289,33 @@ class Index extends Component<any, IndexState> {
 
 
         switch (type) {
-            case 1: url = `c=${picID}&t=${firstPicID}&j=t&title=${encodeURIComponent("照片冲印")}`; break;  // 照片
-            case 2: url = `c=${phoneID}&t=${firstPhoneID}&j=t&title=${encodeURIComponent("手机壳定制")}`; break;  // 手机壳
+            // case 1: url = `c=${picID}&t=${firstPicID}&j=t&title=${encodeURIComponent("照片冲印")}`; break;  // 照片
+            // case 2: url = `c=${phoneID}&t=${firstPhoneID}&j=t&title=${encodeURIComponent("手机壳定制")}`; break;  // 手机壳
             case 3: url = `c=${cateInfo[0].tpl_category_id}&t=${cateInfo[0].tags[0].id}`; break;  // 全部
         }
 
-        Taro.navigateTo({
-            url: `/pages/order/pages/template/index?${url}`
-        })
+        if (type === 1) {
+            if (notNull(userStore.id)) {
+                userStore.showLoginModal = true
+                return
+            }
+            Taro.navigateTo({
+                url: "/pages/editor/pages/printing/index?id=34"
+            })
+        } else if (type === 2) {
+            if (notNull(userStore.id)) {
+                userStore.showLoginModal = true
+                return
+            }
+            jumpToEditor({
+                cid: phoneID,
+                allowinit: "t"
+            })
+        } else {
+            Taro.navigateTo({
+                url: `/pages/order/pages/template/index?${url}`
+            })
+        }
     }
 
     filterArrForType = (arr = [], type: "photo" | "phone") => {

@@ -9,7 +9,7 @@ import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import Fragment from '../../../components/Fragment';
 import UploadFile from "../../../components/Upload/Upload";
-import {debounce, getNextPage, notNull, ossUrl, pageTotal} from "../../../utils/common";
+import {debounce, getFirstTemplateDoc, getNextPage, notNull, ossUrl, pageTotal} from "../../../utils/common";
 import {userStore} from "../../../store/user";
 import moment from "moment";
 import LoadMore from "../../../components/listMore/loadMore";
@@ -1214,50 +1214,9 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
         });
     }) as any, [brandList, brandIndex]);
 
-    function getFirstTemplateDoc() {
-        return new Promise(async (resolve, reject) => {
-            api("app.product/cate").then(res => {
-
-                // 获取标签分类
-                let arr = [];
-                for (const item of res) {
-                    if (item.tpl_category_id == parent.$router.params.cid) {
-                        arr = item.tags;
-                        break;
-                    }
-                }
-                if (arr.length > 0) {
-                    api("editor.tpl/index", {
-                        cid: parent.$router.params.cid,
-                        tag_id: arr[0].id,
-                        page: 0,
-                        size: 5
-                    }).then(tplData => {
-                        if (tplData.list[0]) {
-                            api("editor.tpl/one", {id: tplData.list[0].id}).then(doc => {
-                                resolve(doc)
-                            }).catch(e => {
-                                reject(e)
-                            })
-                        } else {
-                            resolve(null)
-                        }
-                    }).catch(e => {
-                        reject(e)
-                    })
-                } else {
-                    resolve(null)
-                }
-
-            }).catch(e => {
-                console.log("获取商品分类出错：", e)
-            })
-        })
-    }
-
     async function setDefaultDoc() {
         try {
-            const res = await getFirstTemplateDoc();
+            const res = await getFirstTemplateDoc(parent.$router.params.cid);
             if (res) {
                 await callEditor("setDoc", res)
             }
@@ -1419,6 +1378,8 @@ export default class Shell extends Component<{}, {
 
     }
 
+
+
     async componentDidMount() {
 
         // @ts-ignore
@@ -1477,17 +1438,18 @@ export default class Shell extends Component<{}, {
     }
 
     onLoadEmpty = async () => {
-        if (!this.tplId && !this.docId) {
+        const {tpl_id, id} = this.$router.params;
+        console.log(tpl_id, id)
+        if (tpl_id == "0" || notNull(tpl_id)) {
             try {
-
-                const {doc} = Taro.getStorageSync("doc_draft");
+                const doc = await getFirstTemplateDoc(this.$router.params.cid)
                 console.log(doc)
                 if (doc) {
                     await callEditor("setDoc", doc);
                 }
                 // this.tplId = tplId;
             } catch (e) {
-
+                console.log("没有模板时初始化出错：", e)
             }
         }
     }
@@ -1792,7 +1754,7 @@ export default class Shell extends Component<{}, {
 
     getUrl = () => {
         return process.env.NODE_ENV == 'production'
-            ? `/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
+            ? `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
             : `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
     }
 
