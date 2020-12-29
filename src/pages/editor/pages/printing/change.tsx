@@ -31,6 +31,8 @@ const PrintChange: Taro.FC<any> = () => {
     const [animating, setAnimating] = useState(false);
     const _imgstyle = Taro.useRef("");
     const sizeArr = Taro.useRef<any[]>([]);
+    // 只有从商品详情页跳转过来才会为true
+    const [detailStatus, setDetailStatus] = useState(false)
 
     const backPressHandle = () => {
         if (deviceInfo.env === "h5") {
@@ -54,9 +56,10 @@ const PrintChange: Taro.FC<any> = () => {
     /**
      * 在首页活动页跳转过来后，要携带的sku_ID和分类ID，如果两者都在，就说明跳过了上一步选尺寸页面，
      * 需要重新初始化当前用户的 photo Key
-     * @param {Array} path
+     * @param {Array} path 图片路径
+     * @param {boolean} forDetail  默认false， 为true就代表是从商品详情页跳转过来的，已经选好图片了, 此时的sku_id是所有规格都选好了的
      */
-    function getRouterParams(path = []) {
+    function getRouterParams(path = [], forDetail: boolean = false) {
         return new Promise<any>(async (resolve, reject) => {
             try {
                 if (!router.params.sku_id || !router.params.id) {
@@ -66,11 +69,19 @@ const PrintChange: Taro.FC<any> = () => {
                     })
                     reject(`没有相关ID信息: sku_id、分类ID`);
                 } else {
+                    if (deviceInfo.env === "weapp") {
+                        try {
+                            await photoStore.getServerParams({key: getUserKey(), setLocal: true})
+                        }catch (e) {
+                            console.log("初始获取参数错误：", e)
+                        }
+                    }
                     const obj = {
-                        path,
+                        path: forDetail ? [...photoStore.photoProcessParams.photo.path] : path,
                         sku: router.params.sku_id,
                         id: router.params.id
                     };
+                    console.log("初始化的Object：", JSON.parse(JSON.stringify(obj)))
 
                     // 从服务器获取基本数据信息
                     const serPar = await api("app.product/info", {id: router.params.id});
@@ -88,7 +99,7 @@ const PrintChange: Taro.FC<any> = () => {
                             numIdx,
                             pictureSize: serPar.attrItems[idx][0].value,
                             photoStyle: serPar.photostyle,
-                            photoTplId: router.params.tplid
+                            photoTplId: router.params.tplid,
                         })
                         resolve()
                     } else {
@@ -190,6 +201,11 @@ const PrintChange: Taro.FC<any> = () => {
                 Taro.redirectTo({
                     url: `/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`
                 })
+            } else if (router.params.detail && router.params.detail === "t") {  // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
+                await getRouterParams([], true);
+                params = {...photoStore.photoProcessParams}
+                params
+                setDetailStatus(true)
             } else {
                 params = await photoStore.getServerParams({setLocal: true});
             }
@@ -198,7 +214,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
 
 
-        console.log("读取的photo params：", params)
+        console.log("读取的photo params：", JSON.parse(JSON.stringify(params)))
 
         const pix = photoStore.photoProcessParams.pictureSize;
         _imgstyle.current = photoStore.photoProcessParams.photoStyle
@@ -278,6 +294,9 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     function setCount(_, id) {
+        if (detailStatus) {
+            return
+        }
         const arr = [];
         arr.push(photoStore.photoProcessParams.photo.sku);
         arr.push(id);
@@ -287,9 +306,54 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     const onCreateOrder = async () => {
+
         if (photos.length <= 0) {
             return
         }
+
+        if (detailStatus) {
+            // 已选好所有规格，直接跳转
+            let count = 0;
+            photos.forEach(value => {
+                count += parseInt(value.count)
+            })
+
+            const data = {
+                skuid: router.params.sku_id,
+                total: count,
+                page: "photo",
+                parintImges: photos.map(v => {
+                    const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
+                    if (v.hasRotate && v.hasRotate === true) {
+                        return {
+                            url: v.url,
+                            num: v.count,
+                            style: [pixArr[0], pixArr[1], 90].join(",")
+                        }
+                    }
+                    return {
+                        url: v.url,
+                        num: v.count,
+                        style: [pixArr[0], pixArr[1], 0].join(",")
+                    }
+                })
+            }
+
+            try {
+
+                await photoStore.updateServerParams(photoStore.printKey, {
+                    changeUrlParams: data
+                })
+                Taro.navigateTo({
+                    url: `/pages/order/pages/template/confirm?skuid=${router.params.sku_id}&total=${count}&page=photo`
+                })
+            } catch (e) {
+                console.log("本地存储失败：", e)
+
+            }
+            return
+        }
+
         Taro.showLoading({title: "请稍后..."});
         try {
             const res = await api("app.product/info", {id: photoStore.photoProcessParams.photo.id});
@@ -390,14 +454,13 @@ const PrintChange: Taro.FC<any> = () => {
             await photoStore.updateServerParams(photoStore.printKey, {
                 changeUrlParams: data
             })
-
+            Taro.navigateTo({
+                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo`
+            })
         } catch (e) {
             console.log("本地存储失败：", e)
 
         }
-        Taro.navigateTo({
-            url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo`
-        })
     }
 
     const closeSelectPhoto = () => {

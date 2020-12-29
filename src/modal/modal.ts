@@ -14,6 +14,9 @@ export interface PhotoParamsPath {
     id: number | string;
 }
 export class PhotoParams {
+    /**
+     * 如果是从商品详情过来时已经选好了图片, 这个时候没有其它任何数据，只有这个path内容
+     */
     public photo: PhotoParamsPath = {path: [], id: "", sku: ""};
     public pictureSize: string = "";
     public attrItems: any[] = [];
@@ -50,6 +53,6 @@ export class PhotoParams {
         this.photoStyle = json.photoStyle || "";
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
-        this.limit = json.limit || false
+        this.limit = json.limit || false;
     }
 }
