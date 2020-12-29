@@ -17,7 +17,7 @@ const BannerSwiper: Taro.FC<BannerSwiperProps> = props => {
 
     return (
         <View className="banner_swiper_container">
-            <div className="swiper_main">
+            <View className="swiper_main">
                 <Swiper
                     className='index_banner_swiper'
                     indicatorColor='#00000050'
@@ -37,14 +37,14 @@ const BannerSwiper: Taro.FC<BannerSwiperProps> = props => {
                         })
                     }
                 </Swiper>
-            </div>
-            <div className="swiper_dots">
+            </View>
+            <View className="swiper_dots">
                 {
                     banners.map((_, index) => (
                         <View key={`${index}`} className={`dot ${active === index ? "active" : ""}`} />
                     ))
                 }
-            </div>
+            </View>
         </View>
     )
 }
