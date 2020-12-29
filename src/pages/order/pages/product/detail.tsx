@@ -455,6 +455,11 @@ export default class Login extends Component<{}, {
                                         this.setState({
                                             placeOrderShow: false
                                         });
+                                        // let is = false;
+                                        // if (sku.id == ) {
+                                            
+                                        // }
+                                        console.log("tempDataContainerData",this.tempDataContainerData)
                                         setTempDataContainer(this.tempDataContainerKey, {
                                             ...this.tempDataContainerData,
                                             buyTotal,
