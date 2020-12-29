@@ -69,11 +69,19 @@ const PrintChange: Taro.FC<any> = () => {
                     })
                     reject(`没有相关ID信息: sku_id、分类ID`);
                 } else {
+                    if (deviceInfo.env === "weapp") {
+                        try {
+                            await photoStore.getServerParams({key: getUserKey(), setLocal: true})
+                        }catch (e) {
+                            console.log("初始获取参数错误：", e)
+                        }
+                    }
                     const obj = {
-                        path: forDetail ? [...photoStore.photoProcessParams.tempPhotoOfOrderDetail] : path,
+                        path: forDetail ? [...photoStore.photoProcessParams.photo.path] : path,
                         sku: router.params.sku_id,
                         id: router.params.id
                     };
+                    console.log("初始化的Object：", JSON.parse(JSON.stringify(obj)))
 
                     // 从服务器获取基本数据信息
                     const serPar = await api("app.product/info", {id: router.params.id});

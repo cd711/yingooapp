@@ -271,8 +271,11 @@ export default class Login extends Component<{}, {
 
         try {
             await photoStore.setActionParamsToServer(getUserKey(), {
-                tempPhotoOfOrderDetail: path,
-                // isOrderDetail: true
+                photo: {
+                    path,
+                    id: "",
+                    sku: ""
+                }
             })
             Taro.hideLoading()
             const str = getURLParamsStr(urlEncode({
