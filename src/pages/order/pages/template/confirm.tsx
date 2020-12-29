@@ -71,7 +71,7 @@ export default class Confirm extends Component<any, {
     // 是否从照片冲印跳转过来
     private isPhoto: boolean = false;
     private tempContainerKey = "";
-
+    private initPayWayModal = false;
     componentDidMount() {
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
@@ -144,7 +144,7 @@ export default class Confirm extends Component<any, {
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/add", data).then((res) => {
                 console.log("生成的临时订单",res);
-
+                this.initPayWayModal = true;
                 Taro.hideLoading();
                 if (deviceInfo.env == 'h5') {
                     window.history.replaceState(null, null, `/pages/order/pages/template/confirm?orderid=${res.prepay_id}`);
@@ -245,6 +245,7 @@ export default class Confirm extends Component<any, {
             prepay_id: id
         }).then((res) => {
             Taro.hideLoading();
+            this.initPayWayModal = true;
             this.filterUsedTicket(res.orders);
             templateStore.address = res.address;
             console.log(res);
@@ -294,6 +295,7 @@ export default class Confirm extends Component<any, {
         // this.setState({
         //     showPayWayModal:true
         // })
+        this.initPayWayModal = true;
         const {data} = this.state;
         // this.checkOrder(data.prepay_id,false);
         Taro.showLoading({title: '加载中...'})
@@ -856,7 +858,8 @@ export default class Confirm extends Component<any, {
                         </FloatModal>
                         : null
                 }
-                <PayWayModal
+                {
+                    this.initPayWayModal ?<PayWayModal
                     isShow={showPayWayModal}
                     totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
                     order_sn={order_sn}
@@ -872,7 +875,8 @@ export default class Confirm extends Component<any, {
                         Taro.switchTab({
                             url: '/pages/tabbar/order/order?tab=1'
                         })
-                    }}/>
+                    }}/>:null
+                }
             </View>
         )
     }

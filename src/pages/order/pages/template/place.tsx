@@ -51,7 +51,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
             return value.map((val)=>{
                 val["selected"] = false;
                 val["over"] = false;
-                if (defalutSelectIds.length==0) {
+                if (defalutSelectIds && defalutSelectIds.length==0) {
                     if (sku && sku.value && sku.value.indexOf(val.id)>-1) {
                         val["selected"] = true;
                         if (parseInt(sku.stock+"")>0) {
@@ -66,7 +66,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
             });
         });
         setAttrItems(items);
-        if (defalutSelectIds.length>0) {
+        if (defalutSelectIds && defalutSelectIds.length>0) {
             for (let i = 0;i<data.attrItems.length;i++) {
                 const item = data.attrItems[i];
                 for (let j = 0;j<item.length;j++) {
@@ -190,7 +190,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         }
     }
     useEffect(() => {
-        if (!isEmpty(data)) {
+        if (!isEmpty(data) && data != undefined && data != null) {
             initSkus(data.skus);
             selectAtteItems(currentSku,data.attrItems);
             const prices = data.skus.map((item) => {
