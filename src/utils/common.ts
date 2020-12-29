@@ -423,3 +423,50 @@ export function removeURLParameter(url, parameter) {
     }
     return url;
 }
+
+
+/**
+ * 获取改分类下第一个模板内容
+ * @param cid {string}  商品分类id
+ */
+export function getFirstTemplateDoc(cid) {
+    return new Promise(async (resolve, reject) => {
+        api("app.product/cate").then(res => {
+
+            // 获取标签分类
+            let arr = [];
+            for (const item of res) {
+                if (item.tpl_category_id == cid) {
+                    arr = item.tags;
+                    break;
+                }
+            }
+            if (arr.length > 0) {
+                api("editor.tpl/index", {
+                    cid: cid,
+                    tag_id: arr[0].id,
+                    page: 0,
+                    size: 5
+                }).then(tplData => {
+                    if (tplData.list[0]) {
+                        api("editor.tpl/one", {id: tplData.list[0].id}).then(doc => {
+                            resolve(doc)
+                        }).catch(e => {
+                            reject(e)
+                        })
+                    } else {
+                        resolve(null)
+                    }
+                }).catch(e => {
+                    reject(e)
+                })
+            } else {
+                reject("没有模板")
+            }
+
+        }).catch(e => {
+            reject(e)
+            console.log("获取商品分类出错：", e)
+        })
+    })
+}
