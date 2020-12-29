@@ -7,7 +7,7 @@ import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
 import { PlaceOrder } from './place';
 import {userStore} from "../../../../store/user";
-import { deviceInfo,fixStatusBarHeight } from '../../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getURLParamsStr, notNull, urlEncode} from '../../../../utils/common';
 
 
 let editorProxy: WindowProxy | null | undefined;
@@ -80,6 +80,7 @@ export default class Preview extends Component<any, {
     }
 
     getWorkInfo = (id) => {
+        const par = this.$router;
         Taro.showLoading({title:"加载中..."});
         api("editor.user_tpl/info",{
             id
@@ -87,7 +88,11 @@ export default class Preview extends Component<any, {
             Taro.hideLoading();
             this.initModalShow = true
             if (deviceInfo.env == 'h5') {
-                window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${res.id}`);
+                const str = getURLParamsStr(urlEncode({
+                    ...par.params,
+                    workid: res.id,
+                }))
+                window.history.replaceState(null,null,`/pages/order/pages/template/preview?${str}`);
             }
             this.setState({
                 workInfo:res
@@ -264,6 +269,7 @@ export default class Preview extends Component<any, {
 
     render() {
         const { placeOrderShow,workId,productInfo,workInfo} = this.state;
+        const {self} = this.$router.params;
         const workid = workInfo && workInfo.id ? workInfo.id : workId;
         // @ts-ignore
         return (
@@ -271,6 +277,10 @@ export default class Preview extends Component<any, {
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
+                        if (!notNull(self) && self === "t") {
+                            Taro.navigateBack()
+                            return
+                        }
                         let uri = '/pages/editor/pages/shell';
                         if (workId) {
                             uri = `/pages/editor/pages/shell?id=${workId}`;
