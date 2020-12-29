@@ -22,7 +22,7 @@ import PhoneSwiper from "./phoneSwiper";
 import LoginModal from "../../../components/login/loginModal";
 import {userStore} from "../../../store/user";
 import BannerSwiper from "./bannerSwiper";
-import { AtCurtain } from 'taro-ui'
+import Curtain from "../../../components/curtain";
 
 
 interface IndexState {
@@ -385,18 +385,7 @@ class Index extends Component<any, IndexState> {
                     <Image src={require("../../../source/ibg.png")} className="index_fixed_top_img" />
                     {
                         Object.keys(curtain).length > 0
-                            ? <AtCurtain
-                                isOpened={Object.keys(curtain).length > 0}
-                                onClose={this.closeCurtain}
-                            >
-                                <View className="index_curtain_container" onClick={this.onCurtainClick}>
-                                    <Image
-                                        style='width:100%;height:250px'
-                                        src={curtain.thumb_image}
-                                        mode={deviceInfo.env === "h5" ? "scaleToFill" : "heightFix"}
-                                    />
-                                </View>
-                            </AtCurtain>
+                            ? <Curtain src={curtain.thumb_image} onCurtainClick={this.onCurtainClick} onClose={this.closeCurtain} />
                             : null
                     }
                     {
