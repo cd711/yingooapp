@@ -33,6 +33,10 @@ export class PhotoParams {
     public max: number;
     // 照片冲印模板是否有数量限制
     public limit: boolean = false;
+    // 从商品详情过来时已经选好了图片，使用完就要置为false
+    public isOrderDetail: boolean = false;
+    // 从商品详情过来时已经选好了图片, 这个时候没有其它任何数据，只有这个内容，使用完就要清空(订单完成才清空)
+    public tempPhotoOfOrderDetail: Array<PhotoParamsPathArray> = new Array<PhotoParamsPathArray>()
 
     constructor(json?: any) {
         if (!json) {
@@ -50,6 +54,8 @@ export class PhotoParams {
         this.photoStyle = json.photoStyle || "";
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
-        this.limit = json.limit || false
+        this.limit = json.limit || false;
+        this.tempPhotoOfOrderDetail = json.tempPhotoOfOrderDetail || [];
+        this.isOrderDetail = json.isOrderDetail || false
     }
 }
