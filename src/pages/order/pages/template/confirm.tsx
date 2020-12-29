@@ -173,7 +173,6 @@ export default class Confirm extends Component<any, {
                     for (const product of iterator.merge_products) {
                         product["checked"] = false;
                         const isSelectItem: Array<any> = iterator.products.filter((obj) => obj.merge_products.some((ibj) => ibj.product.id == product.id));
-                        console.log("select_add_product", isSelectItem);
                         if (isSelectItem.length == 1) {
                             product["checked"] = true;
                         }
@@ -186,6 +185,7 @@ export default class Confirm extends Component<any, {
     //加购信息
     setABCacheData = (res: any) => {
         // setTempDataContainer()
+
     }
     componentDidShow() {
         console.log("componentDidShow")
@@ -193,9 +193,16 @@ export default class Confirm extends Component<any, {
         if (this.tempContainerKey != "") {
             getTempDataContainer(this.tempContainerKey, (value) => {
                 console.log("加购回来",value)
-                if (value != null && value.isOk) {
-
+                const currentAddBuyItem = value.currentAddBuyItem
+                if (value != null && value.isOk && currentAddBuyItem.checked == false) {
                     this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
+                }else{
+                    const temp = value.mainProduct.merge_products.filter((item)=>{
+                        return item.product.id == currentAddBuyItem.id
+                    })
+                    this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+                        this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
+                    });
                 }
             })
         }
@@ -251,9 +258,13 @@ export default class Confirm extends Component<any, {
             setTimeout(() => {
                 window.history.replaceState(null, null, '/pages/tabbar/me/me');
                 Taro.getApp().tab = 1;
-                Taro.navigateTo({
-                    url: '/pages/tabbar/order/order?tab=1'
-                })
+                if (deviceInfo.env == 'h5') {
+                    window.location.href = '/pages/tabbar/order/order?tab=1';
+                }else{
+                    Taro.switchTab({
+                        url: '/pages/tabbar/order/order?tab=1'
+                    });
+                }
             }, 2000);
             Taro.showToast({
                 title: e,
@@ -308,9 +319,14 @@ export default class Confirm extends Component<any, {
             setTimeout(() => {
                 window.history.replaceState(null, null, '/pages/tabbar/me/me');
                 Taro.getApp().tab = 1;
-                Taro.navigateTo({
-                    url: '/pages/tabbar/order/order?tab=1'
-                })
+                if (deviceInfo.env == 'h5') {
+                    window.location.href = '/pages/tabbar/order/order?tab=1'
+                } else {
+                    Taro.switchTab({
+                        url: '/pages/tabbar/order/order?tab=1'
+                    })
+                }
+
             }, 2000);
             Taro.showToast({
                 title: e,
@@ -435,8 +451,9 @@ export default class Confirm extends Component<any, {
                 duration: 2000
             });
         }
+
         setTimeout(() => {
-            if (res.code == 2) {
+            if (res.code == 2 || res.code == 0) {
                 if (process.env.TARO_ENV == 'h5') {
                     window.location.href = url;
                 } else {
@@ -497,31 +514,38 @@ export default class Confirm extends Component<any, {
             }
         });
     }
+    delBuyProduct = (prepay_id,pre_order_id,product_id,merge_product_id,callback?:()=>void) => {
+        Taro.showLoading({title: "处理中..."})
+        // const {data} = this.state;
+        api("app.order_temp/delproduct", {
+            prepay_id,
+            pre_order_id,
+            product_id,
+            merge_product_id
+        }).then((res) => {
+            Taro.hideLoading();
+            if (callback) {
+                callback(); 
+            } else {
+                this.setState({
+                    data: this.handleData(res)
+                });
+            }
+        }).catch((e) => {
+            console.log("删除加购失败", e);
+            Taro.hideLoading();
+            Taro.showToast({
+                title: "出了一点小问题，请稍后再试!",
+                icon: "none",
+                duration: 2000
+            })
+        })
+    }
     onAddBuyItemClick = (mainProduct, preOrderId, mainProductId, item) => {
         const subItem = mainProduct.merge_products.find((obj) => obj.product.id == item.id)
         if (item.checked) {
-
-            Taro.showLoading({title: "处理中..."})
             const {data} = this.state;
-            api("app.order_temp/delproduct", {
-                prepay_id: data.prepay_id,
-                pre_order_id: preOrderId,
-                product_id: mainProductId,
-                merge_product_id: subItem.id
-            }).then((res) => {
-                Taro.hideLoading();
-                this.setState({
-                    data: this.handleData(res)
-                })
-            }).catch((e) => {
-                console.log("删除加购失败", e);
-                Taro.hideLoading();
-                Taro.showToast({
-                    title: "出了一点小问题，请稍后再试!",
-                    icon: "none",
-                    duration: 2000
-                })
-            })
+            this.delBuyProduct(data.prepay_id,preOrderId,mainProductId,subItem.id)
         } else {
             if (item.sku == null || item.sku == "") {
                 const {data} = this.state;
@@ -536,9 +560,10 @@ export default class Confirm extends Component<any, {
                 },(is)=>{
                     if (is) {
                         this.tempContainerKey = `${item.id}_${mainProductId}`;
+
                         Taro.navigateTo({
                             url: `/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`
-                        });
+                        })
                     }
                 });
 
