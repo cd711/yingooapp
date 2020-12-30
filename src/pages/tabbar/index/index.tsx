@@ -16,7 +16,6 @@ import {
     sleep,
     urlEncode,
     updateLocalCoupon,
-
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -70,11 +69,11 @@ class Index extends Component<any, IndexState> {
 
     getIndexList = async () => {
 
-        let cIds = [];
+        let cIds = {};
         if (userStore.isLogin) {
             try {
                 const res = await api("app.coupon/receiveCoupinId");
-                cIds = res || []
+                cIds = res || {}
             } catch (e) {
                 console.log(e)
             }
@@ -90,55 +89,71 @@ class Index extends Component<any, IndexState> {
         }
         try {
             const res = await api("app.index/h5");
-            this.setState({data: [...res]})
-            let popArr = [];
-            for (const item of res) {
-                if (item.area_type === "popup") {
-                    popArr = [...item.clist] || [];
-                    break;
-                }
+            this.setState({data: [...res]});
+            const popArr = [];
+            const tempArr = res.filter(v => v.area_type === "popup");
+
+            console.log("所有优惠券：", tempArr)
+
+            // 筛选已经领取过的优惠券
+            console.log("已领取过的优惠券：", cIds)
+            for (const item of JSON.parse(JSON.stringify(tempArr))) {
+                let temp = null;
+                temp = {...item}
+                // const temp = JSON.parse(JSON.stringify(item));
+                console.log(temp)
+                temp.clist.forEach((val, idx) => {
+                    if (cIds[`${val.info.id}`]) {
+                        temp.clist.splice(idx, 1)
+                    }
+                })
+                popArr.push(item)
             }
+
+            console.log("已排除领取过的优惠券：", popArr)
+
 
             // 如果优惠券已经领取就不显示了
             let current: any = {};
-            let showCoupon = false;
+            let parent: any = {};
             if (popArr.length > 1) {
-                const idx = Math.floor(Math.random() * popArr.length + 1) - 1;
-                console.log("活动弹窗随机的下标：", idx);
-
-                if (cIds.length > 0) {
-                    const matchIdx = cIds.findIndex(v => v == popArr[idx].info.id );
-                    showCoupon = matchIdx === -1
-                }
-
-                if (showCoupon) {
-                    current = popArr[idx]
+                const parentIdx = Math.floor(Math.random() * popArr.length + 1) - 1;
+                parent = popArr[parentIdx] || {};
+                if (Object.keys(parent).length > 0) {
+                    if (popArr[parentIdx].clist.length > 1) {
+                        const childIdx = Math.floor(Math.random() * popArr[parentIdx].clist.length + 1) - 1;
+                        current = popArr[parentIdx].clist[childIdx] || {}
+                    } else {
+                        current = popArr[parentIdx].clist[0] || {}
+                    }
                 }
             } else {
-                if (popArr.length > 0) {
-                    const matchIdx = cIds.findIndex(v => v == popArr[0].info.id );
-                    showCoupon = matchIdx === -1
-                }
-
-                if (showCoupon) {
-                    current = popArr[0]
+                parent = popArr[0] || {};
+                if (Object.keys(parent).length > 0) {
+                    current = popArr[0].clist[0] || {}
                 }
             }
 
-            if (Object.keys(current).length > 0) {
+            console.log("弹窗优惠券信息：", parent, current)
 
-                const type = current.popup_config.type;
-                const status = allowShowCoupon(current.info.id, type, localCoupon);
+            if (Object.keys(current).length > 0) {
+                const type = parent.popup_config.type;
+                const status = allowShowCoupon(parent.id, current.info.id, type, localCoupon);
+                console.log("弹窗优惠券状态：", status)
                 if (status) {
                     const obj = {...localCoupon};
                     if (type === "only_one") {
                         obj.onlyOnce.push(current.info.id)
+                        obj.onlyOnce = [...new Set(obj.onlyOnce)]
                     } else if (type === "every_time") {
-                        obj.everyTime.push(current.info.id)
+                        obj.everyTime.push(current.info.id);
+                        obj.everyTime = [...new Set(obj.everyTime)]
                     } else {
-                        const expirationTime = moment().add(Number(current.popup_config.time) * Number(current.popup_config.unit), "seconds").valueOf()
+                        const expirationTime = moment().add(Number(parent.popup_config.time) * Number(parent.popup_config.unit), "seconds").valueOf()
                         obj.fixedTime.push({
-                            ...current.popup_config,
+                            ...parent.popup_config,
+                            id: parent.id,
+                            couponId: current.info.id,
                             expirationTime
                         })
                     }
@@ -332,9 +347,12 @@ class Index extends Component<any, IndexState> {
 
     jumpToTemplate = type => {
         let url = "";
+        // @ts-ignore
         let picID = "63";
+        // @ts-ignore
         let firstPicID = "";
         let phoneID = "41";
+        // @ts-ignore
         let firstPhoneID = "";
 
         const {cateInfo} = this.state;
@@ -440,6 +458,16 @@ class Index extends Component<any, IndexState> {
         // Taro.showTabBar();
     }
 
+    getImage(item){
+        if (item.thumb_image) {
+            return item.thumb_image
+        }
+        if (item.info) {
+            return item.info.thumb_image
+        }
+        return ""
+    }
+
     render() {
         const {data, centerPartyHeight, showUnc, scrolling, curtain, toast} = this.state;
         return (
@@ -506,7 +534,7 @@ class Index extends Component<any, IndexState> {
                                                 ? len === 1
                                                 ? <View className="single_index_product_item fix_all_margin">
                                                     <View className="single_img_view">
-                                                        <Image src={list[0].info.thumb_image} className="single_img" mode="widthFix" />
+                                                        <Image src={this.getImage(list[0])} className="single_img" mode="widthFix" />
                                                     </View>
                                                     <View className="single_index_prod_info">
                                                         <Text className="h1">{list[0].title}</Text>
@@ -555,7 +583,7 @@ class Index extends Component<any, IndexState> {
                                                                 return <View className="product_list_item_wrap" key={prodIndex + ""}>
                                                                     <View className="prod_list" onClick={() => this.jumpToDetail(product)}>
                                                                         <View className="img">
-                                                                            <Image src={product.thumb_image} className="prod_img" mode="widthFix" />
+                                                                            <Image src={this.getImage(product)} className="prod_img" mode="widthFix" />
                                                                         </View>
                                                                         <View className="prod_tit">
                                                                             <Text className="txt">{product.title}</Text>
@@ -593,7 +621,7 @@ class Index extends Component<any, IndexState> {
                                                                               onClick={() => this.onItemClick(item.clist[0], index)}>
                                                                             <Image src={require("../../../source/sjk.png")} className="shell_ke" />
                                                                             <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
-                                                                            <Image src={ossUrl(item.clist[0].thumb_image, 1)}
+                                                                            <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
                                                                                    className='photo' mode='aspectFill'/>
                                                                         </View>
                                                                     </View>
@@ -628,7 +656,7 @@ class Index extends Component<any, IndexState> {
                                                                                           onClick={() => this.onItemClick(phone, index)}>
                                                                                         <Image src={require("../../../source/sjk.png")} className="shell_ke rectangle_ke" />
                                                                                         <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
-                                                                                        <Image src={ossUrl(phone.thumb_image, 1)}
+                                                                                        <Image src={ossUrl(this.getImage(phone), 1)}
                                                                                                className='photo rectangle_ke' mode='aspectFill'/>
                                                                                     </View>
                                                                                 </View>
@@ -660,7 +688,7 @@ class Index extends Component<any, IndexState> {
                                                                     <View className='swiper-back'
                                                                           onClick={() => this.onItemClick(item.clist[0], index)}>
                                                                         <View className='temp-swiper'>
-                                                                            <Image src={ossUrl(item.clist[0].thumb_image, 1)}
+                                                                            <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
                                                                                    className='photo' mode='aspectFill'/>
                                                                         </View>
                                                                     </View>
@@ -693,7 +721,7 @@ class Index extends Component<any, IndexState> {
                                                                                 <View className="photo_item_view" onClick={() => this.onItemClick(childPhoto, index)}>
                                                                                     <View className="photo_item_hidden transverse">
                                                                                         <Image src={require("../../../source/transverse.svg")} className="hidden_view transverse" />
-                                                                                        <Image src={ossUrl(childPhoto.thumb_image, 1)} className="transverse_img" mode="aspectFill" />
+                                                                                        <Image src={ossUrl(this.getImage(childPhoto), 1)} className="transverse_img" mode="aspectFill" />
                                                                                     </View>
                                                                                 </View>
                                                                             </View>
@@ -720,7 +748,7 @@ class Index extends Component<any, IndexState> {
                                                 ? item.clist.map((coupon, cIndex) => (
                                                     <View className="index_coupon_main fix_all_margin" key={`${index}_${cIndex}`}
                                                           onClick={() => this.receiveCoupon(coupon)}>
-                                                        <Image src={ossUrl(coupon.thumb_image, 1)} className="coupon_img" mode="widthFix" />
+                                                        <Image src={ossUrl(this.getImage(coupon), 1)} className="coupon_img" mode="widthFix" />
                                                         <View className="receive_btn">
                                                             <View className="anim_btn_receive">
                                                                 <Text className="txt">立即领取</Text>
@@ -786,7 +814,7 @@ class Index extends Component<any, IndexState> {
                                             list.map((colItem, colIdx) => (
                                                 <View className="index_coupon_main" key={`${colIdx}_${index}`}
                                                       onClick={() => this.onCouponColumnClick(colItem)} >
-                                                    <Image src={ossUrl(colItem.thumb_image, 1)} className="coupon_img" mode="widthFix" />
+                                                    <Image src={ossUrl(this.getImage(colItem), 1)} className="coupon_img" mode="widthFix" />
                                                 </View>
                                             ))
                                         }

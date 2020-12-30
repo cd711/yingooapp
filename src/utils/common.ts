@@ -501,8 +501,8 @@ export function updateLocalCoupon(params: {[key: string] : any} = {}) {
     })
 }
 
-export function allowShowCoupon(couponId: string | number, couponType: string, historyCouponArr: LocalCoupon = new LocalCoupon()) {
-    if (notNull(couponId) || historyCouponArr.fixedTime.length === 0 || historyCouponArr.everyTime.length === 0 || historyCouponArr.onlyOnce.length === 0) {
+export function allowShowCoupon(parentId: string | number , couponId: string | number, couponType: string, historyCouponArr: LocalCoupon = new LocalCoupon()) {
+    if (notNull(parentId) || notNull(couponId)) {
         return true
     }
     let status = true;
@@ -524,7 +524,7 @@ export function allowShowCoupon(couponId: string | number, couponType: string, h
     } else {
         // every_other
         for (const item of historyCouponArr.fixedTime) {
-            if (item.expirationTime) {
+            if (item.expirationTime && item.id == parentId && couponId == item.couponId) {
                 if (moment().valueOf() > item.expirationTime) {
                     status = true;
                     break
