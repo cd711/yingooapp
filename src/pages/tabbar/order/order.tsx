@@ -14,12 +14,15 @@ import TipModal from '../../../components/tipmodal/TipModal';
 import { observe } from 'mobx';
 import LoginModal from '../../../components/login/loginModal';
 import Fragment from '../../../components/Fragment';
-
+import page from '../../../utils/ext'
 
 const tabs = ["全部","待付款","待发货","待收货","已完成"];
 
 @inject("userStore","templateStore")
 @observer
+@page({
+    share:true
+})
 export default class Order extends Component<any,{
     switchTabActive:number;
     data:ListModel;

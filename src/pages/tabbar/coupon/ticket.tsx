@@ -9,12 +9,15 @@ import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import { observe } from 'mobx';
 import LoginModal from "../../../components/login/loginModal";
+import page from '../../../utils/ext'
 
 const tabs = ["全部", "未使用", "已使用", "已失效"];
 
 @inject("userStore")
 @observer
-// @page({wechatAutoLogin:true})
+@page({
+    share:true
+})
 export default class Login extends Component<{}, {
     data: ListModel,
     switchTabActive: number,

@@ -14,6 +14,7 @@ import Popover, {PopoverItemClickProps} from "../../../components/popover";
 import {AtModal} from "taro-ui";
 import LoginModal from "../../../components/login/loginModal";
 import { observe } from 'mobx';
+import page from '../../../utils/ext'
 
 const switchBottom = require("../../../source/switchBottom.png");
 
@@ -54,6 +55,9 @@ interface MeState {
 
 @inject("userStore")
 @observer
+@page({
+    share:true
+})
 export default class Me extends Component<any, MeState> {
 
     config: Config = {
