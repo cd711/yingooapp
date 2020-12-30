@@ -9,6 +9,7 @@ import config from "../../../config";
 import {getURLParamsStr, urlEncode} from "../../../utils/common";
 import {api, getToken} from "../../../utils/net";
 import moment from "moment";
+import page from "../../../utils/ext";
 
 
 class Store {
@@ -22,6 +23,9 @@ class Store {
 
 
 @observer
+@page({
+    share:true
+})
 export default class Shell extends Component<{}, {
     size?: { width: string | number; height: string | number };
     data?: number;

@@ -4,7 +4,15 @@ import {View, Text, Image, ScrollView} from "@tarojs/components";
 import IconFont from "../../components/iconfont";
 import {AtInput} from "taro-ui";
 import Empty from "../../components/empty";
-import {debounce, deviceInfo, getSpecialRouter, getURLParamsStr, notNull, urlEncode} from "../../utils/common";
+import {
+    debounce,
+    deviceInfo,
+    getSpecialRouter,
+    getURLParamsStr,
+    notNull,
+    shareAppExtends,
+    urlEncode
+} from "../../utils/common";
 import {api} from "../../utils/net";
 import searchStore from "../../store/search";
 
@@ -24,6 +32,10 @@ const Search:Taro.FC<any> = () => {
             console.log("获取搜索数据出错：", e)
         }
     }
+
+    Taro.useShareAppMessage(() => {
+        return shareAppExtends()
+    })
 
     useEffect(() => {
         if (searchList.length === 0 && searchStore.searchList.length > 0) {

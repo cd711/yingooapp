@@ -12,6 +12,7 @@ import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
 import {userStore} from "../../../../store/user";
 import moment from "moment";
+import page from "../../../../utils/ext";
 
 
 interface PhotosState {
@@ -30,6 +31,9 @@ interface PhotosState {
 }
 
 @observer
+@page({
+    share: true
+})
 export default class Photos extends Component<{}, PhotosState> {
 
     config: Config = {

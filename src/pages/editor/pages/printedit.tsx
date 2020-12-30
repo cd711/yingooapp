@@ -23,6 +23,7 @@ import config from "../../../config";
 import wx from 'weixin-js-sdk'
 import photoStore from "../../../store/photo";
 import PhotosEle from "../../../components/photos/photos";
+import page from "../../../utils/ext";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -1258,6 +1259,9 @@ interface PrintEditState {
     hiddenBar: boolean
 }
 @observer
+@page({
+    share: true
+})
 export default class PrintEdit extends Component<any, PrintEditState> {
 
     public store = new Store();

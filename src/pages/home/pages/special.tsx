@@ -8,7 +8,7 @@ import {
     fixStatusBarHeight,
     getURLParamsStr,
     notNull,
-    ossUrl,
+    ossUrl, shareAppExtends,
     urlEncode
 } from "../../../utils/common";
 import {AtNavBar} from "taro-ui";
@@ -60,6 +60,10 @@ const Special: Taro.FC<any> = () => {
             }
         }
     }
+
+    Taro.useShareAppMessage(() => {
+        return shareAppExtends()
+    })
 
     useEffect(() => {
         const id = router.params.specialid;

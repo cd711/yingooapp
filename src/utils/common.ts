@@ -568,3 +568,12 @@ export function photoGetItemStyle() {
         height: `${deviceInfo.windowWidth / 3 - 2}px`,
     }
 }
+
+
+export function shareAppExtends() {
+    return {
+        title: "免费照片冲印个性化定制手机壳",
+        path: "/pages/tabbar/index/index",
+        imageUrl: "https://cdn.playbox.yingoo.com/uploads/file/20201230/18d71f9418c8ef78d72e6b7b8e81e460.png?x-oss-process=style/m"
+    }
+}

@@ -6,7 +6,7 @@ import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../../components/empty";
 import {api} from '../../../utils/net';
-import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,setTempDataContainer,urlEncode,getURLParamsStr} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,urlEncode,getURLParamsStr} from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import moment from "moment";

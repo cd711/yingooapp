@@ -7,7 +7,7 @@ import {
     deviceInfo, getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
-    notNull, sleep,
+    notNull, shareAppExtends, sleep,
     urlEncode
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
@@ -173,6 +173,10 @@ const PrintChange: Taro.FC<any> = () => {
             setAnimating(true)
         }, 50)
     }
+
+    Taro.useShareAppMessage(() => {
+        return shareAppExtends()
+    })
 
     Taro.useDidShow(async () => {
 
