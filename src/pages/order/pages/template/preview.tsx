@@ -83,9 +83,7 @@ export default class Preview extends Component<any, {
         }
     }
     componentWillUnmount(){
-        if (userStore.isLogin) {
-            setTempDataContainer("product_preview_sku",null,()=>{});
-        }
+
     }
     getWorkInfo = (id) => {
         const par = this.$router;

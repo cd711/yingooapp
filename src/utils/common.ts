@@ -489,7 +489,7 @@ export function getLocalCoupon() {
 }
 
 export function updateLocalCoupon(params: {[key: string] : any} = {}) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
         try {
             const local = await getLocalCoupon();
             const data = {...local, ...params};
@@ -538,3 +538,27 @@ export function allowShowCoupon(couponId: string | number, couponType: string, h
 
     return status
 }
+
+export function jumpUri(url:string,tabbar:boolean = false){
+    if(deviceInfo.env == 'h5'){
+        if (tabbar) {
+            window.location.href = url; 
+        } else {
+            Taro.navigateTo({
+                url
+            })
+        }
+    } else {
+        if (tabbar) {
+            Taro.switchTab({
+                url
+            })
+        } else {
+            Taro.navigateTo({
+                url
+            })
+        }
+
+    }
+}
+

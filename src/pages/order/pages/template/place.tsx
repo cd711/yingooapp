@@ -47,7 +47,6 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
             }
         }
         setSkus([...ts]);
-        // console.log(ts,skus,"ccc")
         selectAtteItems(sku,attrItems,[...ts])
         
     }
@@ -78,7 +77,6 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                 for (let j = 0;j<item.length;j++) {
                     const tag = item[j];
                     if (defalutSelectIds.indexOf(tag.id)!=-1) {
-                        console.log(skusa,"mmm")
                         onSelectItem(i,j,true,items,skusa);
                     }
                 }
@@ -138,7 +136,6 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         selectIds.sort(function(value1, value2) {
             return parseInt(value1) - parseInt(value2);
         });
-        // console.log(tmp,notOverSku,selectIds,tempSelectIds);
         items = items.map((item,index)=>{
             return item.map((tag,idx)=>{
                 tag["over"] = false;
@@ -158,7 +155,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         });
         const skuValue = selectIds.join(',');
         setAttrItems(items);
-        console.log(selectIds.length != items.length,skuValue,maybeSkus)
+
         if (selectIds.length != items.length) {
             const prices = maybeSkus.map((item) => {
                 return item.price;

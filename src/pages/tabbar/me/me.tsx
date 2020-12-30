@@ -349,7 +349,7 @@ export default class Me extends Component<any, MeState> {
         }
     ];
     componentDidShow(){
-        setTempDataContainer("product_preview_sku",null,()=>{});
+        // setTempDataContainer("product_preview_sku",null,()=>{});
     }
     // @ts-ignore
     render() {

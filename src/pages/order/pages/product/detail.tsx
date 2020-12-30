@@ -134,7 +134,7 @@ export default class Login extends Component<{}, {
                             }
                             this.setState({
                                 data: res,
-                                defalutSkuIds: result.defalut_attr_ids
+                                defalutSkuIds: result.default_attr_ids.map((item)=>parseInt(item+""))
                             })
                         })
                     } else {

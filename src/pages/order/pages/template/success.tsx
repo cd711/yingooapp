@@ -7,7 +7,7 @@ import SuccessIcon from '../../../../components/icon/SuccessIcon';
 import WarmIcon from '../../../../components/icon/WarmIcon';
 import { api } from '../../../../utils/net';
 import { Base64 } from 'js-base64';
-import { deviceInfo, fixStatusBarHeight } from '../../../../utils/common';
+import { deviceInfo, fixStatusBarHeight,jumpUri } from '../../../../utils/common';
 
 
 @inject("templateStore")
@@ -93,9 +93,7 @@ export default class Success extends Component<{},{
                 duration:2000
             });
             setTimeout(() => {
-                Taro.navigateTo({
-                    url:'/pages/tabbar/order/order?tab=1'
-                })
+                jumpUri('/pages/tabbar/order/order',true)
             }, 2000);
         })
     }
@@ -109,9 +107,8 @@ export default class Success extends Component<{},{
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
-                        Taro.navigateTo({
-                            url:'/pages/tabbar/order/order?tab=1'
-                        })
+                        Taro.getApp().tab = 1;
+                        jumpUri('/pages/tabbar/order/order=1',true);
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>
@@ -133,14 +130,16 @@ export default class Success extends Component<{},{
                     {
                        state? <View className="ops">
                         <Button className='look-order-btn' onClick={()=>{
-                            window.history.pushState(null,null,'/pages/tabbar/me/me');
-                            Taro.navigateTo({
-                                url:'/pages/tabbar/order/order?tab=0'
-                            })
+                            if (deviceInfo.env == "h5") {
+                                window.history.pushState(null,null,'/pages/tabbar/me/me');
+                            }
+                            jumpUri('/pages/tabbar/order/order?tab=0',true);
                         }}>查看订单</Button>
                         <Button className='back-home-btn' onClick={()=>{
-                            window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
-                            window.location.href = '/pages/tabbar/index/index';
+                            if (deviceInfo.env == "h5") {
+                                window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
+                            }
+                            jumpUri('/pages/tabbar/index/index',true);
                         }}>返回首页</Button>
                     </View>:<View className="ops">
                         <Button className='look-order-btn' onClick={()=>{
@@ -148,10 +147,10 @@ export default class Success extends Component<{},{
                                 Taro.showLoading({title:"正在查询订单支付状态"})
                                 this.getOrderStatus(pay_order_sn)
                             } else {
-                                window.history.pushState(null,null,'/pages/tabbar/me/me');
-                                Taro.navigateTo({
-                                    url:'/pages/tabbar/order/order?tab=0'
-                                })
+                                if (deviceInfo.env == "h5") {
+                                    window.history.pushState(null,null,'/pages/tabbar/me/me');
+                                }
+                                jumpUri('/pages/tabbar/order/order?tab=0',true);
                             }
                         }}>未支付</Button>
                         <Button className='back-home-btn' onClick={()=>{
