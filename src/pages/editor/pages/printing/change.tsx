@@ -174,9 +174,11 @@ const PrintChange: Taro.FC<any> = () => {
         }, 50)
     }
 
-    Taro.useShareAppMessage(() => {
-        return shareAppExtends()
-    })
+    if (deviceInfo.env === "weapp") {
+        Taro.useShareAppMessage(() => {
+            return shareAppExtends()
+        })
+    }
 
     Taro.useDidShow(async () => {
 
