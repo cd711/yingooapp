@@ -1,10 +1,10 @@
 import {Image, ScrollView, Text, View} from "@tarojs/components";
-import {AtInput, AtNavBar, AtTextarea} from 'taro-ui'
-import Taro, {useEffect, useState} from "@tarojs/taro";
+import {AtInput, AtTextarea} from 'taro-ui'
+import Taro, {useState} from "@tarojs/taro";
 import IconFont from "../../../../components/iconfont";
 import UploadFile from "../../../../components/Upload/Upload";
 import "./feedback.less";
-import {deviceInfo,fixStatusBarHeight} from "../../../../utils/common";
+import {deviceInfo} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 
 const Feedback: Taro.FC<any> = (_) => {
@@ -25,7 +25,7 @@ const Feedback: Taro.FC<any> = (_) => {
         imgs: []
     }
     const [formData, setFormData] = useState({...initObj});
-    const [centerPartyHeight,setCenterPartyHeight] = useState(560);
+
     const onUpload = (data) => {
         if (data) {
             const arr = [...formData.imgs];
@@ -70,25 +70,20 @@ const Feedback: Taro.FC<any> = (_) => {
                 icon: "success"
             });
             setFormData({...initObj})
-        }catch (e) {
+        } catch (e) {
             Taro.hideLoading();
             console.log("提交出错：", e)
         }
 
     }
 
-
-    useEffect(()=>{
-        if (process.env.TARO_ENV != 'h5') {
-            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
-                setCenterPartyHeight(Taro.getSystemInfoSync().windowHeight-nav_rect.height);
-            }).exec();
-        }
-    },[])
     return (
         <View className="feedback_container">
             {/* @ts-ignore */}
-            <View className='nav-bar' style={fixStatusBarHeight()}>
+            <View className='nav-bar' style={{
+                height: `${deviceInfo.env === "weapp" ? deviceInfo.menu.bottom : 44}px`,
+                paddingTop: `${deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight : 0}px`
+            }}>
                 <View className='left' onClick={() => {
                     Taro.navigateBack();
                 }}>
@@ -98,13 +93,16 @@ const Feedback: Taro.FC<any> = (_) => {
                     <Text className='title'>问题反馈</Text>
                 </View>
             </View>
-            <ScrollView scrollY style={`height: ${centerPartyHeight}px`}>
+            <ScrollView scrollY style={{
+                height: `${deviceInfo.env === "weapp" ? deviceInfo.windowHeight - deviceInfo.menu.bottom : deviceInfo.windowHeight - 44}px`
+            }}>
                 <View className="feedback_selector">
                     {
                         feedBackArr.map((value, index) => (
                             <View className="feedback_item_wrap" key={index + ""}>
-                                <View className={`feedback_item ${Number(formData.reason) === Number(value.key) ? "active" : ""}`}
-                                      onClick={() => setFormData(prev => ({...prev, reason: Number(value.key)}))}
+                                <View
+                                    className={`feedback_item ${Number(formData.reason) === Number(value.key) ? "active" : ""}`}
+                                    onClick={() => setFormData(prev => ({...prev, reason: Number(value.key)}))}
                                 >
                                     {/* @ts-ignore */}
                                     <IconFont name={value.icon} size={48}
@@ -173,7 +171,8 @@ const Feedback: Taro.FC<any> = (_) => {
                                  onChange={(tel: any, _) => setFormData(prev => ({...prev, tel}))}/>
                     </View>
                     <View className="submit_view">
-                        <View className={`submit ${!formData.remark || !formData.tel ? "disable" : ""}`} onClick={onSubmit}>
+                        <View className={`submit ${!formData.remark || !formData.tel ? "disable" : ""}`}
+                              onClick={onSubmit}>
                             <Text className="txt">提交</Text>
                         </View>
                     </View>

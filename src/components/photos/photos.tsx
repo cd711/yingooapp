@@ -1,11 +1,11 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import {View, Text, Image, Button, ScrollView} from '@tarojs/components'
+import Taro, {Component, Config} from '@tarojs/taro'
+import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './photos.less'
 import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {ossUrl, deviceInfo} from "../../utils/common";
+import {deviceInfo, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
@@ -15,15 +15,16 @@ import {observer} from "@tarojs/mobx";
 interface PhotosEleProps {
     editSelect?: boolean;
     onPhotoSelect?: ({ids: [], imgs: [], attrs: []}) => void;
-    defaultSelect?: Array<{id: string | number, img: string}>;
+    defaultSelect?: Array<{ id: string | number, img: string }>;
     onClose?: () => void;
     // 选择图片必选多少张
     count?: number;
     // 选择图片最大多少张
     max?: number;
 }
+
 interface PhotosEleState {
-    navSwitchActive:number;
+    navSwitchActive: number;
     loading: boolean;
     imageList: any[];
     videoList: any[];
@@ -37,6 +38,7 @@ interface PhotosEleState {
     _count: number;
     _max: number;
 }
+
 @observer
 export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState> {
 
@@ -51,7 +53,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     private scrollView: ScrollViewProps;
-    constructor(props){
+
+    constructor(props) {
         super(props);
         this.state = {
             navSwitchActive: 0,
@@ -89,7 +92,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         if (data.order) {
             Object.assign(temp, {order: data.order})
         }
-        try{
+        try {
             const res = await api("app.profile/imgs", temp);
             this.total = Number(res.total);
             console.log(res);
@@ -97,12 +100,12 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             let list = [];
             if (opt.type === 0) {
                 list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
-                this.setState({imageList : list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
+                this.setState({imageList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
             } else {
                 list = opt.loadMore ? this.state.videoList.concat(res.list) : res.list;
                 this.setState({videoList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
             }
-        }catch (e) {
+        } catch (e) {
             console.log("获取图库出错：", e)
             this.setState({loadStatus: "noMore"})
         }
@@ -115,7 +118,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
         const _editSelect = editSelect || false;
         const _count = count || 0;
-        const _max = max  || 100;
+        const _max = max || 100;
         this.setState({
             _editSelect,
             _count,
@@ -343,7 +346,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     getScrollHeight = () => {
         const {_editSelect} = this.state;
-        const {editSelectImgIds, imageList, videoList,navSwitchActive} = this.state;
+        const {editSelectImgIds, imageList, videoList, navSwitchActive} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const h = _editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
         return deviceInfo.env === "h5" ? h : h + deviceInfo.statusBarHeight + deviceInfo.menu.height
@@ -352,9 +355,17 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     render() {
         const {onClose} = this.props;
         const {_editSelect, _count} = this.state;
-        const { navSwitchActive, loading, imageList, videoList, loadStatus, editSelectImgs, editSelectImgIds} = this.state;
+        const {
+            navSwitchActive,
+            loading,
+            imageList,
+            videoList,
+            loadStatus,
+            editSelectImgs,
+            editSelectImgIds
+        } = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
-        const tabs = ["图片","视频"];
+        const tabs = ["图片", "视频"];
         return (
             <View className='photos'>
                 <View className='photos_nav_bar' style={{
@@ -368,8 +379,9 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     <View className='center'>
                         <View className='nav-switch'>
                             {
-                                tabs.map((item,index)=>(
-                                    <View className={navSwitchActive==index?'item active':'item'} key={index+""} onClick={() => this.changeType(index)}>
+                                tabs.map((item, index) => (
+                                    <View className={navSwitchActive == index ? 'item active' : 'item'} key={index + ""}
+                                          onClick={() => this.changeType(index)}>
                                         <Text className='txt'>{item}</Text>
                                     </View>
                                 ))
@@ -388,7 +400,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                         {
                             list.length === 0
                                 ? <View className='empty'>
-                                    <Image src={require('../../source/empty/nophoto.png')} className='img' />
+                                    <Image src={require('../../source/empty/nophoto.png')} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
                                     <UploadFile extraType={navSwitchActive === 0 ? 3 : 4}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
@@ -401,7 +413,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_filter">
-                                        <Text className="tit" />
+                                        <Text className="tit"/>
                                         <Popover popoverItem={this.popoverItem}>
                                             <View className="weapp_list_filter_act">
                                                 <Text className="txt">排序</Text>
@@ -416,21 +428,26 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                                 type="card"
                                                 count={9}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}
-                                                style="width: 248rpx"
+                                                style={photoGetItemStyle()}
                                                 onChange={this.uploadFile}/>
                                         </View>
                                         {
                                             list.map((item, idx) => {
-                                                return <View className="list_item" key={idx+""}>
-                                                    <View className="img_item" key={idx+""}
+                                                return <View className="list_item" key={idx + ""}>
+                                                    <View className="img_item" key={idx + ""}
+                                                          style={photoGetItemStyle()}
                                                           onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
-                                                        <Image src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)}
-                                                               mode="aspectFill"
-                                                               className="img"/>
+                                                        <Image
+                                                            src={item.imagetype === "video" ? `${item.url}?x-oss-process=video/snapshot,t_1000,w_360,h_0,f_jpg,m_fast` : ossUrl(item.url, 1)}
+                                                            mode="aspectFill"
+                                                            style={photoGetItemStyle()}
+                                                            className="img"/>
                                                     </View>
                                                     {_editSelect && editSelectImgIds.indexOf(item.id) > -1
-                                                        ? <View className="edit_select_index" onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
-                                                            <Text className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
+                                                        ? <View className="edit_select_index"
+                                                                onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
+                                                            <Text
+                                                                className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
                                                         </View>
                                                         : null}
                                                 </View>
@@ -439,14 +456,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     </View>
                                 </View>
                         }
-                        {list.length > 0 ? <LoadMore status={loadStatus} /> : null}
+                        {list.length > 0 ? <LoadMore status={loadStatus}/> : null}
                     </ScrollView>
                     {
                         _editSelect && list.length > 0 && editSelectImgIds.length > 0
                             ? <View className="photo_edit_selector_container">
                                 <View className="select_head">
                                     <View className="left">
-                                        <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text className="txt">个素材</Text><Text className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
+                                        <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text
+                                        className="txt">个素材</Text><Text
+                                        className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
                                         {/*<Text className="ext">长按拖动排序</Text>*/}
                                     </View>
                                     <View className="right">
@@ -459,11 +478,11 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     <View className="select_items">
                                         {
                                             editSelectImgs.map((value, index) => (
-                                                <View className="select_items_wrap" key={index+""}>
+                                                <View className="select_items_wrap" key={index + ""}>
                                                     <View className="clear" onClick={() => this.delEditSelectImg(index)}>
-                                                        <IconFont name="16_qingkong" size={32} />
+                                                        <IconFont name="16_qingkong" size={32}/>
                                                     </View>
-                                                    <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img" />
+                                                    <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img"/>
                                                 </View>
                                             ))
                                         }
@@ -472,7 +491,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             </View>
                             : null
                     }
-                    {loading ? <AtActivityIndicator mode='center' /> : null}
+                    {loading ? <AtActivityIndicator mode='center'/> : null}
                 </View>
             </View>
         )

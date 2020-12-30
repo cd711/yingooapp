@@ -4,7 +4,7 @@ import './ticket.less'
 import {api} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, ListModel} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, ListModel, notNull} from '../../../utils/common';
 import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import { observe } from 'mobx';
@@ -205,7 +205,7 @@ export default class Login extends Component<{}, {
                                                         {
                                                             item.status_tip.value == 1 ?
                                                                 <Button className='use_button' onClick={() => {
-                                                                    if (item.coupon.use_url && item.coupon.use_url.length > 0) {
+                                                                    if (!notNull(item.coupon.use_url)) {
                                                                         Taro.navigateTo({
                                                                             url: item.coupon.use_url
                                                                         });

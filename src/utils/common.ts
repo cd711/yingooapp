@@ -542,7 +542,7 @@ export function allowShowCoupon(parentId: string | number , couponId: string | n
 export function jumpUri(url:string,tabbar:boolean = false){
     if(deviceInfo.env == 'h5'){
         if (tabbar) {
-            window.location.href = url; 
+            window.location.href = url;
         } else {
             Taro.navigateTo({
                 url
@@ -562,3 +562,9 @@ export function jumpUri(url:string,tabbar:boolean = false){
     }
 }
 
+export function photoGetItemStyle() {
+    return {
+        width: `${deviceInfo.windowWidth / 3 - 2}px`,
+        height: `${deviceInfo.windowWidth / 3 - 2}px`,
+    }
+}
