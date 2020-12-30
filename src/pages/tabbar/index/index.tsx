@@ -28,6 +28,7 @@ import Curtain from "../../../components/curtain";
 import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
 import {AtToast} from "taro-ui";
+import page from '../../../utils/ext'
 
 
 interface IndexState {
@@ -42,6 +43,9 @@ interface IndexState {
 
 @inject("userStore")
 @observer
+@page({
+    share:true
+})
 class Index extends Component<any, IndexState> {
 
     config: Config = {

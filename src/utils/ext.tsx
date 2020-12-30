@@ -22,7 +22,7 @@ const page = (option?: {
         if (!clazz.onShareAppMessage) {
             clazz.onShareAppMessage = function() {
                 return {
-                    title: "四喜优享",
+                    title: "免费照片冲印个性化定制手机壳",
                     path: "/pages/tabbar/index/index"
                 };
             };
