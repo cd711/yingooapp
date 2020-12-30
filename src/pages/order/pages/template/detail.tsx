@@ -53,9 +53,9 @@ export default class Detail extends Component<{}, {
         }
 
         if (process.env.TARO_ENV === 'h5') {
-            const url = window.location.href;
-            window.history.pushState(null, null, '/pages/order/pages/template/index');
-            window.history.pushState(null, '模板详情', url);
+            // const url = window.location.href;
+            // window.history.pushState(null, null, '/pages/order/pages/template/index');
+            // window.history.pushState(null, '模板详情', url);
         }
         const {id, cid} = this.$router.params
         console.log(id, cid)

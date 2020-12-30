@@ -526,6 +526,7 @@ class Index extends Component<any, IndexState> {
                                 const phoneArr = this.filterArrForType(list, "phone");  // 手机壳
                                 const photoArr = this.filterArrForType(list, "photo");  // 照片
                                 const onlyFourPhoto = photoArr.length > 3 ? photoArr.slice(0, 4) : [];
+                                const onlyThreePhone = phoneArr.length > 3 ? phoneArr.slice(0, 3) : [];
 
                                 return item.area_type === "content"
                                     ? <Fragment key={index}>
@@ -632,7 +633,7 @@ class Index extends Component<any, IndexState> {
                                                             : null
                                                     }
                                                     {
-                                                        phoneArr.length > 1 && phoneArr.length < 6
+                                                        phoneArr.length > 1 && phoneArr.length <= 3
                                                             ? <PhoneSwiper key={index + ""}
                                                                            data={phoneArr}
                                                                            title={item.title}
@@ -641,7 +642,7 @@ class Index extends Component<any, IndexState> {
                                                             : null
                                                     }
                                                     {
-                                                        phoneArr.length >= 6
+                                                        phoneArr.length > 3
                                                             ? <View className='temp-warp' key={index + ""}>
                                                                 <View className='title'>
                                                                     <Text className='txt'>{item.title}</Text>
@@ -650,7 +651,7 @@ class Index extends Component<any, IndexState> {
                                                                 <View className='grid'>
                                                                     <View className="phone_shell_view_list">
                                                                         {
-                                                                            phoneArr.map((phone, phoneIdx) => (
+                                                                            onlyThreePhone.map((phone, phoneIdx) => (
                                                                                 <View className="single_phone_shell_wrap" key={phoneIdx}>
                                                                                     <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
                                                                                           onClick={() => this.onItemClick(phone, index)}>
@@ -665,7 +666,7 @@ class Index extends Component<any, IndexState> {
                                                                     </View>
                                                                 </View>
                                                                 {
-                                                                    phoneArr.length > 6
+                                                                    phoneArr.length > 3
                                                                         ? <View className='seemore'
                                                                                 onClick={() => this.viewMoreSpecial(item)}>
                                                                             <Text className='txt'>查看更多</Text>
