@@ -86,6 +86,7 @@ export default class SMS extends Component<any,{
             }).then((res)=>{
                 userStore.setInfo(res);
                 Taro.hideLoading();
+
                 Taro.reLaunch({
                     url:"/pages/tabbar/me/me"
                 })

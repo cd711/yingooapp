@@ -224,7 +224,13 @@ export default class Cart extends Component<{}, {
                                                     <View className='pre-image'>
                                                         <Image src={ossUrl(item.thumb_image, 0)} className='img'
                                                             mode='aspectFill'/>
-                                                        <View className='big'><IconFont name='20_fangdayulan'
+                                                        <View className='big' onClick={(e)=>{
+                                                            e.stopPropagation();
+                                                            Taro.previewImage({
+                                                                current:item.thumb_image,
+                                                                urls:[item.thumb_image]
+                                                            })
+                                                        }}><IconFont name='20_fangdayulan'
                                                                                         size={40}/></View>
                                                     </View>
                                                     <View className='party'>

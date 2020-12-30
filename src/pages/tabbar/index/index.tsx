@@ -474,7 +474,7 @@ class Index extends Component<any, IndexState> {
             <View className='index'>
                 {
                     toast.status
-                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={3000} onClose={this.toastClose} />
+                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
                         : null
                 }
                 <LoginModal isTabbar />

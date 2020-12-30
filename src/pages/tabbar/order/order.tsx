@@ -431,7 +431,8 @@ export default class Order extends Component<any,{
 
                 </View>
                 </ScrollView>
-                <PayWayModal
+                {
+                    showPayWayModal?<PayWayModal
                     isShow={showPayWayModal}
                     totalPrice={parseFloat(order_price+"")>0?parseFloat(order_price+"").toFixed(2):"0.00"}
                     order_sn={order_sn}
@@ -443,7 +444,8 @@ export default class Order extends Component<any,{
                         setTimeout(() => {
                             Taro.showTabBar();
                         }, 500);
-                    }}/>
+                    }}/>:null
+                }
                 <TipModal isShow={showCancelModal} tip="是否要取消订单" cancelText="不取消" okText="取消订单" onCancel={()=>{
                     this.setState({
                         showCancelModal:false

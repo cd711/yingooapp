@@ -39,7 +39,7 @@ export class UserStore {
     public get isLogin() {
         return this.id != "" && this.id != null && this.id != 0
     }
-
+    
     @action
     public setInfo(info) {
         if (info.birthday == null || info.birthday == "") {

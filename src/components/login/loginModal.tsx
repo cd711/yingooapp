@@ -19,13 +19,18 @@ class LoginModal extends Component<{
                 this.setState({
                     show:change.newValue
                 })
+                if (change.newValue) {
+                    console.log("显示了.....____",Taro.getCurrentPages()[0].route)
+                }
             }
         });
+
         const {showLoginModal,isLogin} = userStore;
         if (isLogin && showLoginModal) {
             userStore.showLoginModal = false;
         }
     }
+
     componentDidHide(){
         const {showLoginModal} = userStore;
         if (showLoginModal) {

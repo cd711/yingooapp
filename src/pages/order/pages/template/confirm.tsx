@@ -185,17 +185,12 @@ export default class Confirm extends Component<any, {
         }
         return temp
     }
-    //加购信息
-    setABCacheData = (res: any) => {
-        // setTempDataContainer()
 
-    }
     componentDidShow() {
         console.log("componentDidShow")
         const {data: {address}} = this.state;
         if (this.tempContainerKey != "") {
             getTempDataContainer(this.tempContainerKey, (value) => {
-                console.log("加购回来",value)
                 if (value != null && value != undefined && value) {
                     const currentAddBuyItem = value.currentAddBuyItem
                     if (value.isOk && currentAddBuyItem.checked == false) {
