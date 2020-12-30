@@ -15,7 +15,6 @@ import {
     ossUrl,
     sleep,
     urlEncode,
-    setTempDataContainer,
     updateLocalCoupon,
 
 } from "../../../utils/common";
@@ -29,6 +28,7 @@ import BannerSwiper from "./bannerSwiper";
 import Curtain from "../../../components/curtain";
 import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
+import {AtToast} from "taro-ui";
 
 
 interface IndexState {
@@ -37,7 +37,8 @@ interface IndexState {
     showUnc: boolean;
     cateInfo: any[];
     scrolling: boolean;
-    curtain: any
+    curtain: any;
+    toast: any;
 }
 
 @inject("userStore")
@@ -57,7 +58,12 @@ class Index extends Component<any, IndexState> {
             showUnc: false,
             cateInfo: [],
             scrolling: false,
-            curtain: {}
+            curtain: {},
+            toast: {
+                title: "",
+                icon: "",
+                status: false
+            }
         }
 
     }
@@ -263,12 +269,36 @@ class Index extends Component<any, IndexState> {
         if (!notNull(coupon) && Object.keys(coupon).length > 0) {
             try {
                 await api("app.coupon/add", {id: coupon.id});
+                this.setState({
+                    toast: {
+                        title: "领取成功",
+                        icon: require("../../../source/t_succ.png"),
+                        status: true
+                    }
+                })
             }catch (e) {
                 console.log("领取优惠券失败：", e)
+                this.setState({
+                    toast: {
+                        title: e,
+                        icon: require("../../../source/t_fail.png"),
+                        status: true
+                    }
+                })
             }
         }
+        await sleep(3000)
         Taro.navigateTo({
             url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}`
+        })
+    }
+
+    toastClose = () => {
+        this.setState({
+            toast: {
+                ...this.state.toast,
+                status: false
+            }
         })
     }
 
@@ -411,9 +441,14 @@ class Index extends Component<any, IndexState> {
     }
 
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain, toast} = this.state;
         return (
             <View className='index'>
+                {
+                    toast.status
+                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={3000} onClose={this.toastClose} />
+                        : null
+                }
                 <LoginModal isTabbar />
                 <ScrollView scrollY
                             onScroll={this.onScroll}
