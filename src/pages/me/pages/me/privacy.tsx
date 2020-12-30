@@ -4,10 +4,14 @@ import {AtNavBar} from "taro-ui";
 import {api} from "../../../../utils/net";
 import "./privacy.less";
 import {deviceInfo} from "../../../../utils/common";
+import page from "../../../../utils/ext";
 
 interface PrivacyState{
     privacyTxt: string
 }
+@page({
+    share: true
+})
 export default class Privacy extends Component<any, PrivacyState> {
     config: Config = {
         navigationBarTitleText: `${this.$router.params.pageType === "privacy" ? "隐私政策" : "用户协议"}`,

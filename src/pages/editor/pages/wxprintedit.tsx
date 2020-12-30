@@ -8,6 +8,7 @@ import config from "../../../config";
 import {getURLParamsStr, urlEncode} from "../../../utils/common";
 import {getToken} from "../../../utils/net";
 import moment from "moment";
+import page from "../../../utils/ext";
 
 
 class Store {
@@ -25,6 +26,9 @@ interface PrintEditState {
     textInfo: any
 }
 @observer
+@page({
+    share:true
+})
 export default class PrintEdit extends Component<any, PrintEditState> {
 
     public store = new Store();

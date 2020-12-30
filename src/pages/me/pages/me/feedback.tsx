@@ -4,10 +4,14 @@ import Taro, {useState} from "@tarojs/taro";
 import IconFont from "../../../../components/iconfont";
 import UploadFile from "../../../../components/Upload/Upload";
 import "./feedback.less";
-import {deviceInfo} from "../../../../utils/common";
+import {deviceInfo, shareAppExtends} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 
 const Feedback: Taro.FC<any> = (_) => {
+
+    Taro.useShareAppMessage(() => {
+        return shareAppExtends()
+    })
 
     const feedBackArr = [
         {key: 1, name: "页面闪退", icon: "24_yemianshantui"},

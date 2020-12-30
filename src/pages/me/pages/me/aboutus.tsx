@@ -5,7 +5,12 @@ import IconFont from "../../../../components/iconfont";
 import "./aboutus.less";
 import copy from "copy-to-clipboard";
 import {deviceInfo} from "../../../../utils/common";
+import page from "../../../../utils/ext";
 
+
+@page({
+    share:true
+})
 export default class Aboutus extends Component<any, any> {
 
     config: Config = {

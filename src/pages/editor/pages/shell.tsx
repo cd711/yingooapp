@@ -16,6 +16,7 @@ import LoadMore from "../../../components/listMore/loadMore";
 import config from "../../../config";
 import wx from 'weixin-js-sdk'
 import TipModal from "../../../components/tipmodal/TipModal";
+import page from "../../../utils/ext";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -1330,6 +1331,9 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 }
 
 @observer
+@page({
+    share:true
+})
 export default class Shell extends Component<{}, {
     size?: { width: string | number; height: string | number };
     data?: number;

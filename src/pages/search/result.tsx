@@ -4,7 +4,15 @@ import {View, Image, ScrollView} from "@tarojs/components";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
-import {deviceInfo, fixStatusBarHeight, getSpecialRouter, getURLParamsStr, ossUrl, urlEncode} from "../../utils/common";
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    getSpecialRouter,
+    getURLParamsStr,
+    ossUrl,
+    shareAppExtends,
+    urlEncode
+} from "../../utils/common";
 
 const SearchResult:Taro.FC<any> = () => {
 
@@ -42,6 +50,10 @@ const SearchResult:Taro.FC<any> = () => {
             setStatus("more")
         }
     }
+
+    Taro.useShareAppMessage(() => {
+        return shareAppExtends()
+    })
 
     useEffect(() => {
         getList({

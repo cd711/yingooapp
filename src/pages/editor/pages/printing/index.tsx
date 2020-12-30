@@ -8,7 +8,7 @@ import {
     getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
-    notNull,
+    notNull, shareAppExtends,
     sleep,
     urlEncode
 } from "../../../../utils/common";
@@ -99,6 +99,10 @@ const Index: Taro.FC<any> = () => {
 
         getBasicInfo()
 
+    })
+
+    Taro.useShareAppMessage(() => {
+        return shareAppExtends()
     })
 
     const selectSize = (id, attr) => {
