@@ -39,23 +39,13 @@
     }
     .address-part-has{
         position: relative;
-        height: 164px;
-        .backimg{
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            width: 100vw;
-            height: 164px;
-        }
         .address{
-            position: absolute;
-            z-index: 10;
             display: flex;
             align-items: center;
             padding: 30px 32px;
             width: 100vw;
             box-sizing: border-box;
+            background: linear-gradient(180deg, rgba(255, 73, 102, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
             .icon{
                 margin-right: 22px;
             }
@@ -86,6 +76,11 @@
                 margin-left: auto;
                 margin-right: 0;
             }
+        }
+        .address_line{
+            width: 100%;
+            height: 6px;
+            display: flex;
         }
     }
     .address-part{

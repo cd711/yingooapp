@@ -243,7 +243,7 @@ class Index extends Component<any, IndexState> {
     }
 
     updateLocalCoupon = (id) => {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             try {
                 const local = Taro.getStorageSync(`${userStore.id}_local_coupon`);
                 if (local) {

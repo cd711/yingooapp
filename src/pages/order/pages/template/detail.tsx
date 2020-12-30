@@ -4,7 +4,7 @@ import './detail.less';
 import IconFont from '../../../../components/iconfont';
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx';
-import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl, urlDeCode} from '../../../../utils/common'
+import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl, setTempDataContainer} from '../../../../utils/common'
 
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from '../../../../store/user';
@@ -137,6 +137,7 @@ export default class Detail extends Component<{}, {
                 tpl_id: currentItem.id,
                 cid: currentItem.category_id
             })
+            setTempDataContainer("product_preview_sku",null,()=>{});
         } else {
             userStore.showLoginModal = true;
         }

@@ -11,7 +11,6 @@ import Counter from '../../../../components/counter/counter';
 import FloatModal from '../../../../components/floatModal/FloatModal';
 import Ticket from '../../../../components/ticket/Ticket';
 import {
-    convertClassName,
     deviceInfo,
     fixStatusBarHeight,
     getTempDataContainer,
@@ -25,6 +24,7 @@ import AddBuy from '../../../../components/addbuy/addbuy';
 import LoginModal from '../../../../components/login/loginModal';
 import {observe} from 'mobx';
 import photoStore from "../../../../store/photo";
+import Fragment from '../../../../components/Fragment';
 
 @inject("userStore", "templateStore")
 @observer
@@ -73,6 +73,9 @@ export default class Confirm extends Component<any, {
     private tempContainerKey = "";
     private initPayWayModal = false;
     componentDidMount() {
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku",null,()=>{});
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".bottom").boundingClientRect((status_react) => {
@@ -193,17 +196,20 @@ export default class Confirm extends Component<any, {
         if (this.tempContainerKey != "") {
             getTempDataContainer(this.tempContainerKey, (value) => {
                 console.log("加购回来",value)
-                const currentAddBuyItem = value.currentAddBuyItem
-                if (value != null && value.isOk && currentAddBuyItem.checked == false) {
-                    this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
-                }else{
-                    const temp = value.mainProduct.merge_products.filter((item)=>{
-                        return item.product.id == currentAddBuyItem.id
-                    })
-                    this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+                if (value != null && value != undefined && value) {
+                    const currentAddBuyItem = value.currentAddBuyItem
+                    if (value.isOk && currentAddBuyItem.checked == false) {
                         this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
-                    });
+                    }else{
+                        const temp = value.mainProduct.merge_products.filter((item)=>{
+                            return item.product.id == currentAddBuyItem.id
+                        })
+                        this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+                            this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
+                        });
+                    }
                 }
+
             })
         }
         if (!isEmpty(address) && !isEmpty(templateStore.address)) {
@@ -638,7 +644,7 @@ export default class Confirm extends Component<any, {
                                 url: `/pages/me/pages/me/address/index?t=select&id=${address.id}`
                             })
                         }}>
-                            <Image src={require('../../../../source/addressBackground.png')} className='backimg'/>
+                            {/* <Image src={require('../../../../source/addressBackground.png')} className='backimg'/> */}
                             <View className='address'>
                                 <View className='icon'><IconFont name='20_dingwei' size={40} color='#FF4966'/></View>
                                 <View className='info'>
@@ -650,6 +656,7 @@ export default class Confirm extends Component<any, {
                                 </View>
                                 <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
                             </View>
+                            <Image src={require("../../../../source/address_part.png")} className='address_line'/>
                         </View> : <View className='address-part' onClick={() => {
                             Taro.navigateTo({
                                 url: '/pages/me/pages/me/address/index?t=select'
@@ -662,7 +669,7 @@ export default class Confirm extends Component<any, {
 
                     {
                         data.orders && data.orders.map((item) => (
-                            <View key={item.pre_order_id}>
+                            <Fragment key={item.pre_order_id}>
                                 <View className='goods-info'>
                                     <View className='title'>
                                         <Text className='txt'>商品信息</Text>
@@ -805,7 +812,7 @@ export default class Confirm extends Component<any, {
                                             className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "00.00"}</Text>
                                     </View>
                                 </View>
-                            </View>
+                            </Fragment>
                         ))
                     }
                 </ScrollView>

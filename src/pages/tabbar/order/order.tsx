@@ -93,7 +93,7 @@ export default class Order extends Component<any,{
         }
     }
     componentDidShow(){
-        setTempDataContainer("product_preview_sku",null,()=>{});
+        // setTempDataContainer("product_preview_sku",null,()=>{});
         console.log(Taro.getApp().tab,this.$router.params);
         const {tab} = Taro.getApp();
         if (tab>=0) {
@@ -315,7 +315,13 @@ export default class Order extends Component<any,{
                                             }}>
                                                 <View className='order-img'>
                                                     <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
-                                                    <View className='big'><IconFont name='20_fangdayulan' size={40}/></View>
+                                                    <View className='big' onClick={(e)=>{
+                                                        e.stopPropagation();
+                                                        Taro.previewImage({
+                                                            current:product.image,
+                                                            urls:[product.image]
+                                                        })
+                                                    }}><IconFont name='20_fangdayulan' size={40}/></View>
                                                 </View>
                                                 <View className='order-name'>
                                                     <Text className='name'>{product.attributes}</Text>
@@ -330,16 +336,22 @@ export default class Order extends Component<any,{
                                     )):<View className='order-preview'>
                                         {
                                             item.products.map((product,index)=>(
-                                                <View style={`width: ${Taro.pxTransform(160)};height: ${Taro.pxTransform(160)};margin-right: 10px;padding: 24rpx 32rpx;`}>
+                                                <View style={`width: ${Taro.pxTransform(160)};height: ${Taro.pxTransform(160)};`}>
                                                     {
                                                         index<3?<View className='order-img' key={product.product_id} onClick={()=>{
-                                                            Taro.navigateTo({
-                                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
-                                                            })
-                                                        }}>
-                                                        <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
-                                                        <View className='big'><IconFont name='20_fangdayulan' size={40}/></View>
-                                                    </View>:null
+                                                                Taro.navigateTo({
+                                                                    url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                                })
+                                                            }}>
+                                                            <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
+                                                            <View className='big' onClick={(e)=>{
+                                                                e.stopPropagation();
+                                                                Taro.previewImage({
+                                                                    current:product.image,
+                                                                    urls:item.products.map((it)=>it.image)
+                                                                })
+                                                            }}><IconFont name='20_fangdayulan' size={40}/></View>
+                                                        </View>:null
                                                     }
                                                     
                                                 </View>
@@ -383,6 +395,7 @@ export default class Order extends Component<any,{
                                                 })
                                                 return;
                                             }
+                                            Taro.hideTabBar();
                                             this.setState({
                                                 order_price:item.order_price,
                                                 order_sn:item.order_sn,
@@ -427,6 +440,9 @@ export default class Order extends Component<any,{
                         this.setState({
                             showPayWayModal:false
                         })
+                        setTimeout(() => {
+                            Taro.showTabBar();
+                        }, 500);
                     }}/>
                 <TipModal isShow={showCancelModal} tip="是否要取消订单" cancelText="不取消" okText="取消订单" onCancel={()=>{
                     this.setState({

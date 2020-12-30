@@ -24,7 +24,9 @@ export default class Setting extends Component<any,{
             tipModalShow:false
         }
     }
-
+    componentDidMount(){
+        console.log(userStore.mobile)
+    }
 
 
     render() {
@@ -90,7 +92,7 @@ export default class Setting extends Component<any,{
                 </View>
                 <View className='alist'>
                     <Text className='title'>其他方式登录</Text>
-                    <View className='item' onClick={()=>{
+                    {/* <View className='item' onClick={()=>{
                         this.setState({
                             tipModalShow:true
                         })
@@ -100,12 +102,20 @@ export default class Setting extends Component<any,{
                             <Text className='rtxt'>8888888</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
-                    </View>
-                    <View className='item'>
+                    </View> */}
+                    <View className='item' onClick={()=>{
+                        Taro.showToast({
+                            title:'解绑功能开发中',
+                            icon:'none'
+                        })
+                        // this.setState({
+                        //     tipModalShow:true
+                        // })
+                    }}>
                         <Text className='name'>微信</Text>
                         <View className='right'>
-                            <Image src={require('../../../../source/defaultAvatar.png')} className='rimg' />
-                            <Text className='rtxt'>156****8888</Text>
+                            <Image src={userStore.isLogin?userStore.avatar:require('../../../../source/defaultAvatar.png')} className='rimg' />
+                            <Text className='rtxt'>{userStore.nickname}</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>
                     </View>
