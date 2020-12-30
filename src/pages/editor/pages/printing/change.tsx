@@ -210,7 +210,6 @@ const PrintChange: Taro.FC<any> = () => {
             } else if (router.params.detail && router.params.detail === "t") {  // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
                 await getRouterParams([], true);
                 params = {...photoStore.photoProcessParams}
-                params
                 setDetailStatus(true)
             } else {
                 params = await photoStore.getServerParams({setLocal: true});
@@ -220,7 +219,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
 
 
-        console.log("读取的photo params：", JSON.parse(JSON.stringify(params)))
+        console.log("读取的photo params：", params)
 
         const pix = photoStore.photoProcessParams.pictureSize;
         _imgstyle.current = photoStore.photoProcessParams.photoStyle
