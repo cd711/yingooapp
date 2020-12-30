@@ -15,9 +15,13 @@ import {inject, observer} from '@tarojs/mobx'
 import {userStore} from '../../../store/user';
 import { observe } from 'mobx';
 import LoginModal from "../../../components/login/loginModal";
+import page from '../../../utils/ext'
 
 @inject("userStore")
 @observer
+@page({
+    share:true
+})
 export default class Cart extends Component<{}, {
     source: any;
     allSelected: boolean;

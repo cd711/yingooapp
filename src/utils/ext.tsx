@@ -23,7 +23,8 @@ const page = (option?: {
             clazz.onShareAppMessage = function() {
                 return {
                     title: "免费照片冲印个性化定制手机壳",
-                    path: "/pages/tabbar/index/index"
+                    path: "/pages/tabbar/index/index",
+                    imageUrl:"https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m"
                 };
             };
         }
