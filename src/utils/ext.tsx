@@ -1,7 +1,5 @@
 import Taro from "@tarojs/taro";
-import {userStore} from "../store/user";
-import {is_weixin} from "./common";
-import {api} from "./net";
+
 
 const page = (option?: {
     share:boolean
@@ -25,7 +23,7 @@ const page = (option?: {
             clazz.onShareAppMessage = function() {
                 return {
                     title: "四喜优享",
-                    path: "/pages/index/index"
+                    path: "/pages/tabbar/index/index"
                 };
             };
         }
