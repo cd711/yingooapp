@@ -163,7 +163,7 @@ class Index extends Component<any, IndexState> {
         })
     }
     componentDidShow() {
-        setTempDataContainer("product_preview_sku",null,()=>{});
+
     }
     onItemClick = (item, _) => {
         console.log(item)
