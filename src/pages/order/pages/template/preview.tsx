@@ -7,7 +7,7 @@ import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
 import { PlaceOrder } from './place';
 import {userStore} from "../../../../store/user";
-import { deviceInfo,fixStatusBarHeight, getTempDataContainer , notNull, urlEncode,getURLParamsStr} from '../../../../utils/common';
+import { deviceInfo,fixStatusBarHeight, getTempDataContainer , notNull, urlEncode,getURLParamsStr,setTempDataContainer} from '../../../../utils/common';
 import LoginModal from '../../../../components/login/loginModal';
 
 
@@ -82,7 +82,11 @@ export default class Preview extends Component<any, {
             window.addEventListener("message", this.onMsg);
         }
     }
-
+    componentWillUnmount(){
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku",null,()=>{});
+        }
+    }
     getWorkInfo = (id) => {
         const par = this.$router;
         Taro.showLoading({title:"加载中..."});
