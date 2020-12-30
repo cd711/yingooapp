@@ -15,7 +15,7 @@ import {
     ossUrl,
     sleep,
     urlEncode,
-    setTempDataContainer
+    setTempDataContainer,
     updateLocalCoupon,
 
 } from "../../../utils/common";
@@ -162,9 +162,11 @@ class Index extends Component<any, IndexState> {
 
         })
     }
+
     componentDidShow() {
         setTempDataContainer("product_preview_sku",null,()=>{});
     }
+
     onItemClick = (item, _) => {
         console.log(item)
         if (notNull(userStore.id) && item.info.category.type === "photo") {
