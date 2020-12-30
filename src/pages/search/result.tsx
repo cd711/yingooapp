@@ -51,9 +51,11 @@ const SearchResult:Taro.FC<any> = () => {
         }
     }
 
-    Taro.useShareAppMessage(() => {
-        return shareAppExtends()
-    })
+    if (deviceInfo.env === "weapp") {
+        Taro.useShareAppMessage(() => {
+            return shareAppExtends()
+        })
+    }
 
     useEffect(() => {
         getList({
