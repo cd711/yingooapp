@@ -56,15 +56,16 @@ export default class Login extends Component<{}, {
         //         })
         //     }
         // }
-        if (process.env.TARO_ENV != 'h5') {
+        // if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react) => {
+                    console.log(nav_rect.height, status_react.height)
                     this.setState({
-                        centerPartyHeight: Taro.getSystemInfoSync().windowHeight - nav_rect.height - status_react.height
+                        centerPartyHeight: deviceInfo.windowHeight - nav_rect.height - (deviceInfo.env === "weapp" ? 50 : 120)
                     });
                 }).exec();
             }).exec();
-        }
+        // }
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue) {
                 this.requestData();
@@ -197,7 +198,9 @@ export default class Login extends Component<{}, {
                     {
                         list.length > 0 ?
                             <ScrollView scrollY className='ticket_list_scroll' onScrollToLower={this.onLoadMore}
-                                        style={deviceInfo.env === 'h5' ? "" : `height:${centerPartyHeight}px`}>
+                                        style={{
+                                            height: `${centerPartyHeight}px`
+                                        }}>
                                 <View className='ticket_list'>
                                     {
                                         list.map((item) => (
@@ -228,10 +231,8 @@ export default class Login extends Component<{}, {
                                             </View>
                                         ))
                                     }
-                                    {
-                                        listLoading ? <LoadMore status={loadStatus}/> : null
-                                    }
-                                    <View style={{height: 16}}/>
+
+                                    {/*<View style={{height: 16}}/>*/}
                                 </View>
                             </ScrollView> : (listLoading ? <LoadMore status="loading"/> : <View className='black'>
                                 <Image src={require("../../../source/ticket_black.svg")} className='img'/>
