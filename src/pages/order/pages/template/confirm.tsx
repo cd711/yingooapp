@@ -25,9 +25,13 @@ import LoginModal from '../../../../components/login/loginModal';
 import {observe} from 'mobx';
 import photoStore from "../../../../store/photo";
 import Fragment from '../../../../components/Fragment';
+import page from '../../../../utils/ext'
 
 @inject("userStore", "templateStore")
 @observer
+@page({
+    share:true
+})
 export default class Confirm extends Component<any, {
     showTickedModal: boolean;
     showPayWayModal: boolean;
@@ -302,11 +306,11 @@ export default class Confirm extends Component<any, {
             prepay_id: data.prepay_id,
             remarks: ""
         }).then((res) => {
-            // console.log(res);
+            console.log("ccc",res);
             Taro.hideLoading();
             if (res.status > 0) {
                 Taro.navigateTo({
-                    url: `/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn + "-" + "0")}`
+                    url: `/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn + "-" + "0")}&pay_order_sn=${res.order_sn}`
                 });
                 return;
             }
@@ -427,12 +431,14 @@ export default class Confirm extends Component<any, {
         })
     }
     onResult = (res) => {
+        console.log("支付订单号码:",res.data)
         this.setState({
             showPayWayModal: false,
         });
         let title = '';
         Taro.getApp().tab = 1;
         let url = '/pages/tabbar/order/order?tab=1';
+        console.log("支付订单号码:",res.data)
         switch (res.code) {
             case 1:
                 title = '支付成功';

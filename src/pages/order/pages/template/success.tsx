@@ -43,9 +43,17 @@ export default class Success extends Component<{},{
         const {pay_order_sn,status} = this.$router.params;
         if (status && pay_order_sn) {
             const s = Base64.decode(status);
+            console.log(s)
             if (s && s.length && s.length>0) {
                 const t = s.split("-");
+                
                 if (t.length == 2) {
+                    if (parseInt(t[1]+"")==0) {
+                        this.setState({
+                            state:true
+                        });
+                        return
+                    }
                     Taro.showLoading({title:'加载中...'})
                     this.getOrderStatus(pay_order_sn);
                     this.setState({
@@ -108,7 +116,7 @@ export default class Success extends Component<{},{
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={()=>{
                         Taro.getApp().tab = 1;
-                        jumpUri('/pages/tabbar/order/order=1',true);
+                        jumpUri('/pages/tabbar/order/order',true);
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314' />
                     </View>

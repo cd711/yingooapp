@@ -8,10 +8,13 @@ import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl, setTempDa
 
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from '../../../../store/user';
+import page from '../../../../utils/ext'
 
 @inject("templateStore", "userStore")
 @observer
-
+@page({
+    share:true
+})
 export default class Detail extends Component<{}, {
     isLike: boolean;
     likeList: Array<any>;
