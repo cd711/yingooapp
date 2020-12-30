@@ -1,6 +1,8 @@
 import {notNull} from "../utils/common";
 
 interface FixedTimeProps {
+    id: string | number,
+    couponId: string | number,
     time: string,
     type: string,
     unit: string,
