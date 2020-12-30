@@ -101,7 +101,7 @@ const PayWayModal: Taro.FC<{
                 duration:2000
             });
             setTimeout(() => {
-                Taro.navigateTo({
+                Taro.switchTab({
                     url:'/pages/tabbar/order/order?tab=0'
                 })
             }, 2000);
@@ -171,7 +171,7 @@ const PayWayModal: Taro.FC<{
                             duration:2000
                         });
                         setTimeout(() => {
-                            Taro.navigateTo({
+                            Taro.switchTab({
                                 url:'/pages/tabbar/order/order?tab=0'
                             })
                         }, 2000);
@@ -185,7 +185,7 @@ const PayWayModal: Taro.FC<{
                         duration:2000
                     });
                     setTimeout(() => {
-                        Taro.navigateTo({
+                        Taro.switchTab({
                             url:'/pages/tabbar/order/order?tab=0'
                         })
                     }, 2000);
@@ -221,7 +221,6 @@ const PayWayModal: Taro.FC<{
                 pay_method:'miniapp'
             }
             payOrder(d,(res)=>{
-                console.log(res);
                 Taro.requestPayment({
                     timeStamp: res.payinfo.timeStamp,
                     nonceStr: res.payinfo.nonceStr,

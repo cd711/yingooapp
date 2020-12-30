@@ -15,7 +15,7 @@ import {
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
-
+import page from '../../../../utils/ext'
 interface TagData {
     list: Array<any>,
     size: number,
@@ -29,7 +29,9 @@ interface TagList {
 
 @inject("templateStore")
 @observer
-
+@page({
+    share:true
+})
 export default class Template extends Component<any, {
     switchActive: number;
     cates: Array<any>;
