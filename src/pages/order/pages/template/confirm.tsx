@@ -143,10 +143,8 @@ export default class Confirm extends Component<any, {
                 data = {...data, print_images: JSON.stringify(parintImges)}
             }
 
-            console.log("组合的数据：", data)
             Taro.showLoading({title: "加载中"});
             api("app.order_temp/add", data).then((res) => {
-                console.log("生成的临时订单",res);
                 this.initPayWayModal = true;
                 Taro.hideLoading();
                 if (deviceInfo.env == 'h5') {
@@ -258,9 +256,9 @@ export default class Confirm extends Component<any, {
 
             Taro.hideLoading();
             setTimeout(() => {
-                window.history.replaceState(null, null, '/pages/tabbar/me/me');
                 Taro.getApp().tab = 1;
                 if (deviceInfo.env == 'h5') {
+                    window.history.replaceState(null, null, '/pages/tabbar/me/me');
                     window.location.href = '/pages/tabbar/order/order?tab=1';
                 }else{
                     Taro.switchTab({
