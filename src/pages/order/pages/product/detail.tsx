@@ -582,7 +582,7 @@ export default class Login extends Component<{}, {
                     </View>
                 </View>
                 {
-                    this.modalInit ?
+                    placeOrderShow ?
                         <PlaceOrder selectedSkuId={this.state.sku ? this.state.sku.id : 0} maxBuyNum={maxBuyNum}
                                     productType={data && data.product_type ? data.product_type : ""}
                                     defalutSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}

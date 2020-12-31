@@ -29,7 +29,7 @@ const AddBuy: Taro.FC<{
                 onItemClick && onItemClick()
             }}>
             <Checkboxs isChecked={isChecked} disabled/>
-            <Image className='pre_image' src ={ossUrl(product && product.thumb_image?product.thumb_image:"",0)} />
+            <Image className='pre_image' src={ossUrl(product && product.thumb_image?product.thumb_image:"",0)} />
 
             <View className='xy_add_buy_center'>
                 <View className='xy_p_title'>
