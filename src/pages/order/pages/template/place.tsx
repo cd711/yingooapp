@@ -18,9 +18,6 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     
     let currentSku = null;
 
-    useEffect(()=>{
-        console.log(skus,"哈哈哈哈")
-    },[skus])
     const initData = (skus,sku,attrItems:Array<Array<any>>) => {
         const ts = [...skus];
         let currentValue = "";
@@ -53,8 +50,8 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     }
 
     const selectAtteItems = (sku,attrItems:Array<Array<any>>,skusa) => {
-        const items = attrItems.map((value)=>{
-            return value.map((val)=>{
+        const items = attrItems.map((value,i)=>{
+            return value.map((val,j)=>{
                 val["selected"] = false;
                 val["over"] = false;
                 if (defalutSelectIds && defalutSelectIds.length==0) {
@@ -68,22 +65,30 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                         }
                     }
                 }
+                if (data.tpl_product_type == "photo" && defalutSelectIds && defalutSelectIds.length>0) {
+                    if (defalutSelectIds.indexOf(val.id)!=-1) {
+                        val["selected"] = true;
+                    }
+                }
                 return val;
             });
         });
+
         setAttrItems(items);
-        if (defalutSelectIds && defalutSelectIds.length>0) {
-            for (let i = 0;i<data.attrItems.length;i++) {
-                const item = data.attrItems[i];
-                for (let j = 0;j<item.length;j++) {
-                    const tag = item[j];
-                    if (defalutSelectIds.indexOf(tag.id)!=-1) {
-                        onSelectItem(i,j,true,items,skusa);
+        if (data.tpl_product_type != "photo") {
+            if (defalutSelectIds && defalutSelectIds.length>0) {
+                for (let i = 0;i<data.attrItems.length;i++) {
+                    const item = data.attrItems[i];
+                    for (let j = 0;j<item.length;j++) {
+                        const tag = item[j];
+                        if (defalutSelectIds.indexOf(tag.id)!=-1) {
+                            onSelectItem(i,j,true,items,skusa);
+                        }
                     }
                 }
+                const names = getNames(items);
+                onClose && onClose(names)
             }
-            const names = getNames(items);
-            onClose && onClose(names)
         }
     }
 
@@ -209,17 +214,17 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
             });
             data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
             data.image && setImgs(data.image);
-
-
         }
+
     }, [data]);
     const getNames = (attrItems:Array<any>) => {
         let names = [];
-        for (let i = 0; i<attrItems.length; i++) {
+        for (let i = 0; i<data.attrGroup.length; i++) {
             const element = attrItems[i];
             let tid = "";
             for (let j = 0; j<element.length;j++) {
                 if(element[j]["selected"]){
+                    console.log(element[j])
                     tid = element[j].name;
                     break;
                 }
@@ -228,10 +233,12 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         }
         let n = 0;
         const ns = [];
+        console.log("names",names)
         for (let i = 0; i<names.length; i++) {
             const item = names[i];
             if (item == "") {
                 n += 1;
+
                 ns.push(data.attrGroup[i].name)
             }
         }
@@ -245,6 +252,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     }
     const _onClose = () => {
         const names = getNames(attrItems);
+        console.log(names)
         onClose && onClose(names)
     }
     return <View className='placeOrder'>

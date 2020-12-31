@@ -120,6 +120,11 @@ export default class Login extends Component<{}, {
             }).then((res) => {
                 Taro.hideLoading();
                 this.modalInit = true;
+                res.attrGroup = res.attrGroup.filter((item)=>{
+                    console.log(item)
+                    return item.special_show != "photonumber"
+                })
+                console.log(res.attrGroup)
                 if (pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`, (value) => {
                         if (value != null) {
@@ -306,7 +311,7 @@ export default class Login extends Component<{}, {
 
     onPhotoSelect = async ({ids, imgs, attrs}) => {
 
-        const {data, sku} = this.state;
+        const {data, sku,defalutSkuIds} = this.state;
         this.setState({showPicSelector: false})
         Taro.showLoading({title: "请稍后...."})
 
@@ -330,12 +335,21 @@ export default class Login extends Component<{}, {
                 }
             })
             Taro.hideLoading()
-            const str = getURLParamsStr(urlEncode({
+            const tmp = {
                 id: data.id,
                 cid: data.tpl_category_id,
-                sku_id: sku.id,
-                detail: "t"
-            }));
+                sku_id: sku == null && defalutSkuIds.length>0 && data.attrGroup.length != data.attrItems.length?defalutSkuIds.join(","):sku.id,
+            }
+
+            if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+                if (data.attrGroup.length != data.attrItems.length) {
+                    tmp["inc"] = "";
+                }
+            }
+            if (sku != null) {
+                tmp["detail"] = "t";
+            }
+            const str = getURLParamsStr(urlEncode(tmp));
             Taro.navigateTo({
                 url: `/pages/editor/pages/printing/change?${str}`
             })
@@ -542,11 +556,22 @@ export default class Login extends Component<{}, {
                                     <Button className='red-ok-btn' onClick={() => {
                                         const {sku, data} = this.state;
                                         console.log("当前类型：", data.tpl_product_type)
-                                        if (sku != null) {
-                                            if (!userStore.isLogin) {
-                                                userStore.showLoginModal = true;
-                                                return;
+                                        if (!userStore.isLogin) {
+                                            userStore.showLoginModal = true;
+                                            return;
+                                        }
+                                        if (data.tpl_product_type == "photo"){
+                                            if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+                                                console.log(defalutSkuIds);
+                                                if (data.attrGroup.length != data.attrItems.length) {
+                                                    this.modalInit = false
+                                                    this.setState({showPicSelector: true})
+                                                    return;
+                                                }
                                             }
+                                        }
+                                        if (sku != null) {
+
                                             setTempDataContainer("product_preview_sku", sku, (is) => {
                                                 if (is) {
                                                     if (data.tpl_product_type == "phone") {
@@ -660,13 +685,23 @@ export default class Login extends Component<{}, {
 
                             const {sku, data} = this.state;
                             console.log("当前类型：", data.tpl_product_type)
-
+                            if (!userStore.isLogin) {
+                                userStore.showLoginModal = true;
+                                return;
+                            }
+                            if (data.tpl_product_type == "photo"){
+                                if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+                                    console.log(defalutSkuIds);
+                                    if (data.attrGroup.length != data.attrItems.length) {
+                                        this.modalInit = false
+                                        this.setState({showPicSelector: true})
+                                        return;
+                                    }
+                                }
+                            }
                             if (sku != null) {
                                 // let url = ""
-                                if (!userStore.isLogin) {
-                                    userStore.showLoginModal = true;
-                                    return;
-                                }
+
                                 setTempDataContainer("product_preview_sku", sku, (is) => {
                                     if (is) {
                                         if (data.tpl_product_type == "phone") {
