@@ -27,7 +27,6 @@ import BannerSwiper from "./bannerSwiper";
 import Curtain from "../../../components/curtain";
 import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
-import {AtToast} from "taro-ui";
 import page from '../../../utils/ext'
 
 
@@ -38,7 +37,6 @@ interface IndexState {
     cateInfo: any[];
     scrolling: boolean;
     curtain: any;
-    toast: any;
 }
 
 @inject("userStore")
@@ -62,11 +60,6 @@ class Index extends Component<any, IndexState> {
             cateInfo: [],
             scrolling: false,
             curtain: {},
-            toast: {
-                title: "",
-                icon: "",
-                status: false
-            }
         }
 
     }
@@ -188,10 +181,6 @@ class Index extends Component<any, IndexState> {
         })
     }
 
-    componentDidShow() {
-
-    }
-
     onItemClick = (item, _) => {
         console.log(item)
         if (notNull(userStore.id) && item.info.category.type === "photo") {
@@ -285,39 +274,10 @@ class Index extends Component<any, IndexState> {
 
     singleProdAndReceiveCoupon = async (prod, coupon) => {
         console.log(prod)
-        if (!notNull(coupon) && Object.keys(coupon).length > 0) {
-            try {
-                await api("app.coupon/add", {id: coupon.id});
-                this.setState({
-                    toast: {
-                        title: "领取成功",
-                        icon: require("../../../source/t_succ.png"),
-                        status: true
-                    }
-                })
-            }catch (e) {
-                console.log("领取优惠券失败：", e)
-                this.setState({
-                    toast: {
-                        title: e,
-                        icon: require("../../../source/t_fail.png"),
-                        status: true
-                    }
-                })
-            }
-        }
-        await sleep(3000)
         Taro.navigateTo({
-            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}`
-        })
-    }
-
-    toastClose = () => {
-        this.setState({
-            toast: {
-                ...this.state.toast,
-                status: false
-            }
+            url: prod.info.jump_url
+                ? `${prod.info.jump_url}&coupon=${coupon.id}`
+                : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}&coupon=${coupon.id}`,
         })
     }
 
@@ -473,14 +433,9 @@ class Index extends Component<any, IndexState> {
     }
 
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain, toast} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain} = this.state;
         return (
             <View className='index'>
-                {
-                    toast.status
-                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
-                        : null
-                }
                 <LoginModal isTabbar />
                 <ScrollView scrollY
                             onScroll={this.onScroll}

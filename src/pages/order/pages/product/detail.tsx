@@ -4,12 +4,14 @@ import IconFont from '../../../../components/iconfont';
 import {
     deviceInfo,
     fixStatusBarHeight,
-    getTempDataContainer, getURLParamsStr, getUserKey,
+    getTempDataContainer,
+    getURLParamsStr,
+    getUserKey,
     jumpToEditor,
-    jumpToPrintEditor,
     notNull,
     ossUrl,
-    setTempDataContainer, urlEncode
+    setTempDataContainer,
+    urlEncode
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -19,6 +21,7 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from "../../../../store/user";
+import {AtToast} from "taro-ui";
 
 export default class Login extends Component<{}, {
     data: any,
@@ -32,6 +35,7 @@ export default class Login extends Component<{}, {
     defalutSkuIds: Array<number>,
     maxBuyNum: number;
     showPicSelector: boolean;
+    toast: any;
 }> {
 
     config: Config = {
@@ -51,7 +55,12 @@ export default class Login extends Component<{}, {
             centerPartyHeight: 550,
             defalutSkuIds: [],
             maxBuyNum: 0,
-            showPicSelector: false
+            showPicSelector: false,
+            toast: {
+                title: "",
+                icon: "",
+                status: false
+            }
         }
     }
 
@@ -59,8 +68,36 @@ export default class Login extends Component<{}, {
     private tempDataContainerKey = "";
     private modalInit = false;
 
+    receiveCoupon = async () => {
+        const {coupon} = this.$router.params;
+        if (notNull(coupon)) {
+            return
+        }
+        try {
+            await api("app.coupon/add", {id: coupon});
+            this.setState({
+                toast: {
+                    title: "领取成功",
+                    icon: require("../../../../source/t_succ.png"),
+                    status: true
+                }
+            })
+        } catch (e) {
+            console.log("领取优惠券失败：", e)
+            this.setState({
+                toast: {
+                    title: e,
+                    icon: require("../../../../source/t_fail.png"),
+                    status: true
+                }
+            })
+        }
+    }
+
     componentDidMount() {
-        setTempDataContainer("product_preview_sku",null,()=>{});
+        this.receiveCoupon()
+        setTempDataContainer("product_preview_sku", null, () => {
+        });
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".product_bottom_bar").boundingClientRect((status_react) => {
@@ -134,7 +171,7 @@ export default class Login extends Component<{}, {
                             }
                             this.setState({
                                 data: res,
-                                defalutSkuIds: result.default_attr_ids.map((item)=>parseInt(item+""))
+                                defalutSkuIds: result.default_attr_ids.map((item) => parseInt(item + ""))
                             })
                         })
                     } else {
@@ -267,7 +304,7 @@ export default class Login extends Component<{}, {
         }
     }
 
-    onPhotoSelect = async ({ ids, imgs, attrs }) => {
+    onPhotoSelect = async ({ids, imgs, attrs}) => {
 
         const {data, sku} = this.state;
         this.setState({showPicSelector: false})
@@ -310,6 +347,15 @@ export default class Login extends Component<{}, {
         }
     }
 
+    toastClose = () => {
+        this.setState({
+            toast: {
+                ...this.state.toast,
+                status: false
+            }
+        })
+    }
+
     render() {
         const {
             data,
@@ -320,16 +366,22 @@ export default class Login extends Component<{}, {
             centerPartyHeight,
             defalutSkuIds,
             maxBuyNum,
-            showPicSelector
+            showPicSelector,
+            toast
         } = this.state;
         const image: Array<any> = data && data.image && data.image.length > 0 ? data.image : [];
-        const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
+        // const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
         const tags_text: Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0, 4) : [];
         const attrGroup: Array<any> = data && !notNull(data.attrGroup) ? data.attrGroup : [];
         console.log()
         // @ts-ignore
         return (
             <View className='p_detail'>
+                {
+                    toast.status
+                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
+                        : null
+                }
                 {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
@@ -458,7 +510,7 @@ export default class Login extends Component<{}, {
                         {
                             showOkButton ? <View className='ops'>
                                 <Button className='red-ok-btn' onClick={() => {
-                                    
+
                                     if (!userStore.isLogin) {
                                         userStore.showLoginModal = true;
                                         return;
@@ -495,7 +547,7 @@ export default class Login extends Component<{}, {
                                                 userStore.showLoginModal = true;
                                                 return;
                                             }
-                                            setTempDataContainer("product_preview_sku",sku,(is)=>{
+                                            setTempDataContainer("product_preview_sku", sku, (is) => {
                                                 if (is) {
                                                     if (data.tpl_product_type == "phone") {
                                                         jumpToEditor({
@@ -509,9 +561,9 @@ export default class Login extends Component<{}, {
                                                     }
                                                 } else {
                                                     Taro.showToast({
-                                                        title:'服务器走丢啦,请稍后再试~',
-                                                        icon:'none',
-                                                        duration:1500
+                                                        title: '服务器走丢啦,请稍后再试~',
+                                                        icon: 'none',
+                                                        duration: 1500
                                                     });
                                                 }
                                             })
@@ -542,10 +594,10 @@ export default class Login extends Component<{}, {
                                             defalutSkuIds: []
                                         })
                                     }} onAddCart={() => {
-                                        if (!userStore.isLogin) {
-                                            userStore.showLoginModal = true;
-                                            return;
-                                        }
+                            if (!userStore.isLogin) {
+                                userStore.showLoginModal = true;
+                                return;
+                            }
                             const {sku, skuName, data, buyTotal} = this.state;
                             // const {attrGroup} = data;
                             // console.log(sku,skuName,buyTotal)
@@ -615,7 +667,7 @@ export default class Login extends Component<{}, {
                                     userStore.showLoginModal = true;
                                     return;
                                 }
-                                setTempDataContainer("product_preview_sku",sku,(is)=>{
+                                setTempDataContainer("product_preview_sku", sku, (is) => {
                                     if (is) {
                                         if (data.tpl_product_type == "phone") {
                                             jumpToEditor({
@@ -629,9 +681,9 @@ export default class Login extends Component<{}, {
                                         }
                                     } else {
                                         Taro.showToast({
-                                            title:'服务器走丢啦,请稍后再试~',
-                                            icon:'none',
-                                            duration:1500
+                                            title: '服务器走丢啦,请稍后再试~',
+                                            icon: 'none',
+                                            duration: 1500
                                         });
                                     }
                                 })
@@ -649,7 +701,7 @@ export default class Login extends Component<{}, {
                     showPicSelector
                         ? <View className="photo_picker_container">
                             <PhotosEle editSelect={showPicSelector} onClose={() => this.setState({showPicSelector: false})}
-                                     onPhotoSelect={this.onPhotoSelect}/>
+                                       onPhotoSelect={this.onPhotoSelect}/>
                         </View>
                         : null
                 }
