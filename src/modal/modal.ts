@@ -30,7 +30,7 @@ interface PhotoParamsPathArray {
 }
 export interface PhotoParamsPath {
     path: Array<PhotoParamsPathArray>;
-    sku: string | number;
+    sku: string;
     id: number | string;
 }
 export class PhotoParams {

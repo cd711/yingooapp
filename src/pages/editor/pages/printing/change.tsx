@@ -56,11 +56,17 @@ const PrintChange: Taro.FC<any> = () => {
     /**
      * 在首页活动页跳转过来后，要携带的sku_ID和分类ID，如果两者都在，就说明跳过了上一步选尺寸页面，
      * 需要重新初始化当前用户的 photo Key
-     * @param {Array} path 图片路径
-     * @param {boolean} forDetail  默认false， 为true就代表是从商品详情页跳转过来的，已经选好图片了, 此时的sku_id是所有规格都选好了的
+     * @param params {path: array, forDetail: boolean}
+     * path 图片路径
+     * forDetail  默认false， 为true就代表是从商品详情页跳转过来的，已经选好图片了, 此时的sku_id是所有规格都选好了的
      */
-    function getRouterParams(path = [], forDetail: boolean = false) {
+    function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean} = {}) {
         return new Promise<any>(async (resolve, reject) => {
+            const opt = {
+                path: params.path || [],
+                forDetail: params.forDetail || false,
+                incomplete: params.incomplete || false
+            }
             try {
                 if (!router.params.sku_id || !router.params.id) {
                     Taro.showToast({
@@ -77,7 +83,7 @@ const PrintChange: Taro.FC<any> = () => {
                         }
                     }
                     const obj = {
-                        path: forDetail ? [...photoStore.photoProcessParams.photo.path] : path,
+                        path: opt.forDetail ? [...photoStore.photoProcessParams.photo.path] : opt.path,
                         sku: router.params.sku_id,
                         id: router.params.id
                     };
@@ -208,9 +214,13 @@ const PrintChange: Taro.FC<any> = () => {
                     url: `/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`
                 })
             } else if (router.params.detail && router.params.detail === "t") {  // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
-                await getRouterParams([], true);
+                await getRouterParams({path: [], forDetail: true});
                 params = {...photoStore.photoProcessParams}
                 setDetailStatus(true)
+            } else if (router.params.inc) {
+                // 如果从商品详情页跳转过来，有inc(incomplete)字段，就说明sku_id是残缺的子项ID，就需要在onCreateOrder时判断是否已经选完了，选完就直接跳转
+                await getRouterParams({incomplete: true});
+                params = {...photoStore.photoProcessParams}
             } else {
                 params = await photoStore.getServerParams({setLocal: true});
             }
@@ -310,6 +320,47 @@ const PrintChange: Taro.FC<any> = () => {
         setSkus([...arr])
     }
 
+    const forIDJumpToDatail = async (skuId) => {
+        let count = 0;
+        photos.forEach(value => {
+            count += parseInt(value.count)
+        })
+
+        const data = {
+            skuid: skuId,
+            total: count,
+            page: "photo",
+            parintImges: photos.map(v => {
+                const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
+                if (v.hasRotate && v.hasRotate === true) {
+                    return {
+                        url: v.url,
+                        num: v.count,
+                        style: [pixArr[0], pixArr[1], 90].join(",")
+                    }
+                }
+                return {
+                    url: v.url,
+                    num: v.count,
+                    style: [pixArr[0], pixArr[1], 0].join(",")
+                }
+            })
+        }
+
+        try {
+
+            await photoStore.updateServerParams(photoStore.printKey, {
+                changeUrlParams: data
+            })
+            Taro.navigateTo({
+                url: `/pages/order/pages/template/confirm?skuid=${skuId}&total=${count}&page=photo`
+            })
+        } catch (e) {
+            console.log("本地存储失败：", e)
+
+        }
+    }
+
     const onCreateOrder = async () => {
 
         if (photos.length <= 0) {
@@ -318,44 +369,7 @@ const PrintChange: Taro.FC<any> = () => {
 
         if (detailStatus) {
             // 已选好所有规格，直接跳转
-            let count = 0;
-            photos.forEach(value => {
-                count += parseInt(value.count)
-            })
-
-            const data = {
-                skuid: router.params.sku_id,
-                total: count,
-                page: "photo",
-                parintImges: photos.map(v => {
-                    const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
-                    if (v.hasRotate && v.hasRotate === true) {
-                        return {
-                            url: v.url,
-                            num: v.count,
-                            style: [pixArr[0], pixArr[1], 90].join(",")
-                        }
-                    }
-                    return {
-                        url: v.url,
-                        num: v.count,
-                        style: [pixArr[0], pixArr[1], 0].join(",")
-                    }
-                })
-            }
-
-            try {
-
-                await photoStore.updateServerParams(photoStore.printKey, {
-                    changeUrlParams: data
-                })
-                Taro.navigateTo({
-                    url: `/pages/order/pages/template/confirm?skuid=${router.params.sku_id}&total=${count}&page=photo`
-                })
-            } catch (e) {
-                console.log("本地存储失败：", e)
-
-            }
+            forIDJumpToDatail(router.params.sku_id)
             return
         }
 
@@ -393,13 +407,33 @@ const PrintChange: Taro.FC<any> = () => {
                     }
                 }
             } else {
-                setSkus([photoStore.photoProcessParams.photo.sku])
+                let arr = [];
+                const sku = photoStore.photoProcessParams.photo.sku;
+                if (!notNull(sku)) {
+                    arr = sku.split(",");
+                }
+                setSkus([...arr])
             }
 
-
-            setTimeout(() => {
-                setVisible(true)
-            }, 10)
+            if (skus.length === res.attrGroup.length) {
+                const tArr = skus.sort((a, b) => parseInt(a) - parseInt(b));
+                const tStr = tArr.join(",");
+                let currentSkuId = null;
+                for (const item of res.skus) {
+                    if (tStr === item.value) {
+                        currentSkuId = item.id;
+                        break;
+                    }
+                }
+                console.log("当前找到的ID：", currentSkuId)
+                if (!notNull(currentSkuId)) {
+                    forIDJumpToDatail(currentSkuId)
+                }
+            } else {
+                setTimeout(() => {
+                    setVisible(true)
+                }, 10)
+            }
         } catch (e) {
             console.log("获取商品详情出错：", e)
         }

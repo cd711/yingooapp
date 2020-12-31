@@ -31,8 +31,6 @@ import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
 import page from '../../../utils/ext'
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
-import Refresh from "../../../components/refresh";
-import PullScrollView from "../../../components/pullScrollView";
 
 
 interface IndexState {
@@ -43,7 +41,8 @@ interface IndexState {
     scrolling: boolean;
     curtain: any;
     loadStatus: LoadMoreEnum;
-    refresh: boolean;
+    refresherTriggered: boolean;
+    isTop: boolean;
 }
 
 @inject("userStore")
@@ -68,7 +67,8 @@ class Index extends Component<any, IndexState> {
             scrolling: false,
             curtain: {},
             loadStatus: LoadMoreEnum.more,
-            refresh: false
+            refresherTriggered: false,
+            isTop: false
         }
 
     }
@@ -413,6 +413,12 @@ class Index extends Component<any, IndexState> {
         })
     }
 
+    toggleTopStatus = (status) => {
+        if (status !== this.state.isTop) {
+            this.setState({isTop: status})
+        }
+    }
+
     onScroll = (e) => {
         const top = e.detail.scrollTop;
         let scrolling = this.state.scrolling;
@@ -420,7 +426,11 @@ class Index extends Component<any, IndexState> {
         if (scrolling !== this.state.scrolling) {
             this.setState({scrolling: top >= 30})
         }
-
+        if (top <= 0) {
+            this.toggleTopStatus(true)
+        } else {
+            this.toggleTopStatus(false)
+        }
     }
 
     onPullDownRefresh() {
@@ -444,19 +454,15 @@ class Index extends Component<any, IndexState> {
     }
 
     loadRefresh = async () => {
-        Taro.startPullDownRefresh()
-        console.log("刷新");
-        // this.setState({refresh: true});
-        // try {
-        //     const res = await this.getIndexBlocks({size: this.state.data.length});
-        //     this.setState({data: [...res], refresh: false});
-        // } catch (e) {
-        //     this.setState({refresh: false})
-        // }
+        try {
+            const res = await this.getIndexBlocks({size: this.state.data.length});
+            this.setState({data: [...res]}, () => {
+                Taro.stopPullDownRefresh()
+                this.setState({refresherTriggered: false})
+            });
+        } catch (e) {
 
-        setTimeout(() => {
-            Taro.stopPullDownRefresh()
-        }, 3000)
+        }
     }
 
     onCurtainClick = async () => {
@@ -507,21 +513,54 @@ class Index extends Component<any, IndexState> {
         return ""
     }
 
+    // 小程序其实是触发了onRefresherRefresh, h5触发的才是onTouchEnd
+    onTouchEnd = async () => {
+        console.log("结束touch")
+        if (deviceInfo.env === "h5") {  // 此处判断的原因是：小程序中touch事件和onRefresher事件都会触发
+            if (this.state.isTop) {
+                this.loadRefresh()
+            }
+        } else {
+            this.setState({refresherTriggered: true})
+            this.loadRefresh()
+        }
+    }
 
 
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresh} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresherTriggered, isTop} = this.state;
         return (
             <View className='index'>
                 {/*<Refresh visible={refresh} />*/}
                 <LoginModal isTabbar />
+                <View className='top-search'
+                      style={{
+                          paddingTop: deviceInfo.statusBarHeight + 5 + "px",
+                          height: 52 + deviceInfo.statusBarHeight + "px",
+                          background: scrolling ? "#fff" : "transparent",
+                          boxShadow: scrolling ? "0px 3px 11px 1px #f1f1f1" : "none"
+                      }}
+                >
+                    <View className='search-box'
+                          style={{
+                              width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
+                              height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
+                              background: scrolling ? "#f5f5f5" : "#fff"
+                          }}
+                          onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
+                        <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
+                        <Text className='placeholders'>搜索海量模板</Text>
+                    </View>
+                </View>
                 <ScrollView scrollY
-                            refresherEnabled
-                            refresherThreshold={80}
-                            onRefresherRefresh={() => console.log(1111)}
+                            // onTouchEnd={this.onTouchEnd}
+                            refresherTriggered={refresherTriggered}
+                            refresherEnabled={deviceInfo.env === "h5" ? isTop : true}
+                            refresherThreshold={50}
+                            onRefresherRefresh={this.onTouchEnd}
                             onScrollToLower={this.loadMore}
-                            // onScrollToUpper={this.loadRefresh}
                             onScroll={this.onScroll}
+                            // onTouchMove={deviceInfo.env === "h5" && isTop ? () => {} : null}
                             className="index_container_scroll"
                             style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 50} : `height:${centerPartyHeight}px`}>
                     <Image src={require("../../../source/ibg.png")} className="index_fixed_top_img" />
@@ -535,25 +574,6 @@ class Index extends Component<any, IndexState> {
                             ? <Uncultivated visible={showUnc} onClose={this.uncClose} />
                             : null
                     }
-                    <View className='top-search'
-                          style={{
-                              paddingTop: deviceInfo.statusBarHeight + 5 + "px",
-                              height: 52 + deviceInfo.statusBarHeight + "px",
-                              background: scrolling ? "#fff" : "transparent",
-                              boxShadow: scrolling ? "0px 3px 11px 1px #f1f1f1" : "none"
-                          }}
-                    >
-                        <View className='search-box'
-                              style={{
-                                  width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
-                                  height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
-                                  background: scrolling ? "#f5f5f5" : "#fff"
-                              }}
-                              onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
-                            <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
-                            <Text className='placeholders'>搜索海量模板</Text>
-                        </View>
-                    </View>
                     <View className='inde_page_container' style={{
                         paddingTop: `${deviceInfo.env === "h5" ? 55 : deviceInfo.menu.bottom + 10}px`
                     }}>
