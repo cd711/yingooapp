@@ -83,7 +83,7 @@ const PrintChange: Taro.FC<any> = () => {
                         }
                     }
                     const obj = {
-                        path: opt.forDetail ? [...photoStore.photoProcessParams.photo.path] : opt.path,
+                        path: opt.forDetail || opt.incomplete ? [...photoStore.photoProcessParams.photo.path] : opt.path,
                         sku: router.params.sku_id,
                         id: router.params.id
                     };
