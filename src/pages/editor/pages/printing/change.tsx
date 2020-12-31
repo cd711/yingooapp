@@ -1,4 +1,4 @@
-import Taro, {useEffect, useState} from "@tarojs/taro";
+import Taro, {useEffect, useState, useRef} from "@tarojs/taro";
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
@@ -32,7 +32,8 @@ const PrintChange: Taro.FC<any> = () => {
     const _imgstyle = Taro.useRef("");
     const sizeArr = Taro.useRef<any[]>([]);
     // 只有从商品详情页跳转过来才会为true
-    const [detailStatus, setDetailStatus] = useState(false)
+    const [detailStatus, setDetailStatus] = useState(false);
+    const skuArr = useRef([])
 
     const backPressHandle = () => {
         if (deviceInfo.env === "h5") {
@@ -313,10 +314,11 @@ const PrintChange: Taro.FC<any> = () => {
             return
         }
         let arr = [];
-        arr = String(photoStore.photoProcessParams.photo.sku).split(",")
+        arr = String(decodeURIComponent(photoStore.photoProcessParams.photo.sku)).split(",")
         arr.push(id);
 
         console.log("追加的skuID：", arr)
+        skuArr.current = [...arr]
         setSkus([...arr])
     }
 
@@ -410,14 +412,18 @@ const PrintChange: Taro.FC<any> = () => {
                 let arr = [];
                 const sku = photoStore.photoProcessParams.photo.sku;
                 if (!notNull(sku)) {
-                    arr = sku.split(",");
+                    arr = decodeURIComponent(sku).split(",");
                 }
                 setSkus([...arr])
             }
 
-            if (skus.length === res.attrGroup.length) {
-                const tArr = skus.sort((a, b) => parseInt(a) - parseInt(b));
+            console.log(skuArr.current, res.attrGroup.length)
+
+            if (skuArr.current.length === res.attrGroup.length) {
+                const tArr = skuArr.current.sort((a, b) => parseInt(a) - parseInt(b));
+                console.log("tArr：", tArr)
                 const tStr = tArr.join(",");
+                console.log(tStr)
                 let currentSkuId = null;
                 for (const item of res.skus) {
                     if (tStr === item.value) {
