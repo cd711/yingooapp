@@ -27,7 +27,6 @@ import BannerSwiper from "./bannerSwiper";
 import Curtain from "../../../components/curtain";
 import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
-import {AtToast} from "taro-ui";
 import page from '../../../utils/ext'
 
 
@@ -38,7 +37,6 @@ interface IndexState {
     cateInfo: any[];
     scrolling: boolean;
     curtain: any;
-    toast: any;
 }
 
 @inject("userStore")
@@ -62,19 +60,42 @@ class Index extends Component<any, IndexState> {
             cateInfo: [],
             scrolling: false,
             curtain: {},
-            toast: {
-                title: "",
-                icon: "",
-                status: false
-            }
         }
 
+    }
+
+    private total: number = 0;
+
+    getIndexBlocks = (opt: {start?: number, size?: number, loadMore?: boolean, channelCode?: string } = {}) => {
+        return new Promise<any[]>(async (resolve, reject) => {
+            const options = {
+                size: opt.size || 10,
+                start: opt.start || 0,
+                loadMore: opt.loadMore || false
+            };
+            if (opt.channelCode) {
+                Object.assign(options, {channel_code: opt.channelCode})
+            }
+            try {
+                const res = await api("app.index/h5", options);
+                this.total = parseInt(res.total);
+                let arr = [];
+                if (options.loadMore) {
+                    arr = this.state.data.contact(res.list);
+                } else {
+                    arr = res.list
+                }
+                resolve(arr)
+            } catch (e) {
+                reject(e)
+            }
+        })
     }
 
     getIndexList = async () => {
 
         let cIds = {};
-        if (userStore.isLogin) {
+        if (!notNull(userStore.id)) {
             try {
                 const res = await api("app.coupon/receiveCoupinId");
                 cIds = res || {}
@@ -92,7 +113,7 @@ class Index extends Component<any, IndexState> {
             console.log(e)
         }
         try {
-            const res = await api("app.index/h5");
+            const res = await this.getIndexBlocks()
             this.setState({data: [...res]});
             const popArr = [];
             const tempArr = res.filter(v => v.area_type === "popup");
@@ -188,10 +209,6 @@ class Index extends Component<any, IndexState> {
         })
     }
 
-    componentDidShow() {
-
-    }
-
     onItemClick = (item, _) => {
         console.log(item)
         if (notNull(userStore.id) && item.info.category.type === "photo") {
@@ -285,39 +302,10 @@ class Index extends Component<any, IndexState> {
 
     singleProdAndReceiveCoupon = async (prod, coupon) => {
         console.log(prod)
-        if (!notNull(coupon) && Object.keys(coupon).length > 0) {
-            try {
-                await api("app.coupon/add", {id: coupon.id});
-                this.setState({
-                    toast: {
-                        title: "领取成功",
-                        icon: require("../../../source/t_succ.png"),
-                        status: true
-                    }
-                })
-            }catch (e) {
-                console.log("领取优惠券失败：", e)
-                this.setState({
-                    toast: {
-                        title: e,
-                        icon: require("../../../source/t_fail.png"),
-                        status: true
-                    }
-                })
-            }
-        }
-        await sleep(3000)
         Taro.navigateTo({
-            url: prod.info.jump_url ? prod.info.jump_url : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}`
-        })
-    }
-
-    toastClose = () => {
-        this.setState({
-            toast: {
-                ...this.state.toast,
-                status: false
-            }
+            url: prod.info.jump_url
+                ? `${prod.info.jump_url}&coupon=${coupon.id}`
+                : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}&coupon=${coupon.id}`,
         })
     }
 
@@ -423,6 +411,19 @@ class Index extends Component<any, IndexState> {
 
     }
 
+    loadMore = () => {
+        const {data} = this.state;
+        if (this.total <= 10 || data.length <= this.total) {
+            return
+        }
+        if (this.total > data.length) {
+            this.getIndexBlocks({
+                start: data.length,
+                loadMore: true
+            })
+        }
+    }
+
     onCurtainClick = async () => {
         const data = {...this.state.curtain};
         console.log(data);
@@ -473,16 +474,12 @@ class Index extends Component<any, IndexState> {
     }
 
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain, toast} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain} = this.state;
         return (
             <View className='index'>
-                {
-                    toast.status
-                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
-                        : null
-                }
                 <LoginModal isTabbar />
                 <ScrollView scrollY
+                            onScrollToLower={this.loadMore}
                             onScroll={this.onScroll}
                             className="index_container_scroll"
                             style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 50} : `height:${centerPartyHeight}px`}>
