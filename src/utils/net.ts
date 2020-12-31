@@ -1,6 +1,7 @@
 import Taro from '@tarojs/taro';
 import {Base64} from 'js-base64';
 import {userStore} from "../store/user";
+import { is_weixin } from './common';
 
 
 export const options: {
@@ -9,12 +10,14 @@ export const options: {
     editorUrl: string;
     h5Url: string;
     weappUrl:string;
+    channel:string
 } = {
     apiUrl: '',
     sourceUrl:'',
     editorUrl: "",
     h5Url: "",
-    weappUrl:""
+    weappUrl:"",
+    channel:""
 }
 let accessToken;
 
@@ -65,17 +68,32 @@ export function getToken(): string {
     Taro.removeStorage({key:'TaroInfoKey'});
     return "";
 }
+
+function serverPlatform() {
+    let p = "";
+    if (process.env.TARO_ENV === 'h5') {
+        p = "h5"
+        if (is_weixin()) {
+            p = "wechat_h5"
+        }
+    }
+    if (process.env.TARO_ENV === 'weapp') {
+        p = "wechat_miniapp"
+    }
+    return p;
+}
+
 export function api(name: string, params?: any, allowJson = false): Promise<any> {
     return new Promise<any>( (resolve, reject) => {
-
         params = {
-            ...params
+            ...params,
+            channel_code:options.channel,
+            request_platform: serverPlatform()
         };
         params = params || {};
-
         let url = options.apiUrl + name;
         if (getToken()) {
-          url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
+            url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
         }
         // console.log(url);
         // const pl: string[] = [];

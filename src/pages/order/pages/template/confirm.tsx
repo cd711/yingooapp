@@ -140,6 +140,7 @@ export default class Confirm extends Component<any, {
                 }
             }
             if (!isEmpty(userStore.address)) {
+                console.log(userStore)
                 templateStore.address = userStore.address;
                 data["address_id"] = userStore.address.id;
             }
@@ -619,7 +620,8 @@ export default class Confirm extends Component<any, {
 
     render() {
         const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight} = this.state;
-        const {address} = templateStore;
+        const {address} = data;
+        console.log("templateStore",address)
         // @ts-ignore
         return (
             <View className='confirm'>
@@ -651,7 +653,7 @@ export default class Confirm extends Component<any, {
                                         <Text className='name'>{address.contactor_name}</Text>
                                         <Text className='phone'>{address.phone}</Text>
                                     </View>
-                                    <Text className='details'>{address.address}</Text>
+                                    <Text className='details'>{address.area_text+address.address}</Text>
                                 </View>
                                 <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
                             </View>
@@ -698,7 +700,7 @@ export default class Confirm extends Component<any, {
                                                         <Text className='num'>{product.price}</Text>
                                                     </View>
                                                     {
-                                                        this.isPhoto ? <Text>{parseInt(product.quantity)}</Text> :
+                                                        this.isPhoto ? <Text>x{parseInt(product.quantity)}</Text> :
                                                             <Counter num={parseInt(product.quantity)}
                                                                      onButtonClick={(e) => {
                                                                          this.onCounterChange(e, data.prepay_id, item.pre_order_id, product);
@@ -717,7 +719,7 @@ export default class Confirm extends Component<any, {
                                                         <Image className='ygyp'
                                                                src={require("../../../../source/ygyp.svg")}/>
                                                         <Text
-                                                            className='adv'>{item.merge_discount_list[item.merge_discount_rule]}</Text>
+                                                            className='adv'>{item.merge_discount_rule.value}</Text>
                                                         {
                                                             parseInt(item.merge_discount_price + "") > 0 ? <Text
                                                                 className='tip'>{`（已优惠${item.merge_discount_price}元）`}</Text> : null
@@ -751,7 +753,7 @@ export default class Confirm extends Component<any, {
                                         parseInt(item.merge_discount_price + "") > 0 ?
                                             <View className="add_buy_discount">
                                                 <View className='add_buy_name'>
-                                                    <Text className='txt'>加购减免</Text>
+                                                    <Text className='txt'>{item.merge_discount_rule.value}</Text>
                                                 </View>
                                                 <View className='price'>
                                                     <Text className='sym'>-¥</Text>
@@ -759,7 +761,6 @@ export default class Confirm extends Component<any, {
                                                 </View>
                                             </View> : null
                                     }
-
                                 </View>
                                 <View className='goods-item' onClick={() => this.onGoodsItemClick(item, usedTickets)}>
                                     <Text className='title'>优惠券</Text>
@@ -849,7 +850,7 @@ export default class Confirm extends Component<any, {
                                             <Ticket key={index + ""}
                                                     isSelected={value.checked}
                                                     ticket={value.coupon}
-                                                    onChange={() => this.onSelectTicket(tickets, value.id)} hasCheckBox={true}>
+                                                    onChange={() => this.onSelectTicket(tickets, value.id)} hasCheckBox>
                                                         {/* <View ></View> */}
                                                     </Ticket>
                                         ))

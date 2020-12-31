@@ -9,7 +9,7 @@ import { PlaceOrder } from './place';
 import {userStore} from "../../../../store/user";
 import { deviceInfo,fixStatusBarHeight, getTempDataContainer , notNull, urlEncode,getURLParamsStr,setTempDataContainer} from '../../../../utils/common';
 import LoginModal from '../../../../components/login/loginModal';
-
+import page from '../../../../utils/ext'
 
 
 let editorProxy: WindowProxy | null | undefined;
@@ -38,6 +38,9 @@ function callEditor(name, ...args) {
 
 @inject("templateStore")
 @observer
+@page({
+    share:true
+})
 export default class Preview extends Component<any, {
     placeOrderShow: boolean;
     workId:number;

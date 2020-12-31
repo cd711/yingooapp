@@ -578,3 +578,32 @@ export function shareAppExtends() {
     }
     return () => {}
 }
+
+export function xObserves(obj, callback) {
+    // return new Proxy(obj, {
+    //   get(target, key) {
+    //     return target[key]
+    //   },
+    //   set(target, key, value) {
+    //     target[key] = value
+    //     callback(key, value);
+    //     return Reflect.set(target, key, value);
+    //   }
+    // })
+    const newObj = {}
+    Object.keys(obj).forEach(key => {
+      Object.defineProperty(newObj, key, {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return obj[key]
+        },
+        // 当属性的值被修改时，会调用set，这时候就可以在set里面调用回调函数
+        set(newVal) {
+          obj[key] = newVal
+          callback(key, newVal)
+        }
+      })
+    })
+    return newObj
+}

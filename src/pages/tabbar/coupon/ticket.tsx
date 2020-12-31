@@ -4,7 +4,7 @@ import './ticket.less'
 import {api} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, ListModel, notNull} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, ListModel, notNull,xObserves} from '../../../utils/common';
 import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import { observe } from 'mobx';
@@ -45,7 +45,7 @@ export default class Login extends Component<{}, {
         }
     }
 
-
+    
     componentDidMount() {
         // if (!userStore.isLogin) {
         //     if (deviceInfo.env == 'h5') {
@@ -66,24 +66,25 @@ export default class Login extends Component<{}, {
                 }).exec();
             }).exec();
         // }
+
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue) {
                 this.requestData();
             }
         })
+    }
+    
+    componentDidShow(){
         if (userStore.isLogin) {
             this.requestData();
         }
     }
-
     requestData = () => {
         const {tab} = this.$router.params;
         const {data, switchTabActive} = this.state;
         if (parseInt(tab) >= 0) {
             if (switchTabActive != parseInt(tab)) {
-                this.setState({
-                    switchTabActive: parseInt(tab)
-                });
+                this.switchTabChange(parseInt(tab));
             }
             if (parseInt(tab) == 0 && data.list.length == 0) {
                 this.getList(0);
@@ -96,17 +97,8 @@ export default class Login extends Component<{}, {
     componentDidUpdate(_, prevState) {
         const {switchTabActive} = this.state;
         if (switchTabActive != prevState.switchTabActive) {
-            this.setState({
-                data: {
-                    list: [],
-                    start: 0,
-                    size: 0,
-                    total: 0
-                }
-            });
-            setTimeout(() => {
-                this.getList(switchTabActive)
-            }, 100);
+            // @ts-ignore
+
         }
     }
 
@@ -151,7 +143,30 @@ export default class Login extends Component<{}, {
             this.getList(switchTabActive);
         }
     }
+    switchTabChange = (index) => {
+        if (!userStore.isLogin) {
+            userStore.showLoginModal = true;
+            return;
+        }
+        this.setState({
+            switchTabActive: index
+        });
+        if (deviceInfo.env == "h5") {
+            window.history.replaceState(null, this.config.navigationBarTitleText, `/pages/tabbar/coupon/ticket?tab=${index}`);
+        }
+        this.setState({
+            data: {
+                list: [],
+                start: 0,
+                size: 0,
+                total: 0
+            }
+        });
 
+        setTimeout(() => {
+            this.getList(index)
+        }, 100);
+    }
     render() {
         const {data, switchTabActive, listLoading, loadStatus, centerPartyHeight} = this.state;
         const list = data && data.list && data.list.length > 0 ? data.list : [];
@@ -176,18 +191,7 @@ export default class Login extends Component<{}, {
                     <View className='status-switch-bar'>
                         {
                             tabs.map((item, index) => (
-                                <View className={switchTabActive == index ? 'item active' : 'item'} onClick={() => {
-                                    if (!userStore.isLogin) {
-                                        userStore.showLoginModal = true;
-                                        return;
-                                    }
-                                    this.setState({
-                                        switchTabActive: index
-                                    });
-                                    if (deviceInfo.env == "h5") {
-                                        window.history.replaceState(null, this.config.navigationBarTitleText, `/pages/tabbar/coupon/ticket?tab=${index}`);
-                                    }
-                                }} key={index + ""}>
+                                <View className={switchTabActive == index ? 'item active' : 'item'} onClick={() => this.switchTabChange(index)} key={index + ""}>
                                     <Text className='txt'>{item}</Text>
                                     {switchTabActive == index ? <Image src={require("../../../source/switchBottom.png")}
                                                                        className='img'/> : null}
@@ -205,7 +209,7 @@ export default class Login extends Component<{}, {
                                     {
                                         list.map((item) => (
                                             <View
-                                                style={item.status_tip.value == 2 || item.status_tip.value == 3 ? 'filter: grayscale(100%);' : ''}>
+                                                style={item.status_tip.value == 2 || item.status_tip.value == 3 ? 'filter: grayscale(100%);' : ''} key={item.id}>
                                                 <Ticket isNew={false} key={item.id} ticket={item.coupon}>
                                                     <View className='item_right'>
                                                         {
