@@ -64,10 +64,38 @@ class Index extends Component<any, IndexState> {
 
     }
 
+    private total: number = 0;
+
+    getIndexBlocks = (opt: {start?: number, size?: number, loadMore?: boolean, channelCode?: string } = {}) => {
+        return new Promise<any[]>(async (resolve, reject) => {
+            const options = {
+                size: opt.size || 10,
+                start: opt.start || 0,
+                loadMore: opt.loadMore || false
+            };
+            if (opt.channelCode) {
+                Object.assign(options, {channel_code: opt.channelCode})
+            }
+            try {
+                const res = await api("app.index/h5", options);
+                this.total = parseInt(res.total);
+                let arr = [];
+                if (options.loadMore) {
+                    arr = this.state.data.contact(res.list);
+                } else {
+                    arr = res.list
+                }
+                resolve(arr)
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+
     getIndexList = async () => {
 
         let cIds = {};
-        if (userStore.isLogin) {
+        if (!notNull(userStore.id)) {
             try {
                 const res = await api("app.coupon/receiveCoupinId");
                 cIds = res || {}
@@ -85,10 +113,10 @@ class Index extends Component<any, IndexState> {
             console.log(e)
         }
         try {
-            const res = await api("app.index/h5");
-            this.setState({data: [...res.list]});
+            const res = await this.getIndexBlocks()
+            this.setState({data: [...res]});
             const popArr = [];
-            const tempArr = res.list.filter(v => v.area_type === "popup");
+            const tempArr = res.filter(v => v.area_type === "popup");
 
             console.log("所有优惠券：", tempArr)
 
@@ -383,6 +411,19 @@ class Index extends Component<any, IndexState> {
 
     }
 
+    loadMore = () => {
+        const {data} = this.state;
+        if (this.total <= 10 || data.length <= this.total) {
+            return
+        }
+        if (this.total > data.length) {
+            this.getIndexBlocks({
+                start: data.length,
+                loadMore: true
+            })
+        }
+    }
+
     onCurtainClick = async () => {
         const data = {...this.state.curtain};
         console.log(data);
@@ -438,6 +479,7 @@ class Index extends Component<any, IndexState> {
             <View className='index'>
                 <LoginModal isTabbar />
                 <ScrollView scrollY
+                            onScrollToLower={this.loadMore}
                             onScroll={this.onScroll}
                             className="index_container_scroll"
                             style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 50} : `height:${centerPartyHeight}px`}>
