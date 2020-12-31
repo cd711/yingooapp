@@ -719,7 +719,7 @@ export default class Confirm extends Component<any, {
                                                         <Image className='ygyp'
                                                                src={require("../../../../source/ygyp.svg")}/>
                                                         <Text
-                                                            className='adv'>{item.merge_discount_list[item.merge_discount_rule]}</Text>
+                                                            className='adv'>{item.merge_discount_rule.value}</Text>
                                                         {
                                                             parseInt(item.merge_discount_price + "") > 0 ? <Text
                                                                 className='tip'>{`（已优惠${item.merge_discount_price}元）`}</Text> : null
@@ -753,7 +753,7 @@ export default class Confirm extends Component<any, {
                                         parseInt(item.merge_discount_price + "") > 0 ?
                                             <View className="add_buy_discount">
                                                 <View className='add_buy_name'>
-                                                    <Text className='txt'>加购减免</Text>
+                                                    <Text className='txt'>{item.merge_discount_rule.value}</Text>
                                                 </View>
                                                 <View className='price'>
                                                     <Text className='sym'>-¥</Text>

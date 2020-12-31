@@ -88,7 +88,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
         params = {
             ...params,
             channel_code:options.channel,
-            platform: serverPlatform()
+            request_platform: serverPlatform()
         };
         params = params || {};
         let url = options.apiUrl + name;
