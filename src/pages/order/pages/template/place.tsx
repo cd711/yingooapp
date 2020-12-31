@@ -324,8 +324,5 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                 </View>
             </View>
         </View>
-        {/* <AtFloatLayout isOpened={isShow}>
-
-        </AtFloatLayout> */}
     </View>
 }
