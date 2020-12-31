@@ -31,6 +31,8 @@ import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
 import page from '../../../utils/ext'
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
+import Refresh from "../../../components/refresh";
+import PullScrollView from "../../../components/pullScrollView";
 
 
 interface IndexState {
@@ -40,7 +42,8 @@ interface IndexState {
     cateInfo: any[];
     scrolling: boolean;
     curtain: any;
-    loadStatus: LoadMoreEnum
+    loadStatus: LoadMoreEnum;
+    refresh: boolean;
 }
 
 @inject("userStore")
@@ -64,7 +67,8 @@ class Index extends Component<any, IndexState> {
             cateInfo: [],
             scrolling: false,
             curtain: {},
-            loadStatus: LoadMoreEnum.more
+            loadStatus: LoadMoreEnum.more,
+            refresh: false
         }
 
     }
@@ -419,6 +423,10 @@ class Index extends Component<any, IndexState> {
 
     }
 
+    onPullDownRefresh() {
+
+    }
+
     loadMore = async () => {
         const {data} = this.state;
         console.log(this.total <= 10 , data.length == this.total)
@@ -433,6 +441,22 @@ class Index extends Component<any, IndexState> {
             });
             this.setState({data: [...res]})
         }
+    }
+
+    loadRefresh = async () => {
+        Taro.startPullDownRefresh()
+        console.log("刷新");
+        // this.setState({refresh: true});
+        // try {
+        //     const res = await this.getIndexBlocks({size: this.state.data.length});
+        //     this.setState({data: [...res], refresh: false});
+        // } catch (e) {
+        //     this.setState({refresh: false})
+        // }
+
+        setTimeout(() => {
+            Taro.stopPullDownRefresh()
+        }, 3000)
     }
 
     onCurtainClick = async () => {
@@ -483,13 +507,20 @@ class Index extends Component<any, IndexState> {
         return ""
     }
 
+
+
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresh} = this.state;
         return (
             <View className='index'>
+                {/*<Refresh visible={refresh} />*/}
                 <LoginModal isTabbar />
                 <ScrollView scrollY
+                            refresherEnabled
+                            refresherThreshold={80}
+                            onRefresherRefresh={() => console.log(1111)}
                             onScrollToLower={this.loadMore}
+                            // onScrollToUpper={this.loadRefresh}
                             onScroll={this.onScroll}
                             className="index_container_scroll"
                             style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 50} : `height:${centerPartyHeight}px`}>

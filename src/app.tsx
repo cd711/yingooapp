@@ -128,10 +128,11 @@ class App extends Component {
         ],
         window: {
             navigationStyle: "custom",
-            backgroundTextStyle: 'light',
+            backgroundTextStyle: 'dark',
             navigationBarBackgroundColor: '#fff',
             navigationBarTitleText: 'WeChat',
-            navigationBarTextStyle: 'black'
+            navigationBarTextStyle: 'black',
+            enablePullDownRefresh: true,
         },
         tabBar: {
             color: '#9C9DA6',
@@ -216,7 +217,7 @@ class App extends Component {
         }
     }
 
-    
+
 
     // 在 App 类中的 render() 函数没有实际作用
     // 请勿修改此函数
