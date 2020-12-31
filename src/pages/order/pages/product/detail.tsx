@@ -343,7 +343,7 @@ export default class Login extends Component<{}, {
 
             if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
                 if (data.attrGroup.length != data.attrItems.length) {
-                    tmp["inc"] = "";
+                    tmp["inc"] = "xxxx";
                 }
             }
             if (sku != null) {
