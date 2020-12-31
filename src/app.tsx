@@ -63,6 +63,7 @@ class App extends Component {
             {
                 root: "pages/editor",
                 // @ts-ignore
+                // eslint-disable-next-line no-undef
                 pages: preval`
                     module.exports=(function() {
                     const route = [
@@ -175,13 +176,15 @@ class App extends Component {
 
     componentDidMount() {
         const params = this.$router.params;
+        const {code,state,channel} = params;
+        //@ts-ignore
+        options.channel = channel?channel:(params.query && params.query.channel?params.query.channel:"")
         if (!userStore.isLogin) {
             const info = getUserInfo();
             if (info) {
                 userStore.setInfo(info);
             }
         }
-        const {code,state} = params;
         if (process.env.TARO_ENV === 'h5' && code && code.length>5 && state == "login" && !userStore.isLogin) {
             Taro.showLoading({title:"登录中..."});
             let exportUrl = window.location.href.split("?")[0] + (Object.keys(params).length > 0 ? "?" : "");

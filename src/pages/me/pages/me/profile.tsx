@@ -48,7 +48,7 @@ export default class Profile extends Component<any,{
     }
 
     updateInfo = (data) => {
-        return new Promise<any>(async (resolve, reject)=> {
+        return new Promise<void>(async (resolve, reject)=> {
             Taro.showLoading({title:"加载中..."})
             api("user/profile",data).then(()=>{
                 Taro.hideLoading();

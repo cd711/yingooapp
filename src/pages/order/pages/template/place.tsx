@@ -47,6 +47,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
             }
         }
         setSkus([...ts]);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         selectAtteItems(sku,attrItems,[...ts])
         
     }
@@ -81,17 +82,17 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                     }
                 }
             }
-            let names = getNames(items);
+            const names = getNames(items);
             onClose && onClose(names)
         }
     }
 
-    let tempSkuValue = [];
+    const tempSkuValue = [];
     const onSelectItem = (itemIdx,tagIdx,state,aItems,skusa = []) => {
         onSkuChange && onSkuChange(null);
         const selectIds = [];
         let items = aItems;
-        let selectItemIdxs = [];
+        const selectItemIdxs = [];
         items[itemIdx].map((tag,idx)=>{
             tag["selected"] = false;
             if (tagIdx == idx) {
@@ -243,7 +244,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         return names;
     }
     const _onClose = () => {
-        let names = getNames(attrItems);
+        const names = getNames(attrItems);
         onClose && onClose(names)
     }
     return <View className='placeOrder'>
@@ -271,7 +272,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                             </View>
                         </View>
                         <View className='close' onClick={_onClose}>
-                            <IconFont name={'20_guanbi'} size={40} color={'#000'}/>
+                            <IconFont name="20_guanbi" size={40} color="#000"/>
                         </View>
                     </View>
                     <ScrollView scrollY className='scroll'>
