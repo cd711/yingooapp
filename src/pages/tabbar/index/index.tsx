@@ -86,9 +86,9 @@ class Index extends Component<any, IndexState> {
         }
         try {
             const res = await api("app.index/h5");
-            this.setState({data: [...res]});
+            this.setState({data: [...res.list]});
             const popArr = [];
-            const tempArr = res.filter(v => v.area_type === "popup");
+            const tempArr = res.list.filter(v => v.area_type === "popup");
 
             console.log("所有优惠券：", tempArr)
 

@@ -515,7 +515,7 @@ export default class Login extends Component<{}, {
                                         userStore.showLoginModal = true;
                                         return;
                                     }
-                                    const {buyTotal, sku, data} = this.state;
+                                    const {buyTotal, sku} = this.state;
                                     if (sku != null && buyTotal > 0) {
                                         this.setState({
                                             placeOrderShow: false
@@ -598,7 +598,7 @@ export default class Login extends Component<{}, {
                                 userStore.showLoginModal = true;
                                 return;
                             }
-                            const {sku, skuName, data, buyTotal} = this.state;
+                            const {sku, buyTotal} = this.state;
                             // const {attrGroup} = data;
                             // console.log(sku,skuName,buyTotal)
                             if (sku != null && buyTotal > 0) {
