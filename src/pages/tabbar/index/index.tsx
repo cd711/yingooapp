@@ -313,11 +313,11 @@ class Index extends Component<any, IndexState> {
     }
 
     singleProdAndReceiveCoupon = async (prod, coupon) => {
-        console.log(prod)
+        console.log(prod, coupon)
         Taro.navigateTo({
             url: prod.info.jump_url
-                ? `${prod.info.jump_url}&coupon=${coupon.id}`
-                : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}&coupon=${coupon.id}`,
+                ? `${prod.info.jump_url}&coupon=${coupon && coupon.id || ""}`
+                : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}&coupon=${coupon && coupon.id || ""}`,
         })
     }
 
