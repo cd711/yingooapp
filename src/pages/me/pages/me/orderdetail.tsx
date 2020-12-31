@@ -356,7 +356,7 @@ export default class OrderDetail extends Component<{},{
                                 <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
                             </View>
                             <View className='order-name'>
-                                <Text className='name'>{item.title}</Text>
+                                <Text className='name'>{item.title.length>10?item.title.substring(0,10)+"...":item.title}</Text>
                                 <Text className='gg'>规格：{item.attributes}</Text>
                                 <Text className='num'>x{item.quantity}</Text>
                             </View>
