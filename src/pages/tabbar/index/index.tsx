@@ -8,14 +8,16 @@ import {api} from "../../../utils/net";
 import {
     allowShowCoupon,
     deviceInfo,
-    getEvenArr, getLocalCoupon,
+    getEvenArr,
+    getLocalCoupon,
     getSpecialRouter,
-    getURLParamsStr, jumpToEditor,
+    getURLParamsStr,
+    jumpToEditor,
     notNull,
     ossUrl,
     sleep,
-    urlEncode,
     updateLocalCoupon,
+    urlEncode,
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -28,6 +30,7 @@ import Curtain from "../../../components/curtain";
 import {LocalCoupon} from "../../../modal/modal";
 import moment from "moment";
 import page from '../../../utils/ext'
+import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 
 
 interface IndexState {
@@ -37,6 +40,7 @@ interface IndexState {
     cateInfo: any[];
     scrolling: boolean;
     curtain: any;
+    loadStatus: LoadMoreEnum
 }
 
 @inject("userStore")
@@ -60,6 +64,7 @@ class Index extends Component<any, IndexState> {
             cateInfo: [],
             scrolling: false,
             curtain: {},
+            loadStatus: LoadMoreEnum.more
         }
 
     }
@@ -81,10 +86,13 @@ class Index extends Component<any, IndexState> {
                 this.total = parseInt(res.total);
                 let arr = [];
                 if (options.loadMore) {
-                    arr = this.state.data.contact(res.list);
+                    arr = [...this.state.data, ...res.list];
                 } else {
                     arr = res.list
                 }
+                this.setState({
+                    loadStatus: this.total === arr.length ? LoadMoreEnum.noMore : LoadMoreEnum.more
+                })
                 resolve(arr)
             } catch (e) {
                 reject(e)
@@ -411,16 +419,19 @@ class Index extends Component<any, IndexState> {
 
     }
 
-    loadMore = () => {
+    loadMore = async () => {
         const {data} = this.state;
-        if (this.total <= 10 || data.length <= this.total) {
+        console.log(this.total <= 10 , data.length == this.total)
+        if (this.total <= 10 || data.length == this.total) {
             return
         }
         if (this.total > data.length) {
-            this.getIndexBlocks({
+            this.setState({loadStatus: LoadMoreEnum.loading})
+            const res = await this.getIndexBlocks({
                 start: data.length,
                 loadMore: true
-            })
+            });
+            this.setState({data: [...res]})
         }
     }
 
@@ -460,7 +471,6 @@ class Index extends Component<any, IndexState> {
 
     closeCurtain = () => {
         this.setState({curtain: {}});
-        // Taro.showTabBar();
     }
 
     getImage(item){
@@ -474,7 +484,7 @@ class Index extends Component<any, IndexState> {
     }
 
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus} = this.state;
         return (
             <View className='index'>
                 <LoginModal isTabbar />
@@ -835,6 +845,7 @@ class Index extends Component<any, IndexState> {
                             })
                         }
                     </View>
+                    <LoadMore status={loadStatus} />
                 </ScrollView>
             </View>
         )
