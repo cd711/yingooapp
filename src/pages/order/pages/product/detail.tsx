@@ -66,7 +66,6 @@ export default class Login extends Component<{}, {
 
     private tempDataContainerData = null;
     private tempDataContainerKey = "";
-    private modalInit = false;
 
     receiveCoupon = async () => {
         const {coupon} = this.$router.params;
@@ -119,8 +118,7 @@ export default class Login extends Component<{}, {
                 id
             }).then((res) => {
                 Taro.hideLoading();
-                this.modalInit = true;
-                res.attrGroup = res.attrGroup.filter((item)=>{
+                res.attrGroup = res.attrGroup.filter((item) => {
                     console.log(item)
                     return item.special_show != "photonumber"
                 })
@@ -311,7 +309,7 @@ export default class Login extends Component<{}, {
 
     onPhotoSelect = async ({ids, imgs, attrs}) => {
 
-        const {data, sku,defalutSkuIds} = this.state;
+        const {data, sku, defalutSkuIds} = this.state;
         this.setState({showPicSelector: false})
         Taro.showLoading({title: "请稍后...."})
 
@@ -338,10 +336,10 @@ export default class Login extends Component<{}, {
             const tmp = {
                 id: data.id,
                 cid: data.tpl_category_id,
-                sku_id: sku == null && defalutSkuIds.length>0 && data.attrGroup.length != data.attrItems.length?defalutSkuIds.join(","):sku.id,
+                sku_id: sku == null && defalutSkuIds.length > 0 && data.attrGroup.length != data.attrItems.length ? defalutSkuIds.join(",") : sku.id,
             }
 
-            if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+            if (sku == null && defalutSkuIds && defalutSkuIds.length > 0) {
                 if (data.attrGroup.length != data.attrItems.length) {
                     tmp["inc"] = "xxxx";
                 }
@@ -393,7 +391,8 @@ export default class Login extends Component<{}, {
             <View className='p_detail'>
                 {
                     toast.status
-                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
+                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500}
+                                   onClose={this.toastClose}/>
                         : null
                 }
                 {/* @ts-ignore */}
@@ -560,11 +559,10 @@ export default class Login extends Component<{}, {
                                             userStore.showLoginModal = true;
                                             return;
                                         }
-                                        if (data.tpl_product_type == "photo"){
-                                            if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+                                        if (data.tpl_product_type == "photo") {
+                                            if (sku == null && defalutSkuIds && defalutSkuIds.length > 0) {
                                                 console.log(defalutSkuIds);
                                                 if (data.attrGroup.length != data.attrItems.length) {
-                                                    this.modalInit = false
                                                     this.setState({showPicSelector: true})
                                                     return;
                                                 }
@@ -581,7 +579,6 @@ export default class Login extends Component<{}, {
                                                         });
                                                     }
                                                     if (data.tpl_product_type == "photo") {
-                                                        this.modalInit = false
                                                         this.setState({showPicSelector: true})
                                                     }
                                                 } else {
@@ -689,11 +686,10 @@ export default class Login extends Component<{}, {
                                 userStore.showLoginModal = true;
                                 return;
                             }
-                            if (data.tpl_product_type == "photo"){
-                                if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+                            if (data.tpl_product_type == "photo") {
+                                if (sku == null && defalutSkuIds && defalutSkuIds.length > 0) {
                                     console.log(defalutSkuIds);
                                     if (data.attrGroup.length != data.attrItems.length) {
-                                        this.modalInit = false
                                         this.setState({showPicSelector: true})
                                         return;
                                     }
@@ -711,7 +707,6 @@ export default class Login extends Component<{}, {
                                             });
                                         }
                                         if (data.tpl_product_type == "photo") {
-                                            this.modalInit = false
                                             this.setState({showPicSelector: true})
                                         }
                                     } else {
