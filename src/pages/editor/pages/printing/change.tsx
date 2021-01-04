@@ -394,12 +394,14 @@ const PrintChange: Taro.FC<any> = () => {
                 const len = photoStore.photoProcessParams.attrItems[idx].length
                 for (let i = 0; i < len; i++) {
                     const item = photoStore.photoProcessParams.attrItems[idx][i];
+                    console.log(1111, JSON.parse(JSON.stringify(item)))
                     if (parseInt(item.value) > count) {
                         let c = i - 1;
                         if (c <= 0) {
                             c = 0
                         }
-                        setCount(res, photoStore.photoProcessParams.attrItems[idx][c].id)
+                        console.log("c：", c, i)
+                        setCount(res, photoStore.photoProcessParams.attrItems[idx][i].id)
                         break;
                     } else {
                         if (i === len - 1) {
@@ -429,6 +431,7 @@ const PrintChange: Taro.FC<any> = () => {
                     const item = res.skus[i];
                     if (tStr === item.value) {
                         currentSkuId = item.id;
+                        console.log(item)
                         break;
                     }
                 }
