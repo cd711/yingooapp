@@ -90,9 +90,9 @@ const config = {
     router: {
       mode: 'browser',
       customRoutes: {
-        '/pages/tabbar/index/index': '/',
-        '/pages/tabbar/me/me':'/me',
-        '/pages/search/index': "/search"
+        // '/pages/tabbar/index/index': '/',
+        // '/pages/tabbar/me/me':'/me',
+        // '/pages/search/index': "/search"
       }
     },
     publicPath: '/',

@@ -117,6 +117,15 @@ export default class Me extends Component<any, MeState> {
                 }
             })
 
+            // const temp = new Array();
+            // for (let i = 0; i < works.length; i ++) {
+            //     let obj = {key: 0, children: []};
+            //     const item = works[i];
+            //     const year = moment.unix(item.create_time).year();
+            //     console.log(year)
+            //     if ()
+            // }
+
             this.setState({
                 works,
                 loadStatus: this.total == works.length ? LoadMoreEnum.noMore : LoadMoreEnum.more
