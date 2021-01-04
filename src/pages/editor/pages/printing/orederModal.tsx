@@ -28,6 +28,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
 
 
     const selectAtteItems = (attrItems: Array<Array<any>>) => {
+        console.log(defaultActive)
         const items = attrItems.map((value) => {
             return value.map((val) => {
                 val["selected"] = false;
@@ -41,17 +42,29 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
             });
         });
         setAttrItems(items);
+        if (defaultActive.length > 0) {
+            for (let i = 0; i < data.attrItems.length; i++) {
+                const item = data.attrItems[i];
+                for (let j = 0; j < item.length; j++) {
+                    const tag = item[j];
+                    if (defaultActive.indexOf(tag.id) != -1) {
+                        onItemSelect(i, j, true, skus);
+                    }
+                }
+            }
+        }
     }
 
     const tempSkuValue = [];
-    const onItemSelect = (itemIdx, tagIdx, state) => {
+    const onItemSelect = (itemIdx, tagIdx, state, skusa = []) => {
 
 
         onSkuChange && onSkuChange(null);
+
         const selectIds = [];
-        let items = attrItems;
+        let items = [...attrItems];
         const selectItemIdxs = [];
-        items[itemIdx].map((tag,idx)=>{
+        items[itemIdx].map((tag, idx) => {
             tag["selected"] = false;
             if (tagIdx == idx) {
                 tag["selected"] = state;
@@ -59,7 +72,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
             return tag;
         });
 
-        for (let i = 0;i<items.length;i++) {
+        for (let i = 0; i < items.length; i++) {
             const item = items[i];
             for (const tag of item) {
                 if (tag["selected"]) {
@@ -71,35 +84,35 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
         }
 
         const tempSelectIds = selectIds.concat();
-        if (tempSelectIds.length == items.length) {
+        if (tempSelectIds.length == items.length && items.length > 1) {
             tempSelectIds.splice(itemIdx, 1);
             selectItemIdxs.splice(itemIdx, 1)
         }
         let tmp = [];
-        const maybeSkus = skus.filter((obj)=>{
-            if (tempSelectIds.length>0) {
-                const vals:Array<any> = obj.value.split(",");
-                return tempSelectIds.every(v=>vals.includes(v+""))
+        const mskus = skus.length > 0 ? skus : skusa
+        const maybeSkus = mskus.filter((obj) => {
+            if (tempSelectIds.length > 0 || items.length == 1) {
+                const vals: Array<any> = obj.value.split(",");
+                return tempSelectIds.every(v => vals.includes(v + ""))
             }
             return true;
         })
-        maybeSkus.filter((item)=> item.stock>0).map((item)=>{
-            const vs = item.value.split(",").filter((v)=>tempSelectIds.indexOf(parseInt(v))==-1);
+        maybeSkus.filter((item) => item.stock > 0).map((item) => {
+            const vs = item.value.split(",").filter((v) => tempSelectIds.indexOf(parseInt(v)) == -1);
             tmp = tmp.concat(vs);
             return item.value
         });
 
         const notOverSku = Array.from(new Set(tmp));
-        selectIds.sort(function(value1, value2) {
+        selectIds.sort(function (value1, value2) {
             return parseInt(value1) - parseInt(value2);
         });
-        console.log(tmp,notOverSku,selectIds,tempSelectIds);
-        items = items.map((item,index)=>{
-            return item.map((tag)=>{
+        items = items.map((item, index) => {
+            return item.map((tag) => {
                 tag["over"] = false;
-                if (selectItemIdxs.indexOf(index)==-1) {
-                    if (selectIds.length>1) {
-                        if (notOverSku.indexOf(tag.id+"")==-1) {
+                if (selectItemIdxs.indexOf(index) == -1) {
+                    if (selectIds.length > 1) {
+                        if (notOverSku.indexOf(tag.id + "") == -1) {
                             tag["over"] = true;
                             if (tag["selected"]) {
                                 selectIds.splice(index, 1);
@@ -113,6 +126,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
         });
         const skuValue = selectIds.join(',');
         setAttrItems(items);
+
         if (selectIds.length != items.length) {
             const prices = maybeSkus.map((item) => {
                 return item.price;
@@ -123,17 +137,31 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
             setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
             setMarketPriceShow(false);
         } else {
-            for (let i = 0; i<maybeSkus.length; i++) {
+            for (let i = 0; i < maybeSkus.length; i++) {
                 const sku = maybeSkus[i];
+
                 if (sku.value == skuValue) {
+                    console.log(sku)
                     setPrice(sku.price);
                     setMarketPriceShow(true);
                     setMarketPrice(sku.market_price);
-                    onSkuChange && onSkuChange(sku);
+                    setTimeout(() => {
+                        setPrice(sku.price);
+                    }, 100);
+                    if (sku.stock <= 0) {
+                        Taro.showToast({
+                            title: '库存不足',
+                            icon: 'none',
+                            duration: 1500
+                        })
+                    } else {
+                        onSkuChange && onSkuChange(sku);
+                    }
                     break;
                 }
             }
         }
+
     }
 
 

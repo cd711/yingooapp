@@ -90,16 +90,9 @@ const config = {
     router: {
       mode: 'browser',
       customRoutes: {
-        '/pages/index/index': '/',
-        '/pages/template/index': '/template',
-        '/pages/template/detail': '/template/detail',
-        '/pages/editor/shell': '/editor/shell',
-        '/pages/editor/index': '/editor/shell',
-        // '/pages/editor/photos': '/editor/photos',
-        // '/pages/editor/pillow': '/editor/pillow',
-        // '/pages/editor/mousepad': '/editor/mousepad',
-        '/pages/tabbar/me/me':'/me',
-        '/pages/search/index': "/search"
+        // '/pages/tabbar/index/index': '/',
+        // '/pages/tabbar/me/me':'/me',
+        // '/pages/search/index': "/search"
       }
     },
     publicPath: '/',

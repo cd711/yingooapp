@@ -8,6 +8,7 @@ import './app.less'
 import { options,getUserInfo } from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
+import {setCookie} from "./utils/common";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -178,8 +179,20 @@ class App extends Component {
     componentDidMount() {
         const params = this.$router.params;
         const {code,state,channel} = params;
-        //@ts-ignore
-        options.channel = channel?channel:(params.query && params.query.channel?params.query.channel:"")
+
+        if (channel) {
+            options.channel = channel;
+            setCookie("channel", channel)
+        } else {
+            // @ts-ignore
+            if (params.query && params.query.channel) {
+                // @ts-ignore
+                options.channel = params.query.channel;
+            } else {
+                options.channel = ""
+            }
+        }
+
         if (!userStore.isLogin) {
             const info = getUserInfo();
             if (info) {

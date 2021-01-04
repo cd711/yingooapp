@@ -712,7 +712,7 @@ export default class Login extends Component<{}, {
                             }
                             if (sku.length==data.attrGroup.length) {
                                 // let url = ""
-                                
+
                                 setTempDataContainer("product_preview_sku", {
                                     sku,
                                     selectSkuId

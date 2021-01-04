@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
 import {Base64} from 'js-base64';
 import {userStore} from "../store/user";
-import { is_weixin } from './common';
+import {getCookie, is_weixin} from './common';
 
 
 export const options: {
@@ -85,9 +85,17 @@ function serverPlatform() {
 
 export function api(name: string, params?: any, allowJson = false): Promise<any> {
     return new Promise<any>( (resolve, reject) => {
+
+        const code = getCookie("channel");
+        let channel_code = "";
+        if (options.channel) {
+            channel_code = options.channel;
+        } else if (code) {
+            channel_code = code
+        }
         params = {
             ...params,
-            channel_code:options.channel,
+            channel_code,
             request_platform: serverPlatform()
         };
         params = params || {};
@@ -105,7 +113,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
             data: params,
             method: "POST",
             header: {
-                'content-type': allowJson ? "application/json" : 'application/x-www-form-urlencoded'
+                'content-type': allowJson ? "application/json" : 'application/x-www-form-urlencoded',
             }
         }).then((res: any) => {
             if(res.data.code == 401){
