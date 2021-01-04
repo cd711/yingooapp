@@ -395,7 +395,7 @@ const PrintChange: Taro.FC<any> = () => {
                 for (let i = 0; i < len; i++) {
                     const item = photoStore.photoProcessParams.attrItems[idx][i];
                     console.log(1111, JSON.parse(JSON.stringify(item)))
-                    if (parseInt(item.value) > count) {
+                    if (parseInt(item.value) >= count) {
                         let c = i - 1;
                         if (c <= 0) {
                             c = 0
@@ -437,7 +437,7 @@ const PrintChange: Taro.FC<any> = () => {
                 }
                 console.log("当前找到的ID：", currentSkuId)
                 if (!notNull(currentSkuId)) {
-                    forIDJumpToDatail(currentSkuId)
+                    // forIDJumpToDatail(currentSkuId)
                 }
             } else {
                 setTimeout(() => {
