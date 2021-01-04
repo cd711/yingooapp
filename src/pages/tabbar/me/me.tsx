@@ -48,7 +48,7 @@ interface MeState {
     topHeight: number;
     data: MultiData;
     loadStatus: LoadMoreEnum;
-    works: Array<any>;
+    works: { total: number, list: Array<{key: number, children: any[]}> };
     collectionList: Array<CollectiongProps>;
     isOpened: boolean
 }
@@ -73,7 +73,7 @@ export default class Me extends Component<any, MeState> {
             topHeight: 0,
             loadStatus: LoadMoreEnum.loading,
             data: null,
-            works: [],
+            works: {total: 0, list: []},
             collectionList: [],
             isOpened: false
         }
@@ -99,8 +99,13 @@ export default class Me extends Component<any, MeState> {
             });
             this.total = Number(res.total);
             let works = [];
+            const tempWorks = [];
+            for (let y = 0; y < this.state.works.list.length; y++) {
+                const current = this.state.works.list[y];
+                current.children.forEach((v) => tempWorks.push(v))
+            }
             if (opt.loadMore) {
-                works = this.state.works.concat(res.list)
+                works = tempWorks.concat(res.list)
             } else {
                 works = res.list
             }
@@ -117,17 +122,36 @@ export default class Me extends Component<any, MeState> {
                 }
             })
 
-            // const temp = new Array();
-            // for (let i = 0; i < works.length; i ++) {
-            //     let obj = {key: 0, children: []};
-            //     const item = works[i];
-            //     const year = moment.unix(item.create_time).year();
-            //     console.log(year)
-            //     if ()
-            // }
+            const temp = {list: [], total: 0};
+            temp.total = works.length;
+            for (let i = 0; i < works.length; i ++) {
+                const item = works[i];
+                const year = moment.unix(item.create_time).year();
+                console.log(year)
+                const obj = {key: year, children: []};
+                const idx = temp.list.findIndex(v => v.key === year);
+                if (idx === -1) {
+                    temp.list.push(obj)
+                }
+            }
+
+            for (let n = 0; n < temp.list.length; n ++) {
+                const current = {...temp.list[n]};
+                for (let v = 0; v < works.length; v ++) {
+                    const item = works[v];
+                    const year = moment.unix(item.create_time).year();
+                    if (current.key === year) {
+                        current.children.push(item)
+                    }
+                }
+                temp.list[n] = current;
+            }
+
+            console.log(temp)
+
 
             this.setState({
-                works,
+                works: temp,
                 loadStatus: this.total == works.length ? LoadMoreEnum.noMore : LoadMoreEnum.more
             }, () => {
                 this.isLoading = 0
@@ -223,17 +247,17 @@ export default class Me extends Component<any, MeState> {
 
     lodeMore = () => {
         const { works, switchActive, collectionList } = this.state;
-        console.log("加载更多", this.isLoading, this.total, works.length)
+        console.log("加载更多", this.isLoading, this.total, works.total)
 
         if (switchActive === 0) {
-            if (this.total === works.length || this.total < works.length || this.total < 15) {
+            if (this.total === works.total || this.total < works.total || this.total < 15) {
                 this.setState({loadStatus: LoadMoreEnum.noMore})
                 return
             }
-            if (this.total > works.length) {
+            if (this.total > works.total) {
                 this.setState({loadStatus: LoadMoreEnum.loading})
                 this.getWorksList({
-                    start: works.length,
+                    start: works.total,
                     loadMore: true
                 })
             }
@@ -273,30 +297,40 @@ export default class Me extends Component<any, MeState> {
         }
     }
 
-    private deleteId: any = null;
+    private deleteObj: any = {};  // 存储 --> idx：父级下标, index：子级下标, value：当前点击对象
     confirmDelete = async (data: PopoverItemClickProps) => {
         console.log(2222, data.corrValue)
         if (data.corrValue) {
-            this.deleteId = data.corrValue.id
+            this.deleteObj = data.corrValue
             this.setState({isOpened: true})
         }
     }
 
     deleteWork = async () => {
-        if (!this.deleteId) {
+        if (Object.keys(this.deleteObj).length === 0) {
             return
         }
         Taro.showLoading({title: "请稍后"});
+
         try{
-            await api("editor.user_tpl/del", {id: this.deleteId});
-            const works = this.state.works;
-            const idx = works.findIndex(v => Number(v.id) === Number(this.deleteId));
-            if (idx > -1) {
-                works.splice(idx, 1);
-                this.setState({works})
-            }
+            await api("editor.user_tpl/del", {id: this.deleteObj.value.id});
+
+            const works = {...this.state.works};
+            const curArr = [...works.list[this.deleteObj.idx].children];
+            curArr.splice(this.deleteObj.index, 1);
+            works.list[this.deleteObj.idx].children = curArr;
+
+            works.list.forEach((value, index) => {
+                if (value.children.length === 0) {
+                    works.list.splice(index, 1)
+                }
+            })
+            console.log(works)
+            works.total -= 1;
+            this.setState({works})
+
             Taro.showToast({title: "删除成功", icon: "success"});
-            this.deleteId = null;
+            this.deleteObj = {};
             this.setState({isOpened: false});
             this.total--;
         }catch (e) {
@@ -487,84 +521,87 @@ export default class Me extends Component<any, MeState> {
                             switchActive === 0
                                 ? <View className='content'>
                                     {
-                                        works.map((item) => (
-                                            <View className='item' key={item.id}>
+                                        works.list.map((item, idx) => (
+                                            <View key={idx.toString()}>
+                                                <View className='years'>
+                                                    <Text className='text'>{item.key}</Text>
+                                                </View>
                                                 {
-                                                    moment.unix(item.create_time).year() == moment().year() ? null :
-                                                        <View className='years'>
-                                                            <Text className='text'>{moment.unix(item.create_time).year()}</Text>
+                                                    item.children.map((value, index) => (
+                                                        <View className='item' key={index.toString()}>
+                                                            <View className='dates'>
+                                                                <View className='day'>
+                                                                    <View className='circle'>
+                                                                        <Text className='text'>{moment.unix(value.create_time).date()}</Text>
+                                                                    </View>
+                                                                </View>
+                                                                <Text className='date'>{moment.unix(value.create_time).format("MM月DD日")}</Text>
+                                                                <View className="more">
+                                                                    <Popover popoverItem={process.env.TARO_ENV === "h5" ? [
+                                                                        // {
+                                                                        //     title: "保存到相册",
+                                                                        //     value: 1,
+                                                                        //     onClick: this.downloadImage,
+                                                                        //     customRender: <View className='sub-menu'>
+                                                                        //         <View className='list'>
+                                                                        //             <View className='item'>
+                                                                        //                 <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
+                                                                        //                 <Text className='item-text'>保存到相册</Text>
+                                                                        //             </View>
+                                                                        //         </View>
+                                                                        //     </View>
+                                                                        // },
+                                                                        {
+                                                                            title: "分享",
+                                                                            value: 2,
+                                                                            customRender: <View className='sub-menu'>
+                                                                                <View className='list'>
+                                                                                    <View className='item'>
+                                                                                        <IconFont name='24_fenxiang' size={40} color='#121314' />
+                                                                                        <Text className='item-text'>分享</Text>
+                                                                                    </View>
+                                                                                </View>
+                                                                            </View>
+                                                                        },
+                                                                        {
+                                                                            title: "删除",
+                                                                            value: 3,
+                                                                            onClick: this.confirmDelete,
+                                                                            customRender: <View className='sub-menu'>
+                                                                                <View className='list'>
+                                                                                    <View className='item'>
+                                                                                        <IconFont name='24_shanchu' size={40} color='#FF4966' />
+                                                                                        <Text className='item-text' style={{color: "#FF4966"}}>删除</Text>
+                                                                                    </View>
+                                                                                </View>
+                                                                            </View>
+                                                                        },
+                                                                    ] : this.popItemsWeapp}
+                                                                             value={{idx, index, value}}
+                                                                             offsetBottom={30}>
+                                                                        <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
+                                                                    </Popover>
+                                                                </View>
+                                                            </View>
+                                                            <View className='box' onClick={() => this.previewOrder(value)}>
+                                                                <View className='cns'>
+                                                                    <Text className='neir'>{value.name}</Text>
+                                                                    <View className='docker'>
+                                                                        {value.order_sn ? <Text className='nook'>已打印</Text> : null}
+                                                                        <Image src={ossUrl(value.thumbnail, 1)} className='pic'
+                                                                               mode="widthFix"
+                                                                               style={{width: value.attr.width + "px"}} />
+                                                                    </View>
+                                                                </View>
+                                                            </View>
                                                         </View>
+                                                    ))
                                                 }
-                                                <View className='dates'>
-                                                    <View className='day'>
-                                                        <View className='circle'>
-                                                            <Text className='text'>{moment.unix(item.create_time).date()}</Text>
-                                                        </View>
-                                                    </View>
-                                                    <Text className='date'>{moment.unix(item.create_time).format("MM月DD日")}</Text>
-                                                    <View className="more">
-                                                        <Popover popoverItem={process.env.TARO_ENV === "h5" ? [
-                                                            // {
-                                                            //     title: "保存到相册",
-                                                            //     value: 1,
-                                                            //     onClick: this.downloadImage,
-                                                            //     customRender: <View className='sub-menu'>
-                                                            //         <View className='list'>
-                                                            //             <View className='item'>
-                                                            //                 <IconFont name='24_baocundaoxiangce' size={40} color='#121314' />
-                                                            //                 <Text className='item-text'>保存到相册</Text>
-                                                            //             </View>
-                                                            //         </View>
-                                                            //     </View>
-                                                            // },
-                                                            {
-                                                                title: "分享",
-                                                                value: 2,
-                                                                customRender: <View className='sub-menu'>
-                                                                    <View className='list'>
-                                                                        <View className='item'>
-                                                                            <IconFont name='24_fenxiang' size={40} color='#121314' />
-                                                                            <Text className='item-text'>分享</Text>
-                                                                        </View>
-                                                                    </View>
-                                                                </View>
-                                                            },
-                                                            {
-                                                                title: "删除",
-                                                                value: 3,
-                                                                onClick: this.confirmDelete,
-                                                                customRender: <View className='sub-menu'>
-                                                                    <View className='list'>
-                                                                        <View className='item'>
-                                                                            <IconFont name='24_shanchu' size={40} color='#FF4966' />
-                                                                            <Text className='item-text' style={{color: "#FF4966"}}>删除</Text>
-                                                                        </View>
-                                                                    </View>
-                                                                </View>
-                                                            },
-                                                        ] : this.popItemsWeapp}
-                                                                 value={item}
-                                                                 offsetBottom={30}>
-                                                            <IconFont name='24_gengduo' size={48} color='#9C9DA6'/>
-                                                        </Popover>
-                                                    </View>
-                                                </View>
-                                                <View className='box' onClick={() => this.previewOrder(item)}>
-                                                    <View className='cns'>
-                                                        <Text className='neir'>{item.name}</Text>
-                                                        <View className='docker'>
-                                                            {item.order_sn ? <Text className='nook'>已打印</Text> : null}
-                                                            <Image src={ossUrl(item.thumbnail, 1)} className='pic'
-                                                                   mode="widthFix"
-                                                                   style={{width: item.attr.width + "px"}} />
-                                                        </View>
-                                                    </View>
-                                                </View>
                                             </View>
                                         ))
                                     }
                                     {
-                                        works.length === 0
+                                        works.total === 0
                                             ? <Empty button="我要创作" onClick={() => {
                                                 if (userStore.isLogin) {
                                                     if (deviceInfo.env == "h5") {
