@@ -1,4 +1,5 @@
 import Taro from "@tarojs/taro";
+import { options } from "./net";
 
 
 const page = (option?: {
@@ -20,10 +21,15 @@ const page = (option?: {
         };
 
         if (!clazz.onShareAppMessage) {
+            
             clazz.onShareAppMessage = function() {
+                let uri = "/pages/tabbar/index/index";
+                if (options && options.channel.length>0) {
+                    uri = `/pages/tabbar/index/index?channel=${options.channel}`
+                }
                 return {
                     title: "免费照片冲印个性化定制手机壳",
-                    path: "/pages/tabbar/index/index",
+                    path: uri,
                     imageUrl:"https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m"
                 };
             };

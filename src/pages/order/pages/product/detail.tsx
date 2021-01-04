@@ -144,8 +144,12 @@ export default class Login extends Component<{}, {
                                 })
                                 console.log(res.attrItems)
                             }
+                            let select_ids =[];
+                            if (value && value.selectSku) {
+                                select_ids = value.selectSku.value_id.split(",");
+                            }
                             this.setState({
-                                sku: value && value.selectSku ? value.selectSku : null,
+                                defalutSkuIds:select_ids,
                                 skuName: value && value.selectSku ? value.selectSku.value.map((item, index) => {
                                     const key = value.selectSku.keys[index];
                                     if (item == "") {
@@ -155,7 +159,7 @@ export default class Login extends Component<{}, {
                                 }) : [],
                                 maxBuyNum: value && value.currentAddBuyItem && value.currentAddBuyItem.max_quantity ? parseInt(value.currentAddBuyItem.max_quantity + "") : 0,
                                 data: res
-                            })
+                            });
                         }
                     })
                 } else {
@@ -178,7 +182,9 @@ export default class Login extends Component<{}, {
                             }
                             this.setState({
                                 data: res,
-                                defalutSkuIds: result.default_attr_ids.map((item) => parseInt(item + ""))
+                                defalutSkuIds: result.default_attr_ids.map((item) => parseInt(item + "")).map((it)=>{
+                                    return it+""
+                                })
                             })
                         })
                     } else {
@@ -275,9 +281,9 @@ export default class Login extends Component<{}, {
             userStore.showLoginModal = true;
             return;
         }
-        const {buyTotal, sku} = this.state;
-        if (sku != null && buyTotal > 0) {
 
+        const {buyTotal, sku,selectSkuId,data} = this.state;
+        if (sku && sku.length==data.attrGroup.length && selectSkuId>0 && buyTotal>0) {
             this.setState({
                 placeOrderShow: false
             });
@@ -285,6 +291,7 @@ export default class Login extends Component<{}, {
                 ...this.tempDataContainerData,
                 buyTotal,
                 sku,
+                selectSkuId,
                 isOk: true
             }, (is) => {
                 if (is) {
@@ -538,6 +545,7 @@ export default class Login extends Component<{}, {
                                             ...this.tempDataContainerData,
                                             buyTotal,
                                             sku,
+                                            selectSkuId,
                                             isOk: true
                                         }, (is) => {
                                             if (is) {
@@ -611,7 +619,7 @@ export default class Login extends Component<{}, {
                 </View>
                 {
                     placeOrderShow ?
-                        <PlaceOrder selectedSkuId={this.state.sku ? this.state.sku.id : 0} maxBuyNum={maxBuyNum}
+                        <PlaceOrder  maxBuyNum={maxBuyNum}
                                     productType={data && data.product_type ? data.product_type : ""}
                                     defalutSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
                                     isShow={placeOrderShow} onClose={this.onPlaceOrderClose}

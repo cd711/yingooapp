@@ -196,14 +196,16 @@ export default class Confirm extends Component<any, {
             getTempDataContainer(this.tempContainerKey, (value) => {
                 if (value != null && value != undefined && value) {
                     const currentAddBuyItem = value.currentAddBuyItem
+                    console.log("value.sku",value)
                     if (value.isOk && currentAddBuyItem.checked == false) {
-                        this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
+                        this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
                     }else{
                         const temp = value.mainProduct.merge_products.filter((item)=>{
                             return item.product.id == currentAddBuyItem.id
                         })
+                        console.log("temp",temp)
                         this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
-                            this.addBuyProduct(value.pre_order_id, value.product_id, value.sku.id, value.buyTotal);
+                            this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
                         });
                     }
                 }

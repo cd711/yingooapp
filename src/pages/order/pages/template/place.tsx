@@ -35,7 +35,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                 return parseInt(value1) - parseInt(value2);
             });
             skuItem.value = skuKeyAttrs.join(',');
-            // console.log(selectedSkuId)
+
             if (selectedSkuId && parseInt(skuItem.id+"") == parseInt(selectedSkuId+"")) {
                 currentSku = skuItem;
             }
@@ -50,6 +50,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     }
 
     const selectAtteItems = (sku,attrItems:Array<Array<any>>,skusa) => {
+
         const items = attrItems.map((value,i)=>{
             return value.map((val,j)=>{
                 val["selected"] = false;
@@ -75,12 +76,15 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         });
 
         setAttrItems(items);
+        
         if (defalutSelectIds && defalutSelectIds.length>0) {
             for (let i = 0;i<data.attrItems.length;i++) {
                 const item = data.attrItems[i];
                 for (let j = 0;j<item.length;j++) {
                     const tag = item[j];
-                    if (defalutSelectIds.indexOf(tag.id)!=-1) {
+                    console.log("默认id",defalutSelectIds,tag.id,defalutSelectIds.indexOf(tag.id))
+                    if (defalutSelectIds.indexOf(tag.id+"")!=-1) {
+                        
                         onSelectItem(i,j,true,items,skusa);
                     }
                 }
@@ -271,7 +275,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
             <View className='float-layout__overlay' onClick={_onClose}/>
             <View className='float-layout__container'>
                 <View className='float-container'>
-                    <View className='info-part'>
+                    <View className='info-parts'>
                         <Image src={imgs && imgs.length > 0?imgs[0]:""} mode='aspectFill' className='pre_image' onClick={()=>{
                             Taro.previewImage({
                                 current:imgs && imgs.length > 0?imgs[0]:"",
