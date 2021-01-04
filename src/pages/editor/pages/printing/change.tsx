@@ -425,7 +425,8 @@ const PrintChange: Taro.FC<any> = () => {
                 const tStr = tArr.join(",");
                 console.log(tStr)
                 let currentSkuId = null;
-                for (const item of res.skus) {
+                for (let i = 0; i < res.skus.length; i++) {
+                    const item = res.skus[i];
                     if (tStr === item.value) {
                         currentSkuId = item.id;
                         break;
