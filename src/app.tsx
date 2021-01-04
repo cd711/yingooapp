@@ -9,6 +9,7 @@ import { options,getUserInfo } from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
 import {setCookie} from "./utils/common";
+import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -229,6 +230,28 @@ class App extends Component {
                         duration:1500
                     });
                 }, 1500);
+            })
+        }
+
+        if (process.env.TARO_ENV === 'h5') {
+            wx.updateAppMessageShareData({
+                title: '免费照片冲印个性化定制手机壳', // 分享标题
+                desc: '[有人@你]，送你一个创意定制品，快来免费领！', // 分享描述
+                link: `/pages/tabbar/index/index?channel${options.channel}`, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m', // 分享图标
+                success: function () {
+                    // 设置成功
+                    console.log("分享成功")
+                }
+            })
+            wx.updateTimelineShareData({
+                title: '免费照片冲印个性化定制手机壳', // 分享标题
+                link: `/pages/tabbar/index/index?channel${options.channel}`, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m', // 分享图标
+                success: function () {
+                    // 设置成功
+                    console.log("分享成功")
+                }
             })
         }
     }
