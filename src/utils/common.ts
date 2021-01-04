@@ -120,6 +120,9 @@ export const jsApiList = [
     'onMenuShareQQ',
     'onMenuShareWeibo',
     'chooseWXPay',
+    "updateAppMessageShareData",
+    "updateTimelineShareData",
+    "onMenuShareQZone",
 ];
 
 export const deviceInfo = {

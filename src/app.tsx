@@ -5,10 +5,10 @@ import {userStore} from './store/user'
 import {templateStore} from './store/template'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
-import { options,getUserInfo } from './utils/net';
+import {options, getUserInfo, api} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {setCookie} from "./utils/common";
+import {jsApiList, setCookie} from "./utils/common";
 import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -234,24 +234,94 @@ class App extends Component {
         }
 
         if (process.env.TARO_ENV === 'h5') {
-            wx.updateAppMessageShareData({
-                title: '免费照片冲印个性化定制手机壳', // 分享标题
-                desc: '[有人@你]，送你一个创意定制品，快来免费领！', // 分享描述
-                link: `/pages/tabbar/index/index?channel${options.channel}`, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m', // 分享图标
-                success: function () {
-                    // 设置成功
-                    console.log("分享成功")
+            api("wechat/jssdkconfig",{
+                url: window.location.href
+            }).then((res)=>{
+                const share = {
+                    title: "免费照片冲印个性化定制手机壳",
+                    desc: "[有人@你]，送你一个创意定制品，快来免费领！",
+                    link: `/pages/tabbar/index/index?channel=${options.channel}`,
+                    imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
+                };
+                const {title, desc, link, imgUrl} = share;
+                if (process.env.TARO_ENV === 'h5') {
+                    wx.config({
+                        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                        appId: res.appId, // 必填，公众号的唯一标识
+                        timestamp: res.timestamp, // 必填，生成签名的时间戳
+                        nonceStr: res.nonceStr, // 必填，生成签名的随机串
+                        signature: res.signature,// 必填，签名
+                        jsApiList: jsApiList // 必填，需要使用的JS接口列表
+                    });
+                    wx.ready(function () {
+                        wx.updateAppMessageShareData({
+                            title, // 分享标题
+                            desc, // 分享描述
+                            link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            imgUrl, // 分享图标
+                            success: function () {
+                                // 设置成功
+                                console.log("分享成功")
+                            }
+                        })
+                        wx.updateTimelineShareData({
+                            title, // 分享标题
+                            link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            imgUrl, // 分享图标
+                            success: function () {
+                                // 设置成功
+                                console.log("分享成功")
+                            }
+                        })
+                        wx.onMenuShareTimeline({
+                            title, // 分享标题
+                            link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            imgUrl, // 分享图标
+                            success: function () {
+                                // 用户点击了分享后执行的回调函数
+                            }
+                        })
+                        wx.onMenuShareAppMessage({
+                            title, // 分享标题
+                            desc, // 分享描述
+                            link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                            imgUrl, // 分享图标
+                            type: 'link', // 分享类型,music、video或link，不填默认为link
+                            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                            success: function () {
+                                // 用户点击了分享后执行的回调函数
+                            }
+                        });
+                        wx.onMenuShareQQ({
+                            title, // 分享标题
+                            desc, // 分享描述
+                            link, // 分享链接
+                            imgUrl, // 分享图标
+                            success: function () {
+                                // 用户确认分享后执行的回调函数
+                            },
+                            cancel: function () {
+                                // 用户取消分享后执行的回调函数
+                            }
+                        });
+                        wx.onMenuShareQZone({
+                            title, // 分享标题
+                            desc, // 分享描述
+                            link, // 分享链接
+                            imgUrl, // 分享图标
+                            success: function () {
+                                // 用户确认分享后执行的回调函数
+                            },
+                            cancel: function () {
+                                // 用户取消分享后执行的回调函数
+                            }
+                        });
+                    })
                 }
-            })
-            wx.updateTimelineShareData({
-                title: '免费照片冲印个性化定制手机壳', // 分享标题
-                link: `/pages/tabbar/index/index?channel${options.channel}`, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m', // 分享图标
-                success: function () {
-                    // 设置成功
-                    console.log("分享成功")
-                }
+
+            }).catch((e)=>{
+                console.log("分享出错：", e)
+
             })
         }
     }
