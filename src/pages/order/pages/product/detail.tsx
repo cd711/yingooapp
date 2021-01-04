@@ -36,7 +36,8 @@ export default class Login extends Component<{}, {
     maxBuyNum: number;
     showPicSelector: boolean;
     toast: any;
-    selectSkuId:number
+    selectSkuId:number;
+    toastStatus: boolean
 }> {
 
     config: Config = {
@@ -62,6 +63,7 @@ export default class Login extends Component<{}, {
                 icon: "",
                 status: false
             },
+            toastStatus: false,
             selectSkuId:0
         }
     }
@@ -82,7 +84,8 @@ export default class Login extends Component<{}, {
                     title: "领取成功",
                     icon: require("../../../../source/t_succ.png"),
                     status: true
-                }
+                },
+                toastStatus: true
             })
         } catch (e) {
             console.log("领取优惠券失败：", e)
@@ -91,7 +94,8 @@ export default class Login extends Component<{}, {
                     title: e,
                     icon: require("../../../../source/t_fail.png"),
                     status: true
-                }
+                },
+                toastStatus: true
             })
         }
     }
@@ -373,7 +377,8 @@ export default class Login extends Component<{}, {
             toast: {
                 ...this.state.toast,
                 status: false
-            }
+            },
+            toastStatus: false
         })
     }
 
@@ -388,7 +393,8 @@ export default class Login extends Component<{}, {
             defalutSkuIds,
             maxBuyNum,
             showPicSelector,
-            toast
+            toast,
+            toastStatus
         } = this.state;
         const image: Array<any> = data && data.image && data.image.length > 0 ? data.image : [];
         // const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
@@ -399,11 +405,10 @@ export default class Login extends Component<{}, {
         return (
             <View className='p_detail'>
                 {
-                    toast.status
-                        ? <AtToast isOpened={toast.status} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
+                    toastStatus
+                        ? <AtToast isOpened={toastStatus} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
                         : null
                 }
-                {/* @ts-ignore */}
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (Taro.getCurrentPages().length > 1) {
