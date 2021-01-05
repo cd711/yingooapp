@@ -73,6 +73,14 @@ class Index extends Component<any, IndexState> {
 
     }
 
+    getCateInfo = () => {
+        api("app.product/cate").then(res => {
+            this.setState({cateInfo: [...res]})
+        }).catch(_ => {
+
+        })
+    }
+
     private total: number = 0;
 
     getIndexBlocks = (opt: {start?: number, size?: number, loadMore?: boolean, channelCode?: string } = {}) => {
@@ -129,6 +137,11 @@ class Index extends Component<any, IndexState> {
             this.setState({data: [...res]});
             const popArr = [];
             const tempArr = res ? res.filter(v => v.area_type === "popup") : [];
+
+            const idx = res ? res.findIndex(v => v.area_type === "column") : -1;
+            if (idx > -1) {
+                this.getCateInfo()
+            }
 
             console.log("所有优惠券：", tempArr)
 
@@ -213,12 +226,6 @@ class Index extends Component<any, IndexState> {
         }
         this.getIndexList();
 
-
-        api("app.product/cate").then(res => {
-            this.setState({cateInfo: [...res]})
-        }).catch(_ => {
-
-        })
     }
 
     onItemClick = (item, _) => {
