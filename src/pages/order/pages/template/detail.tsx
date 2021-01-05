@@ -199,7 +199,7 @@ export default class Detail extends Component<{}, {
                         {!notNull(currentItem.id) ? <Text className='title'>{`ID:${currentItem.id}`}</Text> : null}
                     </View>
                 </View>
-                <LoginModal/>
+                <LoginModal isTabbar={false}/>
                 <ScrollView scrollY className='detail_page_scroll' scrollTop={scrollTop}
                             onScroll={({detail: {scrollTop}}) => {
                                 this.setState({

@@ -3,9 +3,10 @@ import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import './find.less'
 import IconFont from '../../components/iconfont';
-import {userStore} from "../../store/user";
+// import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import { fixStatusBarHeight,deviceInfo } from '../../utils/common';
+import { api } from '../../utils/net';
 
 @inject("userStore")
 @observer
@@ -36,15 +37,16 @@ export default class Set extends Component<any,{
     }
     private inputRef: { inputRef: { focus: () => void; }; };
     componentDidMount(){
-        if (!userStore.isLogin) {
-            if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
-            } else {
-                Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
-                })
-            }
-        }
+        // console.log("find~~~~~~~~~~~~~~~~")
+        // if (!userStore.isLogin) {
+        //     if (deviceInfo.env == 'h5') {
+        //         window.location.href = "/pages/tabbar/index/index";
+        //     } else {
+        //         Taro.switchTab({
+        //             url:'/pages/tabbar/index/index'
+        //         })
+        //     }
+        // }
 
     }
     onMobileInput = ({detail:{value}}) => {
@@ -93,11 +95,40 @@ export default class Set extends Component<any,{
     sendSMS = () => {
         const { codeBtnActive,inputValue } = this.state;
         if (codeBtnActive && inputValue.length == 11) {
-            Taro.navigateTo({
-                url:`/pages/login/sms?mobile=${inputValue}&status=f`
-            })
-
+            this.checkMobile(inputValue,(is)=>{
+                if (is) {
+                    Taro.navigateTo({
+                        url:`/pages/login/sms?mobile=${inputValue}&status=f`
+                    })
+                } else {
+                    Taro.showToast({
+                        title:"手机号未注册",
+                        icon:"none",
+                        duration:1500
+                    });
+                }
+            });
         }
+    }
+    checkMobile = (mobile,callback:(is:boolean,msg?:string)=>void) => {
+        Taro.showLoading({title:"正在验证..."});
+        api("user/checkMobile",{
+            mobile
+        }).then((res)=>{
+            Taro.hideLoading();
+            if (res && parseInt(res.id+"")>0) {
+                callback(true);
+            } else {
+                callback(false)
+            }
+        }).catch((e)=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:e,
+                icon:"none",
+                duration:1500
+            });
+        })
     }
     render(){
         const { codeBtnActive,showMobileClear,inputValue,inputActive,textActive,inputFocus } = this.state;
