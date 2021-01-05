@@ -46,6 +46,7 @@ export class UserStore {
             info.birthday == ""
         }
         setUserInfo(info);
+        console.log("用户信息",info);
         this.id = info.id;
         this.mobile = info.mobile;
         this.avatar = info.avatar;
@@ -54,7 +55,7 @@ export class UserStore {
         this.bio = info.bio;
         this.address = info.address;
 
-        this.birthday = info.birthday;
+        this.birthday = info.birthday == null || info.birthday == "" ? "未设置":info.birthday;
         this.set_pwd = info.set_pwd > 0;
     }
 
@@ -69,7 +70,7 @@ export class UserStore {
             this.gender = info.gender;
             this.bio = info.bio;
             this.address = info.address;
-            this.birthday = info.birthday;
+            this.birthday = info.birthday == null || info.birthday == "" ? "未设置":info.birthday;
             this.set_pwd = info.set_pwd > 0;
         })
     }
