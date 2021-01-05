@@ -102,6 +102,19 @@ export default class Login extends Component<{}, {
             })
         }
     }
+    componentWillPreload() {
+        console.log("")
+        
+        return new Promise<void>( (resolve, reject) => {
+            setTempDataContainer("product_preview_sku", null, (is) => {
+                if (is) {
+                    resolve();
+                } else {
+                    reject();
+                }
+            });
+        })
+    }
 
     componentDidMount() {
         if (userStore.isLogin) {
@@ -111,7 +124,6 @@ export default class Login extends Component<{}, {
         }
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue && userStore.isLogin) {
-                console.log("登录啦，领取东西啦~~")
                 this.receiveCoupon()
                 setTempDataContainer("product_preview_sku", null, () => {});
             }
@@ -194,7 +206,6 @@ export default class Login extends Component<{}, {
                                     const vals = item.value.split(",");
                                     return vals.every(v => result.attr_ids.includes(parseInt(v + "")))
                                 })
-                                console.log(res.attrItems, res.skus)
                             }
                             this.setState({
                                 data: res,
