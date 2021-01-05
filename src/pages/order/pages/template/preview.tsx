@@ -51,7 +51,8 @@ export default class Preview extends Component<any, {
     isOpened: boolean,
     workInfo:any,
     doc: any,
-    defalutSelectIds:Array<any>
+    defalutSelectIds:Array<any>,
+    selectSkuId:number
 }> {
 
     config: Config = {
@@ -70,7 +71,8 @@ export default class Preview extends Component<any, {
             modalId:0,
             workInfo:{},
             doc: {},
-            defalutSelectIds:[]
+            defalutSelectIds:[],
+            selectSkuId:0
         }
     }
     componentDidMount() {
@@ -310,7 +312,7 @@ export default class Preview extends Component<any, {
     }
 
     render() {
-        const { placeOrderShow,workId,productInfo,workInfo,defalutSelectIds} = this.state;
+        const { placeOrderShow,workId,productInfo,workInfo,defalutSelectIds,selectSkuId} = this.state;
         const {self} = this.$router.params;
         const workid = workInfo && workInfo.id ? workInfo.id : workId;
         // @ts-ignore
@@ -369,11 +371,11 @@ export default class Preview extends Component<any, {
                             buyTotal:n
                         })
                     }} onAddCart={()=>{
-                        const {buyTotal,sku,workId,modalId} = this.state;
-                        if (!isEmpty(sku) && Number(sku.id)>0) {
+                        const {buyTotal,sku,workId,modalId,selectSkuId} = this.state;
+                        if (!isEmpty(sku) && Number(selectSkuId)>0) {
                             Taro.showLoading({title:"加载中"})
                             api("app.cart/add",{
-                                sku_id:sku.id,
+                                sku_id:selectSkuId,
                                 user_tpl_id:workId,
                                 phone_model_id:modalId,
                                 quantity:buyTotal
@@ -400,14 +402,14 @@ export default class Preview extends Component<any, {
                             });
                         }
                     }} onNowBuy={()=>{
-                        const {buyTotal,sku,workId,modalId} = this.state;
-                        if (!isEmpty(sku) && Number(sku.id)>0) {
+                        const {buyTotal,sku,workId,modalId,selectSkuId} = this.state;
+                        if (!isEmpty(sku) && Number(selectSkuId)>0) {
                             this.initModalShow = false;
                             this.setState({
                                 placeOrderShow:false
                             })
                             Taro.navigateTo({
-                                url:`/pages/order/pages/template/confirm?skuid=${sku.id}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
+                                url:`/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
                             })
                         } else {
                             Taro.showToast({
@@ -416,9 +418,10 @@ export default class Preview extends Component<any, {
                                 duration:2000
                             });
                         }
-                    }} onSkuChange={(sku)=>{
+                    }} onSkuChange={(sku,id)=>{
                         this.setState({
-                            sku:sku
+                            sku:sku,
+                            selectSkuId:parseInt(id+"")
                         })
                     }} />:null
                 }
