@@ -164,16 +164,21 @@ const Special: Taro.FC<any> = () => {
                 <View className="special_animate_container" >
                     <View className="animate_container_bg">
                         <Image src={ossUrl(info.image, 2)} className="animate_img" mode="aspectFill" />
-                        <View className="txt_container" style={fixStatusBarHeight()}>
+                        <View className="txt_container" style={{
+                            height: `${225 - deviceInfo.statusBarHeight}px`,
+                            paddingTop: `${deviceInfo.statusBarHeight}px`
+                        }}>
                             <View className='close_btn_container'>
                                 <View className="close_btn" onClick={() => Taro.navigateBack()}>
                                     <IconFont name="32_guanbi" size={64} />
                                 </View>
                             </View>
-                            <Text className="h1">{info.name || " "}</Text>
-                            <Text className="ext">{info.subtitle || " "}</Text>
-                            <View className="action_bar">
-                                <View className="bar" />
+                            <View className="txt_main_info">
+                                <Text className="h1">{info.name || " "}</Text>
+                                <Text className="ext">{info.subtitle || " "}</Text>
+                                <View className="action_bar">
+                                    <View className="bar" />
+                                </View>
                             </View>
                         </View>
                     </View>
