@@ -24,12 +24,12 @@ const PayWayModal: Taro.FC<{
             value:'wechat',
             checked:true
         },
-        {
-            icon:'32_zhifubaozhifu',
-            name:'支付宝',
-            value:'alipay',
-            checked:false
-        }
+        // {
+        //     icon:'32_zhifubaozhifu',
+        //     name:'支付宝',
+        //     value:'alipay',
+        //     checked:false
+        // }
     ]
     if ((is_weixin() && deviceInfo.env == 'h5') ||deviceInfo.env == 'weapp') {
         payway = [

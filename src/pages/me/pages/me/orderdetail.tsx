@@ -409,7 +409,7 @@ export default class OrderDetail extends Component<{},{
                 </View>
                 {
                     deviceInfo.env != "h5"?<View className='contact_service' onClick={this.onServiceModalShow}>
-                        <IconFont name='24_kefu' size={48} color={'#FF4966'} />
+                        <IconFont name='24_kefu' size={48} color="#FF4966" />
                         <Text className='txt'>联系客服</Text>
                     </View> :null
                 }
