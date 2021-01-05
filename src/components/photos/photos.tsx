@@ -348,8 +348,9 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         const {_editSelect} = this.state;
         const {editSelectImgIds, imageList, videoList, navSwitchActive} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
-        const h = _editSelect && (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
-        return deviceInfo.env === "h5" ? h : h + deviceInfo.statusBarHeight + deviceInfo.menu.height
+        const isEdit = _editSelect && (list.length > 0) && editSelectImgIds.length > 0;
+        const h = isEdit ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
+        return deviceInfo.env === "h5" ? h : isEdit ? deviceInfo.windowHeight - 130 - 45 + (deviceInfo.statusBarHeight / 2) : deviceInfo.screenHeight - deviceInfo.safeArea.top - deviceInfo.statusBarHeight
     }
 
     render() {
@@ -366,6 +367,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         } = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片", "视频"];
+        console.log(_editSelect, list.length > 0, editSelectImgIds.length > 0, _editSelect && list.length > 0 && editSelectImgIds.length > 0)
         return (
             <View className='photos'>
                 <View className='photos_nav_bar' style={{
@@ -391,8 +393,11 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     <View className="right"/>
                 </View>
                 <View className='container'>
-                    <ScrollView className='list_scrollview'
-                                style={{height: this.getScrollHeight() + "px"}}
+                    <ScrollView className="list_scrollview"
+                                style={deviceInfo.env !== "h5" && !(_editSelect && list.length > 0 && editSelectImgIds.length > 0)
+                                        ? `height: ${this.getScrollHeight()}px;padding-bottom: constant(safe-area-inset-bottom);padding-bottom: env(safe-area-inset-bottom);`
+                                        : {height: this.getScrollHeight() + "px"}
+                                }
                                 scrollY
                                 scrollWithAnimation
                                 ref={r => this.scrollView = r}
@@ -456,38 +461,42 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     </View>
                                 </View>
                         }
-                        {list.length > 0 ? <LoadMore status={loadStatus}/> : null}
+                        {list.length > 0
+                            ? <LoadMore status={loadStatus} allowFix={!(_editSelect && list.length > 0 && editSelectImgIds.length > 0)} />
+                            : null}
                     </ScrollView>
                     {
                         _editSelect && list.length > 0 && editSelectImgIds.length > 0
-                            ? <View className="photo_edit_selector_container">
-                                <View className="select_head">
-                                    <View className="left">
-                                        <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text
-                                        className="txt">个素材</Text><Text
-                                        className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
-                                        {/*<Text className="ext">长按拖动排序</Text>*/}
-                                    </View>
-                                    <View className="right">
-                                        <View className="submit" onClick={this.submitEditSelect}>
-                                            <Text className="txt">使用</Text>
+                            ? <View className="fix_selector_container">
+                                <View className="photo_edit_selector_container">
+                                    <View className="select_head">
+                                        <View className="left">
+                                            <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text
+                                            className="txt">个素材</Text><Text
+                                            className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
+                                            {/*<Text className="ext">长按拖动排序</Text>*/}
+                                        </View>
+                                        <View className="right">
+                                            <View className="submit" onClick={this.submitEditSelect}>
+                                                <Text className="txt">使用</Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                                <ScrollView scrollX className="select_items_scroll_view">
-                                    <View className="select_items">
-                                        {
-                                            editSelectImgs.map((value, index) => (
-                                                <View className="select_items_wrap" key={index + ""}>
-                                                    <View className="clear" onClick={() => this.delEditSelectImg(index)}>
-                                                        <IconFont name="16_qingkong" size={32}/>
+                                    <ScrollView scrollX className="select_items_scroll_view">
+                                        <View className="select_items">
+                                            {
+                                                editSelectImgs.map((value, index) => (
+                                                    <View className="select_items_wrap" key={index + ""}>
+                                                        <View className="clear" onClick={() => this.delEditSelectImg(index)}>
+                                                            <IconFont name="16_qingkong" size={32}/>
+                                                        </View>
+                                                        <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img"/>
                                                     </View>
-                                                    <Image src={ossUrl(value, 1)} mode="aspectFill" className="select_img"/>
-                                                </View>
-                                            ))
-                                        }
-                                    </View>
-                                </ScrollView>
+                                                ))
+                                            }
+                                        </View>
+                                    </ScrollView>
+                                </View>
                             </View>
                             : null
                     }

@@ -169,49 +169,6 @@
 .list_scrollview{
 
 }
-.select_all_container{
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000001;
-    background: #fff;
-    padding-top: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: constant(safe-area-inset-bottom);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-bottom: 15px;
-    .left{
-        width: 50%;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        flex-direction: column;
-        font-size: 24px;
-        color: #9C9DA6;
-        padding-left: 42px;
-    }
-    .right{
-        width: 50%;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        flex-direction: column;
-        padding-right: 42px;
-    }
-    .btn{
-        width: 107px * 2;
-        height: 44px * 2;
-        background: #FF4966;
-        border-radius: 24px * 2;
-        text-align: center;
-        line-height: 44px * 2;
-        font-size: 32px;
-        color: #fff;
-    }
-}
 
 .sort_item{
     font-size: 32px;
@@ -219,7 +176,11 @@
         color: #FF4966;
     }
 }
-
+.fix_selector_container{
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+    background: #000;
+}
 .photo_edit_selector_container{
     background: #000;
     box-sizing: border-box;

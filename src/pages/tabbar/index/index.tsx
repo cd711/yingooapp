@@ -219,6 +219,8 @@ class Index extends Component<any, IndexState> {
     }
 
     componentDidMount() {
+
+        console.log(deviceInfo)
         if (process.env.TARO_ENV != 'h5') {
             this.setState({
                 centerPartyHeight: deviceInfo.windowHeight
