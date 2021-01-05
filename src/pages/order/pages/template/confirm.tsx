@@ -77,10 +77,14 @@ export default class Confirm extends Component<any, {
     private tempContainerKey = "";
     private initPayWayModal = false;
     componentDidMount() {
+        if (process.env.TARO_ENV == "h5") {
+            document.title = this.config.navigationBarTitleText || "确认订单";
+        }
         if (userStore.isLogin) {
-            setTempDataContainer("product_preview_sku",null,()=>{});
+            setTempDataContainer("product_preview_sku",null);
         }
         if (process.env.TARO_ENV != 'h5') {
+            
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".bottom").boundingClientRect((status_react) => {
                     this.setState({
@@ -101,11 +105,8 @@ export default class Confirm extends Component<any, {
     }
 
     initData = async () => {
-
         const {page, skuid, total}: any = this.$router.params;
-
         this.isPhoto = page && page === "photo";
-
         let params = {};
         if (this.isPhoto) {
             try {
@@ -190,7 +191,6 @@ export default class Confirm extends Component<any, {
     }
 
     componentDidShow() {
-        console.log("componentDidShow")
         const {data: {address}} = this.state;
         if (this.tempContainerKey != "") {
             getTempDataContainer(this.tempContainerKey, (value) => {
@@ -209,7 +209,7 @@ export default class Confirm extends Component<any, {
                         });
                     }
                 }
-
+                setTempDataContainer(this.tempContainerKey,null);
             })
         }
         if (!isEmpty(address) && !isEmpty(templateStore.address)) {
@@ -648,7 +648,7 @@ export default class Confirm extends Component<any, {
                             })
                         }}>
                             {/* <Image src={require('../../../../source/addressBackground.png')} className='backimg'/> */}
-                            <View className='address'>
+                            <View className='c_address'>
                                 <View className='icon'><IconFont name='20_dingwei' size={40} color='#FF4966'/></View>
                                 <View className='info'>
                                     <View className='youi'>

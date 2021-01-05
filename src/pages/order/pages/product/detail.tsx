@@ -21,7 +21,11 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from "../../../../store/user";
+import {inject, observer} from '@tarojs/mobx'
+import { observe } from 'mobx';
 
+@inject("userStore")
+@observer
 export default class Login extends Component<{}, {
     data: any,
     currentPreImageIndex: number,
@@ -100,9 +104,18 @@ export default class Login extends Component<{}, {
     }
 
     componentDidMount() {
-        this.receiveCoupon()
-        setTempDataContainer("product_preview_sku", null, () => {
-        });
+        if (userStore.isLogin) {
+            this.receiveCoupon()
+            setTempDataContainer("product_preview_sku", null, () => {
+            });
+        }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue && userStore.isLogin) {
+                console.log("登录啦，领取东西啦~~")
+                this.receiveCoupon()
+                setTempDataContainer("product_preview_sku", null, () => {});
+            }
+        })
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".product_bottom_bar").boundingClientRect((status_react) => {
