@@ -4,7 +4,9 @@ import { AtActivityIndicator } from 'taro-ui';
 import "./listMore.less";
 
 export interface LoadMoreProps {
-    status: 'more' | 'loading' | 'noMore'
+    status: 'more' | 'loading' | 'noMore';
+    // 如否修正刘海屏底部危险区的,默认是已修正
+    allowFix?: boolean;
 }
 
 export enum LoadMoreEnum {
@@ -16,7 +18,8 @@ export enum LoadMoreEnum {
 class LoadMore extends Component<LoadMoreProps, any> {
 
     static defaultProps = {
-        status: "more"
+        status: "more",
+        allowFix: true
     }
 
     getContent() {
@@ -29,9 +32,9 @@ class LoadMore extends Component<LoadMoreProps, any> {
     }
 
     render() {
-        const {status} = this.props;
+        const {status, allowFix} = this.props;
         return (
-            <View className="load_more_view">
+            <View className={`load_more_view ${allowFix ? "load_more_view_fix_bottom" : ""}`}>
                 {status === "loading" ? <AtActivityIndicator /> : null}
                 <Text className="txt">{this.getContent()}</Text>
             </View>

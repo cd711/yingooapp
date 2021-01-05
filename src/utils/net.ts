@@ -112,6 +112,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
             url,
             data: params,
             method: "POST",
+            timeout: 1000 * 60,
             header: {
                 'content-type': allowJson ? "application/json" : 'application/x-www-form-urlencoded',
             }

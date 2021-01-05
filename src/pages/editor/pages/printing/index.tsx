@@ -233,7 +233,10 @@ const Index: Taro.FC<any> = () => {
                 <View className="printing_main"
                       style={
                           deviceInfo.env === "weapp"
-                              ? {paddingTop: deviceInfo.statusBarHeight + "px"}
+                              ? {
+                                paddingTop: deviceInfo.statusBarHeight + "px",
+                                paddingBottom: 22 + "px"
+                              }
                               : null
                       }
                 >

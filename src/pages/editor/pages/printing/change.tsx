@@ -636,7 +636,10 @@ const PrintChange: Taro.FC<any> = () => {
                 <View className="printing_change_main"
                       style={
                           deviceInfo.env === "weapp"
-                              ? {paddingTop: deviceInfo.statusBarHeight + "px"}
+                              ? {
+                                  paddingTop: deviceInfo.statusBarHeight + "px",
+                                  paddingBottom: 22 + "px"
+                              }
                               : null
                       }
                 >
