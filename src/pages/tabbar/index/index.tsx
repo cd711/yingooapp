@@ -115,7 +115,7 @@ class Index extends Component<any, IndexState> {
     getIndexList = async () => {
 
         let cIds = {};
-        
+
         if (userStore.isLogin) {
             try {
                 const res = await api("app.coupon/receiveCoupinId");
@@ -233,7 +233,7 @@ class Index extends Component<any, IndexState> {
 
     onItemClick = (item, _) => {
         console.log(item)
-        
+
         if (!userStore.isLogin && item.info.category.type === "photo") {
             userStore.showLoginModal = true;
             return;
@@ -927,7 +927,7 @@ class Index extends Component<any, IndexState> {
                             })
                         }
                     </View>
-                    <LoadMore status={loadStatus} />
+                    <LoadMore status={loadStatus} allowFix={false} />
                 </ScrollView>
             </View>
         )
