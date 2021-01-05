@@ -240,7 +240,7 @@ class App extends Component {
                 const share = {
                     title: "免费照片冲印个性化定制手机壳",
                     desc: "[有人@你]，送你一个创意定制品，快来免费领！",
-                    link: `/pages/tabbar/index/index?channel=${options.channel}`,
+                    link: `https://m.playbox.yingoo.com/pages/tabbar/index/index?channel=${options.channel}`,
                     imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
                 };
                 const {title, desc, link, imgUrl} = share;

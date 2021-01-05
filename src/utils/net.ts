@@ -116,6 +116,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
                 'content-type': allowJson ? "application/json" : 'application/x-www-form-urlencoded',
             }
         }).then((res: any) => {
+            console.log("api接口请求：", res.data)
             if(res.data.code == 401){
                 Taro.hideLoading();
                 Taro.removeStorage({key:'token'});
