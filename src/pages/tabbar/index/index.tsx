@@ -97,7 +97,7 @@ class Index extends Component<any, IndexState> {
                 this.setState({
                     loadStatus: this.total === arr.length ? LoadMoreEnum.noMore : LoadMoreEnum.more
                 })
-                resolve(arr)
+                resolve(arr || [])
             } catch (e) {
                 reject(e)
             }
@@ -128,7 +128,7 @@ class Index extends Component<any, IndexState> {
             const res = await this.getIndexBlocks()
             this.setState({data: [...res]});
             const popArr = [];
-            const tempArr = res.filter(v => v.area_type === "popup");
+            const tempArr = res ? res.filter(v => v.area_type === "popup") : [];
 
             console.log("所有优惠券：", tempArr)
 
