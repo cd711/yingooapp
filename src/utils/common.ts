@@ -387,14 +387,14 @@ export function getEvenArr(arr = []) {
     return arr
 }
 
-export function setTempDataContainer(key:string,data:any,callback:(ok:boolean)=>void){
+export function setTempDataContainer(key:string,data:any,callback?:(ok:boolean)=>void){
     api("app.order_temp/container",{
         field_key:key,
         content:JSON.stringify(data)
     }).then(()=>{
-        callback(true)
+        callback && callback(true)
     }).catch(()=>{
-        callback(false)
+        callback && callback(false)
     });
 }
 export function getTempDataContainer(key:string,callback:(value:any)=>void){
@@ -623,7 +623,8 @@ export function setCookie(name,value) {
 
 export function getCookie(name) {
     if (deviceInfo.env === "h5") {
-        let arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+        let arr = [];
+        const reg = new RegExp("(^| )"+name+"=([^;]*)(;|$)");
         if(arr=document.cookie.match(reg))
             return unescape(arr[2]);
         else
