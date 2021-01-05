@@ -10,7 +10,7 @@ import {
     jumpToEditor,
     notNull,
     ossUrl,
-    setTempDataContainer,
+    setTempDataContainer, sleep,
     urlEncode
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
@@ -90,6 +90,7 @@ export default class Login extends Component<{}, {
                 },
                 toastStatus: true
             })
+            this.toastClose()
         } catch (e) {
             console.log("领取优惠券失败：", e)
             this.setState({
@@ -100,6 +101,7 @@ export default class Login extends Component<{}, {
                 },
                 toastStatus: true
             })
+            this.toastClose()
         }
     }
 
@@ -384,7 +386,8 @@ export default class Login extends Component<{}, {
         }
     }
 
-    toastClose = () => {
+    toastClose = async () => {
+        await sleep(2000)
         this.setState({
             toast: {
                 ...this.state.toast,
