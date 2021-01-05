@@ -150,7 +150,6 @@ const Special: Taro.FC<any> = () => {
                         scrollY
                         style={{
                             height: getHeight(),
-                            paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : ""
                         }}
                         onScroll={onScroll}
                         onScrollToLower={loadMore}
@@ -162,12 +161,14 @@ const Special: Taro.FC<any> = () => {
                               leftIconType={{value:'chevron-left', color:'#121314', size:24}}
                     />
                 </View>
-                <View className="special_animate_container">
+                <View className="special_animate_container" >
                     <View className="animate_container_bg">
                         <Image src={ossUrl(info.image, 2)} className="animate_img" mode="aspectFill" />
-                        <View className="txt_container">
-                            <View className="close_btn" onClick={() => Taro.navigateBack()}>
-                                <IconFont name="32_guanbi" size={64} />
+                        <View className="txt_container" style={fixStatusBarHeight()}>
+                            <View className='close_btn_container'>
+                                <View className="close_btn" onClick={() => Taro.navigateBack()}>
+                                    <IconFont name="32_guanbi" size={64} />
+                                </View>
                             </View>
                             <Text className="h1">{info.name || " "}</Text>
                             <Text className="ext">{info.subtitle || " "}</Text>
