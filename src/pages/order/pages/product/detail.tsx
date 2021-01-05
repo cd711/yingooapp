@@ -105,7 +105,7 @@ export default class Login extends Component<{}, {
         }
     }
     componentWillPreload() {
-        console.log("")
+        console.log("componentWillPreload")
         
         return new Promise<void>( (resolve, reject) => {
             setTempDataContainer("product_preview_sku", null, (is) => {
