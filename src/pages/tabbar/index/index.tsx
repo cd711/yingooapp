@@ -314,10 +314,30 @@ class Index extends Component<any, IndexState> {
 
     singleProdAndReceiveCoupon = async (prod, coupon) => {
         console.log(prod, coupon)
+        let obj = {};
+        if (prod.info.jump_url) {
+            if (coupon) {
+                obj = {
+                    coupon: coupon.id
+                }
+            }
+        } else {
+            obj = {
+                id: prod.info.id,
+                rid: prod.id
+            }
+            if (coupon) {
+                obj = {
+                    ...obj,
+                    coupon: coupon.id
+                }
+            }
+        }
+        const str = getURLParamsStr(urlEncode(obj))
         Taro.navigateTo({
             url: prod.info.jump_url
-                ? `${prod.info.jump_url}&coupon=${coupon && coupon.id || ""}`
-                : `/pages/order/pages/product/detail?id=${prod.info.id}&rid=${prod.id}&coupon=${coupon && coupon.id || ""}`,
+                ? `${prod.info.jump_url}&${str}`
+                : `/pages/order/pages/product/detail?${str}`,
         })
     }
 

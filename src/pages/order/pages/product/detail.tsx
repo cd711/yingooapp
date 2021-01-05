@@ -21,7 +21,6 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from "../../../../store/user";
-import {AtToast} from "taro-ui";
 
 export default class Login extends Component<{}, {
     data: any,
@@ -70,7 +69,7 @@ export default class Login extends Component<{}, {
 
     private tempDataContainerData = null;
     private tempDataContainerKey = "";
-    private modalInit = false;
+    public modalInit = false;
 
     receiveCoupon = async () => {
         const {coupon} = this.$router.params;
@@ -322,7 +321,7 @@ export default class Login extends Component<{}, {
 
     onPhotoSelect = async ({ids, imgs, attrs}) => {
 
-        const {data, sku,defalutSkuIds,selectSkuId} = this.state;
+        const {data, sku,selectSkuId} = this.state;
         this.setState({showPicSelector: false})
         Taro.showLoading({title: "请稍后...."})
 
@@ -404,11 +403,6 @@ export default class Login extends Component<{}, {
         // @ts-ignore
         return (
             <View className='p_detail'>
-                {
-                    toastStatus
-                        ? <AtToast isOpened={toastStatus} text={toast.title} image={toast.icon} duration={1500} onClose={this.toastClose} />
-                        : null
-                }
                 <View className='nav-bar' style={fixStatusBarHeight()}>
                     <View className='left' onClick={() => {
                         if (Taro.getCurrentPages().length > 1) {
@@ -429,6 +423,16 @@ export default class Login extends Component<{}, {
                         <Text className='title'>{this.config.navigationBarTitleText || '商品详情'}</Text>
                     </View>
                 </View>
+                {
+                    toastStatus
+                        ? <View className="detail_toast_container">
+                            <View className="toast_main">
+                                <View className="img"><Image src={toast.icon} className="icon" /></View>
+                                <View className="txt_info"><Text className="txt">{toast.title}</Text></View>
+                            </View>
+                        </View>
+                        : null
+                }
                 <LoginModal isTabbar={false}/>
                 <ScrollView scrollY className="p_detail_scroll"
                             style={deviceInfo.env === 'h5' ? "flex:1" : `height:${centerPartyHeight}px`}>
