@@ -107,7 +107,8 @@ class Index extends Component<any, IndexState> {
     getIndexList = async () => {
 
         let cIds = {};
-        if (!notNull(userStore.id)) {
+        
+        if (userStore.isLogin) {
             try {
                 const res = await api("app.coupon/receiveCoupinId");
                 cIds = res || {}
@@ -117,7 +118,7 @@ class Index extends Component<any, IndexState> {
         }
         let localCoupon = new LocalCoupon();
         try {
-            if (!notNull(userStore.id)) {
+            if (userStore.isLogin) {
                 const res = await getLocalCoupon();
                 localCoupon = {...res};
             }
@@ -223,7 +224,8 @@ class Index extends Component<any, IndexState> {
 
     onItemClick = (item, _) => {
         console.log(item)
-        if (notNull(userStore.id) && item.info.category.type === "photo") {
+        
+        if (!userStore.isLogin && item.info.category.type === "photo") {
             userStore.showLoginModal = true;
             return;
         }
@@ -404,7 +406,7 @@ class Index extends Component<any, IndexState> {
         }
 
         if (type === 1) {
-            if (notNull(userStore.id)) {
+            if (!userStore.isLogin) {
                 userStore.showLoginModal = true
                 return
             }
@@ -412,7 +414,7 @@ class Index extends Component<any, IndexState> {
                 url: "/pages/editor/pages/printing/index?id=34"
             })
         } else if (type === 2) {
-            if (notNull(userStore.id)) {
+            if (!userStore.isLogin) {
                 userStore.showLoginModal = true
                 return
             }
@@ -489,7 +491,7 @@ class Index extends Component<any, IndexState> {
         const data = {...this.state.curtain};
         console.log(data);
 
-        if (notNull(userStore.id)) {
+        if (!userStore.isLogin) {
             userStore.showLoginModal = true;
             return
         }
@@ -509,7 +511,7 @@ class Index extends Component<any, IndexState> {
     onBannerClick = (data, idx) => {
         console.log(data, idx)
 
-        if (notNull(userStore.id)) {
+        if (!userStore.isLogin) {
             userStore.showLoginModal = true;
             return
         }
@@ -611,7 +613,7 @@ class Index extends Component<any, IndexState> {
                                 const onlyThreePhone = phoneArr.length > 3 ? phoneArr.slice(0, 3) : [];
 
                                 return item.area_type === "content"
-                                    ? <Fragment key={index}>
+                                    ? <Fragment key={index+""}>
                                         {
                                             item.model === "product"
                                                 ? len === 1
@@ -734,7 +736,7 @@ class Index extends Component<any, IndexState> {
                                                                     <View className="phone_shell_view_list">
                                                                         {
                                                                             onlyThreePhone.map((phone, phoneIdx) => (
-                                                                                <View className="single_phone_shell_wrap" key={phoneIdx}>
+                                                                                <View className="single_phone_shell_wrap" key={phoneIdx+""}>
                                                                                     <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
                                                                                           onClick={() => this.onItemClick(phone, index)}>
                                                                                         <Image src={require("../../../source/sjk.png")} className="shell_ke rectangle_ke" />
