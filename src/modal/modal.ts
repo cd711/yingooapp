@@ -13,7 +13,6 @@ export class LocalCoupon {
     public everyTime: Array<string> = new Array<string>();
     public fixedTime: Array<FixedTimeProps> = new Array<FixedTimeProps>();
     constructor(json?: any) {
-        console.log(json)
         this.onlyOnce = json && json.onlyOnce || [];
         this.everyTime = json && json.everyTime || [];
         this.fixedTime = json && json.fixedTime || new Array<FixedTimeProps>();

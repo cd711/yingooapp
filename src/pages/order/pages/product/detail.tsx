@@ -10,7 +10,8 @@ import {
     jumpToEditor,
     notNull,
     ossUrl,
-    setTempDataContainer, sleep,
+    setTempDataContainer,
+    sleep,
     urlEncode
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
@@ -22,7 +23,7 @@ import photoStore from "../../../../store/photo";
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from "../../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
-import { observe } from 'mobx';
+import {observe} from 'mobx';
 
 @inject("userStore")
 @observer
@@ -39,7 +40,7 @@ export default class Login extends Component<{}, {
     maxBuyNum: number;
     showPicSelector: boolean;
     toast: any;
-    selectSkuId:number;
+    selectSkuId: number;
     toastStatus: boolean
 }> {
 
@@ -67,7 +68,7 @@ export default class Login extends Component<{}, {
                 status: false
             },
             toastStatus: false,
-            selectSkuId:0
+            selectSkuId: 0
         }
     }
 
@@ -75,7 +76,12 @@ export default class Login extends Component<{}, {
     private tempDataContainerKey = "";
     public modalInit = false;
 
+    private requesting: number = 0;
     receiveCoupon = async () => {
+        if (this.requesting > 1) {
+            return
+        }
+        this.requesting += 1;
         const {coupon} = this.$router.params;
         if (notNull(coupon)) {
             return
@@ -90,7 +96,8 @@ export default class Login extends Component<{}, {
                 },
                 toastStatus: true
             })
-            this.toastClose()
+            this.toastClose();
+            this.requesting = 0;
         } catch (e) {
             console.log("领取优惠券失败：", e)
             this.setState({
@@ -100,14 +107,16 @@ export default class Login extends Component<{}, {
                     status: true
                 },
                 toastStatus: true
-            })
+            });
+            this.requesting = 0;
             this.toastClose()
         }
     }
+
     componentWillPreload() {
         console.log("componentWillPreload")
-        
-        return new Promise<void>( (resolve, reject) => {
+
+        return new Promise<void>((resolve, reject) => {
             setTempDataContainer("product_preview_sku", null, (is) => {
                 if (is) {
                     resolve();
@@ -124,10 +133,11 @@ export default class Login extends Component<{}, {
             setTempDataContainer("product_preview_sku", null, () => {
             });
         }
-        observe(userStore,"id",(change)=>{
+        observe(userStore, "id", (change) => {
             if (change.newValue != change.oldValue && userStore.isLogin) {
                 this.receiveCoupon()
-                setTempDataContainer("product_preview_sku", null, () => {});
+                setTempDataContainer("product_preview_sku", null, () => {
+                });
             }
         })
         if (process.env.TARO_ENV != 'h5') {
@@ -152,7 +162,7 @@ export default class Login extends Component<{}, {
             }).then((res) => {
                 Taro.hideLoading();
                 this.modalInit = true;
-                res.attrGroup = res.attrGroup.filter((item)=>{
+                res.attrGroup = res.attrGroup.filter((item) => {
                     console.log(item)
                     return item.special_show != "photonumber"
                 })
@@ -174,12 +184,12 @@ export default class Login extends Component<{}, {
                                 })
                                 console.log(res.attrItems)
                             }
-                            let select_ids =[];
+                            let select_ids = [];
                             if (value && value.selectSku) {
                                 select_ids = value.selectSku.value_id.split(",");
                             }
                             this.setState({
-                                defalutSkuIds:select_ids,
+                                defalutSkuIds: select_ids,
                                 skuName: value && value.selectSku ? value.selectSku.value.map((item, index) => {
                                     const key = value.selectSku.keys[index];
                                     if (item == "") {
@@ -211,8 +221,8 @@ export default class Login extends Component<{}, {
                             }
                             this.setState({
                                 data: res,
-                                defalutSkuIds: result.default_attr_ids.map((item) => parseInt(item + "")).map((it)=>{
-                                    return it+""
+                                defalutSkuIds: result.default_attr_ids.map((item) => parseInt(item + "")).map((it) => {
+                                    return it + ""
                                 })
                             })
                         })
@@ -311,8 +321,8 @@ export default class Login extends Component<{}, {
             return;
         }
 
-        const {buyTotal, sku,selectSkuId,data} = this.state;
-        if (sku && sku.length==data.attrGroup.length && selectSkuId>0 && buyTotal>0) {
+        const {buyTotal, sku, selectSkuId, data} = this.state;
+        if (sku && sku.length == data.attrGroup.length && selectSkuId > 0 && buyTotal > 0) {
             this.setState({
                 placeOrderShow: false
             });
@@ -347,7 +357,7 @@ export default class Login extends Component<{}, {
 
     onPhotoSelect = async ({ids, imgs, attrs}) => {
 
-        const {data, sku,selectSkuId} = this.state;
+        const {data, sku, selectSkuId} = this.state;
         this.setState({showPicSelector: false})
         Taro.showLoading({title: "请稍后...."})
 
@@ -374,7 +384,7 @@ export default class Login extends Component<{}, {
             const tmp = {
                 id: data.id,
                 cid: data.tpl_category_id,
-                sku_id: data.attrGroup.length != data.attrItems.length?sku:selectSkuId,
+                sku_id: data.attrGroup.length != data.attrItems.length ? sku : selectSkuId,
             }
 
             if (sku) {
@@ -454,7 +464,7 @@ export default class Login extends Component<{}, {
                     toastStatus
                         ? <View className="detail_toast_container">
                             <View className="toast_main">
-                                <View className="img"><Image src={toast.icon} className="icon" /></View>
+                                <View className="img"><Image src={toast.icon} className="icon"/></View>
                                 <View className="txt_info"><Text className="txt">{toast.title}</Text></View>
                             </View>
                         </View>
@@ -540,7 +550,7 @@ export default class Login extends Component<{}, {
                             <View className='content'>
                                 <Text className='title'>规格</Text>
                                 <Text
-                                    className='sku'>{skuName.length>0?"已选择":"选择"} {skuName.length > 0 ? skuName.join("/") : attrGroup.map((item) => item["name"]).join("/")}</Text>
+                                    className='sku'>{skuName.length > 0 ? "已选择" : "选择"} {skuName.length > 0 ? skuName.join("/") : attrGroup.map((item) => item["name"]).join("/")}</Text>
                             </View>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
                         </View>
@@ -572,8 +582,8 @@ export default class Login extends Component<{}, {
                                         userStore.showLoginModal = true;
                                         return;
                                     }
-                                    const {buyTotal, sku,selectSkuId} = this.state;
-                                    if (sku && sku.length==data.attrGroup.length && selectSkuId>0 && buyTotal>0) {
+                                    const {buyTotal, sku, selectSkuId} = this.state;
+                                    if (sku && sku.length == data.attrGroup.length && selectSkuId > 0 && buyTotal > 0) {
                                         this.setState({
                                             placeOrderShow: false
                                         });
@@ -598,14 +608,14 @@ export default class Login extends Component<{}, {
                             </View> : (data && data.product_type && data.product_type == "customized" ?
                                 <View className='ops'>
                                     <Button className='red-ok-btn' onClick={() => {
-                                        const {sku, data,selectSkuId} = this.state;
+                                        const {sku, data, selectSkuId} = this.state;
                                         console.log("当前类型：", data.tpl_product_type)
                                         if (!userStore.isLogin) {
                                             userStore.showLoginModal = true;
                                             return;
                                         }
-                                        if (data.tpl_product_type == "photo"){
-                                            if (sku == null && defalutSkuIds && defalutSkuIds.length>0) {
+                                        if (data.tpl_product_type == "photo") {
+                                            if (sku == null && defalutSkuIds && defalutSkuIds.length > 0) {
                                                 console.log(defalutSkuIds);
                                                 if (data.attrGroup.length != data.attrItems.length) {
                                                     this.modalInit = false
@@ -614,7 +624,7 @@ export default class Login extends Component<{}, {
                                                 }
                                             }
                                         }
-                                        if (sku && sku.length==data.attrGroup.length && selectSkuId>0) {
+                                        if (sku && sku.length == data.attrGroup.length && selectSkuId > 0) {
 
                                             setTempDataContainer("product_preview_sku", {
                                                 sku,
@@ -655,7 +665,7 @@ export default class Login extends Component<{}, {
                 </View>
                 {
                     placeOrderShow ?
-                        <PlaceOrder  maxBuyNum={maxBuyNum}
+                        <PlaceOrder maxBuyNum={maxBuyNum}
                                     productType={data && data.product_type ? data.product_type : ""}
                                     defalutSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
                                     isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
@@ -670,10 +680,10 @@ export default class Login extends Component<{}, {
                                 userStore.showLoginModal = true;
                                 return;
                             }
-                            const {sku,selectSkuId,data, buyTotal} = this.state;
+                            const {sku, selectSkuId, data, buyTotal} = this.state;
                             // const {attrGroup} = data;
                             // console.log(sku,skuName,buyTotal)
-                            if (sku.length==data.attrGroup.length && buyTotal > 0) {
+                            if (sku.length == data.attrGroup.length && buyTotal > 0) {
                                 Taro.showLoading({title: "加载中"})
                                 api("app.cart/add", {
                                     sku_id: selectSkuId,
@@ -706,8 +716,8 @@ export default class Login extends Component<{}, {
                                 userStore.showLoginModal = true;
                                 return;
                             }
-                            const {buyTotal, data,selectSkuId,sku} = this.state;
-                            if (sku.length==data.attrGroup.length &&  buyTotal > 0 && selectSkuId>0) {
+                            const {buyTotal, data, selectSkuId, sku} = this.state;
+                            if (sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
                                 this.setState({
                                     placeOrderShow: false
                                 })
@@ -722,22 +732,22 @@ export default class Login extends Component<{}, {
                                 });
                             }
 
-                        }} onSkuChange={(sku,id) => {
-                            console.log("sku change", sku,id);
+                        }} onSkuChange={(sku, id) => {
+                            console.log("sku change", sku, id);
                             this.setState({
                                 sku,
-                                selectSkuId:parseInt(id+"")
+                                selectSkuId: parseInt(id + "")
                             })
                         }} onOkButtonClick={() => this.onOkButtonClick()} onNowButtonClick={() => {
                             //立即制作
-                            const {sku, data,selectSkuId} = this.state;
+                            const {sku, data, selectSkuId} = this.state;
                             console.log("当前类型：", data.tpl_product_type)
                             if (!userStore.isLogin) {
                                 userStore.showLoginModal = true;
                                 return;
                             }
-                            if (data.tpl_product_type == "photo"){
-                                if (sku.length==data.attrGroup.length && selectSkuId>0) {
+                            if (data.tpl_product_type == "photo") {
+                                if (sku.length == data.attrGroup.length && selectSkuId > 0) {
                                     console.log(defalutSkuIds);
                                     if (data.attrGroup.length != data.attrItems.length) {
                                         this.modalInit = false
@@ -746,7 +756,7 @@ export default class Login extends Component<{}, {
                                     }
                                 }
                             }
-                            if (sku.length==data.attrGroup.length) {
+                            if (sku.length == data.attrGroup.length) {
                                 // let url = ""
 
                                 setTempDataContainer("product_preview_sku", {
@@ -780,8 +790,8 @@ export default class Login extends Component<{}, {
                                     duration: 2000
                                 });
                             }
-                        }} onNamesChange={(names)=>{
-                            console.log("哈哈",names);
+                        }} onNamesChange={(names) => {
+                            console.log("哈哈", names);
                             this.setState({
                                 skuName: names,
 
