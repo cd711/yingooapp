@@ -169,40 +169,44 @@
     width: 100%;
     z-index: 1000001;
     background: #fff;
-    padding-top: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding-bottom: constant(safe-area-inset-bottom);
     padding-bottom: env(safe-area-inset-bottom);
-    padding-bottom: 15px;
-    .left{
-        width: 50%;
+    box-shadow: 0px -4px 12px 0px #f1f1f160;
+    .select_all_main{
+        height: 120px;
         display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        flex-direction: column;
-        font-size: 24px;
-        color: #9C9DA6;
-        padding-left: 42px;
-    }
-    .right{
-        width: 50%;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        flex-direction: column;
-        padding-right: 42px;
-    }
-    .btn{
-        width: 107px * 2;
-        height: 44px * 2;
-        background: #FF4966;
-        border-radius: 24px * 2;
-        text-align: center;
-        line-height: 44px * 2;
-        font-size: 32px;
-        color: #fff;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        box-sizing: border-box;
+        .left{
+            width: 50%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 24px;
+            color: #9C9DA6;
+            padding-left: 42px;
+        }
+        .right{
+            width: 50%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            flex-direction: column;
+            padding-right: 42px;
+        }
+        .btn{
+            width: 107px * 2;
+            height: 44px * 2;
+            background: #FF4966;
+            border-radius: 24px * 2;
+            text-align: center;
+            line-height: 44px * 2;
+            font-size: 32px;
+            color: #fff;
+        }
     }
 }
 
@@ -213,103 +217,3 @@
     }
 }
 
-.photo_edit_selector_container{
-    background: #000;
-    box-sizing: border-box;
-    width: 100%;
-    padding: 24px 32px;
-    height: 260px;
-    .select_head{
-        box-sizing: border-box;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        .left{
-            flex: 3;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            .txt{
-                font-size: 32px;
-                color: #fff;
-                white-space: nowrap;
-                .red{
-                    color: #FF4966;
-                    display: inline-block;
-                    padding: 0 12px;
-                }
-            }
-            .ext{
-                font-size: 24px;
-                color: #ffffff45;
-                display: block;
-            }
-
-        }
-        .right{
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            .submit{
-                width: 120px;
-                height: 56px;
-                background: #FF4966;
-                border-radius: 48px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                .txt{
-                    font-size: 28px;
-                    color: #FFFFFF;
-                }
-            }
-        }
-    }
-    .select_items_scroll_view{
-
-    }
-    .select_items{
-        display: inline-block;
-        white-space: nowrap;
-        box-sizing: border-box;
-        width: 100%;
-        margin-top: 32px;
-        .select_items_wrap{
-            position: relative;
-            width: 96px;
-            height: 96px;
-            margin-right: 24px;
-            display: inline-block;
-            .clear{
-                width: 32px;
-                height: 32px;
-                position: absolute;
-                top: -16px;
-                right: -16px;
-                z-index: 100;
-            }
-            .select_img{
-                width: 96px;
-                height: 96px;
-            }
-        }
-    }
-}
-.edit_select_index{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #00000050;
-    .txt{
-        color: #fff;
-        font-size: 64px;
-    }
-}

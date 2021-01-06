@@ -85,7 +85,6 @@ const Feedback: Taro.FC<any> = (_) => {
 
     return (
         <View className="feedback_container">
-            {/* @ts-ignore */}
             <View className='nav-bar' style={{
                 height: `${deviceInfo.env === "weapp" ? deviceInfo.menu.bottom : 44}px`,
                 paddingTop: `${deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight : 0}px`
@@ -99,8 +98,9 @@ const Feedback: Taro.FC<any> = (_) => {
                     <Text className='title'>问题反馈</Text>
                 </View>
             </View>
-            <ScrollView scrollY style={{
-                height: `${deviceInfo.env === "weapp" ? deviceInfo.windowHeight - deviceInfo.menu.bottom : deviceInfo.windowHeight - 44}px`
+            <ScrollView scrollY className="feedback_scroll_view" style={{
+                height: `${deviceInfo.windowHeight}px`,
+                paddingTop: `${(deviceInfo.env === "weapp" ? deviceInfo.menu.bottom : deviceInfo.statusBarHeight + 44)}px`
             }}>
                 <View className="feedback_selector">
                     {

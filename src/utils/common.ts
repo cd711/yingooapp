@@ -129,6 +129,7 @@ export const deviceInfo = {
     ...Taro.getSystemInfoSync(),
     env: process.env.TARO_ENV,
     menu: process.env.TARO_ENV !== "h5" ? Taro.getMenuButtonBoundingClientRect() : {} as any,
+    safeBottomHeight: process.env.TARO_ENV !== "h5" ? Taro.getSystemInfoSync().screenHeight - Taro.getSystemInfoSync().safeArea.height : 0
 };
 
 
@@ -642,4 +643,19 @@ export function delCookie(name) {
             document.cookie = name + "=" + cval + ";expires=" + exp.toDateString();
         }
     }
+}
+
+/**
+ * 跳转政策页面
+ * @param type {enum}  1: 用户协议 2:隐私政策
+ */
+export function jumpToPrivacy(type: 1 | 2) {
+    let p = "";
+    switch (type) {
+        case 1: p = "user_agreement"; break;
+        case 2: p = "privacy"; break;
+    }
+    Taro.navigateTo({
+        url: `/pages/me/pages/me/privacy?pageType=${p}`
+    })
 }

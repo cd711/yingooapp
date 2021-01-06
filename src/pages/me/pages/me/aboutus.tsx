@@ -4,7 +4,7 @@ import {AtModal, AtModalContent, AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
 import "./aboutus.less";
 import copy from "copy-to-clipboard";
-import {deviceInfo} from "../../../../utils/common";
+import {deviceInfo, jumpToPrivacy} from "../../../../utils/common";
 import page from "../../../../utils/ext";
 
 
@@ -46,9 +46,9 @@ export default class Aboutus extends Component<any, any> {
                     </View>
                 </View>
                 <View className="avc">
-                    <Text className="link" onClick={() => Taro.navigateTo({url: "/pages/me/pages/me/privacy?pageType=user_agreement"})}>《映果用户协议》</Text>
+                    <Text className="link" onClick={() => jumpToPrivacy(1)}>《映果用户协议》</Text>
                     <Text className="txt">和</Text>
-                    <Text className="link" onClick={() => Taro.navigateTo({url: "/pages/me/pages/me/privacy?pageType=privacy"})}>《映果隐私协议》</Text>
+                    <Text className="link" onClick={() => jumpToPrivacy(2)}>《映果隐私协议》</Text>
                     <Text className="o_txt">映果版权所有</Text>
                 </View>
                 {

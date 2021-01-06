@@ -21,6 +21,8 @@ interface PhotosEleProps {
     count?: number;
     // 选择图片最大多少张
     max?: number;
+    // 是否强制选图, 默认为false
+    mandatory?: boolean;
 }
 
 interface PhotosEleState {
@@ -45,7 +47,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     static defaultProps = {
         editSelect: false,
         count: 0,
-        max: 100
+        max: 100,
+        mandatory: false
     }
 
     config: Config = {
@@ -171,6 +174,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 // this.setState({editSelectImgs, editSelectImgIds})
             }
         })
+    }
+
+    _onClose = () => {
+        const {onClose, mandatory} = this.props;
+        const {editSelectImgs} = this.state;
+        if (mandatory && editSelectImgs.length === 0) {
+            Taro.showToast({title: "您还未选择图片", icon: "none"})
+            return
+        }
+        onClose && onClose()
     }
 
     uploadFile = async files => {
@@ -346,15 +359,14 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     getScrollHeight = () => {
         const {_editSelect} = this.state;
-        const {editSelectImgIds, imageList, videoList, navSwitchActive} = this.state;
+        const {imageList, videoList, navSwitchActive} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
-        const isEdit = _editSelect && (list.length > 0) && editSelectImgIds.length > 0;
+        const isEdit = _editSelect && (list.length > 0);
         const h = isEdit ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
         return deviceInfo.env === "h5" ? h : isEdit ? deviceInfo.windowHeight - 130 - 45 + (deviceInfo.statusBarHeight / 2) : deviceInfo.screenHeight - deviceInfo.safeArea.top - deviceInfo.statusBarHeight
     }
 
     render() {
-        const {onClose} = this.props;
         const {_editSelect, _count} = this.state;
         const {
             navSwitchActive,
@@ -367,7 +379,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         } = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片", "视频"];
-        console.log(_editSelect, list.length > 0, editSelectImgIds.length > 0, _editSelect && list.length > 0 && editSelectImgIds.length > 0)
         return (
             <View className='photos'>
                 <View className='photos_nav_bar' style={{
@@ -375,7 +386,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     height: `${deviceInfo.env === "weapp" ? deviceInfo.menu.height : 44}px`,
                     paddingTop: `${deviceInfo.env === "h5" ? 10 : 0}px`
                 }}>
-                    <View className='left' onClick={onClose}>
+                    <View className='left' onClick={this._onClose}>
                         <Text className="cl_t">关闭</Text>
                     </View>
                     <View className='center'>
@@ -394,7 +405,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 </View>
                 <View className='container'>
                     <ScrollView className="list_scrollview"
-                                style={deviceInfo.env !== "h5" && !(_editSelect && list.length > 0 && editSelectImgIds.length > 0)
+                                style={deviceInfo.env !== "h5" && !(_editSelect && list.length > 0)
                                         ? `height: ${this.getScrollHeight()}px;padding-bottom: constant(safe-area-inset-bottom);padding-bottom: env(safe-area-inset-bottom);`
                                         : {height: this.getScrollHeight() + "px"}
                                 }
@@ -462,22 +473,30 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 </View>
                         }
                         {list.length > 0
-                            ? <LoadMore status={loadStatus} allowFix={!(_editSelect && list.length > 0 && editSelectImgIds.length > 0)} />
+                            ? <LoadMore status={loadStatus} allowFix={!(_editSelect && list.length > 0)} />
                             : null}
                     </ScrollView>
                     {
-                        _editSelect && list.length > 0 && editSelectImgIds.length > 0
+                        _editSelect && list.length > 0
                             ? <View className="fix_selector_container">
                                 <View className="photo_edit_selector_container">
                                     <View className="select_head">
-                                        <View className="left">
-                                            <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text
-                                            className="txt">个素材</Text><Text
-                                            className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
-                                            {/*<Text className="ext">长按拖动排序</Text>*/}
-                                        </View>
+                                        {editSelectImgIds.length > 0
+                                            ? <View className="left">
+                                                <Text className="txt">已选择</Text><Text className="red">{editSelectImgs.length}</Text><Text
+                                                className="txt">个素材</Text><Text
+                                                className="txt">{_count > 0 ? `，需选择${_count}张` : null}</Text>
+                                            </View>
+                                            : <View className="left">
+                                                <Text className="txt">请选择需要的素材</Text>
+                                            </View>}
                                         <View className="right">
-                                            <View className="submit" onClick={this.submitEditSelect}>
+                                            <View className="submit"
+                                                  onClick={this.submitEditSelect}
+                                                  style={{
+                                                      background: editSelectImgIds.length > 0 ? "#FF4966" : "#ff91a3"
+                                                  }}
+                                            >
                                                 <Text className="txt">使用</Text>
                                             </View>
                                         </View>

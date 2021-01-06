@@ -18,6 +18,7 @@ import photoStore from "../../../../store/photo";
 import {PhotoParams} from "../../../../modal/modal";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
+import {IValueDidChange, observe} from "mobx";
 
 const Index: Taro.FC<any> = () => {
 
@@ -28,6 +29,9 @@ const Index: Taro.FC<any> = () => {
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
     const info = useRef<any>({});
+    const isMandatory = useRef<boolean>(false);
+    const [hasChanged, setChangeStatus] = useState<boolean>(false);
+    const hasTplID = useRef<boolean>(!!router.params.tplid)
 
     async function getBasicInfo() {
         let params = {};
@@ -63,7 +67,7 @@ const Index: Taro.FC<any> = () => {
             console.log("获取--app.product/info出错：", e)
         }
 
-        if (router.params.tplid) {
+        if (hasTplID.current) {
             params = {
                 ...params,
                 photoTplId: router.params.tplid
@@ -91,7 +95,12 @@ const Index: Taro.FC<any> = () => {
 
         console.log("初始化的参数 getBasicInfo：", params)
 
-        await photoStore.setActionParamsToServer(getUserKey(), new PhotoParams(params))
+        await photoStore.setActionParamsToServer(getUserKey(), new PhotoParams(params));
+
+        if (photoStore.photoProcessParams.photo.path.length === 0) {
+            selectPhoto();
+            isMandatory.current = true;
+        }
 
     }
 
@@ -99,6 +108,14 @@ const Index: Taro.FC<any> = () => {
 
         getBasicInfo()
 
+    })
+
+    observe(photoStore, "photoProcessParams", (val: IValueDidChange<PhotoParams>) => {
+        if (hasTplID.current) {
+            setChangeStatus(val.newValue.editPhotos.length > 0)
+        } else {
+            setChangeStatus(val.newValue.photo.path.length > 0)
+        }
     })
 
     if (deviceInfo.env === "weapp") {
@@ -112,54 +129,27 @@ const Index: Taro.FC<any> = () => {
         setCheckAttr(attr)
     }
 
-    function allowJump() {
-        const {tplid} = router.params;
-        return !notNull(tplid)
-    }
-
     async function renderParams(path: any[]) {
         Taro.showLoading({title: "请稍后..."});
         const temp = {path, sku: checked, id: router.params.id};
 
         // 存储选择的照片
         await photoStore.updateServerParams(photoStore.printKey, {
-            photo: allowJump() ? {...temp, path: []} : temp,
+            photo: hasTplID.current ? {...temp, path: []} : temp,
             pictureSize: checkAttr,
             editPhotos: path
         })
 
-
-        const obj: any = {
-            id: router.params.id,
-            cid: info.current.category.tpl_category_id,
-        }
-
         Taro.hideLoading();
-        await sleep(100);
 
-        // 从照片模板点击 -->  选择照片后 --> 直接进入编辑器
-        if (allowJump()) {
-            const p = {
-                cid: router.params.id,
-                tplid: info.current.category.tpl_category_id,
-                key: photoStore.printKey,
-                status: "f",
-                init: "t",
-            }
-            jumpToPrintEditor(p)
-            return
-        }
-
-        // 否则 --> 进入照片冲印列表页面
-        const str = getURLParamsStr(urlEncode(obj));
-        Taro.navigateTo({
-            url: `/pages/editor/pages/printing/change?${str}`
-        })
     }
 
 
     const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
         console.log("返回的结果：", data)
+        if (data.ids.length === 0) {
+            return
+        }
 
         setPhotoPickerVisible(false);
 
@@ -178,17 +168,47 @@ const Index: Taro.FC<any> = () => {
 
     }
 
-    const selectPhoto = () => {
+    const selectPhoto = async () => {
         if (notNull(userStore.id)) {
             userStore.showLoginModal = true
             return
         }
 
-        setPhotoPickerVisible(true);
+        const len = hasTplID.current ? photoStore.photoProcessParams.editPhotos.length :  photoStore.photoProcessParams.photo.path.length;
 
-        setTimeout(() => {
-            setAnimating(true)
-        }, 50)
+        if (len > 0) {
+            const obj: any = {
+                id: router.params.id,
+                cid: info.current.category.tpl_category_id,
+            }
+
+            await sleep(100);
+
+            // 从照片模板点击 -->  选择照片后 --> 直接进入编辑器
+            if (hasTplID.current) {
+                const p = {
+                    cid: router.params.id,
+                    tplid: info.current.category.tpl_category_id,
+                    key: photoStore.printKey,
+                    status: "f",
+                    init: "t",
+                }
+                jumpToPrintEditor(p)
+                return
+            }
+
+            // 否则 --> 进入照片冲印列表页面
+            const str = getURLParamsStr(urlEncode(obj));
+            Taro.navigateTo({
+                url: `/pages/editor/pages/printing/change?${str}`
+            })
+        } else {
+            setPhotoPickerVisible(true);
+
+            setTimeout(() => {
+                setAnimating(true)
+            }, 50)
+        }
     }
 
     const closeSelectPhoto = () => {
@@ -264,18 +284,17 @@ const Index: Taro.FC<any> = () => {
             </ScrollView>
             <View className="print_foot">
                 <View className="print_submit" onClick={selectPhoto}>
-                    <Text className="txt">下一步</Text>
+                    <Text className="txt">{!hasChanged ? "请选择图片" : "下一步"}</Text>
                 </View>
             </View>
             {
                 photoVisible
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
-                        <PhotosEle editSelect={photoVisible}
-                                onClose={closeSelectPhoto}
-                                count={photoStore.photoProcessParams.imageCount}
-                            // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
-                                onPhotoSelect={onPhotoSelect}
-                        />
+                        <PhotosEle
+                            editSelect={photoVisible}
+                            onClose={closeSelectPhoto}
+                            count={photoStore.photoProcessParams.imageCount}
+                            onPhotoSelect={onPhotoSelect} />
                     </View>
                     : null
             }

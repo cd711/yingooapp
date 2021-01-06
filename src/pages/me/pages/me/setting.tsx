@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
-import { deviceInfo } from '../../../../utils/common';
+import {deviceInfo, jumpToPrivacy} from '../../../../utils/common';
 
 
 @inject("userStore")
@@ -137,11 +137,11 @@ export default class Setting extends Component<any,{
                         <Text className='name'>问题反馈</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=user_agreement`})}>
+                    <View className='item' onClick={() => jumpToPrivacy(1)}>
                         <Text className='name'>用户协议</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=privacy`})}>
+                    <View className='item' onClick={() => jumpToPrivacy(2)}>
                         <Text className='name'>隐私政策</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>

@@ -616,7 +616,7 @@ export default class Me extends Component<any, MeState> {
                                                 }
                                             }}/>
                                             : <View className="more_View">
-                                                <LoadMore status={loadStatus} />
+                                                <LoadMore status={loadStatus} allowFix={false} />
                                             </View>
                                     }
                                 </View>
@@ -650,7 +650,7 @@ export default class Me extends Component<any, MeState> {
                                                 <Empty content="暂无收藏"/>
                                             </View>
                                             : <View className="more_View">
-                                                <LoadMore status={loadStatus} />
+                                                <LoadMore status={loadStatus} allowFix={false} />
                                             </View>
                                     }
                                 </View>

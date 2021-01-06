@@ -2,7 +2,7 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Button} from "@tarojs/components";
 import IconFont from "../iconfont";
 import "./login.less"
-import {is_weixin,deviceInfo} from "../../utils/common";
+import {is_weixin, deviceInfo, jumpToPrivacy} from "../../utils/common";
 import Xm from "../../utils/xm";
 
 interface LoginProps {
@@ -23,12 +23,12 @@ const Logins: Taro.FC<LoginProps> = (props) => {
             if (isTabBar) {
                 Taro.hideTabBar();
             }
-            
+
         } else {
             if (isTabBar) {
                 Taro.showTabBar();
             }
-            // 
+            //
             onClose && onClose(visible)
         }
     }, [visible])
@@ -42,7 +42,7 @@ const Logins: Taro.FC<LoginProps> = (props) => {
 
     const privacyView = type => {
         setVisible(false)
-        Taro.navigateTo({url: `/pages/me/pages/me/privacy?pageType=${type}`})
+        jumpToPrivacy(type)
     }
 
     const _onClose = () => {
@@ -50,7 +50,6 @@ const Logins: Taro.FC<LoginProps> = (props) => {
         if (isTabBar) {
             Taro.showTabBar();
         }
-        // 
     }
     const onPhone = () =>{
         _onClose();
@@ -137,7 +136,7 @@ const Logins: Taro.FC<LoginProps> = (props) => {
                     }
                 </View>
                 <View className="priv_item">
-                    <Text className="txt">登录即同意<Text className="link" onClick={() => privacyView("user_agreement")}>《映果用户协议》</Text>和<Text className="link" onClick={() => privacyView("privacy")}>《映果隐私协议》</Text></Text>
+                    <Text className="txt">登录即同意<Text className="link" onClick={() => privacyView(1)}>《映果用户协议》</Text>和<Text className="link" onClick={() => privacyView(2)}>《映果隐私协议》</Text></Text>
                 </View>
             </View>
         </View>

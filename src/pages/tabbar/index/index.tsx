@@ -102,8 +102,9 @@ class Index extends Component<any, IndexState> {
                 } else {
                     arr = res.list
                 }
+
                 this.setState({
-                    loadStatus: this.total === arr.length ? LoadMoreEnum.noMore : LoadMoreEnum.more
+                    loadStatus: parseInt(res.total) <= 10 || arr.length < parseInt(res.total) ? LoadMoreEnum.noMore : LoadMoreEnum.more
                 })
                 resolve(arr || [])
             } catch (e) {
@@ -569,7 +570,7 @@ class Index extends Component<any, IndexState> {
                           paddingTop: deviceInfo.statusBarHeight + 5 + "px",
                           height: 52 + deviceInfo.statusBarHeight + "px",
                           background: scrolling ? "#fff" : "transparent",
-                          boxShadow: scrolling ? "0px 3px 11px 1px #f1f1f1" : "none"
+                          boxShadow: scrolling ? "0px 8px 16px 0px #0A246308" : "none"
                       }}
                 >
                     <View className='search-box'
@@ -908,7 +909,7 @@ class Index extends Component<any, IndexState> {
                                             list.map((colItem, colIdx) => (
                                                 <View className="index_coupon_main" key={`${colIdx}_${index}`}
                                                       onClick={() => this.onCouponColumnClick(colItem)} >
-                                                    <Image src={ossUrl(this.getImage(colItem), 1)} className="coupon_img" mode="widthFix" />
+                                                    <Image src={this.getImage(colItem)} className="coupon_img" mode="widthFix" />
                                                 </View>
                                             ))
                                         }

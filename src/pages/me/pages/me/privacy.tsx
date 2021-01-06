@@ -15,7 +15,6 @@ interface PrivacyState{
 export default class Privacy extends Component<any, PrivacyState> {
     config: Config = {
         navigationBarTitleText: `${this.$router.params.pageType === "privacy" ? "隐私政策" : "用户协议"}`,
-        // backgroundColor:'#F5F6F9'
     }
 
     constructor() {
@@ -57,7 +56,9 @@ export default class Privacy extends Component<any, PrivacyState> {
                         size:24
                     }}
                 />
-                <View className="txt">
+                <View className="txt" style={{
+                    paddingTop: `${deviceInfo.statusBarHeight}px`
+                }}>
                     <RichText nodes={privacyTxt} />
                 </View>
             </View>

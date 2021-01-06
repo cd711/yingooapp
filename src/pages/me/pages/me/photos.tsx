@@ -267,10 +267,9 @@ export default class Photos extends Component<{}, PhotosState> {
     ]
 
     getScrollHeight = () => {
-        const {editSelectImgIds, imageList, videoList, navSwitchActive} = this.state;
-        const list = navSwitchActive === 0 ? imageList : videoList;
-        const h = (list.length > 0) && editSelectImgIds.length > 0 ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
-        return deviceInfo.env === "h5" ? h : h + deviceInfo.menu.height + 5
+        const {isEdit} = this.state;
+        const h = isEdit ? deviceInfo.windowHeight - 105 : deviceInfo.windowHeight - 45;
+        return deviceInfo.env === "h5" ? h : isEdit ? deviceInfo.windowHeight - deviceInfo.safeBottomHeight - 60 - 45 : deviceInfo.screenHeight - deviceInfo.safeArea.top - deviceInfo.statusBarHeight
     }
 
     render() {
@@ -309,7 +308,11 @@ export default class Photos extends Component<{}, PhotosState> {
                 </View>
                 <View className='container'>
                     <ScrollView className='list_scrollview'
-                                style={{height: this.getScrollHeight() + "px"}}
+                                style={`
+                                height: ${this.getScrollHeight()}px;
+                                padding-bottom:${isEdit && deviceInfo.env === "h5" ? "constant(safe-area-inset-bottom)" : 0};
+                                padding-bottom:${isEdit && deviceInfo.env === "h5" ? "env(safe-area-inset-bottom)" : 0};
+                                box-sizing: ${isEdit && deviceInfo.env === "h5" ? "border-box" : "initial"}`}
                                 scrollY
                                 scrollWithAnimation
                                 ref={r => this.scrollView = r}
@@ -395,23 +398,25 @@ export default class Photos extends Component<{}, PhotosState> {
                                     </View>
                                 </View>
                         }
-                        {list.length > 0 ? <LoadMore status={loadStatus}/> : null}
+                        {list.length > 0 ? <LoadMore status={loadStatus} allowFix={!isEdit} /> : null}
                     </ScrollView>
                     {loading ? <AtActivityIndicator mode='center'/> : null}
                     {
                         isEdit
                             ? <View className="select_all_container">
-                                <View className="left">
-                                    <View onClick={this.selectAll}>
-                                        <IconFont
-                                            name={selects.length === list.length ? "22_yixuanzhong" : "22_touming-weixuanzhong"}
-                                            size={44}/>
-                                        <Text>全选</Text>
+                                <View className="select_all_main">
+                                    <View className="left">
+                                        <View onClick={this.selectAll}>
+                                            <IconFont
+                                                name={selects.length === list.length ? "22_yixuanzhong" : "22_touming-weixuanzhong"}
+                                                size={44}/>
+                                            <Text>全选</Text>
+                                        </View>
                                     </View>
-                                </View>
-                                <View className="right">
-                                    <View className="btn"
-                                          onClick={this.onDeleteSelect}>删除{selects.length > 0 ? `(${selects.length})` : null}</View>
+                                    <View className="right">
+                                        <View className="btn"
+                                              onClick={this.onDeleteSelect}>删除{selects.length > 0 ? `(${selects.length})` : null}</View>
+                                    </View>
                                 </View>
                             </View>
                             : null

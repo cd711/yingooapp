@@ -122,6 +122,9 @@
                     font-size: 48px;
                     color: #121314;
                     transition: all .5s ease-in;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                 }
 
                 .sub-title {
@@ -701,6 +704,11 @@
         .h1{
             font-size: 32px;
             color: #121314;
+            text-overflow: ellipsis;
+            box-sizing: border-box;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
         }
     }
     .prod_bugs{
@@ -956,6 +964,7 @@
     align-items: center;
     flex-wrap: wrap;
     width: 100%;
+    padding-bottom: 20px;
 
     .photo_item_view_wrap{
         width: 50%;
@@ -963,7 +972,15 @@
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
+        &:nth-child(even) {
+            justify-content: flex-start;
+            padding-left: 10px;
+        }
+        &:nth-child(odd) {
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
 
         .photo_item_view{
             box-sizing: border-box;

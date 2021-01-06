@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro'
 import {Button, Text, View} from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
-import {convertClassName, deviceInfo, is_weixin} from '../../utils/common';
+import {convertClassName, deviceInfo, is_weixin, jumpToPrivacy} from '../../utils/common';
 import Xm from '../../utils/xm';
 
 const LoginFooter: Taro.FC<any> = () => {
@@ -71,8 +71,8 @@ const LoginFooter: Taro.FC<any> = () => {
         </View>
         <View className={convertClassName('xieyi')}>
             <Text className={convertClassName('enter')}>进入即同意</Text>
-            <View className={convertClassName('xy')}><Text>《映果用户协议》</Text></View>
-            <View className={convertClassName('xy')}><Text>《隐私协议》</Text></View>
+            <View className={convertClassName('xy')}><Text onClick={() => jumpToPrivacy(1)}>《映果用户协议》</Text></View>
+            <View className={convertClassName('xy')}><Text onClick={() => jumpToPrivacy(2)}>《隐私协议》</Text></View>
         </View>
     </View>
 }
