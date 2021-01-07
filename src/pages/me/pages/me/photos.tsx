@@ -195,7 +195,7 @@ export default class Photos extends Component<{}, PhotosState> {
         const {selects} = this.state;
         try {
             await api("app.profile/delImgs", {ids: selects.join(",")});
-            this.setState({selects: []})
+            this.setState({selects: [], isEdit: false})
             this.getList({start: 0})
         } catch (e) {
             console.log("删除出错：", e)
