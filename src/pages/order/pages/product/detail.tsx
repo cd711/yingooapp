@@ -663,141 +663,136 @@ export default class Login extends Component<{}, {
                         }
                     </View>
                 </View>
-                {
-                    placeOrderShow ?
-                        <PlaceOrder maxBuyNum={maxBuyNum}
-                                    productType={data && data.product_type ? data.product_type : ""}
-                                    defalutSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
-                                    isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
-                                    onBuyNumberChange={(n) => {
-                                        console.log(n)
-                                        this.setState({
-                                            buyTotal: n,
-                                            // defalutSkuIds: []
-                                        })
-                                    }} onAddCart={() => {
-                            if (!userStore.isLogin) {
-                                userStore.showLoginModal = true;
-                                return;
-                            }
-                            const {sku, selectSkuId, data, buyTotal} = this.state;
-                            // const {attrGroup} = data;
-                            // console.log(sku,skuName,buyTotal)
-                            if (sku.length == data.attrGroup.length && buyTotal > 0) {
-                                Taro.showLoading({title: "加载中"})
-                                api("app.cart/add", {
-                                    sku_id: selectSkuId,
-                                    user_tpl_id: 0,
-                                    quantity: buyTotal
-                                }).then(() => {
-                                    Taro.hideLoading();
-                                    Taro.showToast({
-                                        title: "已添加到购物车!",
-                                        icon: "success",
-                                        duration: 2000
-                                    })
-                                }).catch((e) => {
-                                    Taro.hideLoading();
-                                    Taro.showToast({
-                                        title: e,
-                                        icon: "none",
-                                        duration: 2000
-                                    })
-                                })
-                            } else {
-                                Taro.showToast({
-                                    title: "请选择规格!",
-                                    icon: "none",
-                                    duration: 2000
-                                });
-                            }
-                        }} onNowBuy={() => {
-                            if (!userStore.isLogin) {
-                                userStore.showLoginModal = true;
-                                return;
-                            }
-                            const {buyTotal, data, selectSkuId, sku} = this.state;
-                            if (sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
+                <PlaceOrder maxBuyNum={maxBuyNum}
+                            productType={data && data.product_type ? data.product_type : ""}
+                            defalutSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
+                            isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                            onBuyNumberChange={(n) => {
+                                console.log(n)
                                 this.setState({
-                                    placeOrderShow: false
+                                    buyTotal: n,
+                                    // defalutSkuIds: []
                                 })
-                                Taro.navigateTo({
-                                    url: `/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}`
-                                })
-                            } else {
-                                Taro.showToast({
-                                    title: "请选择规格!",
-                                    icon: "none",
-                                    duration: 2000
-                                });
-                            }
-
-                        }} onSkuChange={(sku, id) => {
-                            console.log("sku change", sku, id);
-                            this.setState({
-                                sku,
-                                selectSkuId: parseInt(id + "")
+                            }} onAddCart={() => {
+                    if (!userStore.isLogin) {
+                        userStore.showLoginModal = true;
+                        return;
+                    }
+                    const {sku, selectSkuId, data, buyTotal} = this.state;
+                    // const {attrGroup} = data;
+                    // console.log(sku,skuName,buyTotal)
+                    if (sku.length == data.attrGroup.length && buyTotal > 0) {
+                        Taro.showLoading({title: "加载中"})
+                        api("app.cart/add", {
+                            sku_id: selectSkuId,
+                            user_tpl_id: 0,
+                            quantity: buyTotal
+                        }).then(() => {
+                            Taro.hideLoading();
+                            Taro.showToast({
+                                title: "已添加到购物车!",
+                                icon: "success",
+                                duration: 2000
                             })
-                        }} onOkButtonClick={() => this.onOkButtonClick()} onNowButtonClick={() => {
-                            //立即制作
-                            const {sku, data, selectSkuId} = this.state;
-                            console.log("当前类型：", data.tpl_product_type)
-                            if (!userStore.isLogin) {
-                                userStore.showLoginModal = true;
+                        }).catch((e) => {
+                            Taro.hideLoading();
+                            Taro.showToast({
+                                title: e,
+                                icon: "none",
+                                duration: 2000
+                            })
+                        })
+                    } else {
+                        Taro.showToast({
+                            title: "请选择规格!",
+                            icon: "none",
+                            duration: 2000
+                        });
+                    }
+                }} onNowBuy={() => {
+                    if (!userStore.isLogin) {
+                        userStore.showLoginModal = true;
+                        return;
+                    }
+                    const {buyTotal, data, selectSkuId, sku} = this.state;
+                    if (sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
+                        this.setState({
+                            placeOrderShow: false
+                        })
+                        Taro.navigateTo({
+                            url: `/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}`
+                        })
+                    } else {
+                        Taro.showToast({
+                            title: "请选择规格!",
+                            icon: "none",
+                            duration: 2000
+                        });
+                    }
+
+                }} onSkuChange={(sku, id) => {
+                    console.log("sku change", sku, id);
+                    this.setState({
+                        sku,
+                        selectSkuId: parseInt(id + "")
+                    })
+                }} onOkButtonClick={() => this.onOkButtonClick()} onNowButtonClick={() => {
+                    //立即制作
+                    const {sku, data, selectSkuId} = this.state;
+                    console.log("当前类型：", data.tpl_product_type)
+                    if (!userStore.isLogin) {
+                        userStore.showLoginModal = true;
+                        return;
+                    }
+                    if (data.tpl_product_type == "photo") {
+                        if (sku.length == data.attrGroup.length && selectSkuId > 0) {
+                            console.log(defalutSkuIds);
+                            if (data.attrGroup.length != data.attrItems.length) {
+                                this.modalInit = false
+                                this.setState({showPicSelector: true})
                                 return;
                             }
-                            if (data.tpl_product_type == "photo") {
-                                if (sku.length == data.attrGroup.length && selectSkuId > 0) {
-                                    console.log(defalutSkuIds);
-                                    if (data.attrGroup.length != data.attrItems.length) {
-                                        this.modalInit = false
-                                        this.setState({showPicSelector: true})
-                                        return;
-                                    }
-                                }
-                            }
-                            if (sku.length == data.attrGroup.length) {
-                                // let url = ""
+                        }
+                    }
+                    if (sku.length == data.attrGroup.length) {
+                        // let url = ""
 
-                                setTempDataContainer("product_preview_sku", {
-                                    sku,
-                                    selectSkuId
-                                }, (is) => {
-                                    if (is) {
-                                        if (data.tpl_product_type == "phone") {
-                                            jumpToEditor({
-                                                cid: data.tpl_category_id,
-                                                tpl_id: 0
-                                            });
-                                        }
-                                        if (data.tpl_product_type == "photo") {
-                                            this.modalInit = false
-                                            this.setState({showPicSelector: true})
-                                        }
-                                    } else {
-                                        Taro.showToast({
-                                            title: '服务器走丢啦,请稍后再试~',
-                                            icon: 'none',
-                                            duration: 1500
-                                        });
-                                    }
-                                })
-                                // this.goUrl(url);
+                        setTempDataContainer("product_preview_sku", {
+                            sku,
+                            selectSkuId
+                        }, (is) => {
+                            if (is) {
+                                if (data.tpl_product_type == "phone") {
+                                    jumpToEditor({
+                                        cid: data.tpl_category_id,
+                                        tpl_id: 0
+                                    });
+                                }
+                                if (data.tpl_product_type == "photo") {
+                                    this.modalInit = false
+                                    this.setState({showPicSelector: true})
+                                }
                             } else {
                                 Taro.showToast({
-                                    title: "请选择规格!",
-                                    icon: "none",
-                                    duration: 2000
+                                    title: '服务器走丢啦,请稍后再试~',
+                                    icon: 'none',
+                                    duration: 1500
                                 });
                             }
-                        }} onNamesChange={(names) => {
-                            console.log("哈哈", names);
-                            this.setState({
-                                skuName: names,
-
-                            });
-                        }}/> : null
-                }
+                        })
+                        // this.goUrl(url);
+                    } else {
+                        Taro.showToast({
+                            title: "请选择规格!",
+                            icon: "none",
+                            duration: 2000
+                        });
+                    }
+                }} onNamesChange={(names) => {
+                    this.setState({
+                        skuName: names,
+                    });
+                }}/>
                 {
                     showPicSelector
                         ? <View className="photo_picker_container">
