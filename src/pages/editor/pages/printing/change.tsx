@@ -17,6 +17,7 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
+import debounce from "lodash.debounce"
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -24,7 +25,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
-    const goodsInfo = Taro.useRef({});
+    const goodsInfo = Taro.useRef<any>({});
     const [skus, setSkus] = useState<any[]>([]);
     const [skuInfo, setSkuInfo] = useState<any>({});
     const [photoVisible, setPhotoPickerVisible] = useState(false);
@@ -33,7 +34,19 @@ const PrintChange: Taro.FC<any> = () => {
     const sizeArr = Taro.useRef<any[]>([]);
     // 只有从商品详情页跳转过来才会为true
     const [detailStatus, setDetailStatus] = useState(false);
-    const skuArr = useRef([])
+    const skuArr = useRef([]);
+
+    const [pictureSize, setPictureSize] = useState<number>(0);
+    const [describe, setDescribe] = useState<string>("");
+    // 图片数量状态   1:低于{min}张、2：刚好满足{min}/{max}的值、3：最大{max}的值
+    const [countStatus, setCountStatus] = useState<1 | 2 | 3>(1);
+    // 根据当前的总数要展示的SKU价格
+    const [price, setPrice] = useState<string[]>(["0.00"]);
+
+
+    const currentSkus = useRef<any[]>([]);
+    const skuStr = useRef<string>("");
+
 
     const backPressHandle = () => {
         if (deviceInfo.env === "h5") {
@@ -54,22 +67,111 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }, [])
 
+    useEffect(debounce(() => {
+
+        console.log("当前预定的skuStr：", skuStr.current)
+
+        const arr = currentSkus.current.filter(v => v.value.includes(skuStr.current));
+        if (arr.length > 1) {
+            const first = arr[0];
+            const last = arr[arr.length - 1];
+            setPrice([first.price, last.price])
+        } else if (arr.length > 0) {
+            setPrice([arr[0].price])
+        }
+
+    }, 1000), [skuStr.current])
+
+    useEffect(() => {
+
+        // 统计图片及其count的总数
+        let count = 0;
+        for (let i = 0; i < photos.length; i ++) {
+            const item = photos[i];
+            count += (notNull(item.count) ? 1 : item.count)
+        }
+
+        console.log("统计的打印张数：", count)
+        setPictureSize(count)
+
+        // 根据张数判断状态
+        const min = photoStore.photoProcessParams.min;
+        const max = photoStore.photoProcessParams.max;
+
+        if (count < photoStore.photoProcessParams.min) {  // 小于
+
+            if (notNull(min)) {
+                return
+            }
+            setDescribe(`最低打印${min}张照片`);
+            setCountStatus(1)
+        } else if (count >= min && count <= max) {   // 等于最小/最大值
+            setDescribe("");
+            setCountStatus(2)
+        } else if (count > max) {  // 大于
+
+            if (notNull(max)) {
+                return;
+            }
+            setDescribe(`最多打印${max}张照片`);
+            setCountStatus(3)
+        }
+
+        // 查找合适的sku价格
+        if (count > 0) {
+            // 解析路由上的skus
+            let arr = String(decodeURIComponent(photoStore.photoProcessParams.photo.sku)).split(",") || [];
+            const idx = photoStore.photoProcessParams.numIdx;
+            console.log("当前的numIdx：", idx)
+            if (idx > -1) {
+                const countAttrArr = photoStore.photoProcessParams.attrItems[idx];
+                const len = countAttrArr.length;
+                console.log("当前的countAttrArr：", JSON.parse(JSON.stringify(countAttrArr)))
+                for (let i = 0; i < countAttrArr.length; i++) {
+                    const item =  countAttrArr[i];
+                    if (parseInt(item.value) >= count) {
+                        let c = i - 1;
+                        if (c <= 0) {
+                            c = 0
+                        }
+                        console.log("c：", c, i)
+                        arr.push(item.id)
+                        break;
+                    } else {
+                        if (i === len - 1) {
+                            arr.push(countAttrArr[len - 1].id)
+                            break;
+                        }
+                    }
+                }
+            }
+            arr = arr.sort((a, b) => parseInt(a) - parseInt(b));
+            setSkus([...arr])
+            skuStr.current = arr.join(",");
+            console.log("找到的skuID列表：", arr)
+        }
+
+
+    }, [photos])
+
     /**
      * 在首页活动页跳转过来后，要携带的sku_ID和分类ID，如果两者都在，就说明跳过了上一步选尺寸页面，
      * 需要重新初始化当前用户的 photo Key
      * @param params {path: array, forDetail: boolean}
      * path 图片路径
      * forDetail  默认false， 为true就代表是从商品详情页跳转过来的，已经选好图片了, 此时的sku_id是所有规格都选好了的
+     * onlyInitPrice  仅仅只是初始化currentSkus， goodsInfo, currentSkus, 不向容器发送新内容
      */
-    function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean} = {}) {
+    function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean} = {}) {
         return new Promise<any>(async (resolve, reject) => {
             const opt = {
                 path: params.path || [],
                 forDetail: params.forDetail || false,
-                incomplete: params.incomplete || false
+                incomplete: params.incomplete || false,
+                onlyInitPrice: params.onlyInitPrice || false
             }
             try {
-                if (!router.params.sku_id || !router.params.id) {
+                if ((!opt.onlyInitPrice && !router.params.sku_id) || !router.params.id) {
                     Taro.showToast({
                         title: "没有相关ID信息",
                         icon: "none"
@@ -92,11 +194,35 @@ const PrintChange: Taro.FC<any> = () => {
 
                     // 从服务器获取基本数据信息
                     const serPar = await api("app.product/info", {id: router.params.id});
+                    const temp = {...serPar};
+                    temp.skus = temp.skus.filter(v => v.stock > 0);
+                    goodsInfo.current = {...temp};
+
+                    console.log("清楚库存为0的数据：", goodsInfo.current)
+
+                    // 找到当前模糊搜索的suk列表
+                    let arr = [];
+                    const sku = photoStore.photoProcessParams.photo.sku;
+                    if (!notNull(sku)) {
+                        arr = decodeURIComponent(sku).split(",");
+                    }
+                    arr = arr.sort((a, b) => a - b);
+                    skuStr.current = arr.join(",");
+                    currentSkus.current = temp.skus.filter(v => v.value.includes(arr.join(",")));
+                    console.log("第一次产生的currentSkus：", currentSkus.current);
+
+                    // 如果是完成的SkuID
+                    if (opt.forDetail) {
+                        const tArr = serPar.skus.filter(v => v.id == obj.sku);
+                        if (tArr.length > 0) {
+                            setPrice([tArr[0].price])
+                        }
+                    }
 
                     const idx = serPar.attrGroup.findIndex(v => v.special_show === "photosize");
                     const numIdx = serPar.attrGroup.findIndex(v => v.special_show === "photonumber");
                     console.log("查找的下标：", idx, numIdx)
-                    if (idx > -1) {
+                    if (idx > -1 && !opt.onlyInitPrice) {
 
                         // 向本地存储attrItems
                         await photoStore.setActionParamsToServer(getUserKey(), {
@@ -107,10 +233,12 @@ const PrintChange: Taro.FC<any> = () => {
                             pictureSize: serPar.attrItems[idx][0].value,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
+                            max: serPar.max,
+                            min: serPar.min
                         })
                         resolve()
                     } else {
-                        reject("初始化尺寸时没找到尺寸")
+                        opt.onlyInitPrice ? resolve() : reject("初始化尺寸时没找到尺寸")
                         console.log("初始化尺寸时没找到尺寸：", serPar)
                     }
                 }
@@ -223,6 +351,7 @@ const PrintChange: Taro.FC<any> = () => {
                 await getRouterParams({incomplete: true});
                 params = {...photoStore.photoProcessParams}
             } else {
+                await getRouterParams({onlyInitPrice: true})
                 params = await photoStore.getServerParams({setLocal: true});
             }
         }catch (e) {
@@ -264,7 +393,7 @@ const PrintChange: Taro.FC<any> = () => {
                     readLocal: v.originalData && v.originalData.length > 0
                 }
             })
-            setPhotos([...params.photo.path] || [])
+            setPhotos([...params.photo.path] || []);
         }
 
         Taro.hideLoading()
@@ -288,19 +417,8 @@ const PrintChange: Taro.FC<any> = () => {
 
         const arr = [...photos];
 
-        let count = 0;
-        for (const item of arr) {
-            count += parseInt(item.count)
-        }
-        if (count >= photoStore.photoProcessParams.max) {
-            Taro.showToast({
-                title: `最多打印${photoStore.photoProcessParams.max}张`,
-                icon: "none"
-            })
-        } else {
-            arr[idx].count = Number(_num);
-            setPhotos([...arr])
-        }
+        arr[idx].count = Number(_num);
+        setPhotos([...arr])
     }
 
     const onDeleteImg = idx => {
@@ -365,13 +483,31 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onCreateOrder = async () => {
 
-        if (photos.length <= 0) {
+        if (photos.length <= 0 || countStatus !== 2) {
             return
         }
 
-        if (detailStatus) {
+        if (detailStatus && notNull(router.params.inc)) {
             // 已选好所有规格，直接跳转
             forIDJumpToDatail(router.params.sku_id)
+            return
+        }
+
+        if (detailStatus && !notNull(router.params.inc)) {
+            let currentSkuId = null;
+            console.log(currentSkus)
+            for (let i = 0; i < currentSkus.current.length; i++) {
+                const item = currentSkus.current[i];
+                if (skuStr.current === item.value) {
+                    currentSkuId = item.id;
+                    console.log(item)
+                    break;
+                }
+            }
+            console.log("当前找到的ID：", currentSkuId)
+            if (!notNull(currentSkuId)) {
+                forIDJumpToDatail(currentSkuId)
+            }
             return
         }
 
@@ -437,7 +573,7 @@ const PrintChange: Taro.FC<any> = () => {
                 }
                 console.log("当前找到的ID：", currentSkuId)
                 if (!notNull(currentSkuId)) {
-                    // forIDJumpToDatail(currentSkuId)
+                    forIDJumpToDatail(currentSkuId)
                 }
             } else {
                 setTimeout(() => {
@@ -632,15 +768,26 @@ const PrintChange: Taro.FC<any> = () => {
                       color='#121314' title="照片冲印列表" border fixed
                       leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
             />
+            <View className="fixed_top_price_container" style={{
+                top: `${deviceInfo.env === "weapp" ? deviceInfo.menu.bottom + 4 : 44}px`
+            }}>
+                <View className="left">
+                    <Text className="txt">现单价：￥{price.length === 1 ? price[0] : `${price[0]}${!detailStatus ? "起" : ""}`}</Text>
+                </View>
+                <View className="right"/>
+            </View>
             <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}}>
                 <View className="printing_change_main"
                       style={
                           deviceInfo.env === "weapp"
                               ? {
-                                  paddingTop: deviceInfo.statusBarHeight + "px",
+                                  paddingTop: deviceInfo.statusBarHeight + 56 + "px",
                                   paddingBottom: 22 + "px"
                               }
-                              : null
+                              : {
+                                paddingBottom: "88px",
+                                paddingTop: 56
+                              }
                       }
                 >
                     {
@@ -686,12 +833,33 @@ const PrintChange: Taro.FC<any> = () => {
                     }
                 </View>
             </ScrollView>
-            <View className="print_foot" style={{justifyContent: "space-around"}}>
-                <View className="btn default" onClick={selectPhoto}>
-                    <Text className="txt">添加图片</Text>
-                </View>
-                <View className="btn" onClick={onCreateOrder} style={{opacity: photos.length > 0 ? 1 : 0.7}}>
-                    <Text className="txt">立即下单</Text>
+            <View className="print_fixed_select_button" onClick={selectPhoto} style={{bottom: deviceInfo.env === "weapp" ? `${deviceInfo.safeBottomHeight + 80}px` : 80}}>
+                <IconFont name="24_jiahao" size={40} color="#FF4966" />
+                <Text className="txt">加图</Text>
+            </View>
+            <View className="print_foot">
+                <View className="print_foot_main" style={{justifyContent: "space-around"}}>
+                    <View className="print_info">
+                        {
+                            !notNull(describe)
+                                ? <View className="top">
+                                    <Image src={require("../../../../source/waing.png")} className="top_icon" />
+                                    <Text className="v_txt">{describe}</Text>
+                                </View>
+                                : null
+                        }
+                        <View className="print_num_info">
+                            <Text className="b_txt">打印照片数量：</Text>
+                            <Text className="red_txt">4张</Text>
+                        </View>
+                    </View>
+                    <View className="btn"
+                          onClick={onCreateOrder}
+                          style={{
+                              opacity: photos.length > 0 && countStatus === 2 ? 1 : 0.7
+                          }}>
+                        <Text className="txt">立即下单</Text>
+                    </View>
                 </View>
             </View>
             {

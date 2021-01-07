@@ -56,7 +56,8 @@ const Index: Taro.FC<any> = () => {
                         numIdx,
                         pictureSize: res.attrItems[idx][0].value,
                         photoStyle: res.photostyle,
-                        max: res.max
+                        max: res.max,
+                        min: res.min
                     }
 
                 } else {
@@ -283,8 +284,10 @@ const Index: Taro.FC<any> = () => {
                 </View>
             </ScrollView>
             <View className="print_foot">
-                <View className="print_submit" onClick={selectPhoto}>
-                    <Text className="txt">{!hasChanged ? "请选择图片" : "下一步"}</Text>
+                <View className="print_foot_main">
+                    <View className="print_submit" onClick={selectPhoto}>
+                        <Text className="txt">{!hasChanged ? "请选择图片" : "下一步"}</Text>
+                    </View>
                 </View>
             </View>
             {
