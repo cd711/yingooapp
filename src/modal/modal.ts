@@ -53,6 +53,8 @@ export class PhotoParams {
     public photoTplId: string = "";
     // 照片冲印列表最多允许增加的数量
     public max: number;
+    // 照片冲印列表最少选择数量
+    public min: number;
     // 照片冲印模板是否有数量限制
     public limit: boolean = false;
 
@@ -73,5 +75,6 @@ export class PhotoParams {
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
         this.limit = json.limit || false;
+        this.min = !notNull(json.min) ? parseInt(json.min) : 1
     }
 }

@@ -659,3 +659,30 @@ export function jumpToPrivacy(type: 1 | 2) {
         url: `/pages/me/pages/me/privacy?pageType=${p}`
     })
 }
+
+/**
+ * JS 节流
+ * 默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。
+ * @param func {function}  节流体
+ * @param wait {number}  多长时间执行  毫秒
+ */
+export function throttle(func, wait) {
+    let context,
+        args,
+        doSomething = true;
+
+    return function() {
+        context = this;
+        args = arguments;
+
+        if (!doSomething) return;
+
+        doSomething = false;
+
+        setTimeout(function() {
+            //执行的时候到了
+            func.apply(context, args);
+            doSomething = true;
+        }, wait);
+    };
+}

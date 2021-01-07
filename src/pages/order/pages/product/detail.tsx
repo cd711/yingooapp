@@ -384,7 +384,7 @@ export default class Login extends Component<{}, {
             const tmp = {
                 id: data.id,
                 cid: data.tpl_category_id,
-                sku_id: data.attrGroup.length != data.attrItems.length ? sku : selectSkuId,
+                sku_id: data.attrGroup.length != data.attrItems.length ? sku.join(",") : selectSkuId,
             }
 
             if (sku) {
