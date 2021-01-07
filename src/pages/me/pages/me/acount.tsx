@@ -24,6 +24,8 @@ export default class Setting extends Component<any,{
             tipModalShow:false
         }
     }
+
+
     componentDidMount(){
         console.log(userStore.mobile)
     }
