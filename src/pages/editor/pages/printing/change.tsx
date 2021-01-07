@@ -850,7 +850,7 @@ const PrintChange: Taro.FC<any> = () => {
                         }
                         <View className="print_num_info">
                             <Text className="b_txt">打印照片数量：</Text>
-                            <Text className="red_txt">4张</Text>
+                            <Text className="red_txt">{pictureSize}张</Text>
                         </View>
                     </View>
                     <View className="btn"

@@ -1,8 +1,9 @@
-import Taro, {useEffect, useState} from '@tarojs/taro'
+import Taro, {useEffect, useRef, useState} from '@tarojs/taro'
 import {ScrollView, Text, View} from '@tarojs/components'
 import "./orderModal.less"
 import {AtFloatLayout} from "taro-ui"
 import isEmpty from 'lodash/isEmpty';
+import {flattens, intersection} from "../../../../utils/tool";
 
 const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], onSkuChange, onNowBuy}) => {
 
@@ -10,61 +11,151 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
     const [marketPrice, setMarketPrice] = useState("0");
     const [marketPriceShow, setMarketPriceShow] = useState(true);
     const [attrItems, setAttrItems] = useState([]);
-    const [skus, setSkus] = useState([]);
 
-    const initSkus = (skus) => {
+    //没有库存的sku组合
+    const notStockSkus = useRef([]);
+    //有库存的sku组合
+    const stockSkus = useRef([]);
+    //筛选出的没有库存的sku
+    const skuNotStock = useRef({});
 
-        for (let index = 0; index < skus.length; index++) {
-            const skuItem = skus[index];
-            const skuKeyAttrs: Array<any> = skuItem.value.split(',');
-            skuKeyAttrs.sort(function (value1, value2) {
-                return parseInt(value1) - parseInt(value2);
+    /**
+     * @description: 处理价格区间
+     * @param {Array} skus 组合的sku的数组(data.skus)
+     * @return {*}
+     */
+    const handlePriceArea = (skus: Array<any>) => {
+        const prices = skus.map((item) => {
+            return item.price;
+        })
+        prices.sort(function (a, b) {
+            return parseFloat(a + "") - parseFloat(b + "")
+        });
+        setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
+    }
+
+    /**
+     * @description: 初始化sku数据,并选择默认
+     * @param {Array} _  attrGroup
+     * @param {Array} attrItems
+     * @param {Array} skus
+     * @return {*}
+     */
+    const initSku = (_:Array<any>,attrItems:Array<Array<any>>,skus:Array<any>) => {
+
+        notStockSkus.current = skus.filter((item) => item.stock <= 0);
+        stockSkus.current = skus.filter((item) => item.stock > 0);
+        //把所有sku id归类为一个数组,并且筛选出所有sku对应的不可选的sku id
+        const temp = {};
+        const skuItems = attrItems.map((item) => {
+            return item.map((tag) => {
+
+                tag["selected"] = false;
+                tag["over"] = false;
+                const element = tag.id;
+                const hasStockSkus = Array.from(new Set(flattens(stockSkus.current.filter((obj) => {
+                    const vals: Array<any> = obj.value.split(",");
+                    if (vals.includes(element + "")) {
+                        return true;
+                    }
+                    return false;
+                }).map((item) => {
+                    return item.value.split(",")
+                }))));
+
+                const cStockSkus = Array.from(new Set(flattens(notStockSkus.current.filter((item) => {
+                    const vals: Array<any> = item.value.split(",");
+                    return vals.includes(element + "")
+                }).map((item) => {
+                    return item.value.split(",")
+                }))));
+                temp[element] = {};
+                temp[element]["key"] = tag.name
+                temp[element]["value"] = cStockSkus.filter(function (v) {
+                    return hasStockSkus.indexOf(v) == -1
+                });
+                if (defaultActive && defaultActive.length > 0) {
+                    if (defaultActive.indexOf(tag.id + "") != -1) {
+                        tag["selected"] = true;
+                    }
+                }
+                return tag
             });
-            skuItem.value = skuKeyAttrs.join(',');
-        }
+        });
+        skuNotStock.current = temp;
+        handlePriceArea(stockSkus.current);
 
-        setSkus(skus);
+        if (defaultActive && defaultActive.length > 0) {
+            const dsids = defaultActive.map((item) => {
+                return parseInt(item + "");
+            })
+            selectSkuItem(dsids, skuItems)
+        } else {
+            setAttrItems(skuItems);
+        }
     }
 
 
-    const selectAtteItems = (attrItems: Array<Array<any>>) => {
-        console.log(defaultActive)
-        const items = attrItems.map((value) => {
-            return value.map((val) => {
-                val["selected"] = false;
-                val["over"] = false;
-                for (const child of defaultActive) {
-                    if (child == val.id) {
-                        val["selected"] = true
-                    }
+    const selectSkuItem = (selectIds: Array<any>, items: Array<Array<any>>) => {
+        console.log("已选择的sku id", selectIds)
+        let tt = [];
+        for (let index = 0; index < selectIds.length; index++) {
+            const element = selectIds[index];
+            tt = Array.from(new Set(tt.concat(skuNotStock.current[element]["value"])));
+        }
+        items = items.map((item) => {
+            return item.map((tag) => {
+                tag["over"] = false;
+                if (tt.indexOf(tag.id + "") != -1) {
+                    tag["over"] = true;
                 }
-                return val;
+                return tag;
             });
         });
         setAttrItems(items);
-        if (defaultActive.length > 0) {
-            for (let i = 0; i < data.attrItems.length; i++) {
-                const item = data.attrItems[i];
-                for (let j = 0; j < item.length; j++) {
-                    const tag = item[j];
-                    if (defaultActive.indexOf(tag.id) != -1) {
-                        onItemSelect(i, j, true, skus);
-                    }
+        //当前可能所有集合
+        const maybeSkus = stockSkus.current.filter((obj) => {
+            const vals: Array<any> = obj.value.split(",");
+            return selectIds.every(v => vals.includes(v + ""))
+        })
+        if (selectIds.length != data.attrItems.length) {
+            handlePriceArea(maybeSkus);
+            setMarketPriceShow(false);
+        } else {
+            let current: any = {};
+            if (maybeSkus.length == 1) {
+                current = maybeSkus[0];
+            } else {
+                const selectedCombinationSku = maybeSkus.filter((item) => {
+                    const vals: Array<any> = item.value.split(",").map((item) => parseInt(item));
+                    return intersection(vals, selectIds).length == data.attrItems.length
+                });
+                current = selectedCombinationSku[0];
+            }
+            if (current) {
+                if (current.stock && current.stock > 0) {
+                    setPrice(current.price);
+                    setMarketPriceShow(true);
+                    setMarketPrice(current.market_price);
+                    setTimeout(() => {
+                        setPrice(current.price);
+                    }, 100);
+                    onSkuChange && onSkuChange(current);
+                } else {
+                    Taro.showToast({
+                        title: '库存不足',
+                        icon: 'none',
+                        duration: 1500
+                    })
                 }
             }
         }
     }
 
-    const tempSkuValue = [];
-    const onItemSelect = (itemIdx, tagIdx, state, skusa = []) => {
-
-
-        onSkuChange && onSkuChange(null);
-
+    const onSelectItem = (itemIdx,tagIdx,state,aItems) => {
         const selectIds = [];
-        let items = [...attrItems];
-        const selectItemIdxs = [];
-        items[itemIdx].map((tag, idx) => {
+        const items = aItems;
+        items[itemIdx].map((tag,idx)=>{
             tag["selected"] = false;
             if (tagIdx == idx) {
                 tag["selected"] = state;
@@ -72,111 +163,22 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
             return tag;
         });
 
-        for (let i = 0; i < items.length; i++) {
+        for (let i = 0;i<items.length;i++) {
             const item = items[i];
             for (const tag of item) {
                 if (tag["selected"]) {
-                    selectItemIdxs.push(i);
                     selectIds.push(tag.id);
-                    tempSkuValue.push(tag.id);
                 }
             }
         }
-
-        const tempSelectIds = selectIds.concat();
-        if (tempSelectIds.length == items.length && items.length > 1) {
-            tempSelectIds.splice(itemIdx, 1);
-            selectItemIdxs.splice(itemIdx, 1)
-        }
-        let tmp = [];
-        const mskus = skus.length > 0 ? skus : skusa
-        const maybeSkus = mskus.filter((obj) => {
-            if (tempSelectIds.length > 0 || items.length == 1) {
-                const vals: Array<any> = obj.value.split(",");
-                return tempSelectIds.every(v => vals.includes(v + ""))
-            }
-            return true;
-        })
-        maybeSkus.filter((item) => item.stock > 0).map((item) => {
-            const vs = item.value.split(",").filter((v) => tempSelectIds.indexOf(parseInt(v)) == -1);
-            tmp = tmp.concat(vs);
-            return item.value
-        });
-
-        const notOverSku = Array.from(new Set(tmp));
-        selectIds.sort(function (value1, value2) {
-            return parseInt(value1) - parseInt(value2);
-        });
-        items = items.map((item, index) => {
-            return item.map((tag) => {
-                tag["over"] = false;
-                if (selectItemIdxs.indexOf(index) == -1) {
-                    if (selectIds.length > 1) {
-                        if (notOverSku.indexOf(tag.id + "") == -1) {
-                            tag["over"] = true;
-                            if (tag["selected"]) {
-                                selectIds.splice(index, 1);
-                            }
-                            tag["selected"] = false;
-                        }
-                    }
-                }
-                return tag;
-            });
-        });
-        const skuValue = selectIds.join(',');
-        setAttrItems(items);
-
-        if (selectIds.length != items.length) {
-            const prices = maybeSkus.map((item) => {
-                return item.price;
-            })
-            prices.sort(function (a, b) {
-                return parseFloat(a + "") - parseFloat(b + "")
-            });
-            setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
-            setMarketPriceShow(false);
-        } else {
-            for (let i = 0; i < maybeSkus.length; i++) {
-                const sku = maybeSkus[i];
-
-                if (sku.value == skuValue) {
-                    console.log(sku)
-                    setPrice(sku.price);
-                    setMarketPriceShow(true);
-                    setMarketPrice(sku.market_price);
-                    setTimeout(() => {
-                        setPrice(sku.price);
-                    }, 100);
-                    if (sku.stock <= 0) {
-                        Taro.showToast({
-                            title: '库存不足',
-                            icon: 'none',
-                            duration: 1500
-                        })
-                    } else {
-                        onSkuChange && onSkuChange(sku);
-                    }
-                    break;
-                }
-            }
-        }
-
+        selectSkuItem(selectIds,items)
     }
 
 
     useEffect(() => {
 
-        if (!isEmpty(data)) {
-            initSkus(data.skus);
-            selectAtteItems([...data.attrItems]);
-            const prices = data.skus.map((item) => {
-                return item.price;
-            })
-            prices.sort(function (a, b) {
-                return parseFloat(a + "") - parseFloat(b + "")
-            });
-            data.price && setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
+        if (!isEmpty(data) && data != undefined && data != null) {
+            initSku(data.attrGroup, data.attrItems, data.skus)
         }
     }, [data]);
 
@@ -219,7 +221,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
                                                             return
                                                         }
                                                         if (!tag.over) {
-                                                            onItemSelect(index, idx, !tag.selected)
+                                                            onSelectItem(index,idx,!tag.selected,attrItems);
                                                         }
                                                     }}>
                                                     <Text className='txt'>{tag.name}</Text>

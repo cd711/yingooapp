@@ -16,7 +16,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     const [marketPriceShow, setMarketPriceShow] = useState(false);
     const [imgs, setImgs] = useState([]);
     const [attrItems,setAttrItems] = useState([]);
-    
+
 
     //没有库存的sku组合
     const notStockSkus = useRef([]);
@@ -159,7 +159,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         const temp = {};
         const skuItems =  attrItems.map((item)=>{
             return item.map((tag)=>{
-                
+
                 tag["selected"] = false;
                 tag["over"] = false;
                 const element = tag.id;
@@ -192,7 +192,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         });
         skuNotStock.current = temp;
         handlePriceArea(stockSkus.current);
-        
+
         if (defalutSelectIds && defalutSelectIds.length>0) {
             const dsids = defalutSelectIds.map((item)=>{
                 return parseInt(item+"");
@@ -289,7 +289,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                                 <Counter num={1} max={maxBuyNum==0?999:maxBuyNum} onCounterChange={onBuyNumberChange}/>
                             </View>
                         }
-                        
+
                         {
                             showOkButton ?<View className='ops'>
                                 <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
