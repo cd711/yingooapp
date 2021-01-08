@@ -41,7 +41,9 @@ export default class Login extends Component<{}, {
     showPicSelector: boolean;
     toast: any;
     selectSkuId: number;
-    toastStatus: boolean
+    toastStatus: boolean;
+    goodsPrice:string;
+    goodsMarketPrice:string
 }> {
 
     config: Config = {
@@ -68,7 +70,9 @@ export default class Login extends Component<{}, {
                 status: false
             },
             toastStatus: false,
-            selectSkuId: 0
+            selectSkuId: 0,
+            goodsPrice:"0.00",
+            goodsMarketPrice:"0.00"
         }
     }
 
@@ -430,7 +434,10 @@ export default class Login extends Component<{}, {
             maxBuyNum,
             showPicSelector,
             toast,
-            toastStatus
+            toastStatus,
+            goodsPrice,
+            selectSkuId,
+            goodsMarketPrice
         } = this.state;
         const image: Array<any> = data && data.image && data.image.length > 0 ? data.image : [];
         // const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
@@ -531,11 +538,13 @@ export default class Login extends Component<{}, {
                         <View className='price_line'>
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
-                                <Text className='num'>{data && data.price ? data.price : "0.00"}</Text>
+                                <Text className='num'>{goodsPrice}</Text>
                             </View>
-                            <View className='ap'>
-                                <Text className='txt'>￥{data && data.market_price ? data.market_price : "0.00"}</Text>
-                            </View>
+                            {
+                                selectSkuId>0?<View className='ap'>
+                                    <Text className='txt'>￥{goodsMarketPrice}</Text>
+                                </View>:null
+                            }
                             <View className='total'>
                                 <Text className='txt'>{data && data.sold_count ? data.sold_count : 0}人已抢</Text>
                             </View>
@@ -624,7 +633,7 @@ export default class Login extends Component<{}, {
                                                 }
                                             }
                                         }
-                                        if (sku && sku.length == data.attrGroup.length && selectSkuId > 0) {
+                                        if (sku != null && sku && sku.length == data.attrItems.length && selectSkuId > 0) {
 
                                             setTempDataContainer("product_preview_sku", {
                                                 sku,
@@ -715,7 +724,7 @@ export default class Login extends Component<{}, {
                         return;
                     }
                     const {buyTotal, data, selectSkuId, sku} = this.state;
-                    if (sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
+                    if (sku != null && sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
                         this.setState({
                             placeOrderShow: false
                         })
@@ -754,7 +763,7 @@ export default class Login extends Component<{}, {
                             }
                         }
                     }
-                    if (sku.length == data.attrGroup.length) {
+                    if (sku != null && sku.length == data.attrGroup.length) {
                         // let url = ""
 
                         setTempDataContainer("product_preview_sku", {
@@ -792,6 +801,12 @@ export default class Login extends Component<{}, {
                     this.setState({
                         skuName: names,
                     });
+                }} onPriceChange={(price,market)=>{
+                    console.log("goodsMarketPrice",price,market)
+                    this.setState({
+                        goodsPrice:price,
+                        goodsMarketPrice:market
+                    })
                 }}/>
                 {
                     showPicSelector

@@ -167,7 +167,20 @@ export default class Confirm extends Component<any, {
                     title: e,
                     icon: "none",
                     duration: 2000
-                })
+                });
+                setTimeout(() => {
+                    if (Taro.getCurrentPages().length>0) {
+                        Taro.navigateBack();
+                    } else {
+                        if (deviceInfo.env == "h5") {
+                            window.location.href = "/pages/tabbar/index/index"
+                        } else {
+                            Taro.switchTab({
+                                url:'/pages/tabbar/index/index'
+                            });
+                        }
+                    }
+                }, 2000);
             })
         }
     }

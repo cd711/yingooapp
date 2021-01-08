@@ -166,6 +166,7 @@ export default class Cart extends Component<{}, {
     render() {
         const {source, allSelected, total, selectIds, showDelTipModal} = this.state;
         const list = source && source.list && source.list.length > 0 ? source.list : [];
+        console.log("list",list.length>0)
         const delOption = [{
             text: '删除',
             style: {
@@ -239,7 +240,8 @@ export default class Cart extends Component<{}, {
                                                     </View>
                                                     <View className='party'>
                                                         <View className='name'>
-                                                            <Text className='txt'>{item.product.title}</Text>
+                                                            {/* item.title.length>10?item.title.substring(0,10)+"...":item.title */}
+                                                            <Text className='txt'>{item.product.title.length>10?item.product.title.substring(0,10)+"...":item.product.title}</Text>
                                                         </View>
                                                         <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
                                                         <View className='np'>
@@ -289,8 +291,7 @@ export default class Cart extends Component<{}, {
                             }}>去逛逛</Button>
                         </View>
                     }
-                    {
-                        list.length>0?<View className='bottom'>
+                    <View className='bottom' style={deviceInfo.env=="h5"?`bottom: ${Taro.pxTransform(100)};`:`bottom: ${Taro.pxTransform(0)};`}>
                         <View className="all" onClick={this.onAllSelect.bind(this, list, allSelected)}>
                             <Checkboxs isChecked={allSelected} disabled/>
                             <Text className='txt'>全选</Text>
@@ -319,9 +320,7 @@ export default class Cart extends Component<{}, {
                                 <Text className='txt'>结算</Text>
                             </View>
                         </View>
-                    </View>:null
-                    }
-
+                </View>
                 <TipModal isShow={showDelTipModal} tip="是否删除？" cancelText="取消" okText="确定" onCancel={() => {
                     this.setState({showDelTipModal: false})
                 }} onOK={this.tipModalOkCallBack}/>

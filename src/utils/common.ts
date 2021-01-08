@@ -762,3 +762,17 @@ export function useDebounceFn(func, wait, immediate = false) {
     return useCallback(resDebounced, [ wait, cancel, immediate ]);
 }
 export default useDebounceFn;
+
+/**
+ * @description: 格式化价格
+ * @param {string} price
+ * @return {string}
+ */
+export function formatPrice(price:string,is:boolean) {
+    const pp = price + "";
+    if (is) {
+        return parseFloat(pp);
+    } else {
+        return parseFloat(pp).toFixed(2);
+    }
+}
