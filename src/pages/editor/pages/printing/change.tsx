@@ -18,6 +18,7 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
+import Discount from "../../../../components/discount";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -44,6 +45,9 @@ const PrintChange: Taro.FC<any> = () => {
     const [price, setPrice] = useState<string[]>(["0.00"]);
     const [scrolling, setScrolling] = useState<boolean>(false);
 
+    const [discountStatus, setDiscountStatus] = useState<boolean>(false);
+    const [distCountList, setDiscountList] = useState<Array<{id: string | number, name: string, price: string, value: string}>>([]);
+    const [discountInfo, setDiscountInfo] = useState<{count: number, price: number, status: boolean}>({status: false, count: 0, price: 0.00});
 
     const currentSkus = useRef<any[]>([]);
     const skuStr = useRef<string>("");
@@ -83,6 +87,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     }, 1000), [skuStr.current])
 
+    const runOnlyOne = useRef(0);
     useEffect(() => {
 
         // 统计图片及其count的总数
@@ -118,13 +123,14 @@ const PrintChange: Taro.FC<any> = () => {
             setCountStatus(3)
         }
 
+        // 解析路由上的skus
+        const pSku = photoStore.photoProcessParams.photo.sku;
+        const idx = photoStore.photoProcessParams.numIdx;
+        console.log("当前的numIdx：", idx, pSku)
+
         // 查找合适的sku价格
         if (count > 0) {
-            // 解析路由上的skus
-            const pSku = photoStore.photoProcessParams.photo.sku;
             let arr = !notNull(pSku) ? String(decodeURIComponent(pSku)).split(",") : [];
-            const idx = photoStore.photoProcessParams.numIdx;
-            console.log("当前的numIdx：", idx)
             if (idx > -1) {
                 const countAttrArr = photoStore.photoProcessParams.attrItems[idx];
                 const len = countAttrArr.length;
@@ -153,6 +159,77 @@ const PrintChange: Taro.FC<any> = () => {
             console.log("找到的skuID列表：", arr)
         }
 
+        // 在所有的sku列表里查询阶梯价对应的价格, 并且最多执行3次, 弹窗展示用
+        let discountTempArr = [];
+        if (count > 0 && idx > -1 && runOnlyOne.current <= 1) {
+            const countAttrArr = photoStore.photoProcessParams.attrItems[idx];
+            console.log("价格列表：", JSON.parse(JSON.stringify(countAttrArr)))
+
+            for (let i = 0; i < countAttrArr.length; i++) {
+                const cItem = countAttrArr[i];
+                const obj = {...cItem};
+                let arr = !notNull(pSku) ? String(decodeURIComponent(pSku)).split(",") : [];
+                arr.push(cItem.id);
+                arr = arr.sort((a, b) => parseInt(a) - parseInt(b))
+                if (arr.length === photoStore.photoProcessParams.attrItems.length) {
+                    const str = arr.join(",");
+                    const tempSkuArr = goodsInfo.current.skus.filter(v => v.value.includes(str));
+                    if (tempSkuArr.length > 0) {
+                        obj.price = tempSkuArr[0].price;
+                    } else {
+                        console.log("没有找到对应的SKU信息：", tempSkuArr)
+                    }
+                } else {
+                    console.log("sku长度不相等：", JSON.parse(JSON.stringify(arr)))
+                }
+                discountTempArr.push(obj)
+            }
+            console.log("执行完最终查找到的优惠列表：", discountTempArr)
+            discountTempArr = discountTempArr.sort((a, b) => parseInt(a.value) - parseInt(b.value))
+            setDiscountList([...discountTempArr]);
+            runOnlyOne.current += 1;
+        }
+
+        // 根据当前总张数推算展示的阶梯价信息
+        const tempList = distCountList.length > 0 ? distCountList : discountTempArr;
+        console.log("开始查询阶梯价：", count, tempList)
+        if (count > 0 && tempList.length > 0) {
+            const currentIdx = tempList.findIndex((vItem) => {
+                return count <= Number(vItem.value.trim())
+            });
+            console.log("当前的总数查询的位置：", currentIdx, tempList);
+
+            if (currentIdx > -1) {
+                let arr = !notNull(pSku) ? String(decodeURIComponent(pSku)).split(",") : [];
+                arr.push(tempList[currentIdx].id);
+                arr = arr.sort((a, b) => parseInt(a) - parseInt(b));
+                if (arr.length === photoStore.photoProcessParams.attrItems.length) {
+                    skuStr.current = arr.join(",");
+                }
+
+                const nextIdx = currentIdx + 1;
+                console.log("下一个位置：", nextIdx)
+                if (nextIdx < tempList.length) {
+                    const tempCur = tempList[nextIdx];
+                    setDiscountInfo({
+                        count: parseInt(tempCur.value) - count,
+                        price: Number(tempCur.price),
+                        status: true
+                    })
+                } else if (nextIdx === tempList.length) {
+                    // 已达到最大的取值区间，即当前nextIdx为最后一个价位
+                    setDiscountInfo({
+                        status: false,
+                        count: 0,
+                        price: 0
+                    })
+                } else {
+                    console.log("nextIdx：", nextIdx)
+                }
+            } else {
+                console.log("初始下标没有查到：", currentIdx, tempList)
+            }
+        }
 
     }, [photos])
 
@@ -189,7 +266,7 @@ const PrintChange: Taro.FC<any> = () => {
                     }
                     const obj = {
                         path: opt.forDetail || opt.incomplete ? [...photoStore.photoProcessParams.photo.path] : opt.path,
-                        sku: router.params.sku_id,
+                        sku: decodeURIComponent(router.params.sku_id),
                         id: router.params.id
                     };
                     console.log("初始化的Object：", JSON.parse(JSON.stringify(obj)))
@@ -200,7 +277,7 @@ const PrintChange: Taro.FC<any> = () => {
                     temp.skus = temp.skus.filter(v => v.stock > 0);
                     goodsInfo.current = {...temp};
 
-                    console.log("清楚库存为0的数据：", goodsInfo.current)
+                    console.log("清除库存为0的数据：", goodsInfo.current)
 
                     // 找到当前模糊搜索的suk列表
                     let arr = [];
@@ -211,7 +288,7 @@ const PrintChange: Taro.FC<any> = () => {
                     arr = arr.sort((a, b) => a - b);
                     skuStr.current = arr.join(",");
                     currentSkus.current = temp.skus.filter(v => v.value.includes(arr.join(",")));
-                    console.log("第一次产生的currentSkus：", currentSkus.current);
+                    console.log("第一次产生的currentSkus：", skuStr.current, currentSkus.current);
 
                     // 如果是完成的SkuID
                     if (opt.forDetail) {
@@ -793,6 +870,11 @@ const PrintChange: Taro.FC<any> = () => {
     return (
         <View className="printing_container">
             <LoginModal isTabbar={false} />
+            {
+                discountStatus
+                    ? <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
+                    : null
+            }
             <AtNavBar onClickLeftIcon={onBackHandle}
                       customStyle={{
                           paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
@@ -806,7 +888,16 @@ const PrintChange: Taro.FC<any> = () => {
                 <View className="left">
                     <Text className="txt">现单价：￥{price.length === 1 ? price[0] : `${price[0]}${!detailStatus ? "起" : ""}`}</Text>
                 </View>
-                <View className="right"/>
+                <View className="right">
+                    {
+                        discountInfo.status
+                            ? <View className="more_price_info" onClick={() => setDiscountStatus(true)}>
+                                <Text className="red_txt">再加{discountInfo.count}张,单价低至￥{discountInfo.price}</Text>
+                                <IconFont name="24_xiayiye" color="#FF4966" size={28} />
+                            </View>
+                            : null
+                    }
+                </View>
             </View>
             <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}} onScroll={onScroll}>
                 <View className="printing_change_main"
