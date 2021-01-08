@@ -18,7 +18,6 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
-// import debounce from "lodash.debounce"
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -43,6 +42,7 @@ const PrintChange: Taro.FC<any> = () => {
     const [countStatus, setCountStatus] = useState<1 | 2 | 3>(1);
     // 根据当前的总数要展示的SKU价格
     const [price, setPrice] = useState<string[]>(["0.00"]);
+    const [scrolling, setScrolling] = useState<boolean>(false);
 
 
     const currentSkus = useRef<any[]>([]);
@@ -777,6 +777,19 @@ const PrintChange: Taro.FC<any> = () => {
             : deviceInfo.windowHeight - 110 + deviceInfo.statusBarHeight + deviceInfo.menu.height + "px"
     }
 
+    const scrollVal = useRef<number>(0);
+    const debounceScroll = useDebounceFn(() => {
+        setScrolling(false)
+    }, 300, false)
+    const onScroll = (e) => {
+        const top = e.detail.scrollTop;
+        scrollVal.current = top;
+        setScrolling(true);
+        if (scrollVal.current === top) {
+            debounceScroll()
+        }
+    }
+
     return (
         <View className="printing_container">
             <LoginModal isTabbar={false} />
@@ -795,7 +808,7 @@ const PrintChange: Taro.FC<any> = () => {
                 </View>
                 <View className="right"/>
             </View>
-            <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}}>
+            <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}} onScroll={onScroll}>
                 <View className="printing_change_main"
                       style={
                           deviceInfo.env === "weapp"
@@ -852,7 +865,9 @@ const PrintChange: Taro.FC<any> = () => {
                     }
                 </View>
             </ScrollView>
-            <View className="print_fixed_select_button" onClick={selectPhoto} style={{bottom: deviceInfo.env === "weapp" ? `${deviceInfo.safeBottomHeight + 80}px` : 80}}>
+            <View className={`print_fixed_select_button ${scrolling ? "print_fixed_btn_ainm" : ""}`}
+                  onClick={selectPhoto}
+                  style={{bottom: deviceInfo.env === "weapp" ? `${deviceInfo.safeBottomHeight + 80}px` : 80}}>
                 <IconFont name="24_jiahao" size={40} color="#FF4966" />
                 <Text className="txt">加图</Text>
             </View>
