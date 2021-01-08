@@ -633,7 +633,7 @@ export default class Login extends Component<{}, {
                                                 }
                                             }
                                         }
-                                        if (sku && sku.length == data.attrItems.length && selectSkuId > 0) {
+                                        if (sku != null && sku && sku.length == data.attrItems.length && selectSkuId > 0) {
 
                                             setTempDataContainer("product_preview_sku", {
                                                 sku,
@@ -763,7 +763,7 @@ export default class Login extends Component<{}, {
                             }
                         }
                     }
-                    if (sku.length == data.attrGroup.length) {
+                    if (sku != null && sku.length == data.attrGroup.length) {
                         // let url = ""
 
                         setTempDataContainer("product_preview_sku", {
