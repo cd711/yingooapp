@@ -724,7 +724,7 @@ export default class Login extends Component<{}, {
                         return;
                     }
                     const {buyTotal, data, selectSkuId, sku} = this.state;
-                    if (sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
+                    if (sku != null && sku.length == data.attrGroup.length && buyTotal > 0 && selectSkuId > 0) {
                         this.setState({
                             placeOrderShow: false
                         })
