@@ -761,7 +761,6 @@ export function useDebounceFn(func, wait, immediate = false) {
     */
     return useCallback(resDebounced, [ wait, cancel, immediate ]);
 }
-export default useDebounceFn;
 
 /**
  * @description: 格式化价格

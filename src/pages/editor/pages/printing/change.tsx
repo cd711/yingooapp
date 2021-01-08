@@ -3,13 +3,13 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
-import useDebounceFn, {
+import {
     debounce,
     deviceInfo, getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
     notNull, shareAppExtends, sleep,
-    urlEncode
+    urlEncode, useDebounceFn
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 import OrderModal from "./orederModal";
