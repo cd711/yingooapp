@@ -3,7 +3,8 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
-import {
+import useDebounceFn, {
+    debounce,
     deviceInfo, getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
@@ -17,7 +18,7 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
-import debounce from "lodash.debounce"
+// import debounce from "lodash.debounce"
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -120,7 +121,8 @@ const PrintChange: Taro.FC<any> = () => {
         // 查找合适的sku价格
         if (count > 0) {
             // 解析路由上的skus
-            let arr = String(decodeURIComponent(photoStore.photoProcessParams.photo.sku)).split(",") || [];
+            const pSku = photoStore.photoProcessParams.photo.sku;
+            let arr = !notNull(pSku) ? String(decodeURIComponent(pSku)).split(",") : [];
             const idx = photoStore.photoProcessParams.numIdx;
             console.log("当前的numIdx：", idx)
             if (idx > -1) {
@@ -396,10 +398,36 @@ const PrintChange: Taro.FC<any> = () => {
             setPhotos([...params.photo.path] || []);
         }
 
-        Taro.hideLoading()
+        Taro.hideLoading();
+
     })
 
-    const onReducer = (prevNum, idx) => {
+    const debounceUpdateCount = useDebounceFn(async (idx, num) => {
+        const photo = [...photoStore.photoProcessParams.photo.path];
+        photo[idx].count = Number(num);
+        try {
+            await photoStore.updateServerParams(photoStore.printKey, {
+                photo: {
+                    path: photo
+                }
+            })
+        } catch (e) {
+            console.log("更新数量出错：", e)
+        }
+    }, 500, false)
+
+    const onAddCount = async (num, idx) => {
+        let _num = Number(num);
+        _num = _num + 1;
+
+        const arr = [...photos];
+
+        arr[idx].count = Number(_num);
+        setPhotos([...arr]);
+        debounceUpdateCount(idx, Number(_num))
+    }
+
+    const onReducer = async (prevNum, idx) => {
         let num = Number(prevNum);
         num = num - 1;
         if (num < 1) {
@@ -408,17 +436,8 @@ const PrintChange: Taro.FC<any> = () => {
 
         const arr = [...photos];
         arr[idx].count = Number(num);
-        setPhotos([...arr])
-    }
-
-    const onAddCount = (num, idx) => {
-        let _num = Number(num);
-        _num = _num + 1;
-
-        const arr = [...photos];
-
-        arr[idx].count = Number(_num);
-        setPhotos([...arr])
+        setPhotos([...arr]);
+        debounceUpdateCount(idx, Number(num))
     }
 
     const onDeleteImg = idx => {
@@ -819,11 +838,11 @@ const PrintChange: Taro.FC<any> = () => {
                                     <View className="print_change_count">
                                         <View className='counter-fc'>
                                             <View className='reduce' onClick={() => onReducer(value.count, index)}>
-                                                <Image src={require("../../../../source/reduce.png")} className='img'/>
+                                                <Image src={require(`../../../../source/${value.count > 1 ? "reduceActive" : "reduce"}.png`)} className='img'/>
                                             </View>
                                             <Text className='num'>{value.count || 1}</Text>
                                             <View className='add' onClick={() => onAddCount(value.count, index)}>
-                                                <Image src={require("../../../../source/add.png")} className='img'/>
+                                                <Image src={require(`../../../../source/add.png`)} className='img'/>
                                             </View>
                                         </View>
                                     </View>
