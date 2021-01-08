@@ -241,7 +241,7 @@ export default class Cart extends Component<{}, {
                                                     <View className='party'>
                                                         <View className='name'>
                                                             {/* item.title.length>10?item.title.substring(0,10)+"...":item.title */}
-                                                            <Text className='txt'>{item.product.title>10?item.product.title.substring(0,10)+"...":item.product.title}</Text>
+                                                            <Text className='txt'>{item.product.title.length>10?item.product.title.substring(0,10)+"...":item.product.title}</Text>
                                                         </View>
                                                         <Text className='gg'>规格:{item.sku.value.join("/")}</Text>
                                                         <View className='np'>
@@ -291,7 +291,7 @@ export default class Cart extends Component<{}, {
                             }}>去逛逛</Button>
                         </View>
                     }
-                    <View className='bottom'>
+                    <View className='bottom' style={deviceInfo.env=="h5"?`bottom: ${Taro.pxTransform(100)};`:`bottom: ${Taro.pxTransform(0)};`}>
                         <View className="all" onClick={this.onAllSelect.bind(this, list, allSelected)}>
                             <Checkboxs isChecked={allSelected} disabled/>
                             <Text className='txt'>全选</Text>
