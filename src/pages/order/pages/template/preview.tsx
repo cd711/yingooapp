@@ -247,21 +247,14 @@ export default class Preview extends Component<any, {
             // console.log("aaa",res);
             getTempDataContainer("product_preview_sku",(val)=>{
 
-                if (val && val.sku.length>0 && val.selectSkuId) {
-                    const temp = parseInt(val.selectSkuId+"")
-                    res.skus = res.skus.filter((item) => {
-                        return temp==parseInt(item.id+"")
-                    });
-                    let ids:Array<any> = val.sku.split(",");
-                    ids = ids.map((item)=>{
-                       return parseInt(item+"");
-                    })
+                if (val && val.sku.length>0) {
+                    let ids:Array<any> = val.sku;
+                    ids = ids.map((item)=>item+"")
                     res.attrItems = res.attrItems.map((item) => {
                         return item.filter((val) => {
-                            return ids.indexOf(parseInt(val.selectSkuId + "")) != -1
+                            return ids.indexOf(val.id + "") != -1
                         })
                     });
-
                     this.setState({
                         productInfo:res,
                         defalutSelectIds:ids

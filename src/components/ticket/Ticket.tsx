@@ -5,7 +5,7 @@ import './Ticket.less';
 import IconFont from '../iconfont';
 import Checkboxs from '../checkbox/checkbox';
 import moment from "moment";
-import { convertClassName } from '../../utils/common';
+import { convertClassName, formatPrice } from '../../utils/common';
 
 const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, ticket,children}) => {
     const [showDes,setShowDes] = useState(false)
@@ -30,9 +30,9 @@ const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, 
             <View className='left-part'>
                 <View className='price'>
                     <Text className='left'>¥</Text>
-                    <Text className='right'>{ticket.money}</Text>
+                    <Text className='right'>{ticket && ticket.money ? formatPrice(ticket.money,true):"0"}</Text>
                 </View>
-                <Text className='ky'>满{ticket.order_min_amount}可用</Text>
+                <Text className='ky'>满{ticket && ticket.order_min_amount?formatPrice(ticket.money,true):"0"}可用</Text>
             </View>
             <View className='right-part'>
                 <Text className='name'>{ticket.name}</Text>

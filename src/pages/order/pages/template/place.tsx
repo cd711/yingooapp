@@ -9,14 +9,15 @@ import { flattens,intersection } from '../../../../utils/tool'
 
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick,onNamesChange}) => {
+export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick,onNamesChange,onPriceChange}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
     const [marketPriceShow, setMarketPriceShow] = useState(false);
     const [imgs, setImgs] = useState([]);
     const [attrItems,setAttrItems] = useState([]);
-
+    const [isLoad,setIsLoad] = useState(false);
+    const [centerPartyHeight,setCenterPartyHeight] = useState(626);
 
     //没有库存的sku组合
     const notStockSkus = useRef([]);
@@ -60,7 +61,9 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         prices.sort(function (a, b) {
             return parseFloat(a + "") - parseFloat(b + "")
         });
-        setPrice(prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`);
+        const p = prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`
+        setPrice(p);
+        onPriceChange && onPriceChange(p,"")
     }
 
     /**
@@ -115,6 +118,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                         setPrice(current.price);
                     }, 100);
                     onSkuChange && onSkuChange(selectIds,current.id);
+                    onPriceChange && onPriceChange(current.price,current.market_price)
                 } else {
                     Taro.showToast({
                         title:'库存不足',
@@ -207,6 +211,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     useEffect(() => {
         console.log("data被初始化",data)
         if (!isEmpty(data) && data != undefined && data != null) {
+            setIsLoad(true);
             initSku(data.attrGroup,data.attrItems,data.skus)
             data.image && setImgs(data.image);
         }
@@ -217,7 +222,7 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
         const sc = skuNotStock.current;
         for (let index = 0; index < selectIds.length; index++) {
             const element = selectIds[index];
-            console.log("选择的项目",sc[element])
+            // console.log("选择的项目",sc[element])
             names.push(sc[element]["key"])
         }
         return names;
@@ -227,17 +232,12 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
     }
     return <View className='placeOrder'>
         {
-            isShow?<View className={isShow?'float-layout float-layout--active':'float-layout'}>
+            isLoad?<View className={isShow?'float-layout float-layout--active':'float-layout'}>
                 <View className='float-layout__overlay' onClick={_onClose}/>
                 <View className='float-layout__container'>
-                    <View className='float-container'>
-                        <View className='info-parts'>
-                            <Image src={imgs && imgs.length > 0?imgs[0]:""} mode='aspectFill' className='pre_image' onClick={()=>{
-                                Taro.previewImage({
-                                    current:imgs && imgs.length > 0?imgs[0]:"",
-                                    urls:imgs && imgs.length > 0?imgs:[]
-                                })
-                            }}/>
+                    <View className='float-container' >
+                        <View className='xy_info-parts'>
+                            <Image src={imgs && imgs.length > 0?imgs[0]:""} mode='aspectFill' className='pre_image'/>
                             <View className='info'>
                                 <Text className='name'>{ data && data.title ? (data.title.length>10?`${data.title.substring(0,10)}...`:data.title):"商品名称"}</Text>
                                 <View className='price'>
@@ -281,21 +281,21 @@ export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,i
                                         </View>
                                     ))
                                 }
+                                {
+                                    productType == "customized"?null:<View className='buy-number'>
+                                        <Text className='title'>购买数量</Text>
+                                        <Counter num={1} max={maxBuyNum==0?999:maxBuyNum} onCounterChange={onBuyNumberChange}/>
+                                    </View>
+                                }
                             </View>
                         </ScrollView>
-                        {
-                            productType == "customized"?null:<View className='buy-number'>
-                                <Text className='title'>购买数量</Text>
-                                <Counter num={1} max={maxBuyNum==0?999:maxBuyNum} onCounterChange={onBuyNumberChange}/>
-                            </View>
-                        }
 
                         {
-                            showOkButton ?<View className='ops'>
+                            showOkButton ?<View className='xy_x_ops'>
                                 <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
-                            </View>:(productType=="customized"?<View className='ops'>
+                            </View>:(productType=="customized"?<View className='xy_x_ops'>
                                 <Button className='red-ok-btn' onClick={onNowButtonClick}>立即制作</Button>
-                            </View>:<View className='ops'>
+                            </View>:<View className='xy_x_ops'>
                                 <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
                                 <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
                             </View>)

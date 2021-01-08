@@ -6,7 +6,7 @@ import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../../components/empty";
 import {api} from '../../../utils/net';
-import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,urlEncode,getURLParamsStr} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,urlEncode,getURLParamsStr,setTempDataContainer} from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import moment from "moment";
@@ -396,7 +396,14 @@ export default class Me extends Component<any, MeState> {
         }
     ];
     componentDidShow(){
-        // setTempDataContainer("product_preview_sku",null,()=>{});
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku",null);
+        }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue && parseInt(change.newValue+"")>0) {
+                setTempDataContainer("product_preview_sku",null);
+            }
+        })
     }
     // @ts-ignore
     render() {
@@ -432,7 +439,7 @@ export default class Me extends Component<any, MeState> {
                                     <IconFont name='24_shezhi' size={48} color='#121314'/>
                                 </View>:null
                             }
-                            <Text className='me_txt' style={pageScrollShowTop ?`opacity: 1;transition: .8s opacity ease-out;`:"opacity: 0;transition: .04s opacity ease-in;"}>我的</Text>
+                            <Text className='me_txt' style={pageScrollShowTop ?`opacity: 1;transition: .8s opacity ease-out;`:"opacity: 0;"}>我的</Text>
                             {
                                 deviceInfo.env == "h5" ?<View className='right' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
                                     <IconFont name='24_shezhi' size={48} color='#121314'/>

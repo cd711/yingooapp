@@ -8,6 +8,7 @@ import {api} from "../../../utils/net";
 import {
     allowShowCoupon,
     deviceInfo,
+    formatPrice,
     getEvenArr,
     getLocalCoupon,
     getSpecialRouter,
@@ -649,7 +650,8 @@ class Index extends Component<any, IndexState> {
                                                                 <Image src={require("../../../source/yhq.svg")} className="prod_yhq" />
                                                                 <View className="single_prod_info">
                                                                     <View className="left">
-                                                                        <Text className="pri">￥<Text className="pr">{list[0].coupon.money}</Text></Text>
+                                                                        <Text className="pri">¥</Text>
+                                                                        <Text className="pr">{formatPrice(list[0].coupon.money,true)}</Text>
                                                                     </View>
                                                                     <View className="mid">
                                                                         <Text className="h1">{list[0].coupon.name}</Text>

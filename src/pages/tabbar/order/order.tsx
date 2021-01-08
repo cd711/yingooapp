@@ -309,8 +309,8 @@ export default class Order extends Component<any,{
                                     <Text className={`status ${item.state_tip.value==1?'pay':(item.state_tip.value==2||item.state_tip.value==3?'deliver':'complete')}`}>{item.after_sale_status_tip.value!=0?item.after_sale_status_tip.text:item.state_tip.text}</Text>
                                 </View>
                                 {
-                                    item.products.length==1?item.products.map((product)=>(
-                                        <Fragment>
+                                    item.products.length==1?item.products.map((product,index)=>(
+                                        <Fragment key={index+""}>
                                             <View className='order-info' key={product.product_id} onClick={()=>{
                                                 Taro.navigateTo({
                                                     url:`/pages/me/pages/me/orderdetail?id=${item.id}`
@@ -339,7 +339,7 @@ export default class Order extends Component<any,{
                                     )):<View className='order-preview'>
                                         {
                                             item.products.map((product,index)=>(
-                                                <View style={`width: ${Taro.pxTransform(160)};height: ${Taro.pxTransform(160)};`}>
+                                                <View style={`width: ${Taro.pxTransform(160)};height: ${Taro.pxTransform(160)};`} key={index+""}>
                                                     {
                                                         index<3?<View className='order-img' key={product.product_id} onClick={()=>{
                                                                 Taro.navigateTo({
