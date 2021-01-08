@@ -485,6 +485,7 @@ const PrintChange: Taro.FC<any> = () => {
         try {
             await photoStore.updateServerParams(photoStore.printKey, {
                 photo: {
+                    ...photoStore.photoProcessParams.photo,
                     path: photo
                 }
             })
