@@ -87,9 +87,12 @@ export default class Preview extends Component<any, {
             window.addEventListener("message", this.onMsg);
         }
     }
-    componentWillUnmount(){
-
+    componentDidShow() {
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku", null);
+        }
     }
+
     getWorkInfo = (id) => {
         const par = this.$router;
         Taro.showLoading({title:"加载中..."});
