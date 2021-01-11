@@ -105,6 +105,7 @@ export default class Order extends Component<any,{
             })
         }
         Taro.getApp().tab = -1;
+        
     }
 
     componentWillUpdate(_, nextState) {
