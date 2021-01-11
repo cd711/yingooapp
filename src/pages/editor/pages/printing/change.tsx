@@ -111,6 +111,8 @@ const PrintChange: Taro.FC<any> = () => {
             setDescribe(`请上传${min}张照片`);
             if (count === min) {
                 setCountStatus(4);
+            } else {
+                setCountStatus(1)
             }
         } else {
             if (count < min) {  // 小于
