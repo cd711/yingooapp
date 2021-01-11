@@ -1,40 +1,51 @@
 import Taro, {useEffect, useRef, useState} from '@tarojs/taro'
-import {Button, Image, ScrollView, Swiper, SwiperItem, Text, View} from '@tarojs/components'
+import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './place.less'
 import IconFont from '../../../../components/iconfont'
 import Counter from '../../../../components/counter/counter'
 import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
-import { flattens,intersection } from '../../../../utils/tool'
+import {flattens, intersection} from '../../../../utils/tool'
 
-interface OderParams{
-    data:any; //商品信息
-    productType?:string;//商品类型
-    maxBuyNum?:number;//最大购买数
-    isShow:boolean;//是否显示
-    showOkButton?:boolean;//显示加购确定按钮
-    defalutSelectIds?:Array<any>;//默认选项 ["56","124"]
-    onClose:()=> void; //关闭回调
-    onBuyNumberChange:(count: number) => void; //购买数量变化回调
-    onSkuChange:(sku:Array<any>,skusId:number)=>void; //sku变化回调，sku为当前选择项数组，如果当前选择了所有的sku项,在skus中存在这个组合，那么skusId>0
-    onAddCart?:()=>void; //添加购物车按钮回调
-    onNowBuy?:()=>void; //立即购买按钮回调
-    onOkButtonClick?:()=>void; //确定按钮回调
-    onNowButtonClick?:()=>void; //立即制作按钮回调
-    onNamesChange?:(name:Array<string>)=>void; //已经选择项目回调，例如:["5寸","高清打印"]
-    onPriceChange?:(price:string,marketPrice:string)=>void; //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
+interface OderParams {
+    data: any; //商品信息
+    productType?: string;//商品类型
+    maxBuyNum?: number;//最大购买数
+    isShow: boolean;//是否显示
+    showOkButton?: boolean;//显示加购确定按钮
+    defaultSelectIds?: Array<any>;//默认选项 ["56","124"]
+    onClose: () => void; //关闭回调
+    onBuyNumberChange: (count: number) => void; //购买数量变化回调
+    onSkuChange: (sku: Array<any>, skusId: number) => void; //sku变化回调，sku为当前选择项数组，如果当前选择了所有的sku项,在skus中存在这个组合，那么skusId>0
+    onAddCart?: () => void; //添加购物车按钮回调
+    onNowBuy?: () => void; //立即购买按钮回调
+    onOkButtonClick?: () => void; //确定按钮回调
+    onNowButtonClick?: () => void; //立即制作按钮回调
+    onNamesChange?: (name: Array<string>) => void; //已经选择项目回调，例如:["5寸","高清打印"]
+    onPriceChange?: (price: string, marketPrice: string) => void; //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNum = 0,isShow = false, showOkButton = false,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick,onNamesChange,onPriceChange}) => {
+const PlaceOrder: Taro.FC<OderParams> = props => {
+
+    const {
+        data,
+        productType = "",
+        maxBuyNum = 0,
+        isShow = false,
+        showOkButton = false,
+        defaultSelectIds,
+        onClose, onBuyNumberChange,
+        onSkuChange, onAddCart, onNowBuy, onOkButtonClick,
+        onNowButtonClick, onNamesChange, onPriceChange
+    } = props;
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");
     const [marketPriceShow, setMarketPriceShow] = useState(false);
     const [imgs, setImgs] = useState([]);
-    const [attrItems,setAttrItems] = useState([]);
-    const [isLoad,setIsLoad] = useState(false);
-    const [centerPartyHeight,setCenterPartyHeight] = useState(626);
+    const [attrItems, setAttrItems] = useState([]);
+    const [isLoad, setIsLoad] = useState(false);
+    const [centerPartyHeight, setCenterPartyHeight] = useState(626);
 
     //没有库存的sku组合
     const notStockSkus = useRef([]);
@@ -43,11 +54,11 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
     //筛选出的没有库存的sku
     const skuNotStock = useRef({});
 
-    const onSelectItem = (itemIdx,tagIdx,state,aItems) => {
-        onSkuChange && onSkuChange([],0);
+    const onSelectItem = (itemIdx, tagIdx, state, aItems) => {
+        onSkuChange && onSkuChange([], 0);
         const selectIds = [];
         const items = aItems;
-        items[itemIdx].map((tag,idx)=>{
+        items[itemIdx].map((tag, idx) => {
             tag["selected"] = false;
             if (tagIdx == idx) {
                 tag["selected"] = state;
@@ -55,7 +66,7 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
             return tag;
         });
 
-        for (let i = 0;i<items.length;i++) {
+        for (let i = 0; i < items.length; i++) {
             const item = items[i];
             for (const tag of item) {
                 if (tag["selected"]) {
@@ -63,7 +74,7 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
                 }
             }
         }
-        selectSkuItem(selectIds,items)
+        selectSkuItem(selectIds, items)
     }
 
     /**
@@ -71,7 +82,7 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
      * @param {Array} skus 组合的sku的数组(data.skus)
      * @return {*}
      */
-    const handlePriceArea = (skus:Array<any>) => {
+    const handlePriceArea = (skus: Array<any>) => {
         const prices = skus.map((item) => {
             return item.price;
         })
@@ -80,7 +91,7 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
         });
         const p = prices[0] == prices[prices.length - 1] ? prices[0] : `${prices[0]}-${prices[prices.length - 1]}`
         setPrice(p);
-        onPriceChange && onPriceChange(p,"")
+        onPriceChange && onPriceChange(p, "")
     }
 
     /**
@@ -89,17 +100,17 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
      * @param {Array} items (data.attrItems)
      * @return {*}
      */
-    const selectSkuItem = (selectIds:Array<any>,items:Array<Array<any>>) => {
-        console.log("已选择的sku id",selectIds)
+    const selectSkuItem = (selectIds: Array<any>, items: Array<Array<any>>) => {
+        console.log("已选择的sku id", selectIds)
         let tt = [];
         for (let index = 0; index < selectIds.length; index++) {
             const element = selectIds[index];
             tt = Array.from(new Set(tt.concat(skuNotStock.current[element]["value"])));
         }
-        items = items.map((item)=>{
-            return item.map((tag)=>{
+        items = items.map((item) => {
+            return item.map((tag) => {
                 tag["over"] = false;
-                if (tt.indexOf(tag.id+"")!=-1) {
+                if (tt.indexOf(tag.id + "") != -1) {
                     tag["over"] = true;
                 }
                 return tag;
@@ -107,59 +118,59 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
         });
         setAttrItems(items);
         //当前可能所有集合
-        const maybeSkus = stockSkus.current.filter((obj)=>{
-            const vals:Array<any> = obj.value.split(",");
-            return selectIds.every(v=>vals.includes(v+""))
+        const maybeSkus = stockSkus.current.filter((obj) => {
+            const vals: Array<any> = obj.value.split(",");
+            return selectIds.every(v => vals.includes(v + ""))
         })
         if (selectIds.length != data.attrItems.length) {
             handlePriceArea(maybeSkus);
             setMarketPriceShow(false);
-            onSkuChange && onSkuChange(selectIds,0);
+            onSkuChange && onSkuChange(selectIds, 0);
         } else {
-            let current:any = {};
+            let current: any = {};
             if (maybeSkus.length == 1) {
                 current = maybeSkus[0];
             } else {
-                const selectedCombinationSku = maybeSkus.filter((item)=>{
-                    const vals:Array<any> = item.value.split(",").map((item)=>parseInt(item));
-                    return intersection(vals,selectIds).length==data.attrItems.length
+                const selectedCombinationSku = maybeSkus.filter((item) => {
+                    const vals: Array<any> = item.value.split(",").map((item) => parseInt(item));
+                    return intersection(vals, selectIds).length == data.attrItems.length
                 });
                 current = selectedCombinationSku[0];
             }
             if (current) {
-                if (current.stock && current.stock>0) {
+                if (current.stock && current.stock > 0) {
                     setPrice(current.price);
                     setMarketPriceShow(true);
                     setMarketPrice(current.market_price);
                     setTimeout(() => {
                         setPrice(current.price);
                     }, 100);
-                    onSkuChange && onSkuChange(selectIds,current.id);
-                    onPriceChange && onPriceChange(current.price,current.market_price)
+                    onSkuChange && onSkuChange(selectIds, current.id);
+                    onPriceChange && onPriceChange(current.price, current.market_price)
                 } else {
                     Taro.showToast({
-                        title:'库存不足',
-                        icon:'none',
-                        duration:1500
+                        title: '库存不足',
+                        icon: 'none',
+                        duration: 1500
                     })
                 }
             }
         }
-        if (selectIds.length>0 && data.imgs && data.imgs.length>0) {
+        if (selectIds.length > 0 && data.imgs && data.imgs.length > 0) {
             const ids = [];
-            for (let i = 0; i<items.length; i++) {
+            for (let i = 0; i < items.length; i++) {
                 const element = items[i];
                 let tid = "";
-                for (let j = 0; j<element.length;j++) {
-                    if(element[j]["selected"]){
+                for (let j = 0; j < element.length; j++) {
+                    if (element[j]["selected"]) {
                         tid = element[j].id;
                         break;
                     }
                 }
                 ids.push(tid)
             }
-            const imgs = data.imgs.filter((item)=>item.image.length>0 && item.value == ids.join(","));
-            setImgs(imgs.length==1?imgs[0].image:data.image);
+            const imgs = data.imgs.filter((item) => item.image.length > 0 && item.value == ids.join(","));
+            setImgs(imgs.length == 1 ? imgs[0].image : data.image);
         } else {
             setImgs(data.image);
         }
@@ -173,38 +184,40 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
      * @param {Array} skus
      * @return {*}
      */
-    const initSku = (attrGroup:Array<any>,attrItems:Array<Array<any>>,skus:Array<any>) => {
-        notStockSkus.current = skus.filter((item)=> item.stock<=0);
-        stockSkus.current = skus.filter((item)=> item.stock>0);
+    const initSku = (_: Array<any>, attrItems: Array<Array<any>>, skus: Array<any>) => {
+        notStockSkus.current = skus.filter((item) => item.stock <= 0);
+        stockSkus.current = skus.filter((item) => item.stock > 0);
         //把所有sku id归类为一个数组,并且筛选出所有sku对应的不可选的sku id
         const temp = {};
-        const skuItems =  attrItems.map((item)=>{
-            return item.map((tag)=>{
+        const skuItems = attrItems.map((item) => {
+            return item.map((tag) => {
 
                 tag["selected"] = false;
                 tag["over"] = false;
                 const element = tag.id;
-                const hasStockSkus = Array.from(new Set(flattens(stockSkus.current.filter((obj)=>{
-                    const vals:Array<any> = obj.value.split(",");
-                    if (vals.includes(element+"")) {
+                const hasStockSkus = Array.from(new Set(flattens(stockSkus.current.filter((obj) => {
+                    const vals: Array<any> = obj.value.split(",");
+                    if (vals.includes(element + "")) {
                         return true;
                     }
                     return false;
-                }).map((item)=>{
+                }).map((item) => {
                     return item.value.split(",")
                 }))));
 
-                const cStockSkus = Array.from(new Set(flattens(notStockSkus.current.filter((item)=>{
-                    const vals:Array<any> = item.value.split(",");
-                    return vals.includes(element+"")
-                }).map((item)=>{
+                const cStockSkus = Array.from(new Set(flattens(notStockSkus.current.filter((item) => {
+                    const vals: Array<any> = item.value.split(",");
+                    return vals.includes(element + "")
+                }).map((item) => {
                     return item.value.split(",")
                 }))));
                 temp[element] = {};
                 temp[element]["key"] = tag.name
-                temp[element]["value"] = cStockSkus.filter(function(v){ return hasStockSkus.indexOf(v) == -1 });
-                if (defalutSelectIds && defalutSelectIds.length>0) {
-                    if (defalutSelectIds.indexOf(tag.id+"")!=-1) {
+                temp[element]["value"] = cStockSkus.filter(function (v) {
+                    return hasStockSkus.indexOf(v) == -1
+                });
+                if (defaultSelectIds && defaultSelectIds.length > 0) {
+                    if (defaultSelectIds.indexOf(tag.id + "") != -1) {
                         tag["selected"] = true;
                     }
                 }
@@ -214,11 +227,11 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
         skuNotStock.current = temp;
         handlePriceArea(stockSkus.current);
 
-        if (defalutSelectIds && defalutSelectIds.length>0) {
-            const dsids = defalutSelectIds.map((item)=>{
-                return parseInt(item+"");
+        if (defaultSelectIds && defaultSelectIds.length > 0) {
+            const dsids = defaultSelectIds.map((item) => {
+                return parseInt(item + "");
             })
-            selectSkuItem(dsids,skuItems)
+            selectSkuItem(dsids, skuItems)
         } else {
             setAttrItems(skuItems);
         }
@@ -226,15 +239,15 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
 
 
     useEffect(() => {
-        console.log("data被初始化",data)
+        console.log("data被初始化", data)
         if (!isEmpty(data) && data != undefined && data != null) {
             setIsLoad(true);
-            initSku(data.attrGroup,data.attrItems,data.skus)
+            initSku(data.attrGroup, data.attrItems, data.skus)
             data.image && setImgs(data.image);
         }
     }, [data]);
 
-    const getNames = (selectIds:Array<any>) => {
+    const getNames = (selectIds: Array<any>) => {
         const names = [];
         const sc = skuNotStock.current;
         for (let index = 0; index < selectIds.length; index++) {
@@ -249,14 +262,16 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
     }
     return <View className='placeOrder'>
         {
-            isLoad?<View className={isShow?'float-layout float-layout--active':'float-layout'}>
+            isLoad ? <View className={isShow ? 'float-layout float-layout--active' : 'float-layout'}>
                 <View className='float-layout__overlay' onClick={_onClose}/>
                 <View className='float-layout__container'>
-                    <View className='float-container' >
+                    <View className='float-container'>
                         <View className='xy_info-parts'>
-                            <Image src={imgs && imgs.length > 0?imgs[0]:""} mode='aspectFill' className='pre_image'/>
+                            <Image src={imgs && imgs.length > 0 ? imgs[0] : ""} mode='aspectFill'
+                                   className='pre_image'/>
                             <View className='info'>
-                                <Text className='name'>{ data && data.title ? (data.title.length>10?`${data.title.substring(0,10)}...`:data.title):"商品名称"}</Text>
+                                <Text
+                                    className='name'>{data && data.title ? (data.title.length > 10 ? `${data.title.substring(0, 10)}...` : data.title) : "商品名称"}</Text>
                                 <View className='price'>
                                     <View className='folding'>
                                         <Text className='sym'>¥</Text>
@@ -279,14 +294,14 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
                                             <Text className='title'>{item.name}</Text>
                                             <View className='params'>
                                                 {
-                                                    attrItems && attrItems[index] && attrItems[index].map((tag,idx) => (
+                                                    attrItems && attrItems[index] && attrItems[index].map((tag, idx) => (
                                                         <Fragment key={tag.id}>
                                                             <View
-                                                                className={tag.over ?'item over':(tag.selected?'item active' :'item')}
+                                                                className={tag.over ? 'item over' : (tag.selected ? 'item active' : 'item')}
                                                                 onClick={() => {
                                                                     if (!tag.over) {
                                                                         // onItemSelect(index, item.id, tag.id);
-                                                                        onSelectItem(index,idx,!tag.selected,attrItems);
+                                                                        onSelectItem(index, idx, !tag.selected, attrItems);
                                                                     }
                                                                 }}>
                                                                 <Text className='txt'>{tag.name}</Text>
@@ -299,28 +314,31 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
                                     ))
                                 }
                                 {
-                                    productType == "customized"?null:<View className='buy-number'>
+                                    productType == "customized" ? null : <View className='buy-number'>
                                         <Text className='title'>购买数量</Text>
-                                        <Counter num={1} max={maxBuyNum==0?999:maxBuyNum} onCounterChange={onBuyNumberChange}/>
+                                        <Counter num={1} max={maxBuyNum == 0 ? 999 : maxBuyNum}
+                                                 onCounterChange={onBuyNumberChange}/>
                                     </View>
                                 }
                             </View>
                         </ScrollView>
 
                         {
-                            showOkButton ?<View className='xy_x_ops'>
+                            showOkButton ? <View className='xy_x_ops'>
                                 <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
-                            </View>:(productType=="customized"?<View className='xy_x_ops'>
+                            </View> : (productType == "customized" ? <View className='xy_x_ops'>
                                 <Button className='red-ok-btn' onClick={onNowButtonClick}>立即制作</Button>
-                            </View>:<View className='xy_x_ops'>
+                            </View> : <View className='xy_x_ops'>
                                 <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
                                 <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
                             </View>)
                         }
                     </View>
                 </View>
-            </View>:null
+            </View> : null
         }
 
     </View>
 }
+
+export default PlaceOrder

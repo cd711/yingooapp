@@ -16,7 +16,7 @@ import {
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
-import {PlaceOrder} from '../template/place';
+import PlaceOrder from '../template/place';
 import WxParse from '../../../../components/wxParse/wxParse';
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -674,7 +674,7 @@ export default class Login extends Component<{}, {
                 </View>
                 <PlaceOrder maxBuyNum={maxBuyNum}
                             productType={data && data.product_type ? data.product_type : ""}
-                            defalutSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
+                            defaultSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
                             isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                             onBuyNumberChange={(n) => {
                                 console.log(n)

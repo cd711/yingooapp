@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import { api, getToken } from '../../../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
-import { PlaceOrder } from './place';
+import PlaceOrder  from './place';
 import {userStore} from "../../../../store/user";
 import { deviceInfo,fixStatusBarHeight, getTempDataContainer , notNull, urlEncode,getURLParamsStr,setTempDataContainer} from '../../../../utils/common';
 import LoginModal from '../../../../components/login/loginModal';
@@ -361,7 +361,7 @@ export default class Preview extends Component<any, {
                     <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
                 {
-                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose}
+                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defaultSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         this.setState({
                             buyTotal:n
