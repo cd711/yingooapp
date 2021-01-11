@@ -16,7 +16,7 @@ import {
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
-import PlaceOrder from '../template/place';
+import PlaceOrder from '../../../../components/place/place';
 import WxParse from '../../../../components/wxParse/wxParse';
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -158,7 +158,7 @@ export default class Login extends Component<{}, {
                     }
                     return item.special_show != "photonumber"
                 })
-                
+
                 console.log(res.attrGroup)
                 if (pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`, (value) => {
