@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import { options } from "./net";
+import {shareInfo} from "./common";
 
 
 const page = (option?: {
@@ -14,23 +14,23 @@ const page = (option?: {
             if (option) {
                 this.__option = Object.assign({}, option);
                 if (!option.share) {
-                    Taro.hideShareMenu();   
+                    Taro.hideShareMenu();
                 }
             }
             mount && mount.apply(this, arguments);
         };
 
         if (!clazz.onShareAppMessage) {
-            
+
             clazz.onShareAppMessage = function() {
-                let uri = "/pages/tabbar/index/index";
-                if (options && options.channel.length>0) {
-                    uri = `/pages/tabbar/index/index?channel=${options.channel}`
-                }
+                // let uri = "/pages/tabbar/index/index";
+                // if (options && options.channel.length>0) {
+                //     uri = `/pages/tabbar/index/index?channel=${options.channel}`
+                // }
                 return {
-                    title: "免费照片冲印个性化定制手机壳",
-                    path: uri,
-                    imageUrl:"https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m"
+                    title: shareInfo.title,
+                    path: shareInfo.link,
+                    imageUrl: shareInfo.imgUrl
                 };
             };
         }

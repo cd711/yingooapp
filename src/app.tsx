@@ -8,7 +8,7 @@ import './app.less'
 import {options, getUserInfo, api} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {jsApiList, setCookie} from "./utils/common";
+import {jsApiList, setCookie, shareInfo} from "./utils/common";
 import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -237,13 +237,7 @@ class App extends Component {
             api("wechat/jssdkconfig",{
                 url: window.location.href
             }).then((res)=>{
-                const share = {
-                    title: "免费照片冲印个性化定制手机壳",
-                    desc: "[有人@你]，送你一个创意定制品，快来免费领！",
-                    link: `https://m.playbox.yingoo.com/pages/tabbar/index/index?channel=${options.channel}`,
-                    imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
-                };
-                const {title, desc, link, imgUrl} = share;
+                const {title, desc, link, imgUrl} = shareInfo;
                 if (process.env.TARO_ENV === 'h5') {
                     wx.config({
                         debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。

@@ -4,7 +4,7 @@ import {wxColors} from "./wxColor";
 import ENV_TYPE = Taro.ENV_TYPE;
 import {userStore} from "../store/user";
 import moment from "moment";
-import { api } from "./net";
+import {api, options} from "./net";
 import {LocalCoupon} from "../modal/modal";
 
 export function ossUrl(url: string, type: number) {
@@ -774,4 +774,12 @@ export function formatPrice(price:string,is:boolean) {
     } else {
         return parseFloat(pp).toFixed(2);
     }
+}
+
+
+export const shareInfo = {
+    title: "免费照片冲印个性化定制手机壳",
+    desc: "[有人@你]，送你一个创意定制品，快来免费领！",
+    link: `https://m.playbox.yingoo.com/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`,
+    imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
 }

@@ -212,7 +212,7 @@ const PrintChange: Taro.FC<any> = () => {
                 if (nextIdx < tempList.length) {
                     const tempCur = tempList[nextIdx];
                     setDiscountInfo({
-                        count: parseInt(tempCur.value) - count,
+                        count: parseInt(tempList[currentIdx].value) - count + 1,
                         price: Number(tempCur.price),
                         status: true
                     })
