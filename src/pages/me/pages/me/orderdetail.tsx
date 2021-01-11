@@ -343,7 +343,7 @@ export default class OrderDetail extends Component<{},{
                                     <Text className='txt'>默认</Text>
                                 </View> */}
                             </View>
-                            <Text className='address'>{data.address}</Text>
+                            <Text className='address_x'>{data.address}</Text>
                         </View>
                     </View>
                 </View>
