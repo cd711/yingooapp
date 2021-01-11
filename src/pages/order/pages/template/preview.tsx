@@ -100,7 +100,7 @@ export default class Preview extends Component<any, {
             id
         }).then((res)=>{
             Taro.hideLoading();
-            this.initModalShow = true
+            // this.initModalShow = true
             if (deviceInfo.env == 'h5') {
                 const str = getURLParamsStr(urlEncode({
                     ...par.params,
@@ -285,7 +285,7 @@ export default class Preview extends Component<any, {
     onOrderIng = () => {
         // const {workId} = this.state;
         const {isLogin} = userStore;
-        this.initModalShow = true;
+        // this.initModalShow = true;
         if (isLogin) {
             this.setState({
                 placeOrderShow: true
@@ -360,8 +360,7 @@ export default class Preview extends Component<any, {
                     }
                     <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
-                {
-                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose}
+                <PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         this.setState({
                             buyTotal:n
@@ -400,7 +399,7 @@ export default class Preview extends Component<any, {
                     }} onNowBuy={()=>{
                         const {buyTotal,sku,workId,modalId,selectSkuId} = this.state;
                         if (!isEmpty(sku) && Number(selectSkuId)>0) {
-                            this.initModalShow = false;
+                            // this.initModalShow = false;
                             this.setState({
                                 placeOrderShow:false
                             })
@@ -419,9 +418,7 @@ export default class Preview extends Component<any, {
                             sku:sku,
                             selectSkuId:parseInt(id+"")
                         })
-                    }} />:null
-                }
-
+                    }} />
             </View>
         )
     }

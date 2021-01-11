@@ -34,7 +34,7 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
     const [imgs, setImgs] = useState([]);
     const [attrItems,setAttrItems] = useState([]);
     const [isLoad,setIsLoad] = useState(false);
-    const [centerPartyHeight,setCenterPartyHeight] = useState(626);
+
 
     //没有库存的sku组合
     const notStockSkus = useRef([]);
@@ -116,7 +116,7 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
             setMarketPriceShow(false);
             onSkuChange && onSkuChange(selectIds,0);
         } else {
-            let current:any = {};
+            let current:any = null;
             if (maybeSkus.length == 1) {
                 current = maybeSkus[0];
             } else {
@@ -124,9 +124,9 @@ export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNu
                     const vals:Array<any> = item.value.split(",").map((item)=>parseInt(item));
                     return intersection(vals,selectIds).length==data.attrItems.length
                 });
-                current = selectedCombinationSku[0];
+                current = selectedCombinationSku.length>0?selectedCombinationSku[0]:null;
             }
-            if (current) {
+            if (current != null) {
                 if (current.stock && current.stock>0) {
                     setPrice(current.price);
                     setMarketPriceShow(true);
