@@ -8,7 +8,7 @@ import './app.less'
 import {options, getUserInfo, api} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {jsApiList, setCookie, shareInfo} from "./utils/common";
+import {delCookie, jsApiList, setCookie, shareInfo} from "./utils/common";
 import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -179,18 +179,32 @@ class App extends Component {
 
     componentDidMount() {
         const params = this.$router.params;
+
         const {code,state,channel} = params;
 
-        if (channel) {
-            options.channel = channel;
-            setCookie("channel", channel)
-        } else {
-            // @ts-ignore
-            if (params.query && params.query.channel) {
-                // @ts-ignore
-                options.channel = params.query.channel;
+        if (process.env.TARO_ENV === "h5") {
+            const path = window.location.pathname;
+            if (path === "/") {
+                // 直接清除cookie，不需要渠道商
+                delCookie("channel");
+                options.channel = "";
             } else {
-                options.channel = ""
+                if (channel) {
+                    options.channel = channel;
+                    setCookie("channel", channel)
+                }
+            }
+        } else {
+            if (channel) {
+                options.channel = channel;
+            } else {
+                // @ts-ignore
+                if (params.query && params.query.channel) {
+                    // @ts-ignore
+                    options.channel = params.query.channel;
+                } else {
+                    options.channel = ""
+                }
             }
         }
 
