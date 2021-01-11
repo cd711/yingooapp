@@ -315,7 +315,7 @@ export default class Login extends Component<{}, {
         }
 
         const {buyTotal, sku, selectSkuId, data} = this.state;
-        if (sku && sku.length == data.attrGroup.length && selectSkuId > 0 && buyTotal > 0) {
+        if (sku && sku.length == data.attrGroup.length && selectSkuId>0 && buyTotal > 0) {
             this.setState({
                 placeOrderShow: false
             });
@@ -377,7 +377,7 @@ export default class Login extends Component<{}, {
             const tmp = {
                 id: data.id,
                 cid: data.tpl_category_id,
-                sku_id: sku.length>0 ? sku.join(",") : selectSkuId,
+                sku_id: sku.length>0 && selectSkuId == 0 ? sku.join(",") : selectSkuId,
             }
             if (sku) {
                 if (sku.length>0 && selectSkuId == 0) {
@@ -490,8 +490,9 @@ export default class Login extends Component<{}, {
                                                 <Image lazyLoad src={ossUrl(item, 2)}
                                                        style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}
                                                        onClick={() => {
+                                                        //    console.log("当前点击的图片",ossUrl(item, 3),index)
                                                            Taro.previewImage({
-                                                               current: ossUrl(item, 3),
+                                                               current: image[index],
                                                                urls: image
                                                            })
                                                        }}/>

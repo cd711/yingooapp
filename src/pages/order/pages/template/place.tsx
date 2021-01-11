@@ -147,7 +147,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
         if (maybeSkus.length==0) {
             return;
         }
-        if (maybeSkus.length>0) {
+        if (maybeSkus.length>1) {
             handlePriceArea(maybeSkus);
             setMarketPriceShow(false);
             onSkuChange && onSkuChange(selectIds, 0);
