@@ -3,26 +3,42 @@ import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './place.less'
 import IconFont from '../../../../components/iconfont'
 import Counter from '../../../../components/counter/counter'
-import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 import {flattens, intersection} from '../../../../utils/tool'
 
 interface OderParams {
-    data: any; //商品信息
-    productType?: string;//商品类型
-    maxBuyNum?: number;//最大购买数
-    isShow: boolean;//是否显示
-    showOkButton?: boolean;//显示加购确定按钮
-    defaultSelectIds?: Array<any>;//默认选项 ["56","124"]
-    onClose: () => void; //关闭回调
-    onBuyNumberChange: (count: number) => void; //购买数量变化回调
-    onSkuChange: (sku: Array<any>, skusId: number) => void; //sku变化回调，sku为当前选择项数组，如果当前选择了所有的sku项,在skus中存在这个组合，那么skusId>0
-    onAddCart?: () => void; //添加购物车按钮回调
-    onNowBuy?: () => void; //立即购买按钮回调
-    onOkButtonClick?: () => void; //确定按钮回调
-    onNowButtonClick?: () => void; //立即制作按钮回调
-    onNamesChange?: (name: Array<string>) => void; //已经选择项目回调，例如:["5寸","高清打印"]
-    onPriceChange?: (price: string, marketPrice: string) => void; //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
+    //商品信息
+    data: any;
+    //商品类型
+    productType?: string;
+    //最大购买数
+    maxBuyNum?: number;
+    //是否显示
+    isShow: boolean;
+    //显示加购确定按钮
+    showOkButton?: boolean;
+    //默认选项 ["56","124"]
+    defaultSelectIds?: Array<any>;
+    //关闭回调
+    onClose: () => void;
+    //购买数量变化回调
+    onBuyNumberChange?: (count: number) => void;
+    //sku变化回调，sku为当前选择项数组，如果当前选择了所有的sku项,在skus中存在这个组合，那么skusId>0
+    onSkuChange: (sku: Array<any>, skusId: number) => void;
+    //添加购物车按钮回调
+    onAddCart?: () => void;
+    //立即购买按钮回调
+    onNowBuy?: () => void;
+    //确定按钮回调
+    onOkButtonClick?: () => void;
+    //立即制作按钮回调
+    onNowButtonClick?: () => void;
+    //已经选择项目回调，例如:["5寸","高清打印"]
+    onNamesChange?: (name: Array<string>) => void;
+    //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
+    onPriceChange?: (price: string, marketPrice: string) => void;
+    // 引用类型，"photo" | "base"
+    quoteType?: "photo" | "base"
 }
 
 const PlaceOrder: Taro.FC<OderParams> = props => {
@@ -34,6 +50,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
         isShow = false,
         showOkButton = false,
         defaultSelectIds,
+        quoteType = "base",
         onClose, onBuyNumberChange,
         onSkuChange, onAddCart, onNowBuy, onOkButtonClick,
         onNowButtonClick, onNamesChange, onPriceChange
@@ -289,23 +306,23 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                             <View className='param-part'>
                                 {
                                     data && data.attrGroup && data.attrGroup.map((item, index) => (
-                                        <View className='param' key={item.id}>
+                                        <View className='param' key={item.id} style={item.disable ? {display: "none"} : null}>
                                             <Text className='title'>{item.name}</Text>
                                             <View className='params'>
                                                 {
                                                     attrItems && attrItems[index] && attrItems[index].map((tag, idx) => (
-                                                        <Fragment key={tag.id}>
-                                                            <View
-                                                                className={tag.over ? 'item over' : (tag.selected ? 'item active' : 'item')}
-                                                                onClick={() => {
-                                                                    if (!tag.over) {
-                                                                        // onItemSelect(index, item.id, tag.id);
-                                                                        onSelectItem(index, idx, !tag.selected, attrItems);
-                                                                    }
-                                                                }}>
-                                                                <Text className='txt'>{tag.name}</Text>
-                                                            </View>
-                                                        </Fragment>
+                                                        <View key={`${index}-${idx}`}
+                                                            className={tag.over ? 'item over' : (tag.selected ? 'item active' : 'item')}
+                                                            onClick={() => {
+                                                                if (item.disable && item.disable === true) {
+                                                                    return
+                                                                }
+                                                                if (!tag.over) {
+                                                                    onSelectItem(index, idx, !tag.selected, attrItems);
+                                                                }
+                                                            }}>
+                                                            <Text className='txt'>{tag.name}</Text>
+                                                        </View>
                                                     ))
                                                 }
                                             </View>
@@ -313,7 +330,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                                     ))
                                 }
                                 {
-                                    productType == "customized" ? null : <View className='buy-number'>
+                                    productType == "customized" || quoteType === "photo" ? null : <View className='buy-number'>
                                         <Text className='title'>购买数量</Text>
                                         <Counter num={1} max={maxBuyNum == 0 ? 999 : maxBuyNum}
                                                  onCounterChange={onBuyNumberChange}/>
@@ -323,14 +340,22 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                         </ScrollView>
 
                         {
-                            showOkButton ? <View className='xy_x_ops'>
-                                <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
-                            </View> : (productType == "customized" ? <View className='xy_x_ops'>
-                                <Button className='red-ok-btn' onClick={onNowButtonClick}>立即制作</Button>
-                            </View> : <View className='xy_x_ops'>
-                                <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
-                                <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
-                            </View>)
+                            quoteType === "base"
+                                ? showOkButton
+                                ? <View className='xy_x_ops'>
+                                    <Button className='red-ok-btn' onClick={onOkButtonClick}>确定</Button>
+                                </View>
+                                : (productType == "customized"
+                                    ? <View className='xy_x_ops'>
+                                        <Button className='red-ok-btn' onClick={onNowButtonClick}>立即制作</Button>
+                                    </View>
+                                    : <View className='xy_x_ops'>
+                                        <Button className='add-cart-btn' onClick={onAddCart}>加入购物车</Button>
+                                        <Button className='now-buy-btn' onClick={onNowBuy}>立即购买</Button>
+                                    </View>)
+                                : <View className='xy_x_ops'>
+                                    <Button className='red-ok-btn' onClick={onNowBuy}>立即购买</Button>
+                                </View>
                         }
                     </View>
                 </View>
