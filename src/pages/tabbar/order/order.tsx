@@ -6,7 +6,7 @@ import {userStore} from "../../../store/user";
 import {templateStore} from "../../../store/template";
 import { observer, inject } from '@tarojs/mobx'
 import { api } from '../../../utils/net';
-import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl,setTempDataContainer } from '../../../utils/common';
+import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl } from '../../../utils/common';
 
 import PayWayModal from '../../../components/payway/PayWayModal';
 import copy from 'copy-to-clipboard';
@@ -356,7 +356,7 @@ export default class Order extends Component<any,{
                                                             }}><IconFont name='20_fangdayulan' size={40}/></View>
                                                         </View>:null
                                                     }
-                                                    
+
                                                 </View>
                                             ))
                                         }
