@@ -275,12 +275,17 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    transition: all .3s ease;
+    transform: scale(1);
     .txt{
         width: 48px;
         height: 40px;
         color: #ff4966;
         font-size: 24px;
     }
+}
+.print_fixed_btn_ainm{
+    transform: scale(0);
 }
 
 .fixed_top_price_container{
@@ -303,9 +308,23 @@
             color: rgba(20,20,43,0.87);
             display: flex;
             align-items: center;
+            white-space: nowrap;
         }
     }
     .right{
-        flex: 1;
+        flex: 2;
+        .more_price_info{
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            .red_txt{
+                font-size: 28px;
+                color: #FF4966;
+                display: inline-block;
+                align-items: center;
+                margin-right: 10px;
+                flex-wrap: nowrap;
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@ import './ticket.less'
 import {api} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, ListModel, notNull,xObserves} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, ListModel, notNull} from '../../../utils/common';
 import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import { observe } from 'mobx';
@@ -45,7 +45,7 @@ export default class Login extends Component<{}, {
         }
     }
 
-    
+
     componentDidMount() {
         // if (!userStore.isLogin) {
         //     if (deviceInfo.env == 'h5') {
@@ -73,7 +73,7 @@ export default class Login extends Component<{}, {
             }
         })
     }
-    
+
     componentDidShow(){
         if (userStore.isLogin) {
             this.requestData();
@@ -168,7 +168,7 @@ export default class Login extends Component<{}, {
         }, 100);
     }
     render() {
-        const {data, switchTabActive, listLoading, loadStatus, centerPartyHeight} = this.state;
+        const {data, switchTabActive, listLoading, centerPartyHeight} = this.state;
         const list = data && data.list && data.list.length > 0 ? data.list : [];
 
         return (

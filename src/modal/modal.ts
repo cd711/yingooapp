@@ -25,7 +25,8 @@ interface PhotoParamsPathArray {
     attr: string;
     doc: string;
     edited: boolean;
-    originalData: Array<{ id: string | number, url: string }>
+    originalData: Array<{ id: string | number, url: string }>;
+    count: number;
 }
 export interface PhotoParamsPath {
     path: Array<PhotoParamsPathArray>;
