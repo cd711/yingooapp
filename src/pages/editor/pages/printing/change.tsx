@@ -39,8 +39,8 @@ const PrintChange: Taro.FC<any> = () => {
 
     const [pictureSize, setPictureSize] = useState<number>(0);
     const [describe, setDescribe] = useState<string>("");
-    // 图片数量状态   1:低于{min}张、2：刚好满足{min}/{max}的值、3：最大{max}的值
-    const [countStatus, setCountStatus] = useState<1 | 2 | 3>(1);
+    // 图片数量状态   1:低于{min}张、2：刚好满足{min}/{max}的值、3：最大{max}的值、4：{min}{max}值相等
+    const [countStatus, setCountStatus] = useState<1 | 2 | 3 | 4>(1);
     // 根据当前的总数要展示的SKU价格
     const [price, setPrice] = useState<string[]>(["0.00"]);
     const [scrolling, setScrolling] = useState<boolean>(false);
@@ -104,23 +104,28 @@ const PrintChange: Taro.FC<any> = () => {
         const min = photoStore.photoProcessParams.min;
         const max = photoStore.photoProcessParams.max;
 
-        if (count < photoStore.photoProcessParams.min) {  // 小于
+        if (min === max) {
+            setDescribe(`请上传${min}张照片`);
+            setCountStatus(4);
+        } else {
+            if (count < photoStore.photoProcessParams.min) {  // 小于
 
-            if (notNull(min)) {
-                return
-            }
-            setDescribe(`最低打印${min}张照片`);
-            setCountStatus(1)
-        } else if (count >= min && count <= max) {   // 等于最小/最大值
-            setDescribe("");
-            setCountStatus(2)
-        } else if (count > max) {  // 大于
+                if (notNull(min)) {
+                    return
+                }
+                setDescribe(`最低打印${min}张照片`);
+                setCountStatus(1)
+            } else if (count >= min && count <= max) {   // 等于最小/最大值
+                setDescribe("");
+                setCountStatus(2)
+            } else if (count > max) {  // 大于
 
-            if (notNull(max)) {
-                return;
+                if (notNull(max)) {
+                    return;
+                }
+                setDescribe(`最多打印${max}张照片`);
+                setCountStatus(3)
             }
-            setDescribe(`最多打印${max}张照片`);
-            setCountStatus(3)
         }
 
         // 解析路由上的skus
