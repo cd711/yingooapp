@@ -19,7 +19,7 @@ import {
     updateChannelCode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
-import moment from "moment";
+import dayjs from "dayjs"
 import LoadMore from "../../../components/listMore/loadMore";
 import config from "../../../config";
 import wx from 'weixin-js-sdk'
@@ -1380,7 +1380,8 @@ export default class Shell extends Component<{}, {
             try {
                 Taro.showLoading({title: "请稍候"});
                 const res = await api("editor.phone_shell/default");
-                Taro.setStorageSync("phone_model", {mod: res, time: moment().add(30, "minutes").valueOf()});
+                
+                Taro.setStorageSync("phone_model", {mod: res, time: dayjs().add(30, "minutes").valueOf()});
                 Taro.hideLoading();
                 resolve(res)
             } catch (e) {
@@ -1405,7 +1406,7 @@ export default class Shell extends Component<{}, {
             if (!modData.time || !modData.mod) {
                 this.defaultModel = await this.getDefaultPhoneShell();
             } else {
-                const isAfter = moment().isBefore(moment(modData.time));
+                const isAfter = dayjs().isBefore(dayjs(modData.time));
                 if (!isAfter) {
                     this.defaultModel = await this.getDefaultPhoneShell();
                 } else {

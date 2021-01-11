@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import { api } from '../../../../utils/net'
 import isEmpty from 'lodash/isEmpty';
 import {deviceInfo, fixStatusBarHeight, ossUrl, updateChannelCode} from '../../../../utils/common';
-import moment from "moment";
+import dayjs from "dayjs";
 import PayWayModal from '../../../../components/payway/PayWayModal';
 import { templateStore } from '../../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
@@ -14,6 +14,9 @@ import copy from 'copy-to-clipboard';
 import TipModal from '../../../../components/tipmodal/TipModal';
 import Fragment from '../../../../components/Fragment';
 import { userStore } from '../../../../store/user';
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration)
 
 @inject("templateStore")
 @observer
@@ -97,9 +100,9 @@ export default class OrderDetail extends Component<{},{
 
     }
     componentDidShow(){
-        if(templateStore.address !=  null){
+        const {data} = this.state;
+        if(templateStore.address !=  null && data && data.id){
             Taro.showLoading({title:"加载中..."});
-            const {data} = this.state;
             api("app.order/editAddress",{
                 id:data.id,
                 address_id:templateStore.address.id
@@ -129,10 +132,10 @@ export default class OrderDetail extends Component<{},{
 
     private intervalTime:any = 0;
     calcTime = (time) =>{
-        const ftime:any = moment.unix(time).add(30,'m');
+        const ftime:any = dayjs.unix(time).add(30,'m');
         const dd = () => {
-            const nowt:any = moment();
-            const du = moment.duration(ftime - nowt, 'ms');
+            const nowt:any = dayjs();
+            const du = dayjs.duration(ftime - nowt, 'ms');
             let hours = du.get('hours');
             let mins = du.get('minutes');
             let ss = du.get('seconds');
@@ -353,7 +356,12 @@ export default class OrderDetail extends Component<{},{
                         <View className='order-info' key={item.product_id}>
                             <View className='order-img'>
                                 <Image src={ossUrl(item.image,0)} className='img' mode='aspectFill' />
-                                <View className='big'><IconFont name='20_fangdayulan' size={40} /></View>
+                                <View className='big' onClick={()=>{
+                                    Taro.previewImage({
+                                        current:item.image,
+                                        urls:plist.map((obj)=>obj.image)
+                                    })
+                                }}><IconFont name='20_fangdayulan' size={40} /></View>
                             </View>
                             <View className='order-name'>
                                 <Text className='name'>{item.title.length>10?item.title.substring(0,10)+"...":item.title}</Text>
@@ -403,7 +411,7 @@ export default class OrderDetail extends Component<{},{
                                 })
                             }}><IconFont name='20_fuzhi' size={40} color='#9C9DA6' /></View>
                         </View>
-                        <Text className='order-time'>下单时间：{moment.unix(data.create_time).format("YYYY-MM-DD HH:mm:ss")}</Text>
+                        <Text className='order-time'>下单时间：{dayjs.unix(data.create_time).format("YYYY-MM-DD HH:mm:ss")}</Text>
                         <Text className='pay-way'>支付方式：微信支付</Text>
                     </View>
                 </View>
@@ -416,34 +424,36 @@ export default class OrderDetail extends Component<{},{
                 <Text className='order-tips'>如收到商品出现质量、错发、漏发，可申请售后退款</Text>
                 </View>
                 </ScrollView>
-                <View className='ops'>
-                    {
-                        state == 1 && afterState == 0?<Fragment>
-                        <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
-                        <Button className='red-border-btn' onClick={()=>{
-                            Taro.navigateTo({
-                                url: updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${0}`)
-                            })
-                        }}>修改地址</Button>
-                        {/* <Button className='gray-border-btn' onClick={()=>{
-                            Taro.navigateTo({
-                                url:'/pages/me/refund'
-                            })
-                        }}>申请退款</Button> */}
-                        <Button className='red-full-btn' onClick={()=>{
-                            this.setState({
-                                showPayWayModal:true
-                            })
-                        }}>去支付</Button>
-                        </Fragment>:state == 2 && afterState == 0?<Fragment>
-                        <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
+                <View className='ops_iphone_x'>
+                    <View className='ops'>
+                        {
+                            state == 1 && afterState == 0?<Fragment>
+                            <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
+                            <Button className='red-border-btn' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${0}`)
+                                })
+                            }}>修改地址</Button>
+                            {/* <Button className='gray-border-btn' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/refund'
+                                })
+                            }}>申请退款</Button> */}
+                            <Button className='red-full-btn' onClick={()=>{
+                                this.setState({
+                                    showPayWayModal:true
+                                })
+                            }}>去支付</Button>
+                            </Fragment>:state == 2 && afterState == 0?<Fragment>
+                            <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
 
-                        </Fragment>:(state == 4 || state == -1)&& afterState == 0?<Fragment>
-                        <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
-                        </Fragment>:state == 3 && afterState == 0?<Fragment>
-                        <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,data.id)}>确认收货</Button>
-                        </Fragment>:null
-                    }
+                            </Fragment>:(state == 4 || state == -1)&& afterState == 0?<Fragment>
+                            <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
+                            </Fragment>:state == 3 && afterState == 0?<Fragment>
+                            <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,data.id)}>确认收货</Button>
+                            </Fragment>:null
+                        }
+                    </View>
                 </View>
                 <PayWayModal
                     isShow={showPayWayModal}

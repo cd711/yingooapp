@@ -8,7 +8,7 @@ import {observer} from '@tarojs/mobx';
 import config from "../../../config";
 import {getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
 import {api, getToken} from "../../../utils/net";
-import moment from "moment";
+import dayjs from "dayjs"
 import page from "../../../utils/ext";
 
 
@@ -84,7 +84,7 @@ export default class Shell extends Component<{}, {
 
     getUrl = () => {
         const str = getURLParamsStr(urlEncode({
-            ts: moment().valueOf(),  // 加上时间戳去处理小程序webview的缓存问题
+            ts: dayjs().valueOf(),  // 加上时间戳去处理小程序webview的缓存问题
             tok: getToken(),
             tpl_id: this.tplId,
             cid: this.$router.params.cid,

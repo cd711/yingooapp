@@ -398,16 +398,18 @@ export default class Editor extends Component<any,{
                     </Picker>
                     <View className='item column'>
                         <Text className='name'>详细地址：</Text>
-                        <AtTextarea
-                          value={addressValue}
-                          onChange={(value)=>{
-                                this.setState({
-                                    addressValue:value
-                                })
-                            }}
-                          maxLength={30}
-                          placeholder='请输入详细的地址信息'
-                        />
+                        <View className="addr_textarea">
+                            <AtTextarea
+                                value={addressValue}
+                                onChange={(value)=>{
+                                    this.setState({
+                                        addressValue:value
+                                    })
+                                }}
+                                maxLength={30}
+                                placeholder='请输入详细的地址信息'
+                            />
+                        </View>
                     </View>
                     <View className='item'>
                         {/* <Text className="name">设为默认地址</Text> */}

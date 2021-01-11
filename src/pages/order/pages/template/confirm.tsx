@@ -744,7 +744,7 @@ export default class Confirm extends Component<any, {
                                                 </View>
                                                 <View className='add_buy_container'>
                                                     {
-                                                        item.merge_products.map((addbuyItem, index) => (
+                                                        item.merge_products.map((addbuyItem) => (
                                                             <AddBuy key={addbuyItem.id} mainProducts={item.products[0]}
                                                                     product={addbuyItem} isChecked={addbuyItem.checked}
                                                                     onItemClick={() => this.onAddBuyItemClick(item.products[0], item.pre_order_id, item.products[0].id, addbuyItem)}

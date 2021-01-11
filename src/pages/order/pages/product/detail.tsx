@@ -16,7 +16,7 @@ import {
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
-import PlaceOrder from '../template/place';
+import PlaceOrder from '../../../../components/place/place';
 import WxParse from '../../../../components/wxParse/wxParse';
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -116,32 +116,23 @@ export default class Login extends Component<{}, {
             this.toastClose()
         }
     }
-
-    componentWillPreload() {
-        console.log("componentWillPreload")
-
-        return new Promise<void>((resolve, reject) => {
-            setTempDataContainer("product_preview_sku", null, (is) => {
-                if (is) {
-                    resolve();
-                } else {
-                    reject();
-                }
+    componentWillMount() {
+        const {id, pid} = this.$router.params;
+        if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
+            this.setState({
+                showOkButton: true
             });
-        })
+        }
     }
-
     componentDidMount() {
         if (userStore.isLogin) {
             this.receiveCoupon()
-            setTempDataContainer("product_preview_sku", null, () => {
-            });
+            setTempDataContainer("product_preview_sku", null);
         }
         observe(userStore, "id", (change) => {
             if (change.newValue != change.oldValue && userStore.isLogin) {
                 this.receiveCoupon()
-                setTempDataContainer("product_preview_sku", null, () => {
-                });
+                setTempDataContainer("product_preview_sku", null);
             }
         })
         if (process.env.TARO_ENV != 'h5') {
@@ -154,11 +145,6 @@ export default class Login extends Component<{}, {
             }).exec();
         }
         const {id, pid, rid} = this.$router.params;
-        if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
-            this.setState({
-                showOkButton: true
-            });
-        }
         if (id != "" && id != undefined && id != null && parseInt(id) > 0) {
             Taro.showLoading({title: '加载中...'})
             api("app.product/info", {
@@ -166,10 +152,13 @@ export default class Login extends Component<{}, {
             }).then((res) => {
                 Taro.hideLoading();
                 this.modalInit = true;
-                res.attrGroup = res.attrGroup.filter((item) => {
-                    console.log(item)
+                res.attrGroup = res.attrGroup.filter((item,index) => {
+                    if (item.special_show == "photonumber") {
+                        res.attrItems.splice(index,1)
+                    }
                     return item.special_show != "photonumber"
                 })
+
                 console.log(res.attrGroup)
                 if (pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`, (value) => {
@@ -326,7 +315,7 @@ export default class Login extends Component<{}, {
         }
 
         const {buyTotal, sku, selectSkuId, data} = this.state;
-        if (sku && sku.length == data.attrGroup.length && selectSkuId > 0 && buyTotal > 0) {
+        if (sku && sku.length == data.attrGroup.length && selectSkuId>0 && buyTotal > 0) {
             this.setState({
                 placeOrderShow: false
             });
@@ -388,11 +377,10 @@ export default class Login extends Component<{}, {
             const tmp = {
                 id: data.id,
                 cid: data.tpl_category_id,
-                sku_id: data.attrGroup.length != data.attrItems.length ? sku.join(",") : selectSkuId,
+                sku_id: sku.length>0 && selectSkuId == 0 ? sku.join(",") : selectSkuId,
             }
-
             if (sku) {
-                if (data.attrGroup.length != data.attrItems.length) {
+                if (sku.length>0 && selectSkuId == 0) {
                     tmp["inc"] = "xxxx";
                 }
             }
@@ -502,8 +490,9 @@ export default class Login extends Component<{}, {
                                                 <Image lazyLoad src={ossUrl(item, 2)}
                                                        style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}
                                                        onClick={() => {
+                                                        //    console.log("当前点击的图片",ossUrl(item, 3),index)
                                                            Taro.previewImage({
-                                                               current: ossUrl(item, 3),
+                                                               current: image[index],
                                                                urls: image
                                                            })
                                                        }}/>
@@ -623,17 +612,7 @@ export default class Login extends Component<{}, {
                                             userStore.showLoginModal = true;
                                             return;
                                         }
-                                        if (data.tpl_product_type == "photo") {
-                                            if (sku == null && defalutSkuIds && defalutSkuIds.length > 0) {
-                                                console.log(defalutSkuIds);
-                                                if (data.attrGroup.length != data.attrItems.length) {
-                                                    this.modalInit = false
-                                                    this.setState({showPicSelector: true})
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                        if (sku != null && sku && sku.length == data.attrItems.length && selectSkuId > 0) {
+                                        if (sku != null && sku && sku.length == data.attrItems.length) {
 
                                             setTempDataContainer("product_preview_sku", {
                                                 sku,
@@ -753,19 +732,7 @@ export default class Login extends Component<{}, {
                         userStore.showLoginModal = true;
                         return;
                     }
-                    if (data.tpl_product_type == "photo") {
-                        if (sku.length == data.attrGroup.length && selectSkuId > 0) {
-                            console.log(defalutSkuIds);
-                            if (data.attrGroup.length != data.attrItems.length) {
-                                this.modalInit = false
-                                this.setState({showPicSelector: true})
-                                return;
-                            }
-                        }
-                    }
                     if (sku != null && sku.length == data.attrGroup.length) {
-                        // let url = ""
-
                         setTempDataContainer("product_preview_sku", {
                             sku,
                             selectSkuId

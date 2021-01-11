@@ -30,7 +30,7 @@ import {userStore} from "../../../store/user";
 import BannerSwiper from "./bannerSwiper";
 import Curtain from "../../../components/curtain";
 import {LocalCoupon} from "../../../modal/modal";
-import moment from "moment";
+import dayjs from "dayjs";
 import page from '../../../utils/ext'
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 
@@ -203,7 +203,7 @@ class Index extends Component<any, IndexState> {
                         obj.everyTime.push(current.info.id);
                         obj.everyTime = [...new Set(obj.everyTime)]
                     } else {
-                        const expirationTime = moment().add(Number(parent.popup_config.time) * Number(parent.popup_config.unit), "seconds").valueOf()
+                        const expirationTime = dayjs().add(Number(parent.popup_config.time) * Number(parent.popup_config.unit), "seconds").valueOf()
                         obj.fixedTime.push({
                             ...parent.popup_config,
                             id: parent.id,

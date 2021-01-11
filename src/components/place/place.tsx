@@ -1,10 +1,10 @@
 import Taro, {useEffect, useRef, useState} from '@tarojs/taro'
 import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './place.less'
-import IconFont from '../../../../components/iconfont'
-import Counter from '../../../../components/counter/counter'
+import IconFont from '../iconfont'
+import Counter from '../counter/counter'
 import isEmpty from 'lodash/isEmpty';
-import {flattens, intersection} from '../../../../utils/tool'
+import {flattens, intersection} from '../../utils/tool'
 
 interface OderParams {
     //商品信息
@@ -123,22 +123,31 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
             const element = selectIds[index];
             tt = Array.from(new Set(tt.concat(skuNotStock.current[element]["value"])));
         }
-        items = items.map((item) => {
-            return item.map((tag) => {
-                tag["over"] = false;
-                if (tt.indexOf(tag.id + "") != -1) {
-                    tag["over"] = true;
-                }
-                return tag;
-            });
-        });
-        setAttrItems(items);
         //当前可能所有集合
         const maybeSkus = stockSkus.current.filter((obj) => {
             const vals: Array<any> = obj.value.split(",");
             return selectIds.every(v => vals.includes(v + ""))
         })
-        if (selectIds.length != data.attrItems.length) {
+        items = items.map((item) => {
+            return item.map((tag) => {
+                tag["over"] = false;
+                if (maybeSkus.length==0) {
+                    tag["selected"] = false;
+                } else {
+                    if (tt.indexOf(tag.id + "") != -1) {
+                        tag["over"] = true;
+                    }
+                }
+
+                return tag;
+            });
+        });
+        setAttrItems(items);
+
+        if (maybeSkus.length==0) {
+            return;
+        }
+        if (maybeSkus.length>1) {
             handlePriceArea(maybeSkus);
             setMarketPriceShow(false);
             onSkuChange && onSkuChange(selectIds, 0);
@@ -151,7 +160,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                     const vals: Array<any> = item.value.split(",").map((item) => parseInt(item));
                     return intersection(vals, selectIds).length == data.attrItems.length
                 });
-                current = selectedCombinationSku.length>0?selectedCombinationSku[0]:null;
+                current = selectedCombinationSku.length==1?selectedCombinationSku[0]:null;
             }
             if (current != null) {
                 if (current.stock && current.stock>0) {
@@ -170,6 +179,12 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                         duration: 1500
                     })
                 }
+            } else {
+                Taro.showToast({
+                    title: '库存不足',
+                    icon: 'none',
+                    duration: 1500
+                })
             }
         }
         if (selectIds.length > 0 && data.imgs && data.imgs.length > 0) {

@@ -18,7 +18,7 @@ import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
-import PlaceOrder from "../../../order/pages/template/place";
+import PlaceOrder from "../../../../components/place/place";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -970,13 +970,13 @@ const PrintChange: Taro.FC<any> = () => {
                     }
                 </View>
             </ScrollView>
-            <View className={`print_fixed_select_button ${scrolling ? "print_fixed_btn_ainm" : ""}`}
-                  onClick={selectPhoto}
-                  style={{bottom: deviceInfo.env === "weapp" ? `${deviceInfo.safeBottomHeight + 80}px` : 80}}>
-                <IconFont name="24_jiahao" size={40} color="#FF4966" />
-                <Text className="txt">加图</Text>
-            </View>
             <View className="print_foot">
+                <View className={`print_fixed_select_button ${scrolling ? "print_fixed_btn_ainm" : ""}`}
+                      onClick={selectPhoto}
+                >
+                    <IconFont name="24_jiahao" size={40} color="#fff" />
+                    <Text className="txt">加图</Text>
+                </View>
                 <View className="print_foot_main" style={{justifyContent: "space-around"}}>
                     <View className="print_info">
                         {

@@ -11,7 +11,7 @@ import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../../../comp
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
 import {userStore} from "../../../../store/user";
-import moment from "moment";
+import dayjs from "dayjs";
 import page from "../../../../utils/ext";
 
 
@@ -122,12 +122,12 @@ export default class Photos extends Component<{}, PhotosState> {
 
     updateLocalPhotos = (arr = []) => {
         try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+            const res = Taro.getStorageSync(`${userStore.id}_photo_${dayjs().date()}`);
             if (res) {
                 let temp = JSON.parse(res);
                 const _arr = [...temp.path, ...arr];
                 temp = {...temp, path: _arr}
-                Taro.setStorageSync(`${userStore.id}_photo_${moment().date()}`, JSON.stringify(temp))
+                Taro.setStorageSync(`${userStore.id}_photo_${dayjs().date()}`, JSON.stringify(temp))
             } else {
                 console.log("选图没有本地存储")
             }

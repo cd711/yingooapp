@@ -5,7 +5,7 @@ import "./NavBar.less";
 import { CSSProperties } from 'react';
 
 
-let ticons = {
+const ticons = {
     "success": require("../res/icon/success.png"),
     "error": require("../res/icon/error.png"),
     "info": require("../res/icon/info.png")
@@ -46,21 +46,21 @@ class NavBar extends Component<{
         Taro.navigateBack();
     }
     render() {
-        let config = this.props.config || {};
+        const config = this.props.config || {};
         // console.log(this.props.left === NavBar.EmptyLeft, this.props.left, NavBar.EmptyLeft)
-        let closeLeft = this.props.left === NavBar.EmptyLeft;
-        let left = closeLeft ? <View style="width: 44PX" /> : (this.props.left ? this.props.left : <Image src={require("../res/back_icon.png")} onClick={this.onLeft} className="left" />);
+        const closeLeft = this.props.left === NavBar.EmptyLeft;
+        const left = closeLeft ? <View style="width: 44PX" /> : (this.props.left ? this.props.left : <Image src={require("../res/back_icon.png")} onClick={this.onLeft} className="left" />);
         let title = this.props.title;
         title = title ? title : config.navigationBarTitleText ? config.navigationBarTitleText : "";
 
-        let style = config.backgroundColor ? {
+        const style = config.backgroundColor ? {
             backgroundColor: config.backgroundColor
         } : null;
         const {
             appToastOuting,
             appToast
         } = this.props.pageInfo || {appToastOuting: false, appToast: null};
-        
+
         let ticon = null;
         if (appToast && appToast.icon) {
             ticon = ticons[appToast.icon];

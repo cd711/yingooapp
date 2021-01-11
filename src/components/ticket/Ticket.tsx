@@ -4,7 +4,7 @@ import { View, Text,Image } from '@tarojs/components'
 import './Ticket.less';
 import IconFont from '../iconfont';
 import Checkboxs from '../checkbox/checkbox';
-import moment from "moment";
+import dayjs from "dayjs"
 import { convertClassName, formatPrice } from '../../utils/common';
 
 const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, ticket,children}) => {
@@ -37,7 +37,7 @@ const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, 
             <View className='right-part'>
                 <Text className='name'>{ticket.name}</Text>
                 <Text className='time'>
-                    {ticket && ticket.use_start_time?`${moment.unix(ticket.use_start_time).format("YYYY-MM-DD")} - ${moment.unix(ticket.use_end_time).format("YYYY-MM-DD")}`:""}
+                    {ticket && ticket.use_start_time?`${dayjs.unix(ticket.use_start_time).format("YYYY-MM-DD")} - ${dayjs.unix(ticket.use_end_time).format("YYYY-MM-DD")}`:""}
                 </Text>
                 <View className='apply' onClick={(e)=>{
                     e.stopPropagation();

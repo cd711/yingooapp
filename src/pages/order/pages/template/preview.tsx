@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import { api, getToken } from '../../../../utils/net'
 import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
-import PlaceOrder  from './place';
+import PlaceOrder  from '../../../../components/place/place';
 import {userStore} from "../../../../store/user";
 import {
     deviceInfo,

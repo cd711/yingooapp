@@ -7,7 +7,7 @@ import {observer} from '@tarojs/mobx';
 import config from "../../../config";
 import {getURLParamsStr, urlEncode} from "../../../utils/common";
 import {getToken} from "../../../utils/net";
-import moment from "moment";
+import dayjs from "dayjs";
 import page from "../../../utils/ext";
 
 
@@ -53,7 +53,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     getUrl = () => {
         const str = getURLParamsStr(urlEncode({
-            ts: moment().valueOf(),  // 加上时间戳去处理小程序webview的缓存问题
+            ts: dayjs().valueOf(),  // 加上时间戳去处理小程序webview的缓存问题
             ...this.routerParams,
             tpl_id: this.tplId,
             cid: this.routerParams.cid,
