@@ -18,7 +18,7 @@ import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
-import PlaceOrder from "../../../order/pages/template/place";
+import PlaceOrder from "../../../../components/place/place";
 
 const PrintChange: Taro.FC<any> = () => {
 

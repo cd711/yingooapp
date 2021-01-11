@@ -1,10 +1,10 @@
 import Taro, {useEffect, useRef, useState} from '@tarojs/taro'
 import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './place.less'
-import IconFont from '../../../../components/iconfont'
-import Counter from '../../../../components/counter/counter'
+import IconFont from '../iconfont'
+import Counter from '../counter/counter'
 import isEmpty from 'lodash/isEmpty';
-import {flattens, intersection} from '../../../../utils/tool'
+import {flattens, intersection} from '../../utils/tool'
 
 interface OderParams {
     //商品信息
@@ -138,7 +138,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                         tag["over"] = true;
                     }
                 }
-                
+
                 return tag;
             });
         });
