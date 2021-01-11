@@ -240,7 +240,6 @@ export default class Cart extends Component<{}, {
                                                     </View>
                                                     <View className='party'>
                                                         <View className='name'>
-                                                            {/* item.title.length>10?item.title.substring(0,10)+"...":item.title */}
                                                             <Text className='txt'>{item.product.title.length>10?item.product.title.substring(0,10)+"...":item.product.title}</Text>
                                                         </View>
                                                         <Text className='gg'>规格:{item.sku.value.join("/")}</Text>

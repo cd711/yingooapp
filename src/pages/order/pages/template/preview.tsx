@@ -87,9 +87,12 @@ export default class Preview extends Component<any, {
             window.addEventListener("message", this.onMsg);
         }
     }
-    componentWillUnmount(){
-
+    componentDidShow() {
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku", null);
+        }
     }
+
     getWorkInfo = (id) => {
         const par = this.$router;
         Taro.showLoading({title:"加载中..."});
@@ -358,7 +361,7 @@ export default class Preview extends Component<any, {
                     <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
                 {
-                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
+                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         this.setState({
                             buyTotal:n
