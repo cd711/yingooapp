@@ -12,7 +12,6 @@ import {
     urlEncode, useDebounceFn
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
-import OrderModal from "./orederModal";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -28,6 +27,7 @@ const PrintChange: Taro.FC<any> = () => {
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
     const goodsInfo = Taro.useRef<any>({});
+    const useMoreThan = useRef<any>({});
     // sku子项ID列表
     const [skus, setSkus] = useState<any[]>([]);
     // skus ID， 已选好所有子项sku的大项ID
@@ -88,7 +88,7 @@ const PrintChange: Taro.FC<any> = () => {
             setPrice([arr[0].price])
         }
 
-    }, 1000), [skuStr.current])
+    }, 800), [skuStr.current])
 
     const runOnlyOne = useRef(0);
     useEffect(() => {
@@ -176,7 +176,7 @@ const PrintChange: Taro.FC<any> = () => {
                 arr = arr.sort((a, b) => parseInt(a) - parseInt(b))
                 if (arr.length === photoStore.photoProcessParams.attrItems.length) {
                     const str = arr.join(",");
-                    const tempSkuArr = goodsInfo.current.skus.filter(v => v.value.includes(str));
+                    const tempSkuArr = useMoreThan.current.skus.filter(v => v.value.includes(str));
                     if (tempSkuArr.length > 0) {
                         obj.price = tempSkuArr[0].price;
                     } else {
@@ -277,10 +277,11 @@ const PrintChange: Taro.FC<any> = () => {
                     // 从服务器获取基本数据信息
                     const serPar = await api("app.product/info", {id: router.params.id});
                     const temp = {...serPar};
+                    // temp.attrGroup = temp.attrGroup.map(val => ({...val, disable: !notNull(val.special_show)}))
                     temp.skus = temp.skus.filter(v => v.stock > 0);
-                    goodsInfo.current = {...temp};
+                    useMoreThan.current = {...temp};
 
-                    console.log("清除库存为0的数据：", goodsInfo.current)
+                    console.log("清除库存为0的数据：", useMoreThan.current)
 
                     // 找到当前模糊搜索的suk列表
                     let arr = [];
