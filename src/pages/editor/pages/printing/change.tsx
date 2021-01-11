@@ -27,8 +27,10 @@ const PrintChange: Taro.FC<any> = () => {
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
     const goodsInfo = Taro.useRef<any>({});
+    // sku子项ID列表
     const [skus, setSkus] = useState<any[]>([]);
-    const [skuInfo, setSkuInfo] = useState<any>({});
+    // skus ID， 已选好所有子项sku的大项ID
+    const [skuInfoID, setSkuInfoID] = useState<any>(0);
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
     const _imgstyle = Taro.useRef("");
@@ -683,9 +685,9 @@ const PrintChange: Taro.FC<any> = () => {
         Taro.hideLoading()
     }
 
-    const orderSkuChange = data => {
-        console.log("sku信息：", data)
-        setSkuInfo({...data})
+    const orderSkuChange = (skus: any[], skuID: number | string) => {
+        console.log("sku信息：", skus, skuID)
+        setSkuInfoID(skuID)
     }
 
     const onSubmitOrder = async () => {
@@ -706,12 +708,12 @@ const PrintChange: Taro.FC<any> = () => {
             return;
         }
 
-        if (notNull(skuInfo.id) || skuInfo.id == 0) {
+        if (notNull(skuInfoID) || skuInfoID == 0) {
             Taro.showToast({title: "请选择规格", icon: "none"})
             return
         }
         const data = {
-            skuid: skuInfo.id,
+            skuid: skuInfoID,
             total: count,
             page: "photo",
             parintImges: photos.map(v => {
@@ -737,7 +739,7 @@ const PrintChange: Taro.FC<any> = () => {
                 changeUrlParams: data
             })
             Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo`
+                url: `/pages/order/pages/template/confirm?skuid=${skuInfoID}&total=${count}&page=photo`
             })
         } catch (e) {
             console.log("本地存储失败：", e)
