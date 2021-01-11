@@ -585,7 +585,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onCreateOrder = async () => {
 
-        if (photos.length <= 0 || countStatus !== 2) {
+        if (photos.length <= 0 || countStatus === 1 || countStatus === 3) {
             return
         }
 
@@ -987,7 +987,7 @@ const PrintChange: Taro.FC<any> = () => {
                     <View className="btn"
                           onClick={onCreateOrder}
                           style={{
-                              opacity: photos.length > 0 && countStatus === 2 ? 1 : 0.7
+                              opacity: photos.length > 0 && (countStatus === 2 || countStatus === 4) ? 1 : 0.7
                           }}>
                         <Text className="txt">立即下单</Text>
                     </View>
