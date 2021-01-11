@@ -19,6 +19,7 @@ import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
+import PlaceOrder from "../../../order/pages/template/place";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -992,13 +993,21 @@ const PrintChange: Taro.FC<any> = () => {
             </View>
             {
                 visible
-                    ? <OrderModal data={goodsInfo.current}
-                                  isShow={visible}
-                                  defaultActive={skus || []}
-                                  onClose={() => setVisible(false)}
-                                  onSkuChange={orderSkuChange}
-                                  onNowBuy={onSubmitOrder}
-                    />
+                    ? <View>
+                        {/*<OrderModal data={goodsInfo.current}*/}
+                        {/*            isShow={visible}*/}
+                        {/*            defaultActive={skus || []}*/}
+                        {/*            onClose={() => setVisible(false)}*/}
+                        {/*            onSkuChange={orderSkuChange}*/}
+                        {/*            onNowBuy={onSubmitOrder}*/}
+                        {/*/>*/}
+                        <PlaceOrder  data={goodsInfo.current} isShow={visible}
+                                     onClose={() => setVisible(false)}
+                                     onSkuChange={orderSkuChange}
+                                     quoteType="photo"
+                                     defaultSelectIds={skus || []}
+                                     onNowBuy={onSubmitOrder} />
+                    </View>
                     : null
             }
             {
