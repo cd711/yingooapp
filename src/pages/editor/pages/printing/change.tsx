@@ -12,13 +12,13 @@ import {
     urlEncode, useDebounceFn
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
-import OrderModal from "./orederModal";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
+import PlaceOrder from "../../../order/pages/template/place";
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -27,8 +27,11 @@ const PrintChange: Taro.FC<any> = () => {
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
     const goodsInfo = Taro.useRef<any>({});
+    const useMoreThan = useRef<any>({});
+    // sku子项ID列表
     const [skus, setSkus] = useState<any[]>([]);
-    const [skuInfo, setSkuInfo] = useState<any>({});
+    // skus ID， 已选好所有子项sku的大项ID
+    const [skuInfoID, setSkuInfoID] = useState<any>(0);
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
     const _imgstyle = Taro.useRef("");
@@ -39,8 +42,8 @@ const PrintChange: Taro.FC<any> = () => {
 
     const [pictureSize, setPictureSize] = useState<number>(0);
     const [describe, setDescribe] = useState<string>("");
-    // 图片数量状态   1:低于{min}张、2：刚好满足{min}/{max}的值、3：最大{max}的值
-    const [countStatus, setCountStatus] = useState<1 | 2 | 3>(1);
+    // 图片数量状态   1:低于{min}张、2：刚好满足{min}/{max}的值、3：最大{max}的值、4：{min}{max}值相等
+    const [countStatus, setCountStatus] = useState<1 | 2 | 3 | 4>(1);
     // 根据当前的总数要展示的SKU价格
     const [price, setPrice] = useState<string[]>(["0.00"]);
     const [scrolling, setScrolling] = useState<boolean>(false);
@@ -85,7 +88,7 @@ const PrintChange: Taro.FC<any> = () => {
             setPrice([arr[0].price])
         }
 
-    }, 1000), [skuStr.current])
+    }, 800), [skuStr.current])
 
     const runOnlyOne = useRef(0);
     useEffect(() => {
@@ -104,23 +107,30 @@ const PrintChange: Taro.FC<any> = () => {
         const min = photoStore.photoProcessParams.min;
         const max = photoStore.photoProcessParams.max;
 
-        if (count < photoStore.photoProcessParams.min) {  // 小于
-
-            if (notNull(min)) {
-                return
+        if (min === max) {
+            setDescribe(`请上传${min}张照片`);
+            if (count === min) {
+                setCountStatus(4);
             }
-            setDescribe(`最低打印${min}张照片`);
-            setCountStatus(1)
-        } else if (count >= min && count <= max) {   // 等于最小/最大值
-            setDescribe("");
-            setCountStatus(2)
-        } else if (count > max) {  // 大于
+        } else {
+            if (count < min) {  // 小于
 
-            if (notNull(max)) {
-                return;
+                if (notNull(min)) {
+                    return
+                }
+                setDescribe(`最低打印${min}张照片`);
+                setCountStatus(1)
+            } else if (count >= min && count <= max) {   // 等于最小/最大值
+                setDescribe("");
+                setCountStatus(2)
+            } else if (count > max) {  // 大于
+
+                if (notNull(max)) {
+                    return;
+                }
+                setDescribe(`最多打印${max}张照片`);
+                setCountStatus(3)
             }
-            setDescribe(`最多打印${max}张照片`);
-            setCountStatus(3)
         }
 
         // 解析路由上的skus
@@ -173,7 +183,7 @@ const PrintChange: Taro.FC<any> = () => {
                 arr = arr.sort((a, b) => parseInt(a) - parseInt(b))
                 if (arr.length === photoStore.photoProcessParams.attrItems.length) {
                     const str = arr.join(",");
-                    const tempSkuArr = goodsInfo.current.skus.filter(v => v.value.includes(str));
+                    const tempSkuArr = useMoreThan.current.skus.filter(v => v.value.includes(str));
                     if (tempSkuArr.length > 0) {
                         obj.price = tempSkuArr[0].price;
                     } else {
@@ -274,10 +284,11 @@ const PrintChange: Taro.FC<any> = () => {
                     // 从服务器获取基本数据信息
                     const serPar = await api("app.product/info", {id: router.params.id});
                     const temp = {...serPar};
+                    // temp.attrGroup = temp.attrGroup.map(val => ({...val, disable: !notNull(val.special_show)}))
                     temp.skus = temp.skus.filter(v => v.stock > 0);
-                    goodsInfo.current = {...temp};
+                    useMoreThan.current = {...temp};
 
-                    console.log("清除库存为0的数据：", goodsInfo.current)
+                    console.log("清除库存为0的数据：", useMoreThan.current)
 
                     // 找到当前模糊搜索的suk列表
                     let arr = [];
@@ -580,7 +591,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onCreateOrder = async () => {
 
-        if (photos.length <= 0 || countStatus !== 2) {
+        if (photos.length <= 0 || countStatus === 1 || countStatus === 3) {
             return
         }
 
@@ -683,9 +694,9 @@ const PrintChange: Taro.FC<any> = () => {
         Taro.hideLoading()
     }
 
-    const orderSkuChange = data => {
-        console.log("sku信息：", data)
-        setSkuInfo({...data})
+    const orderSkuChange = (skus: any[], skuID: number | string) => {
+        console.log("sku信息：", skus, skuID)
+        setSkuInfoID(skuID)
     }
 
     const onSubmitOrder = async () => {
@@ -706,12 +717,12 @@ const PrintChange: Taro.FC<any> = () => {
             return;
         }
 
-        if (notNull(skuInfo.id) || skuInfo.id == 0) {
+        if (notNull(skuInfoID) || skuInfoID == 0) {
             Taro.showToast({title: "请选择规格", icon: "none"})
             return
         }
         const data = {
-            skuid: skuInfo.id,
+            skuid: skuInfoID,
             total: count,
             page: "photo",
             parintImges: photos.map(v => {
@@ -737,7 +748,7 @@ const PrintChange: Taro.FC<any> = () => {
                 changeUrlParams: data
             })
             Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo`
+                url: `/pages/order/pages/template/confirm?skuid=${skuInfoID}&total=${count}&page=photo`
             })
         } catch (e) {
             console.log("本地存储失败：", e)
@@ -982,7 +993,7 @@ const PrintChange: Taro.FC<any> = () => {
                     <View className="btn"
                           onClick={onCreateOrder}
                           style={{
-                              opacity: photos.length > 0 && countStatus === 2 ? 1 : 0.7
+                              opacity: photos.length > 0 && (countStatus === 2 || countStatus === 4) ? 1 : 0.7
                           }}>
                         <Text className="txt">立即下单</Text>
                     </View>
@@ -990,13 +1001,21 @@ const PrintChange: Taro.FC<any> = () => {
             </View>
             {
                 visible
-                    ? <OrderModal data={goodsInfo.current}
-                                  isShow={visible}
-                                  defaultActive={skus || []}
-                                  onClose={() => setVisible(false)}
-                                  onSkuChange={orderSkuChange}
-                                  onNowBuy={onSubmitOrder}
-                    />
+                    ? <View>
+                        {/*<OrderModal data={goodsInfo.current}*/}
+                        {/*            isShow={visible}*/}
+                        {/*            defaultActive={skus || []}*/}
+                        {/*            onClose={() => setVisible(false)}*/}
+                        {/*            onSkuChange={orderSkuChange}*/}
+                        {/*            onNowBuy={onSubmitOrder}*/}
+                        {/*/>*/}
+                        <PlaceOrder  data={goodsInfo.current} isShow={visible}
+                                     onClose={() => setVisible(false)}
+                                     onSkuChange={orderSkuChange}
+                                     quoteType="photo"
+                                     defaultSelectIds={skus || []}
+                                     onNowBuy={onSubmitOrder} />
+                    </View>
                     : null
             }
             {
