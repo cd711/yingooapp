@@ -9,7 +9,7 @@ import {api} from '../../../utils/net';
 import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,urlEncode,getURLParamsStr,setTempDataContainer} from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
-import moment from "moment";
+import dayjs from "dayjs";
 import Popover, {PopoverItemClickProps} from "../../../components/popover";
 import {AtModal} from "taro-ui";
 import LoginModal from "../../../components/login/loginModal";
@@ -126,7 +126,7 @@ export default class Me extends Component<any, MeState> {
             temp.total = works.length;
             for (let i = 0; i < works.length; i ++) {
                 const item = works[i];
-                const year = moment.unix(item.create_time).year();
+                const year = dayjs.unix(item.create_time).year();
                 console.log(year)
                 const obj = {key: year, children: []};
                 const idx = temp.list.findIndex(v => v.key === year);
@@ -139,7 +139,7 @@ export default class Me extends Component<any, MeState> {
                 const current = {...temp.list[n]};
                 for (let v = 0; v < works.length; v ++) {
                     const item = works[v];
-                    const year = moment.unix(item.create_time).year();
+                    const year = dayjs.unix(item.create_time).year();
                     if (current.key === year) {
                         current.children.push(item)
                     }
@@ -539,10 +539,10 @@ export default class Me extends Component<any, MeState> {
                                                             <View className='dates'>
                                                                 <View className='day'>
                                                                     <View className='circle'>
-                                                                        <Text className='text'>{moment.unix(value.create_time).date()}</Text>
+                                                                        <Text className='text'>{dayjs.unix(value.create_time).date()}</Text>
                                                                     </View>
                                                                 </View>
-                                                                <Text className='date'>{moment.unix(value.create_time).format("MM月DD日")}</Text>
+                                                                <Text className='date'>{dayjs.unix(value.create_time).format("MM月DD日")}</Text>
                                                                 <View className="more">
                                                                     <Popover popoverItem={process.env.TARO_ENV === "h5" ? [
                                                                         // {

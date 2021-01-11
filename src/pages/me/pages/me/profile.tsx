@@ -6,7 +6,7 @@ import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import {AtFloatLayout} from 'taro-ui'
 import { api,updateLocalUserInfo } from '../../../../utils/net';
-import moment from "moment";
+import dayjs from "dayjs";
 import UploadFile from "../../../../components/Upload/Upload";
 import { fixStatusBarHeight } from '../../../../utils/common';
 
@@ -198,7 +198,7 @@ export default class Profile extends Component<any,{
                         </Picker>
                     </View>
                     <View className='picker-item'>
-                        <Picker mode='date' onChange={this.onDateChange} start='1950-01-01' end={moment().format("YYYY-MM-DD")} value={birthday}>
+                        <Picker mode='date' onChange={this.onDateChange} start='1950-01-01' end={dayjs().format("YYYY-MM-DD")} value={birthday}>
                             <View className='item'>
                                 <Text className='title'>生日</Text>
                                 <View className='right'>

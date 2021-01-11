@@ -3,7 +3,7 @@ import Rgbaster from "rgbaster";
 import {wxColors} from "./wxColor";
 import ENV_TYPE = Taro.ENV_TYPE;
 import {userStore} from "../store/user";
-import moment from "moment";
+import dayjs from "dayjs";
 import {api, options} from "./net";
 import {LocalCoupon} from "../modal/modal";
 
@@ -372,7 +372,7 @@ export function cutString(str: string = "", len: number = 1, suffix: string = ".
 
 
 export function getUserKey() {
-    return `${userStore.id}_key_${moment().date()}`
+    return `${userStore.id}_key_${dayjs().date()}`
 }
 
 // 数组取双，3取2, 5取4...
@@ -527,7 +527,7 @@ export function allowShowCoupon(parentId: string | number , couponId: string | n
         // every_other
         for (const item of historyCouponArr.fixedTime) {
             if (item.expirationTime && item.id == parentId && couponId == item.couponId) {
-                if (moment().valueOf() > item.expirationTime) {
+                if (dayjs().valueOf() > item.expirationTime) {
                     status = true;
                     break
                 } else {

@@ -160,7 +160,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                     const vals: Array<any> = item.value.split(",").map((item) => parseInt(item));
                     return intersection(vals, selectIds).length == data.attrItems.length
                 });
-                current = selectedCombinationSku.length>0?selectedCombinationSku[0]:null;
+                current = selectedCombinationSku.length==1?selectedCombinationSku[0]:null;
             }
             if (current != null) {
                 if (current.stock && current.stock>0) {
@@ -179,6 +179,12 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                         duration: 1500
                     })
                 }
+            } else {
+                Taro.showToast({
+                    title: '库存不足',
+                    icon: 'none',
+                    duration: 1500
+                })
             }
         }
         if (selectIds.length > 0 && data.imgs && data.imgs.length > 0) {

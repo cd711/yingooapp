@@ -8,7 +8,7 @@ import {api} from "../../../../utils/net";
 import Counter from "../../../../components/counter/counter";
 import OrderModal from "./orederModal";
 import {userStore} from "../../../../store/user";
-import moment from "moment";
+import dayjs from "dayjs"
 import {templateStore} from "../../../../store/template";
 import Photos from "../../../me/pages/me/photos";
 import ENV_TYPE = Taro.ENV_TYPE;
@@ -49,20 +49,24 @@ class PrintChange extends Component<any, PrintChangeState>{
         let params: any = {};
 
         try {
-            const res = Taro.getStorageSync(`${userStore.id}_photo_${moment().date()}`);
+            const res = Taro.getStorageSync(`${userStore.id}_photo_${dayjs().date()}`);
             if (res) {
                 console.log("----------使用的本地数据-------")
                 params = JSON.parse(res)
             } else {
+                // @ts-ignore
                 if (Object.keys(templateStore.photoSizeParams).length > 0) {
                     console.log("----------使用的store数据-------")
+                    // @ts-ignore
                     params = templateStore.photoSizeParams
                 } else {
                     Taro.showToast({title: "系统错误，请稍后重试", icon: "none"})
                 }
             }
         } catch (e) {
+            // @ts-ignore
             if (Object.keys(templateStore.photoSizeParams).length > 0) {
+                // @ts-ignore
                 params = templateStore.photoSizeParams
                 console.log("----------使用的store数据-------")
             } else {
@@ -206,7 +210,7 @@ class PrintChange extends Component<any, PrintChangeState>{
         // 如果地址栏参数长度大于200，就使用本地存储加store存储
         if (paramsStr.length > 200) {
             try {
-                Taro.setStorageSync(`${userStore.id}_${skuInfo.id}_${count}_${moment().date()}`, JSON.stringify(data));
+                Taro.setStorageSync(`${userStore.id}_${skuInfo.id}_${count}_${dayjs().date()}`, JSON.stringify(data));
                 templateStore.photoParams = data;
             } catch (e) {
                 console.log("本地存储失败：", e)
@@ -368,6 +372,7 @@ class PrintChange extends Component<any, PrintChangeState>{
                 {
                     photoVisible
                         ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
+                            {/* @ts-ignore */}
                             <Photos editSelect
                                     onClose={this.closeSelectPhoto}
                                 // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
