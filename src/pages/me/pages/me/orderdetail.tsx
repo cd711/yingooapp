@@ -416,34 +416,36 @@ export default class OrderDetail extends Component<{},{
                 <Text className='order-tips'>如收到商品出现质量、错发、漏发，可申请售后退款</Text>
                 </View>
                 </ScrollView>
-                <View className='ops'>
-                    {
-                        state == 1 && afterState == 0?<Fragment>
-                        <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
-                        <Button className='red-border-btn' onClick={()=>{
-                            Taro.navigateTo({
-                                url:`/pages/me/pages/me/address/index?t=select&id=${0}`
-                            })
-                        }}>修改地址</Button>
-                        {/* <Button className='gray-border-btn' onClick={()=>{
-                            Taro.navigateTo({
-                                url:'/pages/me/refund'
-                            })
-                        }}>申请退款</Button> */}
-                        <Button className='red-full-btn' onClick={()=>{
-                            this.setState({
-                                showPayWayModal:true
-                            })
-                        }}>去支付</Button>
-                        </Fragment>:state == 2 && afterState == 0?<Fragment>
-                        <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
+                <View className='ops_iphone_x'>
+                    <View className='ops'>
+                        {
+                            state == 1 && afterState == 0?<Fragment>
+                            <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
+                            <Button className='red-border-btn' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:`/pages/me/pages/me/address/index?t=select&id=${0}`
+                                })
+                            }}>修改地址</Button>
+                            {/* <Button className='gray-border-btn' onClick={()=>{
+                                Taro.navigateTo({
+                                    url:'/pages/me/refund'
+                                })
+                            }}>申请退款</Button> */}
+                            <Button className='red-full-btn' onClick={()=>{
+                                this.setState({
+                                    showPayWayModal:true
+                                })
+                            }}>去支付</Button>
+                            </Fragment>:state == 2 && afterState == 0?<Fragment>
+                            <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
 
-                        </Fragment>:(state == 4 || state == -1)&& afterState == 0?<Fragment>
-                        <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
-                        </Fragment>:state == 3 && afterState == 0?<Fragment>
-                        <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,data.id)}>确认收货</Button>
-                        </Fragment>:null
-                    }
+                            </Fragment>:(state == 4 || state == -1)&& afterState == 0?<Fragment>
+                            <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,data.id)}>删除订单</Button>
+                            </Fragment>:state == 3 && afterState == 0?<Fragment>
+                            <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,data.id)}>确认收货</Button>
+                            </Fragment>:null
+                        }
+                    </View>
                 </View>
                 <PayWayModal
                     isShow={showPayWayModal}
