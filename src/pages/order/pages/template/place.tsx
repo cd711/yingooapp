@@ -123,22 +123,31 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
             const element = selectIds[index];
             tt = Array.from(new Set(tt.concat(skuNotStock.current[element]["value"])));
         }
-        items = items.map((item) => {
-            return item.map((tag) => {
-                tag["over"] = false;
-                if (tt.indexOf(tag.id + "") != -1) {
-                    tag["over"] = true;
-                }
-                return tag;
-            });
-        });
-        setAttrItems(items);
         //当前可能所有集合
         const maybeSkus = stockSkus.current.filter((obj) => {
             const vals: Array<any> = obj.value.split(",");
             return selectIds.every(v => vals.includes(v + ""))
         })
-        if (selectIds.length != data.attrItems.length) {
+        items = items.map((item) => {
+            return item.map((tag) => {
+                tag["over"] = false;
+                if (maybeSkus.length==0) {
+                    tag["selected"] = false;
+                } else {
+                    if (tt.indexOf(tag.id + "") != -1) {
+                        tag["over"] = true;
+                    }
+                }
+                
+                return tag;
+            });
+        });
+        setAttrItems(items);
+
+        if (maybeSkus.length==0) {
+            return;
+        }
+        if (maybeSkus.length>0) {
             handlePriceArea(maybeSkus);
             setMarketPriceShow(false);
             onSkuChange && onSkuChange(selectIds, 0);
