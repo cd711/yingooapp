@@ -8,7 +8,7 @@ import {
     fixStatusBarHeight,
     getURLParamsStr,
     notNull,
-    ossUrl, shareAppExtends,
+    ossUrl, shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../../utils/common";
 import {AtNavBar} from "taro-ui";
@@ -114,7 +114,7 @@ const Special: Taro.FC<any> = () => {
             return;
         }
         if (item.info.jump_url) {
-            Taro.navigateTo({url: item.info.jump_url});
+            Taro.navigateTo({url: updateChannelCode(item.info.jump_url)});
             return
         }
 
@@ -124,7 +124,7 @@ const Special: Taro.FC<any> = () => {
                 cid: item.info.category.id,
             }))
             Taro.navigateTo({
-                url: `/pages/order/pages/template/detail?${str}`
+                url: updateChannelCode(`/pages/order/pages/template/detail?${str}`)
             })
         } else {
             const str = getURLParamsStr(urlEncode({
@@ -132,7 +132,7 @@ const Special: Taro.FC<any> = () => {
                 tplid: item.info.id,
             }))
             Taro.navigateTo({
-                url: `/pages/editor/pages/printing/index?${str}`
+                url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
             });
         }
     }

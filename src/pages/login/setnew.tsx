@@ -4,7 +4,7 @@ import './index.less'
 import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
-import { fixStatusBarHeight } from '../../utils/common';
+import {fixStatusBarHeight, updateChannelCode} from '../../utils/common';
 
 export default class Set extends Component<any,{
     btnAtive:boolean;
@@ -25,12 +25,12 @@ export default class Set extends Component<any,{
         }
     }
     componentDidMount(){
-        
+
 
     }
-    
+
     onSetPassword = () => {
-        // 
+        //
         const {pwd,again} = this.state;
         const {mobile,code} = this.$router.params;
         console.log(pwd,again,mobile,code)
@@ -51,7 +51,7 @@ export default class Set extends Component<any,{
                 });
                 setTimeout(() => {
                     Taro.navigateTo({
-                        url:'/pages/login/acount'
+                        url: updateChannelCode('/pages/login/acount')
                     });
                 }, 1500);
             }).catch((e)=>{

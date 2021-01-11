@@ -10,7 +10,7 @@ import {
     getSpecialRouter,
     getURLParamsStr,
     ossUrl,
-    shareAppExtends,
+    shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../utils/common";
 
@@ -83,7 +83,7 @@ const SearchResult:Taro.FC<any> = () => {
                     cid: item.category.id,
                 }))
                 Taro.navigateTo({
-                    url: `/pages/order/pages/template/detail?${phoneStr}&cp=${getSpecialRouter(router)}`
+                    url: updateChannelCode(`/pages/order/pages/template/detail?${phoneStr}&cp=${getSpecialRouter(router)}`)
                 });
                 break;
             case "photo":
@@ -95,7 +95,7 @@ const SearchResult:Taro.FC<any> = () => {
                     img: item.thumb_image,
                 }))
                 Taro.navigateTo({
-                    url: `/pages/editor/pages/printing/index?${str}`
+                    url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
                 });
                 break;
         }

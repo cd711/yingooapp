@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
-import {deviceInfo, jumpToPrivacy} from '../../../../utils/common';
+import {deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
 
 
 @inject("userStore")
@@ -30,10 +30,10 @@ export default class Setting extends Component<any,{
     componentDidMount(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
+                window.location.href = updateChannelCode("/pages/tabbar/index/index");
             } else {
                 Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 })
             }
         }
@@ -58,9 +58,9 @@ export default class Setting extends Component<any,{
             }, 1500)
             setTimeout(() => {
                 if(process.env.TARO_ENV === 'h5'){
-                    window.location.href = "/pages/tabbar/index/index"
+                    window.location.href = updateChannelCode("/pages/tabbar/index/index")
                 } else {
-                    Taro.reLaunch({url: "/pages/tabbar/index/index"});
+                    Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
                 }
             }, 1501)
         }catch (e) {
@@ -78,11 +78,11 @@ export default class Setting extends Component<any,{
                     <View className='left' onClick={() => {
                         if(process.env.TARO_ENV === 'h5'){
                             Taro.reLaunch({
-                                url:'/pages/tabbar/me/me'
+                                url: updateChannelCode('/pages/tabbar/me/me')
                             });
                         } else {
                             Taro.switchTab({
-                                url:'/pages/tabbar/me/me'
+                                url: updateChannelCode('/pages/tabbar/me/me')
                             });
                         }
                     }}>
@@ -97,7 +97,7 @@ export default class Setting extends Component<any,{
                     <Text className='title'>个人/账号</Text>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/pages/me/profile'
+                            url: updateChannelCode('/pages/me/pages/me/profile')
                         })
                     }}>
                         <Text className='name'>个人信息</Text>
@@ -105,7 +105,7 @@ export default class Setting extends Component<any,{
                     </View>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/pages/me/acount'
+                            url: updateChannelCode('/pages/me/pages/me/acount')
                         })
                     }}>
                         <Text className='name'>账号管理</Text>
@@ -116,7 +116,7 @@ export default class Setting extends Component<any,{
                     <Text className='title'>通用</Text>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/pages/me/photos'
+                            url: updateChannelCode('/pages/me/pages/me/photos')
                         })
                     }}>
                         <Text className='name'>素材库</Text>
@@ -124,7 +124,7 @@ export default class Setting extends Component<any,{
                     </View>
                     <View className='item' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/pages/me/address/index'
+                            url: updateChannelCode('/pages/me/pages/me/address/index')
                         })
                     }}>
                         <Text className='name'>收货地址</Text>
@@ -133,7 +133,7 @@ export default class Setting extends Component<any,{
                 </View>
                 <View className='slist'>
                     <Text className='title'>关于反馈</Text>
-                    <View className='item' onClick={() => Taro.navigateTo({url: "/pages/me/pages/me/feedback"})}>
+                    <View className='item' onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/me/pages/me/feedback")})}>
                         <Text className='name'>问题反馈</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
@@ -145,7 +145,7 @@ export default class Setting extends Component<any,{
                         <Text className='name'>隐私政策</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>
-                    <View className='item' onClick={() => Taro.navigateTo({url: `/pages/me/pages/me/aboutus`})}>
+                    <View className='item' onClick={() => Taro.navigateTo({url: updateChannelCode(`/pages/me/pages/me/aboutus`)})}>
                         <Text className='name'>关于我们</Text>
                         <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                     </View>

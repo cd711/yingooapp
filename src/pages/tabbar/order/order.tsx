@@ -6,7 +6,14 @@ import {userStore} from "../../../store/user";
 import {templateStore} from "../../../store/template";
 import { observer, inject } from '@tarojs/mobx'
 import { api } from '../../../utils/net';
-import { deviceInfo, fixStatusBarHeight, ListModel, ossUrl,setTempDataContainer } from '../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    ListModel,
+    ossUrl,
+    setTempDataContainer,
+    updateChannelCode
+} from '../../../utils/common';
 
 import PayWayModal from '../../../components/payway/PayWayModal';
 import copy from 'copy-to-clipboard';
@@ -133,8 +140,8 @@ export default class Order extends Component<any,{
                 icon:"none",
             });
             setTimeout(() => {
-                Taro.reLaunch({
-                    url:'/pages/tabbar/me/me'
+                Taro.switchTab({
+                    url: updateChannelCode('/pages/tabbar/me/me')
                 })
             }, 1500);
         })
@@ -226,7 +233,7 @@ export default class Order extends Component<any,{
         }
         setTimeout(() => {
             Taro.navigateTo({
-                url
+                url: updateChannelCode(url)
             })
         }, 1500);
     }
@@ -268,7 +275,7 @@ export default class Order extends Component<any,{
                                     switchTabActive:index
                                 });
                                 if (deviceInfo.env == 'h5') {
-                                    window.history.replaceState(null,null,`/pages/tabbar/order/order?tab=${index}`);
+                                    window.history.replaceState(null,null,updateChannelCode(`/pages/tabbar/order/order?tab=${index}`));
                                 }
                             }} key={index+""}>
                                 <Text className='txt'>{item}</Text>
@@ -285,7 +292,7 @@ export default class Order extends Component<any,{
                             <Text className='txt'>暂无订单</Text>
                             <Button className='gofind' onClick={()=>{
                                 Taro.switchTab({
-                                    url:'/pages/tabbar/index/index'
+                                    url: updateChannelCode('/pages/tabbar/index/index')
                                 })
                             }}>去发现</Button>
                         </View>:list.map((item)=>(
@@ -313,7 +320,7 @@ export default class Order extends Component<any,{
                                         <Fragment key={index+""}>
                                             <View className='order-info' key={product.product_id} onClick={()=>{
                                                 Taro.navigateTo({
-                                                    url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                    url: updateChannelCode(`/pages/me/pages/me/orderdetail?id=${item.id}`)
                                                 })
                                             }}>
                                                 <View className='order-img'>
@@ -343,7 +350,7 @@ export default class Order extends Component<any,{
                                                     {
                                                         index<3?<View className='order-img' key={product.product_id} onClick={()=>{
                                                                 Taro.navigateTo({
-                                                                    url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                                    url: updateChannelCode(`/pages/me/pages/me/orderdetail?id=${item.id}`)
                                                                 })
                                                             }}>
                                                             <Image src={ossUrl(product.image,0)} className='img' mode='aspectFill'/>
@@ -356,7 +363,7 @@ export default class Order extends Component<any,{
                                                             }}><IconFont name='20_fangdayulan' size={40}/></View>
                                                         </View>:null
                                                     }
-                                                    
+
                                                 </View>
                                             ))
                                         }
@@ -386,7 +393,7 @@ export default class Order extends Component<any,{
                                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,item.id)}>取消订单</Button>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                url: updateChannelCode(`/pages/me/pages/me/orderdetail?id=${item.id}`)
                                             })
                                         }}>查看订单</Button>
                                         <Button className='red-full-btn' onClick={()=>{
@@ -409,13 +416,13 @@ export default class Order extends Component<any,{
                                     </View>:item.state_tip.value == 2 && item.after_sale_status_tip.value==0 ? <View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                url: updateChannelCode(`/pages/me/pages/me/orderdetail?id=${item.id}`)
                                             })
                                         }}>查看订单</Button>
                                     </View>:item.state_tip.value == 3&& item.after_sale_status_tip.value==0  ?<View className='ops'>
                                         <Button className='red-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                url: updateChannelCode(`/pages/me/pages/me/orderdetail?id=${item.id}`)
                                             })
                                         }}>查看订单</Button>
                                         <Button className='red-full-btn' onClick={this.onReceviceOrder.bind(this,item.id)}>确定收货</Button>
@@ -423,7 +430,7 @@ export default class Order extends Component<any,{
                                         <Button className='gray-border-btn' onClick={this.onDelOrder.bind(this,item.id)}>删除订单</Button>
                                         <Button className='gray-border-btn' onClick={()=>{
                                             Taro.navigateTo({
-                                                url:`/pages/me/pages/me/orderdetail?id=${item.id}`
+                                                url: updateChannelCode(`/pages/me/pages/me/orderdetail?id=${item.id}`)
                                             })
                                         }}>查看订单</Button>
                                     </View>:null

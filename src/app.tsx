@@ -8,7 +8,7 @@ import './app.less'
 import {options, getUserInfo, api} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {delCookie, jsApiList, setCookie, shareInfo} from "./utils/common";
+import {delCookie, jsApiList, setCookie, shareInfo, updateChannelCode} from "./utils/common";
 import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -223,7 +223,7 @@ class App extends Component {
                 }
             })
             exportUrl = exportUrl[exportUrl.length - 1] === '&' ? exportUrl.substring(0, exportUrl.length - 1) : exportUrl;
-            window.history.replaceState(null, null, exportUrl)
+            window.history.replaceState(null, null, updateChannelCode(exportUrl))
             Xm.login({
                 code
             }).then(()=>{

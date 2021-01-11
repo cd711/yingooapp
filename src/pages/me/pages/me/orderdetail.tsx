@@ -4,7 +4,7 @@ import './orderdetail.less'
 import IconFont from '../../../../components/iconfont';
 import { api } from '../../../../utils/net'
 import isEmpty from 'lodash/isEmpty';
-import { deviceInfo, fixStatusBarHeight, ossUrl } from '../../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, ossUrl, updateChannelCode} from '../../../../utils/common';
 import moment from "moment";
 import PayWayModal from '../../../../components/payway/PayWayModal';
 import { templateStore } from '../../../../store/template';
@@ -50,10 +50,10 @@ export default class OrderDetail extends Component<{},{
     componentDidMount(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
+                window.location.href = updateChannelCode("/pages/tabbar/index/index");
             } else {
                 Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 })
             }
         }
@@ -275,10 +275,10 @@ export default class OrderDetail extends Component<{},{
                     <View className='left' onClick={() => {
                         if (Taro.getCurrentPages().length==1) {
                             if (deviceInfo.env == "h5") {
-                                window.location.href = "/pages/tabbar/order/order?tab=0";
+                                window.location.href = updateChannelCode("/pages/tabbar/order/order?tab=0");
                             } else {
                                 Taro.switchTab({
-                                    url:"/pages/tabbar/order/order?tab=0"
+                                    url: updateChannelCode("/pages/tabbar/order/order?tab=0")
                                 })
                             }
 
@@ -296,7 +296,7 @@ export default class OrderDetail extends Component<{},{
                             <IconFont name='24_kefu' size={48} color={navBarChange?'#121314':'#FFF'} />
                         </View>:null
                     }
-                    
+
                 </View>
                 <ScrollView scrollY className='order_content_page' onScroll={this.onScroll} style={deviceInfo.env === 'h5'?"":`height:${centerPartyHeight}px`}>
                 <View className='container'>
@@ -422,7 +422,7 @@ export default class OrderDetail extends Component<{},{
                         <Button className='red-border-btn' onClick={this.onCancelOrder.bind(this,data.id)}>取消订单</Button>
                         <Button className='red-border-btn' onClick={()=>{
                             Taro.navigateTo({
-                                url:`/pages/me/pages/me/address/index?t=select&id=${0}`
+                                url: updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${0}`)
                             })
                         }}>修改地址</Button>
                         {/* <Button className='gray-border-btn' onClick={()=>{

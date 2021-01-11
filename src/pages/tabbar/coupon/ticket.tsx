@@ -4,7 +4,7 @@ import './ticket.less'
 import {api} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, ListModel, notNull} from '../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, ListModel, notNull, updateChannelCode} from '../../../utils/common';
 import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import { observe } from 'mobx';
@@ -131,8 +131,8 @@ export default class Login extends Component<{}, {
                     total: 0
                 }
             });
-            Taro.reLaunch({
-                url: '/pages/tabbar/me/me'
+            Taro.switchTab({
+                url: updateChannelCode('/pages/tabbar/me/me')
             });
         })
     }
@@ -152,7 +152,7 @@ export default class Login extends Component<{}, {
             switchTabActive: index
         });
         if (deviceInfo.env == "h5") {
-            window.history.replaceState(null, this.config.navigationBarTitleText, `/pages/tabbar/coupon/ticket?tab=${index}`);
+            window.history.replaceState(null, this.config.navigationBarTitleText, updateChannelCode(`/pages/tabbar/coupon/ticket?tab=${index}`));
         }
         this.setState({
             data: {
@@ -217,7 +217,7 @@ export default class Login extends Component<{}, {
                                                                 <Button className='use_button' onClick={() => {
                                                                     if (!notNull(item.coupon.use_url)) {
                                                                         Taro.navigateTo({
-                                                                            url: item.coupon.use_url
+                                                                            url: updateChannelCode(item.coupon.use_url)
                                                                         });
                                                                     }
                                                                 }}>使用</Button> : null

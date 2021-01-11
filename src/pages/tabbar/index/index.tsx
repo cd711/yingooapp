@@ -19,7 +19,7 @@ import {
     sleep,
     updateLocalCoupon,
     urlEncode,
-    setTempDataContainer
+    setTempDataContainer, updateChannelCode
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -247,12 +247,12 @@ class Index extends Component<any, IndexState> {
             return;
         }
         if (item.info.jump_url) {
-            Taro.navigateTo({url: `${item.info.jump_url}&cp=${getSpecialRouter(this.$router)}`});
+            Taro.navigateTo({url: updateChannelCode(`${item.info.jump_url}&cp=${getSpecialRouter(this.$router)}`)});
             return
         }
         if (item.info.category.type === "photo") {
             if (item.info.jump_url) {
-                Taro.navigateTo({url: item.info.jump_url});
+                Taro.navigateTo({url: updateChannelCode(item.info.jump_url)});
                 return
             }
             const str = getURLParamsStr(urlEncode({
@@ -260,7 +260,7 @@ class Index extends Component<any, IndexState> {
                 tplid: item.info.id,
             }))
             Taro.navigateTo({
-                url: `/pages/editor/pages/printing/index?${str}`
+                url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
             });
         } else if (item.info.category.type === "phone") {
             const str = getURLParamsStr(urlEncode({
@@ -268,7 +268,7 @@ class Index extends Component<any, IndexState> {
                 cid: item.info.category.id,
             }))
             Taro.navigateTo({
-                url: `/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`
+                url: updateChannelCode(`/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`)
             });
         }
     }
@@ -276,20 +276,20 @@ class Index extends Component<any, IndexState> {
     viewMoreSpecial = (item) => {
         console.log(item)
         if (item.more_url) {
-            Taro.navigateTo({url: item.more_url});
+            Taro.navigateTo({url: updateChannelCode(item.more_url)});
             return
         }
         const type = item.clist[0].info.category.type;
         if (type === "photo") {
-            Taro.navigateTo({url: `/pages/home/pages/special?specialid=${item.id}&type=photo`})
+            Taro.navigateTo({url: updateChannelCode(`/pages/home/pages/special?specialid=${item.id}&type=photo`)})
         } else if (type === "phone") {
-            Taro.navigateTo({url: `/pages/home/pages/special?specialid=${item.id}&type=phone`})
+            Taro.navigateTo({url: updateChannelCode(`/pages/home/pages/special?specialid=${item.id}&type=phone`)})
         }
     }
 
     onCustomized = (item, _) => {
         if (item.info.jump_url) {
-            Taro.navigateTo({url: item.info.jump_url});
+            Taro.navigateTo({url: updateChannelCode(item.info.jump_url)});
             return
         }
     }
@@ -354,16 +354,16 @@ class Index extends Component<any, IndexState> {
         }
         const str = getURLParamsStr(urlEncode(obj))
         Taro.navigateTo({
-            url: prod.info.jump_url
+            url: updateChannelCode(prod.info.jump_url
                 ? `${prod.info.jump_url}&${str}`
-                : `/pages/order/pages/product/detail?${str}`,
+                : `/pages/order/pages/product/detail?${str}`)
         })
     }
 
     jumpToDetail = item => {
         console.log(item)
         Taro.navigateTo({
-            url: `/pages/order/pages/product/detail?id=${item.info.id}&rid=${item.id}`
+            url: updateChannelCode(`/pages/order/pages/product/detail?id=${item.info.id}&rid=${item.id}`)
         })
     }
 
@@ -371,7 +371,7 @@ class Index extends Component<any, IndexState> {
         console.log(val)
         if (val.info.jump_url) {
             Taro.navigateTo({
-                url: val.info.jump_url
+                url: updateChannelCode(val.info.jump_url)
             })
             return
         }
@@ -428,7 +428,7 @@ class Index extends Component<any, IndexState> {
                 return
             }
             Taro.navigateTo({
-                url: "/pages/editor/pages/printing/index?id=34"
+                url: updateChannelCode("/pages/editor/pages/printing/index?id=34")
             })
         } else if (type === 2) {
             if (!userStore.isLogin) {
@@ -441,7 +441,7 @@ class Index extends Component<any, IndexState> {
             })
         } else {
             Taro.navigateTo({
-                url: `/pages/order/pages/template/index?${url}`
+                url: updateChannelCode(`/pages/order/pages/template/index?${url}`)
             })
         }
     }
@@ -515,7 +515,7 @@ class Index extends Component<any, IndexState> {
 
         if (data.info.jump_url) {
             Taro.navigateTo({
-                url: data.info.jump_url
+                url: updateChannelCode(data.info.jump_url)
             })
             return;
         }
@@ -534,7 +534,7 @@ class Index extends Component<any, IndexState> {
         }
 
         Taro.navigateTo({
-            url: data.info.jump_url || `/pages/order/pages/product/detail?id=${data.info.id}&rid=${data.id}`
+            url: updateChannelCode(data.info.jump_url || `/pages/order/pages/product/detail?id=${data.info.id}&rid=${data.id}`)
         })
     }
 
@@ -586,7 +586,7 @@ class Index extends Component<any, IndexState> {
                               height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
                               background: scrolling ? "#f5f5f5" : "#fff"
                           }}
-                          onClick={() => Taro.navigateTo({url: "/pages/search/index"})}>
+                          onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/search/index")})}>
                         <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
                         <Text className='placeholders'>搜索海量模板</Text>
                     </View>

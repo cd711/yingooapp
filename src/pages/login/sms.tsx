@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import { deviceInfo, fixStatusBarHeight } from '../../utils/common';
+import {deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -87,8 +87,8 @@ export default class SMS extends Component<any,{
                 userStore.setInfo(res);
                 Taro.hideLoading();
 
-                Taro.reLaunch({
-                    url:"/pages/tabbar/me/me"
+                Taro.switchTab({
+                    url: updateChannelCode("/pages/tabbar/me/me")
                 })
             }).catch((e)=>{
                 Taro.hideLoading();
@@ -107,7 +107,7 @@ export default class SMS extends Component<any,{
             }).then(()=>{
                 Taro.hideLoading();
                 Taro.reLaunch({
-                    url:`/pages/login/setnew?mobile=${mobile}&code=${code}`
+                    url: updateChannelCode(`/pages/login/setnew?mobile=${mobile}&code=${code}`)
                 })
             }).catch((e)=>{
                 Taro.hideLoading();

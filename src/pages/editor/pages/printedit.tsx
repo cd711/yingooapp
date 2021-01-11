@@ -15,7 +15,7 @@ import {
     getURLParamsStr, getUserKey,
     notNull,
     ossUrl,
-    pageTotal, sleep,
+    pageTotal, sleep, updateChannelCode,
     urlDeCode, urlEncode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
@@ -1521,9 +1521,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             Taro.navigateBack();
         } else {
             if (deviceInfo.env == "h5") {
-                window.location.href = "/";
+                window.location.href = updateChannelCode("/");
             } else {
-                Taro.switchTab({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
             }
         }
     }
@@ -1601,7 +1601,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 if (fastJump) {
                     // 小程序跳转到照片冲印列表页
                     wx.miniProgram.redirectTo({
-                        url: `/pages/editor/pages/printing/change?${str}`
+                        url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
                     })
                 } else {
                     // 小程序返回上一页
@@ -1611,7 +1611,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 // 网页跳转到照片冲印列表页
                 if (fastJump) {
                     Taro.redirectTo({
-                        url: `/pages/editor/pages/printing/change?${str}`
+                        url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
                     })
                 } else {
                     // 网页返回上一页

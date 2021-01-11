@@ -9,7 +9,7 @@ import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../../../store/user';
 import {templateStore} from '../../../../../store/template';
 import isEmpty from 'lodash/isEmpty';
-import { fixStatusBarHeight } from '../../../../../utils/common';
+import {fixStatusBarHeight, updateChannelCode} from '../../../../../utils/common';
 
 interface CityModal {
     province:any,
@@ -52,9 +52,9 @@ export default class Editor extends Component<any,{
     componentDidMount() {
         if (!userStore.isLogin) {
             if (process.env.TARO_ENV == "h5") {
-                window.location.href = "/pages/tabbar/index/index";
+                window.location.href = updateChannelCode("/pages/tabbar/index/index");
             } else {
-                Taro.switchTab({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
             }
         }
         this.getRegion()

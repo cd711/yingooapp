@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro'
 import {Button, Text, View} from '@tarojs/components'
 import './index.less'
 import IconFont from '../../components/iconfont';
-import {convertClassName, deviceInfo, is_weixin, jumpToPrivacy} from '../../utils/common';
+import {convertClassName, deviceInfo, is_weixin, jumpToPrivacy, updateChannelCode} from '../../utils/common';
 import Xm from '../../utils/xm';
 
 const LoginFooter: Taro.FC<any> = () => {
@@ -41,9 +41,9 @@ const LoginFooter: Taro.FC<any> = () => {
                                                             });
                                                             setTimeout(() => {
                                                                 if (process.env.TARO_ENV == "h5") {
-                                                                    window.location.href = "/pages/tabbar/me/me";
+                                                                    window.location.href = updateChannelCode("/pages/tabbar/me/me");
                                                                 } else {
-                                                                    Taro.switchTab({url: "/pages/tabbar/me/me"});
+                                                                    Taro.switchTab({url: updateChannelCode("/pages/tabbar/me/me")});
                                                                 }
                                                             }, 2001);
                                                         }).catch((e) => {

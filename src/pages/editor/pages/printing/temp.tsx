@@ -3,7 +3,7 @@ import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
-import {deviceInfo, getURLParamsStr, notNull, ossUrl, urlEncode} from "../../../../utils/common";
+import {deviceInfo, getURLParamsStr, notNull, ossUrl, updateChannelCode, urlEncode} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 import Counter from "../../../../components/counter/counter";
 import OrderModal from "./orederModal";
@@ -213,11 +213,11 @@ class PrintChange extends Component<any, PrintChangeState>{
                 templateStore.photoParams = data;
             }
             Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`
+                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${skuInfo.id}&total=${count}&page=photo&succ=0`)
             })
         } else {
             Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?${paramsStr}&succ=1`
+                url: updateChannelCode(`/pages/order/pages/template/confirm?${paramsStr}&succ=1`)
             })
         }
     }
@@ -252,7 +252,7 @@ class PrintChange extends Component<any, PrintChangeState>{
 
     onEditClick = (item ,index) => {
         Taro.navigateTo({
-            url: `/pages/editor/pages/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`
+            url: updateChannelCode(`/pages/editor/pages/printedit?idx=${index}&status=${item.edited && !notNull(item.doc) ? "t" : "f"}&img=${item.url}`)
         })
     }
 

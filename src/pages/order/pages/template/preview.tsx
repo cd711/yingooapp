@@ -7,7 +7,16 @@ import { observer, inject } from '@tarojs/mobx';
 import isEmpty from 'lodash/isEmpty';
 import PlaceOrder  from './place';
 import {userStore} from "../../../../store/user";
-import { deviceInfo,fixStatusBarHeight, getTempDataContainer , notNull, urlEncode,getURLParamsStr,setTempDataContainer} from '../../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    getTempDataContainer,
+    notNull,
+    urlEncode,
+    getURLParamsStr,
+    setTempDataContainer,
+    updateChannelCode
+} from '../../../../utils/common';
 import LoginModal from '../../../../components/login/loginModal';
 import page from '../../../../utils/ext'
 
@@ -106,7 +115,7 @@ export default class Preview extends Component<any, {
                     ...par.params,
                     workid: res.id,
                 }))
-                window.history.replaceState(null,null,`/pages/order/pages/template/preview?${str}`);
+                window.history.replaceState(null,null,updateChannelCode(`/pages/order/pages/template/preview?${str}`));
             }
             this.getShellInfo();
             this.setState({
@@ -120,8 +129,8 @@ export default class Preview extends Component<any, {
                 duration:1500
             });
             setTimeout(() => {
-                Taro.reLaunch({
-                    url:'/pages/tabbar/index/index'
+                Taro.switchTab({
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 })
             }, 1500);
         })
@@ -180,7 +189,7 @@ export default class Preview extends Component<any, {
                     const { doc,docId,modelId } = Taro.getStorageSync("doc_draft");
                     // const {doc_id} = this.$router.params;
                     if (parseInt(docId+"")>0) {
-                        window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${docId}`);
+                        window.history.replaceState(null,null,updateChannelCode(`/pages/order/pages/template/preview?workid=${docId}`));
                     }
                     this.setState({
                         workId:parseInt(docId+"")>=0?docId:0,
@@ -224,7 +233,7 @@ export default class Preview extends Component<any, {
                 workId: res.id
             })
             Taro.hideLoading();
-            window.history.replaceState(null,null,`/pages/order/pages/template/preview?workid=${res.id}`)
+            window.history.replaceState(null,null,updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`))
             Taro.showToast({
                 title:"保存成功",
                 icon:"success",
@@ -268,7 +277,7 @@ export default class Preview extends Component<any, {
                     })
                 }
             })
-            
+
 
         })
     }
@@ -277,7 +286,7 @@ export default class Preview extends Component<any, {
         console.log(workId, workInfo)
         Taro.getApp().finishId =  workInfo.id && workInfo.id || workId;
         if (deviceInfo.env === "h5") {
-            window.location.replace(`/pages/editor/pages/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`);
+            window.location.replace(updateChannelCode(`/pages/editor/pages/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`));
         } else {
             Taro.navigateBack()
         }
@@ -328,7 +337,7 @@ export default class Preview extends Component<any, {
                             uri = `/pages/editor/pages/shell?id=${workId}`;
                         }
                         if (deviceInfo.env == 'h5') {
-                            window.location.replace(uri);
+                            window.location.replace(updateChannelCode(uri));
                         } else {
                             Taro.getApp().finishId =  workid;
                             Taro.navigateBack()
@@ -405,7 +414,7 @@ export default class Preview extends Component<any, {
                                 placeOrderShow:false
                             })
                             Taro.navigateTo({
-                                url:`/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}&tplid=${workId}&model=${modalId}`
+                                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}&tplid=${workId}&model=${modalId}`)
                             })
                         } else {
                             Taro.showToast({

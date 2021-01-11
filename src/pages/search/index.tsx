@@ -10,7 +10,7 @@ import {
     getSpecialRouter,
     getURLParamsStr,
     notNull,
-    shareAppExtends,
+    shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../utils/common";
 import {api} from "../../utils/net";
@@ -68,7 +68,7 @@ const Search:Taro.FC<any> = () => {
                     cid: item.category.id,
                 }))
                 Taro.navigateTo({
-                    url: `/pages/order/pages/template/detail?${phoneStr}&cp=${getSpecialRouter(router)}`
+                    url: updateChannelCode(`/pages/order/pages/template/detail?${phoneStr}&cp=${getSpecialRouter(router)}`)
                 });
                 break;
             case "photo":
@@ -80,7 +80,7 @@ const Search:Taro.FC<any> = () => {
                     img: item.thumb_image,
                 }))
                 Taro.navigateTo({
-                    url: `/pages/editor/pages/printing/index?${str}`
+                    url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
                 });
                 break;
         }
@@ -111,7 +111,7 @@ const Search:Taro.FC<any> = () => {
                                 <View className="more">
                                     <Text className="tit">{value.name}</Text>
                                     <Text className="more_txt"
-                                          onClick={() => Taro.navigateTo({url: `/pages/search/result?tpl_category_id=${value.tpl_category_id}&title=${value.name}`})}>
+                                          onClick={() => Taro.navigateTo({url: updateChannelCode(`/pages/search/result?tpl_category_id=${value.tpl_category_id}&title=${value.name}`)})}>
                                         更多 <IconFont name="24_xiayiye" size={32} color="#9C9DA6" />
                                     </Text>
                                 </View>

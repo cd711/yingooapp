@@ -8,7 +8,7 @@ import {
     deviceInfo, getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
-    notNull, shareAppExtends, sleep,
+    notNull, shareAppExtends, sleep, updateChannelCode,
     urlEncode, useDebounceFn
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
@@ -432,7 +432,7 @@ const PrintChange: Taro.FC<any> = () => {
                 }
                 await sleep(300)
                 Taro.redirectTo({
-                    url: `/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`
+                    url: updateChannelCode(`/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`)
                 })
             } else if (router.params.detail && router.params.detail === "t") {  // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
                 await getRouterParams({path: [], forDetail: true});
@@ -583,7 +583,7 @@ const PrintChange: Taro.FC<any> = () => {
                 changeUrlParams: data
             })
             Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuId}&total=${count}&page=photo`
+                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${skuId}&total=${count}&page=photo`)
             })
         } catch (e) {
             console.log("本地存储失败：", e)
@@ -750,7 +750,7 @@ const PrintChange: Taro.FC<any> = () => {
                 changeUrlParams: data
             })
             Taro.navigateTo({
-                url: `/pages/order/pages/template/confirm?skuid=${skuInfoID}&total=${count}&page=photo`
+                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${skuInfoID}&total=${count}&page=photo`)
             })
         } catch (e) {
             console.log("本地存储失败：", e)
@@ -855,9 +855,9 @@ const PrintChange: Taro.FC<any> = () => {
             Taro.navigateBack();
         } else {
             if (process.env.TARO_ENV == "h5") {
-                window.location.href = "/";
+                window.location.href = updateChannelCode("/");
             } else {
-                Taro.switchTab({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
             }
         }
     }
