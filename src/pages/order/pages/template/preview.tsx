@@ -58,7 +58,7 @@ export default class Preview extends Component<any, {
     config: Config = {
         navigationBarTitleText: '预览'
     }
-    private initModalShow = false
+
     constructor(props) {
         super(props);
         this.state = {
@@ -309,7 +309,7 @@ export default class Preview extends Component<any, {
     }
 
     render() {
-        const { placeOrderShow,workId,productInfo,workInfo,defalutSelectIds,selectSkuId} = this.state;
+        const { placeOrderShow,workId,productInfo,workInfo,defalutSelectIds} = this.state;
         const {self} = this.$router.params;
         const workid = workInfo && workInfo.id ? workInfo.id : workId;
         // @ts-ignore
