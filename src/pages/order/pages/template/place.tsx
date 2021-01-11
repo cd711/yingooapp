@@ -7,9 +7,26 @@ import Fragment from '../../../../components/Fragment'
 import isEmpty from 'lodash/isEmpty';
 import { flattens,intersection } from '../../../../utils/tool'
 
+interface OderParams{
+    data:any; //商品信息
+    productType?:string;//商品类型
+    maxBuyNum?:number;//最大购买数
+    isShow:boolean;//是否显示
+    showOkButton?:boolean;//显示加购确定按钮
+    defalutSelectIds?:Array<any>;//默认选项 ["56","124"]
+    onClose:()=> void; //关闭回调
+    onBuyNumberChange:(count: number) => void; //购买数量变化回调
+    onSkuChange:(sku:Array<any>,skusId:number)=>void; //sku变化回调，sku为当前选择项数组，如果当前选择了所有的sku项,在skus中存在这个组合，那么skusId>0
+    onAddCart?:()=>void; //添加购物车按钮回调
+    onNowBuy?:()=>void; //立即购买按钮回调
+    onOkButtonClick?:()=>void; //确定按钮回调
+    onNowButtonClick?:()=>void; //立即制作按钮回调
+    onNamesChange?:(name:Array<string>)=>void; //已经选择项目回调，例如:["5寸","高清打印"]
+    onPriceChange?:(price:string,marketPrice:string)=>void; //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
+}
 
 // eslint-disable-next-line import/prefer-default-export
-export const PlaceOrder: Taro.FC<any> = ({data, productType = "",maxBuyNum = 0,isShow = false, showOkButton = false, selectedSkuId,selectedSku,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick,onNamesChange,onPriceChange}) => {
+export const PlaceOrder: Taro.FC<OderParams> = ({data, productType = "",maxBuyNum = 0,isShow = false, showOkButton = false,defalutSelectIds,onClose, onBuyNumberChange, onSkuChange, onAddCart, onNowBuy,onOkButtonClick,onNowButtonClick,onNamesChange,onPriceChange}) => {
 
     const [price, setPrice] = useState("0");
     const [marketPrice, setMarketPrice] = useState("0");

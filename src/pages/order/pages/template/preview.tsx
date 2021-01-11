@@ -358,7 +358,7 @@ export default class Preview extends Component<any, {
                     <Button className='noworder' onClick={this.onOrderIng}>立即下单</Button>
                 </View>
                 {
-                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose} onButtonClose={this.onPlaceOrderClose}
+                    this.initModalShow?<PlaceOrder data={productInfo} isShow={placeOrderShow} defalutSelectIds={defalutSelectIds} onClose={this.onPlaceOrderClose}
                     onBuyNumberChange={(n) => {
                         this.setState({
                             buyTotal:n
