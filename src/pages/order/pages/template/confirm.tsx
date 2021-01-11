@@ -84,7 +84,7 @@ export default class Confirm extends Component<any, {
             setTempDataContainer("product_preview_sku",null);
         }
         if (process.env.TARO_ENV != 'h5') {
-            
+
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".bottom").boundingClientRect((status_react) => {
                     this.setState({
@@ -115,7 +115,7 @@ export default class Confirm extends Component<any, {
                 params = photoStore.photoProcessParams.changeUrlParams
             } catch (e) {
                 console.log("读取参数出错：", e)
-                
+
             }
         } else {
             params = this.$router.params
@@ -548,7 +548,7 @@ export default class Confirm extends Component<any, {
         }).then((res) => {
             Taro.hideLoading();
             if (callback) {
-                callback(); 
+                callback();
             } else {
                 this.setState({
                     data: this.handleData(res)
@@ -744,7 +744,7 @@ export default class Confirm extends Component<any, {
                                                 </View>
                                                 <View className='add_buy_container'>
                                                     {
-                                                        item.merge_products.map((addbuyItem, index) => (
+                                                        item.merge_products.map((addbuyItem) => (
                                                             <AddBuy key={addbuyItem.id} mainProducts={item.products[0]}
                                                                     product={addbuyItem} isChecked={addbuyItem.checked}
                                                                     onItemClick={() => this.onAddBuyItemClick(item.products[0], item.pre_order_id, item.products[0].id, addbuyItem)}
