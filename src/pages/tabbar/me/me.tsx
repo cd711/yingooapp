@@ -16,7 +16,7 @@ import {
     urlEncode,
     getURLParamsStr,
     setTempDataContainer,
-    updateChannelCode
+    updateChannelCode, updateTabBarChannelCode
 } from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
@@ -208,6 +208,18 @@ export default class Me extends Component<any, MeState> {
             console.log("获取作品出错：", e)
             this.isLoading = 0
         }
+    }
+
+    componentDidShow(){
+        updateTabBarChannelCode("/pages/tabbar/me/me")
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku",null);
+        }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue && parseInt(change.newValue+"")>0) {
+                setTempDataContainer("product_preview_sku",null);
+            }
+        })
     }
 
     componentDidMount() {
@@ -406,17 +418,7 @@ export default class Me extends Component<any, MeState> {
             onClick: this.confirmDelete,
         }
     ];
-    componentDidShow(){
-        if (userStore.isLogin) {
-            setTempDataContainer("product_preview_sku",null);
-        }
-        observe(userStore,"id",(change)=>{
-            if (change.newValue != change.oldValue && parseInt(change.newValue+"")>0) {
-                setTempDataContainer("product_preview_sku",null);
-            }
-        })
-    }
-    // @ts-ignore
+
     render() {
         const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;
         const {nickname, avatar,bio,isLogin} = userStore;

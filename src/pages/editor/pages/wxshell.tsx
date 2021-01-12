@@ -91,9 +91,9 @@ export default class Shell extends Component<{}, {
             hidden: "t",
             workid: Taro.getApp().finishId || "f"
         }))
-        return process.env.NODE_ENV == 'production'
+        return updateChannelCode(process.env.NODE_ENV == 'production'
             ? `${config.weappUrl}/pages/editor/pages/shell?${str}`
-            : `${config.h5Url}/pages/editor/pages/shell?${str}`
+            : `${config.h5Url}/pages/editor/pages/shell?${str}`)
     }
 
 

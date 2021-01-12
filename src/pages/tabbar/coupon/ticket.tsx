@@ -4,7 +4,14 @@ import './ticket.less'
 import {api} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, ListModel, notNull, updateChannelCode} from '../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    ListModel,
+    notNull,
+    updateChannelCode,
+    updateTabBarChannelCode
+} from '../../../utils/common';
 import Ticket from '../../../components/ticket/Ticket';
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import { observe } from 'mobx';
@@ -75,6 +82,7 @@ export default class Login extends Component<{}, {
     }
 
     componentDidShow(){
+        updateTabBarChannelCode("/pages/tabbar/coupon/ticket")
         if (userStore.isLogin) {
             this.requestData();
         }

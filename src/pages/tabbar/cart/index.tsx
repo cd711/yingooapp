@@ -3,7 +3,13 @@ import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import IconFont from '../../../components/iconfont';
 import Checkboxs from '../../../components/checkbox/checkbox';
 import Counter from '../../../components/counter/counter';
-import {deviceInfo, fixStatusBarHeight, ossUrl, updateChannelCode} from '../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    ossUrl,
+    updateChannelCode,
+    updateTabBarChannelCode
+} from '../../../utils/common';
 import {api} from '../../../utils/net';
 import CartLeftIcon from '../../../components/icon/CartLeftIcon';
 import CartRightIcon from '../../../components/icon/CartRightIcon';
@@ -46,6 +52,10 @@ export default class Cart extends Component<{}, {
             selectIds: [],
             showDelTipModal: false
         }
+    }
+
+    componentDidShow() {
+        updateTabBarChannelCode("/pages/tabbar/cart/index")
     }
 
     componentDidMount() {

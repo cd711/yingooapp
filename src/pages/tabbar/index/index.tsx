@@ -19,7 +19,7 @@ import {
     sleep,
     updateLocalCoupon,
     urlEncode,
-    setTempDataContainer, updateChannelCode
+    setTempDataContainer, updateChannelCode, updateTabBarChannelCode
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -234,6 +234,7 @@ class Index extends Component<any, IndexState> {
 
     }
     componentDidShow() {
+        updateTabBarChannelCode("/pages/tabbar/index/index")
         if (userStore.isLogin) {
             setTempDataContainer("product_preview_sku", null);
         }

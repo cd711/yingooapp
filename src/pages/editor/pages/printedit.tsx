@@ -1738,6 +1738,12 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         return ele
     }
 
+    getUrl = () => {
+        return updateChannelCode(process.env.NODE_ENV == 'production'
+            ? `/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
+            :`${config.editorUrl}/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`)
+    }
+
     render() {
         const {loadingTemplate, size, hiddenBar} = this.state;
         const {tool} = this.store;
@@ -1758,13 +1764,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 <View onClick={this.next} className='right'>完成</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
-                <iframe className="editor_frame"
-                        src={
-                            process.env.NODE_ENV == 'production'
-                            ? `/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                            :`${config.editorUrl}/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                        }
-                />
+                <iframe className="editor_frame" src={this.getUrl()}/>
                 {loadingTemplate
                     ? <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
                     : null}

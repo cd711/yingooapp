@@ -11,8 +11,7 @@ import {
     fixStatusBarHeight,
     ListModel,
     ossUrl,
-    setTempDataContainer,
-    updateChannelCode
+    updateChannelCode, updateTabBarChannelCode
 } from '../../../utils/common';
 
 import PayWayModal from '../../../components/payway/PayWayModal';
@@ -64,6 +63,21 @@ export default class Order extends Component<any,{
             centerPartyHeight:500
         }
     }
+
+    componentDidShow(){
+
+        updateTabBarChannelCode("/pages/tabbar/order/order")
+
+        const {tab} = Taro.getApp();
+        if (tab>=0) {
+            this.setState({
+                switchTabActive:tab
+            })
+        }
+        Taro.getApp().tab = -1;
+
+    }
+
     componentDidMount(){
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
@@ -83,6 +97,7 @@ export default class Order extends Component<any,{
             this.initData();
         }
     }
+
     initData = () => {
         const {tab} = this.$router.params;
         const {data,switchTabActive} = this.state;
@@ -101,18 +116,6 @@ export default class Order extends Component<any,{
 
             this.getList();
         }
-    }
-    componentDidShow(){
-        // setTempDataContainer("product_preview_sku",null,()=>{});
-        console.log(Taro.getApp().tab,this.$router.params);
-        const {tab} = Taro.getApp();
-        if (tab>=0) {
-            this.setState({
-                switchTabActive:tab
-            })
-        }
-        Taro.getApp().tab = -1;
-
     }
 
     componentWillUpdate(_, nextState) {

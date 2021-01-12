@@ -782,6 +782,44 @@ export function formatPrice(price:string,is:boolean) {
     }
 }
 
+export function updateTabBarChannelCode(path: string, code: string = "") {
+    if (notNull(path)) {
+        if (process.env.NODE_ENV !== 'production') {
+            console.error("updateChannelCode方法没有传入地址")
+        }
+        return
+    }
+
+    if (process.env.TARO_ENV === "h5") {
+        let _path = path;
+        const hasParams = path.indexOf("?") > -1;
+
+        let channelCode = "";
+        if (options && options.channel) {
+            channelCode = options.channel
+        } else if (!notNull(code)) {
+            channelCode = code
+        }
+
+        if (hasParams) {
+            // 有参数
+            // 有无渠道商code
+            const hasCode = path.indexOf("channel") > -1;
+            if (!hasCode) {
+                if (!notNull(channelCode)) {
+                    _path = `${path}&channel=${channelCode}`
+                }
+            }
+        } else {
+            // 没有参数
+            if (!notNull(channelCode)) {
+                _path = `${path}?channel=${channelCode}`
+            }
+        }
+        console.log(_path)
+        window.history.pushState(null, null, _path)
+    }
+}
 
 export function updateChannelCode(path: string, code:string = "") {
     if (notNull(path)) {
