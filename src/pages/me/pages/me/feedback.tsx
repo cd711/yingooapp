@@ -66,7 +66,7 @@ const Feedback: Taro.FC<any> = (_) => {
         try {
             await api("app.feedback/add", {
                 classify: formData.reason,
-                intro: formData.reason,
+                intro: formData.remark,
                 images: formData.imgs.join(","),
                 phone: formData.tel
             });
