@@ -569,8 +569,8 @@ export function jumpUri(url:string,tabbar:boolean = false){
 
 export function photoGetItemStyle() {
     return {
-        width: `${deviceInfo.windowWidth / 3 - 2}px`,
-        height: `${deviceInfo.windowWidth / 3 - 2}px`,
+        width: `${deviceInfo.windowWidth / 4 - 2}px`,
+        height: `${deviceInfo.windowWidth / 4 - 2}px`,
     }
 }
 

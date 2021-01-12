@@ -1,6 +1,6 @@
 import "./upload.less";
 import Taro, {Component} from '@tarojs/taro';
-import {View, Text} from "@tarojs/components";
+import {View, Text, Image} from "@tarojs/components";
 import IconFont from "../iconfont";
 import {getToken, options} from "../../utils/net";
 import {notNull} from "../../utils/common";
@@ -21,9 +21,13 @@ interface UploadFileProps{
     onChange?: (data: Array<UploadFileChangeProps> | UploadFileChangeProps) => void,
     // index为多图上传的下边，单张上传时始终为0
     onProgress?: (progress: number, currentTotal: number, total: number, index: number) => void,
-    className?: string
-    style?: any
-    title?: string
+    className?: string,
+    style?: any,
+    title?: string,
+    // image和icon二选一,优先识别image
+    image?: string,
+    // image和icon二选一,优先识别image
+    icon?: string,
 }
 interface UploadFileState {
     files: Array<any>;
@@ -33,7 +37,8 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
     static defaultProps = {
         type: "button",
         sourceType: ['album', 'camera'],
-        count: 1
+        count: 1,
+        uploadType: 'image'
     }
     constructor(props) {
         super(props);
@@ -184,15 +189,19 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
     }
 
     render(): React.ReactNode {
-        const {type, className, style, title} = this.props;
+        const {type, className, style, title, image, icon} = this.props;
         return (
             <View className={`upload_container ${className ? className : ""}`} style={style} onClick={this._upload}>
                 {
                     type === "button"
                         ? this.props.children
                         : <View className="card_view">
-                            <IconFont size={96} name="24_paizhaoshangchuan" color="#fff" />
-                            <Text className="title">{title || "上传图片"}</Text>
+                            {
+                                image
+                                    ? <Image src={image} className="car_img" />
+                                    : <IconFont size={96} name={icon ? icon : "24_paizhaoshangchuan"} color="#fff" />
+                            }
+                            {title ? <Text className="title">{title}</Text> : null}
                         </View>
                 }
             </View>

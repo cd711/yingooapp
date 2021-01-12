@@ -29,7 +29,7 @@ interface PhotosEleState {
     navSwitchActive: number;
     loading: boolean;
     imageList: any[];
-    videoList: any[];
+    usefulList: any[];
     loadStatus: 'more' | 'loading' | 'noMore';
     isEdit: boolean;
     sortActive: object;
@@ -63,7 +63,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             navSwitchActive: 0,
             loading: true,
             imageList: [],
-            videoList: [],
+            usefulList: [],
             loadStatus: "noMore",
             isEdit: false,
             sortActive: {},
@@ -82,12 +82,12 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
         const opt = {
             start: data.start || 0,
-            size: data.size || 15,
+            size: data.size || 25,
             type: data.type || this.state.navSwitchActive,
             loadMore: data.loadMore || false
         };
         const temp = {
-            start: opt.start, size: opt.size, type: opt.type === 0 ? "image" : "video"
+            start: opt.start, size: opt.size, type: "image"
         }
         if (data.sort) {
             Object.assign(temp, {sort: data.sort})
@@ -101,13 +101,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             console.log(res);
             this.setState({loading: false});
             let list = [];
-            if (opt.type === 0) {
-                list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
-                this.setState({imageList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
-            } else {
-                list = opt.loadMore ? this.state.videoList.concat(res.list) : res.list;
-                this.setState({videoList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
-            }
+            list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
+            this.setState({imageList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
         } catch (e) {
             console.log("获取图库出错：", e)
             this.setState({loadStatus: "noMore"})
@@ -267,26 +262,23 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         if (navSwitchActive === idx) {
             return
         }
-        this.setState({loading: true});
-        this.setState({navSwitchActive: idx}, () => {
-            this.getList({start: 0})
-        });
+        // this.setState({loading: true});
+        this.setState({navSwitchActive: idx});
     }
 
     loadMore = () => {
-        const {navSwitchActive, imageList, videoList, sortActive} = this.state;
-        const len = navSwitchActive === 0 ? imageList.length : videoList.length;
-        console.log(len, this.total)
-        if (this.total === len) {
+        const {imageList, sortActive} = this.state;
+
+        if (this.total === imageList.length) {
             this.setState({loadStatus: "noMore"})
             return
         }
-        if (len < 15) {
+        if (imageList.length < 25) {
             this.setState({loadStatus: "noMore"});
             return;
         }
         this.setState({loadStatus: "loading"});
-        const temp = {start: len, loadMore: true};
+        const temp = {start: imageList.length, loadMore: true};
         if (Object.keys(sortActive).length > 0) {
             Object.assign(temp, sortActive)
         }
@@ -359,8 +351,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     getScrollHeight = () => {
         const {_editSelect} = this.state;
-        const {imageList, videoList, navSwitchActive} = this.state;
-        const list = navSwitchActive === 0 ? imageList : videoList;
+        const {imageList, usefulList, navSwitchActive} = this.state;
+        const list = navSwitchActive === 0 ? imageList : usefulList;
         const isEdit = _editSelect && (list.length > 0);
         const h = isEdit ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
         return deviceInfo.env === "h5" ? h : isEdit ? deviceInfo.windowHeight - 130 - 45 + (deviceInfo.statusBarHeight / 2) : deviceInfo.screenHeight - deviceInfo.safeArea.top - deviceInfo.statusBarHeight
@@ -372,13 +364,14 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             navSwitchActive,
             loading,
             imageList,
-            videoList,
+            usefulList,
             loadStatus,
             editSelectImgs,
             editSelectImgIds
         } = this.state;
-        const list = navSwitchActive === 0 ? imageList : videoList;
-        const tabs = ["图片", "视频"];
+        // const list = navSwitchActive === 0 ? imageList : usefulList;
+        const list = imageList;
+        const tabs = ["未使用", "已使用"];
         return (
             <View className='photos'>
                 <View className='photos_nav_bar' style={{
@@ -390,16 +383,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                         <Text className="cl_t">关闭</Text>
                     </View>
                     <View className='center'>
-                        <View className='nav-switch'>
-                            {
-                                tabs.map((item, index) => (
-                                    <View className={navSwitchActive == index ? 'item active' : 'item'} key={index + ""}
-                                          onClick={() => this.changeType(index)}>
-                                        <Text className='txt'>{item}</Text>
-                                    </View>
-                                ))
-                            }
-                        </View>
+                        <Text className="txt">素材库</Text>
                     </View>
                     <View className="right"/>
                 </View>
@@ -418,9 +402,9 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 ? <View className='empty'>
                                     <Image src={require('../../source/empty/nophoto.png')} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
-                                    <UploadFile extraType={navSwitchActive === 0 ? 3 : 4}
-                                                uploadType={navSwitchActive === 0 ? "image" : "video"}
-                                                title={navSwitchActive === 0 ? "上传图片" : "上传视频"}
+                                    <UploadFile extraType={3}
+                                                uploadType="image"
+                                                title="上传图片"
                                                 type="button"
                                                 count={9}
                                                 onChange={this.uploadFile}>
@@ -429,21 +413,28 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_filter">
-                                        <Text className="tit"/>
-                                        <Popover popoverItem={this.popoverItem}>
-                                            <View className="weapp_list_filter_act">
-                                                <Text className="txt">排序</Text>
-                                                <IconFont size={48} name="24_tupianpaixu"/>
-                                            </View>
-                                        </Popover>
+                                        <View className="filter_txt">
+                                            <Text className="tit">按大小排序</Text>
+                                            <Image src={require("../../source/down.png")} className="filter_icon" />
+                                        </View>
+                                        <View className="filter_switch_bar">
+                                            {tabs.map((value, index) => (
+                                                <View className={`filter_switch_item ${index === navSwitchActive ? "active" : ""}`}
+                                                      key={index.toString()}
+                                                      onClick={() => this.changeType(index)}>
+                                                    <Text className="txt">{value}</Text>
+                                                </View>
+                                            ))}
+                                        </View>
                                     </View>
                                     <View className="list_main">
                                         <View className="list_item">
                                             <UploadFile
-                                                extraType={navSwitchActive}
+                                                extraType={3}
                                                 type="card"
                                                 count={9}
-                                                uploadType={navSwitchActive === 0 ? "image" : "video"}
+                                                image={require("../../source/car.png")}
+                                                uploadType="image"
                                                 style={photoGetItemStyle()}
                                                 onChange={this.uploadFile}/>
                                         </View>
