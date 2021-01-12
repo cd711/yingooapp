@@ -367,6 +367,9 @@ export function cutString(str: string = "", len: number = 1, suffix: string = ".
     if (notNull(str)) {
         return ""
     }
+    if (str.length <= len) {
+        return str
+    }
     return `${str.substr(0, len)}${suffix}`;
 }
 
