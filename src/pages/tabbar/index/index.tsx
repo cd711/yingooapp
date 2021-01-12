@@ -45,6 +45,7 @@ interface IndexState {
     loadStatus: LoadMoreEnum;
     refresherTriggered: boolean;
     isTop: boolean;
+    topFix: any[];
 }
 
 @inject("userStore")
@@ -70,7 +71,8 @@ class Index extends Component<any, IndexState> {
             curtain: {},
             loadStatus: LoadMoreEnum.more,
             refresherTriggered: false,
-            isTop: false
+            isTop: false,
+            topFix: []
         }
 
     }
@@ -88,7 +90,7 @@ class Index extends Component<any, IndexState> {
     getIndexBlocks = (opt: {start?: number, size?: number, loadMore?: boolean, channelCode?: string } = {}) => {
         return new Promise<any[]>(async (resolve, reject) => {
             const options = {
-                size: opt.size || 10,
+                size: opt.size || 50,
                 start: opt.start || 0,
                 loadMore: opt.loadMore || false
             };
@@ -104,9 +106,12 @@ class Index extends Component<any, IndexState> {
                 } else {
                     arr = res.list
                 }
+                let topFix = [];
+                topFix = arr.filter(value => value.area_type === "search" && value.display === "top");
 
                 this.setState({
-                    loadStatus: parseInt(res.total) <= 10 || arr.length < parseInt(res.total) ? LoadMoreEnum.noMore : LoadMoreEnum.more
+                    loadStatus: parseInt(res.total) <= 10 || arr.length < parseInt(res.total) ? LoadMoreEnum.noMore : LoadMoreEnum.more,
+                    topFix
                 })
                 resolve(arr || [])
             } catch (e) {
@@ -582,30 +587,35 @@ class Index extends Component<any, IndexState> {
 
 
     render() {
-        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresherTriggered, isTop} = this.state;
+        const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresherTriggered, isTop, topFix} = this.state;
         return (
             <View className='index'>
-                {/*<Refresh visible={refresh} />*/}
                 <LoginModal isTabbar />
-                <View className='top-search'
-                      style={{
-                          paddingTop: deviceInfo.statusBarHeight + 5 + "px",
-                          height: 52 + deviceInfo.statusBarHeight + "px",
-                          background: scrolling ? "#fff" : "transparent",
-                          boxShadow: scrolling ? "0px 8px 16px 0px #0A246308" : "none"
-                      }}
-                >
-                    <View className='search-box'
-                          style={{
-                              width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
-                              height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
-                              background: scrolling ? "#f5f5f5" : "#fff"
-                          }}
-                          onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/search/index")})}>
-                        <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
-                        <Text className='placeholders'>搜索海量模板</Text>
-                    </View>
-                </View>
+                {
+                    topFix.map((item, index) => {
+                        return item.display === "top" && <View className='top-search' key={index.toString()}
+                                     style={{
+                                         paddingTop: item.display === "top" ? deviceInfo.statusBarHeight + 5 + "px" : "7px",
+                                         height: item.display === "top" ? 52 + deviceInfo.statusBarHeight + "px" : "52px",
+                                         background: item.display === "top" ? scrolling ? "#fff" : "transparent" : "#fff",
+                                         boxShadow: item.display === "top" ? scrolling ? "0px 8px 16px 0px #0A246308" : "none" : "none",
+                                         position: item.display === "top" ? "fixed" : "relative",
+                                         top: item.display === "top" ? "0px" : "initial"
+                                     }}
+                        >
+                            <View className='search-box'
+                                  style={{
+                                      width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
+                                      height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
+                                      background: scrolling ? "#f5f5f5" : "#fff"
+                                  }}
+                                  onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/search/index")})}>
+                                <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
+                                <Text className='placeholders'>搜索海量模板</Text>
+                            </View>
+                        </View>
+                    })
+                }
                 <ScrollView scrollY
                             // onTouchEnd={this.onTouchEnd}
                             refresherTriggered={refresherTriggered}
@@ -629,7 +639,7 @@ class Index extends Component<any, IndexState> {
                             : null
                     }
                     <View className='inde_page_container' style={{
-                        paddingTop: `${deviceInfo.env === "h5" ? 55 : deviceInfo.menu.bottom + 10}px`
+                        paddingTop: `${deviceInfo.env === "h5" ? deviceInfo.statusBarHeight : deviceInfo.menu.bottom}px`
                     }}>
                         {
                             data.map((item, index) => {
@@ -644,11 +654,10 @@ class Index extends Component<any, IndexState> {
                                 const onlyFourPhoto = photoArr.length > 3 ? photoArr.slice(0, 4) : [];
                                 const onlyThreePhone = phoneArr.length > 3 ? phoneArr.slice(0, 3) : [];
 
-                                return item.area_type === "content"
+                                return item.area_type === "product"
                                     ? <Fragment key={index+""}>
                                         {
-                                            item.model === "product"
-                                                ? len === 1
+                                            len === 1
                                                 ? <View className="single_index_product_item fix_all_margin">
                                                     <View className="single_img_view">
                                                         <Image src={this.getImage(list[0])} className="single_img" mode="widthFix" />
@@ -720,234 +729,248 @@ class Index extends Component<any, IndexState> {
                                                         }
                                                     </View>
                                                 </View>
-                                                : null
                                         }
-                                        {
-                                            item.model === "tpl_product"
-                                                ? <Fragment>
-                                                    {
-                                                        phoneArr.length === 1
-                                                            ? <View className='temp-warp' key={index + ""}>
-                                                                <View className='masks'>
-                                                                    <View className='title'>
-                                                                        <Text className='txt'>{item.title}</Text>
-                                                                        {item.subtitle ? <Text
-                                                                            className='sub-title'>{item.subtitle}</Text> : null}
-                                                                    </View>
-                                                                    <View className="single_phone_shell_view">
-                                                                        <View className="single_phone_shell"
-                                                                              onClick={() => this.onItemClick(item.clist[0], index)}>
-                                                                            <Image src={require("../../../source/sjk.png")} className="shell_ke" />
-                                                                            <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
-                                                                            <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
-                                                                                   className='photo' mode='aspectFill'/>
-                                                                        </View>
-                                                                    </View>
-                                                                    <Button className='now-design-btn'
-                                                                            onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
+                                    </Fragment>
+                                    : item.area_type === "tpl_product"
+                                        ?  <Fragment>
+                                            {
+                                                phoneArr.length === 1
+                                                    ? <View className='temp-warp' key={index + ""}>
+                                                        <View className='masks'>
+                                                            <View className='title'>
+                                                                <Text className='txt'>{item.title}</Text>
+                                                                {item.subtitle ? <Text
+                                                                    className='sub-title'>{item.subtitle}</Text> : null}
+                                                            </View>
+                                                            <View className="single_phone_shell_view">
+                                                                <View className="single_phone_shell"
+                                                                      onClick={() => this.onItemClick(item.clist[0], index)}>
+                                                                    <Image src={require("../../../source/sjk.png")} className="shell_ke" />
+                                                                    <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
+                                                                    <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
+                                                                           className='photo' mode='aspectFill'/>
                                                                 </View>
                                                             </View>
-                                                            : null
-                                                    }
-                                                    {
-                                                        phoneArr.length > 1 && phoneArr.length <= 3
-                                                            ? <PhoneSwiper key={index + ""}
-                                                                           data={phoneArr}
-                                                                           title={item.title}
-                                                                           subtitle={item.subtitle}
-                                                                           onItemClick={current => this.onItemClick(current, index)}/>
-                                                            : null
-                                                    }
-                                                    {
-                                                        phoneArr.length > 3
-                                                            ? <View className='temp-warp' key={index + ""}>
-                                                                <View className='title'>
-                                                                    <Text className='txt'>{item.title}</Text>
-                                                                    {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
-                                                                </View>
-                                                                <View className='grid'>
-                                                                    <View className="phone_shell_view_list">
-                                                                        {
-                                                                            onlyThreePhone.map((phone, phoneIdx) => (
-                                                                                <View className="single_phone_shell_wrap" key={phoneIdx+""}>
-                                                                                    <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
-                                                                                          onClick={() => this.onItemClick(phone, index)}>
-                                                                                        <Image src={require("../../../source/sjk.png")} className="shell_ke rectangle_ke" />
-                                                                                        <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
-                                                                                        <Image src={ossUrl(this.getImage(phone), 1)}
-                                                                                               className='photo rectangle_ke' mode='aspectFill'/>
-                                                                                    </View>
-                                                                                </View>
-                                                                            ))
-                                                                        }
-                                                                    </View>
-                                                                </View>
+                                                            <Button className='now-design-btn'
+                                                                    onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
+                                                        </View>
+                                                    </View>
+                                                    : null
+                                            }
+                                            {
+                                                phoneArr.length > 1 && phoneArr.length <= 3
+                                                    ? <PhoneSwiper key={index + ""}
+                                                                   data={phoneArr}
+                                                                   title={item.title}
+                                                                   subtitle={item.subtitle}
+                                                                   onItemClick={current => this.onItemClick(current, index)}/>
+                                                    : null
+                                            }
+                                            {
+                                                phoneArr.length > 3
+                                                    ? <View className='temp-warp' key={index + ""}>
+                                                        <View className='title'>
+                                                            <Text className='txt'>{item.title}</Text>
+                                                            {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
+                                                        </View>
+                                                        <View className='grid'>
+                                                            <View className="phone_shell_view_list">
                                                                 {
-                                                                    phoneArr.length > 3
-                                                                        ? <View className='seemore'
-                                                                                onClick={() => this.viewMoreSpecial(item)}>
-                                                                            <Text className='txt'>查看更多</Text>
-                                                                            <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
-                                                                        </View>
-                                                                        : null
-                                                                }
-                                                            </View>
-                                                            : null
-                                                    }
-                                                    {
-                                                        photoArr.length === 1
-                                                            ? <View className='temp-warp' key={index + ""}>
-                                                                <View className='masks'>
-                                                                    <View className='title'>
-                                                                        <Text className='txt'>{item.title}</Text>
-                                                                        {item.subtitle ? <Text
-                                                                            className='sub-title'>{item.subtitle}</Text> : null}
-                                                                    </View>
-                                                                    <View className='swiper-back'
-                                                                          onClick={() => this.onItemClick(item.clist[0], index)}>
-                                                                        <View className='temp-swiper'>
-                                                                            <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
-                                                                                   className='photo' mode='aspectFill'/>
-                                                                        </View>
-                                                                    </View>
-                                                                    <Button className='now-design-btn'
-                                                                            onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
-                                                                </View>
-                                                            </View>
-                                                            : null
-                                                    }
-                                                    {
-                                                        photoArr.length > 1 && photoArr.length < 4
-                                                            ? <PhotoSwiper key={index + ""}
-                                                                           title={item.title}
-                                                                           subtitle={item.subtitle}
-                                                                           onItemClick={c => this.onItemClick(c, index)}
-                                                                           data={photoArr} />
-                                                            : null
-                                                    }
-                                                    {
-                                                        photoArr.length > 3
-                                                            ? <View className='temp-warp' key={index + ""}>
-                                                                <View className='title'>
-                                                                    <Text className='txt'>{item.title}</Text>
-                                                                    {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
-                                                                </View>
-                                                                <View className="photo_item_view_container">
-                                                                    {
-                                                                        onlyFourPhoto.map((childPhoto, photoIdx) => (
-                                                                            <View className="photo_item_view_wrap" key={photoIdx+""}>
-                                                                                <View className="photo_item_view" onClick={() => this.onItemClick(childPhoto, index)}>
-                                                                                    <View className="photo_item_hidden transverse">
-                                                                                        <Image src={require("../../../source/transverse.svg")} className="hidden_view transverse" />
-                                                                                        <Image src={ossUrl(this.getImage(childPhoto), 1)} className="transverse_img" mode="aspectFill" />
-                                                                                    </View>
-                                                                                </View>
+                                                                    onlyThreePhone.map((phone, phoneIdx) => (
+                                                                        <View className="single_phone_shell_wrap" key={phoneIdx+""}>
+                                                                            <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
+                                                                                  onClick={() => this.onItemClick(phone, index)}>
+                                                                                <Image src={require("../../../source/sjk.png")} className="shell_ke rectangle_ke" />
+                                                                                <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
+                                                                                <Image src={ossUrl(this.getImage(phone), 1)}
+                                                                                       className='photo rectangle_ke' mode='aspectFill'/>
                                                                             </View>
-                                                                        ))
-                                                                    }
-                                                                </View>
-                                                                {
-                                                                    photoArr.length > 4
-                                                                        ? <View className='seemore'
-                                                                                onClick={() => this.viewMoreSpecial(item)}>
-                                                                            <Text className='txt'>查看更多</Text>
-                                                                            <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
                                                                         </View>
-                                                                        : null
+                                                                    ))
                                                                 }
                                                             </View>
-                                                            : null
-                                                    }
-                                                </Fragment>
-                                                : null
-                                        }
-                                        {
-                                            item.model === "coupon"
-                                                ? item.clist.map((coupon, cIndex) => (
-                                                    <View className="index_coupon_main fix_all_margin" key={`${index}_${cIndex}`}
-                                                          onClick={() => this.receiveCoupon(coupon)}>
-                                                        <Image src={ossUrl(this.getImage(coupon), 1)} className="coupon_img" mode="widthFix" />
-                                                        <View className="receive_btn">
-                                                            <View className="anim_btn_receive">
-                                                                <Text className="txt">立即领取</Text>
-                                                                <View className="icon"><IconFont name="16_xiayiye" color="#fff" size={32}/></View>
+                                                        </View>
+                                                        {
+                                                            phoneArr.length > 3
+                                                                ? <View className='seemore'
+                                                                        onClick={() => this.viewMoreSpecial(item)}>
+                                                                    <Text className='txt'>查看更多</Text>
+                                                                    <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                                                </View>
+                                                                : null
+                                                        }
+                                                    </View>
+                                                    : null
+                                            }
+                                            {
+                                                photoArr.length === 1
+                                                    ? <View className='temp-warp' key={index + ""}>
+                                                        <View className='masks'>
+                                                            <View className='title'>
+                                                                <Text className='txt'>{item.title}</Text>
+                                                                {item.subtitle ? <Text
+                                                                    className='sub-title'>{item.subtitle}</Text> : null}
+                                                            </View>
+                                                            <View className='swiper-back'
+                                                                  onClick={() => this.onItemClick(item.clist[0], index)}>
+                                                                <View className='temp-swiper'>
+                                                                    <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
+                                                                           className='photo' mode='aspectFill'/>
+                                                                </View>
+                                                            </View>
+                                                            <Button className='now-design-btn'
+                                                                    onClick={() => this.onItemClick(item.clist[0], index)}>立即设计</Button>
+                                                        </View>
+                                                    </View>
+                                                    : null
+                                            }
+                                            {
+                                                photoArr.length > 1 && photoArr.length < 4
+                                                    ? <PhotoSwiper key={index + ""}
+                                                                   title={item.title}
+                                                                   subtitle={item.subtitle}
+                                                                   onItemClick={c => this.onItemClick(c, index)}
+                                                                   data={photoArr} />
+                                                    : null
+                                            }
+                                            {
+                                                photoArr.length > 3
+                                                    ? <View className='temp-warp' key={index + ""}>
+                                                        <View className='title'>
+                                                            <Text className='txt'>{item.title}</Text>
+                                                            {item.subtitle ? <Text className='sub-title'>{item.subtitle}</Text> : null}
+                                                        </View>
+                                                        <View className="photo_item_view_container">
+                                                            {
+                                                                onlyFourPhoto.map((childPhoto, photoIdx) => (
+                                                                    <View className="photo_item_view_wrap" key={photoIdx+""}>
+                                                                        <View className="photo_item_view" onClick={() => this.onItemClick(childPhoto, index)}>
+                                                                            <View className="photo_item_hidden transverse">
+                                                                                <Image src={require("../../../source/transverse.svg")} className="hidden_view transverse" />
+                                                                                <Image src={ossUrl(this.getImage(childPhoto), 1)} className="transverse_img" mode="aspectFill" />
+                                                                            </View>
+                                                                        </View>
+                                                                    </View>
+                                                                ))
+                                                            }
+                                                        </View>
+                                                        {
+                                                            photoArr.length > 4
+                                                                ? <View className='seemore'
+                                                                        onClick={() => this.viewMoreSpecial(item)}>
+                                                                    <Text className='txt'>查看更多</Text>
+                                                                    <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                                                </View>
+                                                                : null
+                                                        }
+                                                    </View>
+                                                    : null
+                                            }
+                                        </Fragment>
+                                        : item.area_type === "coupon"
+                                            ? <Fragment>
+                                                {
+                                                    item.clist.map((coupon, cIndex) => (
+                                                        <View className="index_coupon_main fix_all_margin" key={`${index}_${cIndex}`}
+                                                              onClick={() => this.receiveCoupon(coupon)}>
+                                                            <Image src={ossUrl(this.getImage(coupon), 1)} className="coupon_img" mode="widthFix" />
+                                                            <View className="receive_btn">
+                                                                <View className="anim_btn_receive">
+                                                                    <Text className="txt">立即领取</Text>
+                                                                    <View className="icon"><IconFont name="16_xiayiye" color="#fff" size={32}/></View>
+                                                                </View>
+                                                            </View>
+                                                        </View>
+                                                    ))
+                                                }
+                                            </Fragment>
+                                            : item.area_type === "column"
+                                                ?  <Fragment>
+                                                    <View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
+                                                        <View className="read_fast_link_wrap">
+                                                            <View className="read_fast_link" onClick={this.uncShow}>
+                                                                <Image src={require("../../../source/il.svg")} className="fast_img" mode="widthFix" />
+                                                                <View className="info">
+                                                                    <Text className="h2">当面冲印照片</Text>
+                                                                    <Text className="txt">高清冲印照片</Text>
+                                                                </View>
+                                                            </View>
+                                                        </View>
+                                                        <View className="read_fast_link_wrap">
+                                                            <View className="read_fast_link" onClick={this.uncShow}>
+                                                                <Image src={require("../../../source/cnxh.svg")} className="fast_img" mode="widthFix" />
+                                                                <View className="info">
+                                                                    <Text className="h2">当面冲印文档</Text>
+                                                                    <Text className="txt">极速打印文档</Text>
+                                                                </View>
                                                             </View>
                                                         </View>
                                                     </View>
-                                                ))
-                                                : null
-                                        }
-                                    </Fragment>
-                                    : item.area_type === "column"
-                                    ?  <Fragment>
-                                        <View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
-                                            <View className="read_fast_link_wrap">
-                                                <View className="read_fast_link" onClick={this.uncShow}>
-                                                    <Image src={require("../../../source/il.svg")} className="fast_img" mode="widthFix" />
-                                                    <View className="info">
-                                                        <Text className="h2">当面冲印照片</Text>
-                                                        <Text className="txt">高清冲印照片</Text>
+                                                    <View className="index_fast_link_view fixed_padding" style={{paddingBottom: "0px"}}>
+                                                        <View className="fast_order_link_wrap">
+                                                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
+                                                                <Image src={require("../../../source/pz.svg")} className="fast_img" />
+                                                                <Text className="h2">照片冲印</Text>
+                                                                <Text className="info">高清盐印冲印</Text>
+                                                            </View>
+                                                        </View>
+                                                        <View className="fast_order_link_wrap">
+                                                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(2)}>
+                                                                <Image src={require("../../../source/az.svg")} className="fast_img" />
+                                                                <Text className="h2">手机壳定制</Text>
+                                                                <Text className="info">多种精美模板</Text>
+                                                            </View>
+                                                        </View>
+                                                        <View className="fast_order_link_wrap">
+                                                            <View className="fast_order_link" onClick={() => this.jumpToTemplate(3)}>
+                                                                <Image src={require("../../../source/iall.svg")} className="fast_img" />
+                                                                <Text className="h2">更多定制</Text>
+                                                                <Text className="info">各种惊喜不断</Text>
+                                                            </View>
+                                                        </View>
                                                     </View>
-                                                </View>
-                                            </View>
-                                            <View className="read_fast_link_wrap">
-                                                <View className="read_fast_link" onClick={this.uncShow}>
-                                                    <Image src={require("../../../source/cnxh.svg")} className="fast_img" mode="widthFix" />
-                                                    <View className="info">
-                                                        <Text className="h2">当面冲印文档</Text>
-                                                        <Text className="txt">极速打印文档</Text>
+                                                </Fragment>
+                                                : item.area_type === "ad"
+                                                    ? <View className="index_spacial_column fix_all_margin" key={`${item.area_type}_${index}`}>
+                                                        {
+                                                            list.map((colItem, colIdx) => (
+                                                                <View className="index_coupon_main" key={`${colIdx}_${index}`}
+                                                                      onClick={() => this.onCouponColumnClick(colItem)} >
+                                                                    <Image src={this.getImage(colItem)} className="coupon_img" mode="widthFix" />
+                                                                </View>
+                                                            ))
+                                                        }
                                                     </View>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View className="index_fast_link_view fixed_padding" style={{
-                                            paddingBottom: "0px"
-                                        }}>
-                                                <View className="fast_order_link_wrap">
-                                                    <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
-                                                        <Image src={require("../../../source/pz.svg")} className="fast_img" />
-                                                        <Text className="h2">照片冲印</Text>
-                                                        <Text className="info">高清盐印冲印</Text>
-                                                    </View>
-                                                </View>
-                                                <View className="fast_order_link_wrap">
-                                                    <View className="fast_order_link" onClick={() => this.jumpToTemplate(2)}>
-                                                        <Image src={require("../../../source/az.svg")} className="fast_img" />
-                                                        <Text className="h2">手机壳定制</Text>
-                                                        <Text className="info">多种精美模板</Text>
-                                                    </View>
-                                                </View>
-                                                <View className="fast_order_link_wrap">
-                                                    <View className="fast_order_link" onClick={() => this.jumpToTemplate(3)}>
-                                                        <Image src={require("../../../source/iall.svg")} className="fast_img" />
-                                                        <Text className="h2">更多定制</Text>
-                                                        <Text className="info">各种惊喜不断</Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                    </Fragment>
-                                    : item.area_type === "ad"
-                                    ? <View className="index_spacial_column fix_all_margin" key={`${item.area_type}_${index}`}>
-                                        {
-                                            list.map((colItem, colIdx) => (
-                                                <View className="index_coupon_main" key={`${colIdx}_${index}`}
-                                                      onClick={() => this.onCouponColumnClick(colItem)} >
-                                                    <Image src={this.getImage(colItem)} className="coupon_img" mode="widthFix" />
-                                                </View>
-                                            ))
-                                        }
-                                    </View>
-                                    : item.area_type === "title"
-                                    ? <View className="remmond_your_love fix_all_margin">
-                                        {item.clist[0].thumb_image
-                                            ? <Image src={item.clist[0].thumb_image} className="love" />
-                                            : <Text className="txt">{item.clist[0].title}</Text>}
-                                    </View>
-                                    : item.area_type === "banner"
-                                    ? <View className="index_banner_container fix_all_margin" key={`${index}`}>
-                                        <BannerSwiper banners={item.clist} onItemClick={this.onBannerClick} />
-                                    </View>
-                                    : null
+                                                    : item.area_type === "title"
+                                                        ? <View className="remmond_your_love fix_all_margin">
+                                                            {item.clist[0].thumb_image
+                                                                ? <Image src={item.clist[0].thumb_image} className="love" />
+                                                                : <Text className="txt">{item.clist[0].title}</Text>}
+                                                        </View>
+                                                        : item.area_type === "banner"
+                                                            ? <View className="index_banner_container fix_all_margin" key={`${index}`}>
+                                                                <BannerSwiper banners={item.clist} onItemClick={this.onBannerClick} />
+                                                            </View>
+                                                            : item.area_type === "search" && item.display !== "top"
+                                                                ? <View className='top-search' key={index.toString()}
+                                                                        style={{
+                                                                            background: "transparent",
+                                                                            position: "relative",
+                                                                            marginTop: topFix.length === 0 ? "20px" : 0,
+                                                                            padding: "0 16px"
+                                                                        }}
+                                                                >
+                                                                    <View className='search-box'
+                                                                          style={{
+                                                                              height: 76 / 2 + "px",
+                                                                              background: "#fff"
+                                                                          }}
+                                                                          onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/search/index")})}>
+                                                                        <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
+                                                                        <Text className='placeholders'>搜索海量模板</Text>
+                                                                    </View>
+                                                                </View>
+                                                                : null
                             })
                         }
                     </View>
