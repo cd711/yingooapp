@@ -8,7 +8,7 @@ import './app.less'
 import {api, getUserInfo, options} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {delCookie, jsApiList, setCookie, shareInfo, updateChannelCode} from "./utils/common";
+import {jsApiList, shareInfo, updateChannelCode} from "./utils/common";
 import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -182,29 +182,31 @@ class App extends Component {
 
         const {channel} = params;
 
-        if (process.env.TARO_ENV === "h5") {
-            const path = window.location.pathname;
-            if (path === "/") {
-                // 直接清除cookie，不需要渠道商
-                delCookie("channel");
-                options.channel = "";
-            } else {
-                if (channel) {
-                    options.channel = channel;
-                    setCookie("channel", channel)
-                }
-            }
+        // if (process.env.TARO_ENV === "h5") {
+        //     const path = window.location.pathname;
+        //     if (path === "/") {
+        //         // 直接清除cookie，不需要渠道商
+        //         delCookie("channel");
+        //         options.channel = "";
+        //     } else {
+        //         if (channel) {
+        //             options.channel = channel;
+        //             setCookie("channel", channel)
+        //         }
+        //     }
+        // } else {
+        //
+        // }
+
+        if (channel) {
+            options.channel = channel;
         } else {
-            if (channel) {
-                options.channel = channel;
-            } else {
+            // @ts-ignore
+            if (params.query && params.query.channel) {
                 // @ts-ignore
-                if (params.query && params.query.channel) {
-                    // @ts-ignore
-                    options.channel = params.query.channel;
-                } else {
-                    options.channel = ""
-                }
+                options.channel = params.query.channel;
+            } else {
+                options.channel = ""
             }
         }
     }

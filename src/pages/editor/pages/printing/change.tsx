@@ -531,10 +531,23 @@ const PrintChange: Taro.FC<any> = () => {
         debounceUpdateCount(idx, Number(num))
     }
 
-    const onDeleteImg = idx => {
+    const onDeleteImg = async idx => {
         const arr = [...photos];
         arr.splice(idx, 1);
         setPhotos([...arr])
+
+        const photo = [...photoStore.photoProcessParams.photo.path];
+        photo.splice(idx, 1)
+        try {
+            await photoStore.updateServerParams(photoStore.printKey, {
+                photo: {
+                    ...photoStore.photoProcessParams.photo,
+                    path: photo
+                }
+            })
+        } catch (e) {
+            console.log("更新数量出错：", e)
+        }
     }
 
     function setCount(_, id) {

@@ -115,8 +115,7 @@ class Index extends Component<any, IndexState> {
         })
     }
 
-    getIndexList = async () => {
-
+    checkUserReceiveCoupon = async () => {
         let cIds = {};
 
         if (userStore.isLogin) {
@@ -137,12 +136,11 @@ class Index extends Component<any, IndexState> {
             console.log(e)
         }
         try {
-            const res = await this.getIndexBlocks()
-            this.setState({data: [...res]});
+            const {data} = this.state;
             const popArr = [];
-            const tempArr = res ? res.filter(v => v.area_type === "popup") : [];
+            const tempArr = data.filter(v => v.area_type === "popup");
 
-            const idx = res ? res.findIndex(v => v.area_type === "column") : -1;
+            const idx = data.findIndex(v => v.area_type === "column");
             if (idx > -1) {
                 this.getCateInfo()
             }
@@ -218,8 +216,22 @@ class Index extends Component<any, IndexState> {
             }
 
         } catch (e) {
-            console.log("首页获取列表出错：", e)
+            console.log("检查用户已领取的优惠券出错：", e)
         }
+    }
+
+    getIndexList = () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const res = await this.getIndexBlocks();
+                this.setState({data: [...res]}, () => {
+                    resolve()
+                });
+            } catch (e) {
+                console.log("获取首页列表出错：", e)
+                reject(e)
+            }
+        })
     }
 
     componentDidMount() {
@@ -230,7 +242,9 @@ class Index extends Component<any, IndexState> {
                 centerPartyHeight: deviceInfo.windowHeight
             });
         }
-        this.getIndexList();
+        this.getIndexList().then(() => {
+            this.checkUserReceiveCoupon()
+        });
 
     }
     componentDidShow() {
