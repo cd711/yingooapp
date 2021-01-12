@@ -429,17 +429,48 @@ export default class OrderDetail extends Component<{},{
                         </View>
                     </View>
                 </View>
+                {
+                    data && data.express_no && data.express_no != null ? <View className='logistics'>
+                        <View className="l_container">
+                            <View className='left'>
+                                <View className='name'>
+                                    <Text className='txt'>快递单号：</Text>
+                                </View>
+                                <View className='note_num'>
+                                    <Text className='txt'>{data.express_no}</Text>
+                                </View>
+                            </View>
+                            <Button className='copy_btn' onClick={()=>{
+                                if (deviceInfo.env == 'h5') {
+                                    copy(data.order_sn);
+                                    Taro.showToast({
+                                        title:"复制成功",
+                                        icon:'none',
+                                        duration:1000
+                                    })
+                                } else {
+                                    Taro.setClipboardData({data:data.order_sn})
+                                }
+                            }}>复制运单号</Button>
+                        </View>
+                    </View>:null
+                }
+                
                 <View className='order-plist'>
                     <View className='box'>
                         <View className='order-num'>
                             <Text className='txt'>订单编号：{data.order_sn}</Text>
                             <View onClick={()=>{
-                                copy(data.order_sn);
-                                Taro.showToast({
-                                    title:"复制成功",
-                                    icon:'none',
-                                    duration:1000
-                                })
+                                if (deviceInfo.env == 'h5') {
+                                    copy(data.order_sn);
+                                    Taro.showToast({
+                                        title:"复制成功",
+                                        icon:'none',
+                                        duration:1000
+                                    })
+                                } else {
+                                    Taro.setClipboardData({data:data.order_sn})
+                                }
                             }}><IconFont name='20_fuzhi' size={40} color='#9C9DA6' /></View>
                         </View>
                         <Text className='order-time'>下单时间：{dayjs.unix(data.create_time).format("YYYY-MM-DD HH:mm:ss")}</Text>
