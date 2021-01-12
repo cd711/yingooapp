@@ -29,7 +29,9 @@ export default class OrderDetail extends Component<{},{
     navBarChange:boolean,
     showServiceModal:boolean,
     showCancelModal:boolean,
-    centerPartyHeight:number
+    centerPartyHeight:number;
+    showDeleteModal:boolean;
+    showConfimModal:boolean
 }> {
 
     config: Config = {
@@ -47,9 +49,13 @@ export default class OrderDetail extends Component<{},{
             navBarChange:false,
             showServiceModal:false,
             showCancelModal:false,
-            centerPartyHeight:500
+            centerPartyHeight:500,
+            showDeleteModal:false,
+            showConfimModal:false
         }
     }
+    private delTipModalOkCallBack: () => void = undefined;
+    private confimTipModalOkCallBack:()=>void = undefined;
     componentDidMount(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
@@ -198,28 +204,40 @@ export default class OrderDetail extends Component<{},{
         })
     }
     onDelOrder = (id) => {
-        Taro.showLoading({title:"处理中"})
-        api("app.order/del",{
-            id
-        }).then(()=>{
-            Taro.hideLoading();
-            setTimeout(() => {
-                Taro.navigateBack();
-            }, 2000);
-            Taro.showToast({
-                title:'删除成功',
-                icon:'none',
-                duration:2000
-            });
-
-        }).catch(()=>{
-            Taro.hideLoading();
-            Taro.showToast({
-                title:'服务器开小差了，稍后再试',
-                icon:'none',
-                duration:2000
-            });
+        this.delTipModalOkCallBack = () => {
+            Taro.showLoading({title:"处理中"})
+            api("app.order/del",{
+                id
+            }).then(()=>{
+                this.setState({
+                    showDeleteModal:false
+                })
+                Taro.hideLoading();
+                setTimeout(() => {
+                    Taro.navigateBack();
+                }, 2000);
+                Taro.showToast({
+                    title:'删除成功',
+                    icon:'none',
+                    duration:2000
+                });
+    
+            }).catch(()=>{
+                this.setState({
+                    showDeleteModal:false
+                })
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:'服务器开小差了，稍后再试',
+                    icon:'none',
+                    duration:2000
+                });
+            })
+        }
+        this.setState({
+            showDeleteModal:true
         })
+
     }
     onResult = (res) => {
         if (res.code == 1) {
@@ -243,19 +261,32 @@ export default class OrderDetail extends Component<{},{
         })
     }
     onReceviceOrder = (id) => {
-        api('app.order/receive',{
-            id
-        }).then(()=>{
-            Taro.hideLoading();
-            // this.getList(this.state.switchTabActive)
-        }).catch(()=>{
-            Taro.hideLoading();
-            Taro.showToast({
-                title:'服务器开小差了，稍后再试',
-                icon:'none',
-                duration:2000
-            });
+        this.confimTipModalOkCallBack = () => {
+            Taro.showLoading({title:"处理中..."});
+            api('app.order/receive',{
+                id
+            }).then(()=>{
+                this.setState({
+                    showConfimModal:false
+                })
+                Taro.hideLoading();
+                // this.getList(this.state.switchTabActive)
+            }).catch(()=>{
+                this.setState({
+                    showConfimModal:false
+                })
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:'服务器开小差了，稍后再试',
+                    icon:'none',
+                    duration:2000
+                });
+            })
+        }
+        this.setState({
+            showConfimModal:true
         })
+
     }
     onServiceModalShow = () => {
         this.setState({
@@ -263,7 +294,7 @@ export default class OrderDetail extends Component<{},{
         })
     }
     render() {
-        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal,showCancelModal,centerPartyHeight } = this.state;
+        const { data,hours,minutes,seconds,showPayWayModal,navBarChange,showServiceModal,showCancelModal,centerPartyHeight,showDeleteModal,showConfimModal } = this.state;
         const state = data.state_tip?data.state_tip.value:0;
         const afterState = data.after_sale_status_tip?data.after_sale_status_tip.value:0;
         let status = data.state_tip?data.state_tip.text:"";
@@ -510,6 +541,16 @@ export default class OrderDetail extends Component<{},{
                     }} onOK={()=>{
                         this.handleCancel();
                     }} />
+                <TipModal isShow={showDeleteModal} tip="是否要删除订单" cancelText="不删除" okText="删除" onCancel={()=>{
+                    this.setState({
+                        showDeleteModal:false
+                    });
+                }} onOK={this.delTipModalOkCallBack} />
+                <TipModal isShow={showConfimModal} tip="确认收到该商品？" cancelText="没收到" okText="收到" onCancel={()=>{
+                    this.setState({
+                        showConfimModal:false
+                    });
+                }} onOK={this.confimTipModalOkCallBack} />
             </View>
         )
     }
