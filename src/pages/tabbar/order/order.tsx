@@ -37,7 +37,9 @@ export default class Order extends Component<any,{
     order_sn:string;
     orderId:number;
     showCancelModal:boolean;
-    centerPartyHeight:number
+    centerPartyHeight:number;
+    showDeleteModal:boolean;
+    showConfimModal:boolean
 }> {
 
     config: Config = {
@@ -60,10 +62,12 @@ export default class Order extends Component<any,{
             order_sn:"",
             orderId:0,
             showCancelModal:false,
-            centerPartyHeight:500
+            centerPartyHeight:500,
+            showDeleteModal:false,
+            showConfimModal:false
         }
     }
-
+    private delTipModalOkCallBack: () => void = undefined;
     componentDidShow(){
 
         updateTabBarChannelCode("/pages/tabbar/order/order")
@@ -188,34 +192,59 @@ export default class Order extends Component<any,{
         this.cancelId = 0;
     }
     onDelOrder = (id) => {
-        Taro.showLoading({title:"处理中"})
-        api("app.order/del",{
-            id
-        }).then(()=>{
-            Taro.hideLoading();
-            this.getList(this.state.switchTabActive)
-        }).catch(()=>{
-            Taro.hideLoading();
-            Taro.showToast({
-                title:'服务器开小差了，稍后再试',
-                icon:'none',
-                duration:2000
-            });
+        this.delTipModalOkCallBack = () => {
+            Taro.showLoading({title:"处理中"})
+            api("app.order/del",{
+                id
+            }).then(()=>{
+                Taro.hideLoading();
+                this.getList(this.state.switchTabActive);
+                this.setState({
+                    showDeleteModal:false
+                })
+            }).catch(()=>{
+                this.setState({
+                    showDeleteModal:false
+                })
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:'服务器开小差了，稍后再试',
+                    icon:'none',
+                    duration:2000
+                });
+            })
+        }
+        this.setState({
+            showDeleteModal:true
         })
+
     }
+    private confimTipModalOkCallBack:()=>void = undefined;
     onReceviceOrder = (id) => {
-        api('app.order/receive',{
-            id
-        }).then(()=>{
-            Taro.hideLoading();
-            this.getList(this.state.switchTabActive)
-        }).catch(()=>{
-            Taro.hideLoading();
-            Taro.showToast({
-                title:'服务器开小差了，稍后再试',
-                icon:'none',
-                duration:2000
-            });
+        this.confimTipModalOkCallBack = () => {
+            Taro.showLoading({title:"处理中..."});
+            api('app.order/receive',{
+                id
+            }).then(()=>{
+                this.setState({
+                    showConfimModal:false
+                })
+                Taro.hideLoading();
+                this.getList(this.state.switchTabActive);
+            }).catch(()=>{
+                this.setState({
+                    showConfimModal:false
+                })
+                Taro.hideLoading();
+                Taro.showToast({
+                    title:'服务器开小差了，稍后再试',
+                    icon:'none',
+                    duration:2000
+                });
+            })
+        }
+        this.setState({
+            showConfimModal:true
         })
     }
     onResult = (res) => {
@@ -242,7 +271,7 @@ export default class Order extends Component<any,{
         }, 1500);
     }
     render() {
-        const {switchTabActive,data,showPayWayModal,order_price,order_sn,showCancelModal,centerPartyHeight} = this.state;
+        const {switchTabActive,data,showPayWayModal,order_price,order_sn,showCancelModal,centerPartyHeight,showDeleteModal,showConfimModal} = this.state;
         const list = data && data.list && data.list.length>0 ? data.list:[];
 
         return (
@@ -468,6 +497,16 @@ export default class Order extends Component<any,{
                 }} onOK={()=>{
                     this.handleCancel();
                 }} />
+                <TipModal isShow={showDeleteModal} tip="是否要删除订单" cancelText="不删除" okText="删除" onCancel={()=>{
+                    this.setState({
+                        showDeleteModal:false
+                    });
+                }} onOK={this.delTipModalOkCallBack} />
+                <TipModal isShow={showConfimModal} tip="确认收到该商品？" cancelText="没收到" okText="收到" onCancel={()=>{
+                    this.setState({
+                        showConfimModal:false
+                    });
+                }} onOK={this.confimTipModalOkCallBack} />
             </View>
         )
     }
