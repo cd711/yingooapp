@@ -11,8 +11,10 @@ import {
     notNull,
     ossUrl,
     setTempDataContainer,
+    shareInfo,
     sleep, updateChannelCode,
-    urlEncode
+    urlEncode,
+    isEmptyX
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -122,6 +124,44 @@ export default class Login extends Component<{}, {
             this.setState({
                 showOkButton: true
             });
+        }
+    }
+    onShareAppMessage(){
+        const {data} = this.state;
+        if (data && data.id) {
+            const {id, coupon, rid} = this.$router.params;
+            let uri = "/pages/order/pages/product/detail?"
+            if (!isEmptyX(id)) {
+                uri = `${uri}id=${id}`
+            } else {
+                uri = `${uri}id=${data.id}`
+            }
+            if (!isEmptyX(coupon)) {
+                uri = `${uri}&coupon=${coupon}`
+            }
+            if (!isEmptyX(rid)) {
+                uri = `${uri}&rid=${rid}`
+            }
+            const share = {
+                title:data.title || data.description,
+                path:updateChannelCode(uri),
+                imageUrl:""
+            }
+            if (!isEmptyX(data.share_title)) {
+                share.title = data.share_title;
+            }
+            if (!isEmptyX(data.share_path)) {
+                share.path = data.share_path;
+            }
+            if (!isEmptyX(data.share_image)) {
+                share.imageUrl = data.share_image;
+            }
+            return share
+        }
+        return {
+            title: shareInfo.title,
+            path: shareInfo.link,
+            imageUrl: shareInfo.imgUrl
         }
     }
     componentDidMount() {
