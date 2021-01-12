@@ -455,6 +455,7 @@ export default class Confirm extends Component<any, {
         Taro.getApp().tab = 1;
         let url = '/pages/tabbar/order/order?tab=1';
         console.log("支付订单号码:",res.data)
+
         switch (res.code) {
             case 1:
                 title = '支付成功';
@@ -490,7 +491,6 @@ export default class Confirm extends Component<any, {
                     url: updateChannelCode(url)
                 })
             }
-
         }, 2000);
     }
     onGoodsItemClick = (item, usedTickets) => {
