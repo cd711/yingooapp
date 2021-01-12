@@ -234,6 +234,7 @@ class Index extends Component<any, IndexState> {
 
     }
     componentDidShow() {
+        
         if (userStore.isLogin) {
             setTempDataContainer("product_preview_sku", null);
         }

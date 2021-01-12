@@ -176,7 +176,9 @@ class App extends Component {
             ]
         }
     }
-
+    componentDidShow() {
+        
+    }
     componentDidMount() {
         const params = this.$router.params;
 

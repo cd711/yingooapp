@@ -39,7 +39,6 @@ export default class Success extends Component<{},{
             window.history.pushState(null,'支付结果',url);
         }
         if (userStore.isLogin) {
-                    // Taro.showLoading({title:"查询订单状态"});
             const {pay_order_sn,status} = this.$router.params;
             if (status && pay_order_sn) {
                 const s = Base64.decode(status);
@@ -48,17 +47,18 @@ export default class Success extends Component<{},{
                     if (t.length == 2) {
                         if (parseInt(t[1]+"")==0) {
                             this.setState({
-                                state:true
+                                state:true,
+                                price:"0.00"
                             });
                             return
                         }
-                        Taro.showLoading({title:'加载中...'})
-                        this.getOrderStatus(pay_order_sn);
-                        this.setState({
-                            state:true
-                        })
                     }
                 }
+                Taro.showLoading({title:'正在查询订单支付状态'})
+                this.getOrderStatus(pay_order_sn);
+                this.setState({
+                    state:true
+                })
             }
             setTimeout(() => {
                 if (pay_order_sn) {
@@ -80,30 +80,30 @@ export default class Success extends Component<{},{
         api("app.pay/payStatus",{
             pay_order_sn,
         }).then((res)=>{
-            if (parseInt(res.status+"")>=1) {
+            setTimeout(() => {
                 Taro.hideLoading();
-                this.setState({
-                    way:res.pay_type,
-                    price:res.pay_price,
-                    state:true
-                });
-                
-            }else{
-                if (this.request<=1) {
-                    setTimeout(() => {
-                        this.getOrderStatus(pay_order_sn);
-                        this.request += 1;
-                    }, 1000);
+                if (parseInt(res.status+"")>=1) {
+                    this.setState({
+                        way:res.pay_type,
+                        price:res.pay_price,
+                        state:true
+                    });
                 }else{
-                    if (deviceInfo.env == "h5") {
-                        window.location.href = '/pages/tabbar/order/order'
-                    } else {
-                        Taro.switchTab({
-                            url:'/pages/tabbar/order/order'
-                        })
+                    if (this.request<=1) {
+                        setTimeout(() => {
+                            this.getOrderStatus(pay_order_sn);
+                            this.request += 1;
+                        }, 1000);
+                    }else{
+                        Taro.showToast({
+                            title:"订单",
+                            icon:"none",
+                            duration:2000
+                        });
+                        jumpUri('/pages/tabbar/order/order',true)
                     }
                 }
-            }
+            }, 800);
         }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
