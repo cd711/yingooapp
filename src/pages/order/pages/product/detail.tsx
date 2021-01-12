@@ -191,6 +191,9 @@ export default class Login extends Component<{}, {
                 id
             }).then((res) => {
                 Taro.hideLoading();
+                if (deviceInfo.env != "h5") {
+                    WxParse.wxParse('article', 'html', res.content, this.$scope, 0);
+                }
                 this.modalInit = true;
                 res.attrGroup = res.attrGroup.filter((item,index) => {
                     if (item.special_show == "photonumber") {
@@ -266,9 +269,7 @@ export default class Login extends Component<{}, {
                     }
 
                 }
-                if (deviceInfo.env != "h5") {
-                    WxParse.wxParse('article', 'html', res.content, this.$scope, 0);
-                }
+
             }).catch((e) => {
                 console.log(e);
                 Taro.hideLoading();
