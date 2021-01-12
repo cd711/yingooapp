@@ -782,6 +782,11 @@ export function formatPrice(price:string,is:boolean) {
     }
 }
 
+/**
+ * 更新TabBar的ChannelCode， 仅h5可用
+ * @param path {string} 跳转路径
+ * @param code {string} channelCode， 默认为空, 可手动传入
+ */
 export function updateTabBarChannelCode(path: string, code: string = "") {
     if (notNull(path)) {
         if (process.env.NODE_ENV !== 'production') {
@@ -821,6 +826,11 @@ export function updateTabBarChannelCode(path: string, code: string = "") {
     }
 }
 
+/**
+ * 更新跳转地址，把channelCode更新到地址栏上去
+ * @param path {string} 跳转路径
+ * @param code {string} channelCode， 默认为空, 可手动传入
+ */
 export function updateChannelCode(path: string, code:string = "") {
     if (notNull(path)) {
         if (process.env.NODE_ENV !== 'production') {
@@ -846,7 +856,6 @@ export function updateChannelCode(path: string, code:string = "") {
         channelCode = code
     }
 
-    console.log(55555, barPath.indexOf(path) > -1)
     if (hasParams) {
         // 有参数
         // 有无渠道商code
