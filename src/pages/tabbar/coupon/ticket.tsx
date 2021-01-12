@@ -123,7 +123,6 @@ export default class Login extends Component<{}, {
             size: 8
         }).then((res) => {
             res.list = list.concat(res.list);
-            console.log("api", res.list)
             this.setState({
                 listLoading: res.total == res.list.length && res.list.length > 0,
                 loadStatus: res.total == res.list.length && res.list.length > 0 ? LoadMoreEnum.noMore : LoadMoreEnum.loading,

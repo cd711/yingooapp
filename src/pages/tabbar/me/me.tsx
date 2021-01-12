@@ -446,13 +446,13 @@ export default class Me extends Component<any, MeState> {
                 >
                     <View className='me_bg'/>
                     <View className='me_top'
-                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;transition: .8s background ease-out;background:#FFF;` : `position: fixed;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                            style={pageScrollShowTop ? `position: fixed;top:0;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;transition: .1s background ease-out;background:#FFF;` : `position: fixed;padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
                             {
                                 deviceInfo.env != "h5" ?<View className='left' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
                                     <IconFont name='24_shezhi' size={48} color='#121314'/>
                                 </View>:null
                             }
-                            <Text className='me_txt' style={pageScrollShowTop ?`opacity: 1;transition: .8s opacity ease-out;`:"opacity: 0;"}>我的</Text>
+                            <Text className='me_txt' style={pageScrollShowTop ?`opacity: 1;transition: .1s opacity ease-out;`:"opacity: 0;"}>我的</Text>
                             {
                                 deviceInfo.env == "h5" ?<View className='right' onClick={() => this.jumpTo('/pages/me/pages/me/setting')}>
                                     <IconFont name='24_shezhi' size={48} color='#121314'/>
