@@ -8,6 +8,7 @@ import WarmIcon from '../../../../components/icon/WarmIcon';
 import { api } from '../../../../utils/net';
 import { Base64 } from 'js-base64';
 import { deviceInfo, fixStatusBarHeight,jumpUri } from '../../../../utils/common';
+import { userStore } from '../../../../store/user';
 
 
 @inject("templateStore")
@@ -31,43 +32,48 @@ export default class Success extends Component<{},{
     }
 
     componentDidMount() {
-        console.log();
-
         if (deviceInfo.env == 'h5') {
             const url = window.location.href;
             window.history.pushState(null,null,'/pages/tabbar/me/me');
             window.history.pushState(null,null,'/pages/tabbar/order/order?tab=0');
             window.history.pushState(null,'支付结果',url);
         }
-        // Taro.showLoading({title:"查询订单状态"});
-        const {pay_order_sn,status} = this.$router.params;
-        if (status && pay_order_sn) {
-            const s = Base64.decode(status);
-            console.log(s)
-            if (s && s.length && s.length>0) {
-                const t = s.split("-");
-                
-                if (t.length == 2) {
-                    if (parseInt(t[1]+"")==0) {
+        if (userStore.isLogin) {
+                    // Taro.showLoading({title:"查询订单状态"});
+            const {pay_order_sn,status} = this.$router.params;
+            if (status && pay_order_sn) {
+                const s = Base64.decode(status);
+                if (s && s.length && s.length>0) {
+                    const t = s.split("-");
+                    if (t.length == 2) {
+                        if (parseInt(t[1]+"")==0) {
+                            this.setState({
+                                state:true
+                            });
+                            return
+                        }
+                        Taro.showLoading({title:'加载中...'})
+                        this.getOrderStatus(pay_order_sn);
                         this.setState({
                             state:true
-                        });
-                        return
+                        })
                     }
-                    Taro.showLoading({title:'加载中...'})
-                    this.getOrderStatus(pay_order_sn);
-                    this.setState({
-                        state:true
-                    })
                 }
             }
-        }
-        setTimeout(() => {
-            if (pay_order_sn) {
-                this.getOrderStatus(pay_order_sn);
+            setTimeout(() => {
+                if (pay_order_sn) {
+                    this.getOrderStatus(pay_order_sn);
+                }
+            }, 1500);
+        } else {
+            if (deviceInfo.env == "h5") {
+                window.location.href = '/pages/tabbar/index/index'
+            } else {
+                Taro.switchTab({
+                    url:'/pages/tabbar/index/index'
+                })
             }
-        }, 3000);
-
+        }
     }
     private request = 0;
     getOrderStatus = (pay_order_sn) => {
@@ -81,16 +87,21 @@ export default class Success extends Component<{},{
                     price:res.pay_price,
                     state:true
                 });
+                
             }else{
                 if (this.request<=1) {
                     setTimeout(() => {
                         this.getOrderStatus(pay_order_sn);
                         this.request += 1;
-                    }, 5000);
+                    }, 1000);
                 }else{
-                    // Taro.navigateTo({
-                    //     url:'/pages/tabbar/order/order?tab=1'
-                    // })
+                    if (deviceInfo.env == "h5") {
+                        window.location.href = '/pages/tabbar/order/order'
+                    } else {
+                        Taro.switchTab({
+                            url:'/pages/tabbar/order/order'
+                        })
+                    }
                 }
             }
         }).catch((e)=>{

@@ -112,6 +112,7 @@ export default class Order extends Component<any,{
             })
         }
         Taro.getApp().tab = -1;
+
     }
 
     componentWillUpdate(_, nextState) {
@@ -240,7 +241,7 @@ export default class Order extends Component<any,{
     render() {
         const {switchTabActive,data,showPayWayModal,order_price,order_sn,showCancelModal,centerPartyHeight} = this.state;
         const list = data && data.list && data.list.length>0 ? data.list:[];
-        //
+
         return (
             <View className='order'>
                 <LoginModal isTabbar />

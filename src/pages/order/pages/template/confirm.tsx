@@ -458,7 +458,7 @@ export default class Confirm extends Component<any, {
         switch (res.code) {
             case 1:
                 title = '支付成功';
-                url = deviceInfo.env == 'h5' ? `/pages/order/pages/template/success?way=${res.way}&price=${res.total}` : `/pages/order/pages/template/success?status=${Base64.encodeURI(res.data + "-" + "0")}&pay_order_sn=${res.data}`;
+                url = deviceInfo.env == 'h5' ? `/pages/order/pages/template/success?pay_order_sn=${res.data}` : `/pages/order/pages/template/success?status=${Base64.encodeURI(res.data + "-" + "0")}&pay_order_sn=${res.data}`;
                 break;
             case 2:
                 url = '/pages/tabbar/order/order?tab=1';
