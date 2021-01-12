@@ -6,6 +6,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import { observer, inject } from '@tarojs/mobx';
 import { fixStatusBarHeight } from '../../utils/common';
+import {userStore} from "../../store/user";
 
 @inject("userStore")
 @observer
@@ -40,7 +41,7 @@ export default class Set extends Component<any,{
                 newpassword:again
             }).then((res)=>{
                 console.log(res);
-                // userStore.getUserInfo();
+                userStore.getUserInfo();
                 Taro.hideLoading();
                 Taro.showToast({
                     title:"密码设置成功",

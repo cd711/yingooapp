@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
-import { fixStatusBarHeight } from '../../../../utils/common';
+import {fixStatusBarHeight, updateChannelCode} from '../../../../utils/common';
 
 @inject("userStore")
 @observer
@@ -59,7 +59,7 @@ export default class Setting extends Component<any,{
                     <View className='item' onClick={()=>{
                         if (mobile.length!=11) {
                             Taro.navigateTo({
-                                url:`/pages/login/mobile`
+                                url: updateChannelCode(`/pages/login/mobile`)
                             })
                         }
                     }}>
@@ -82,7 +82,7 @@ export default class Setting extends Component<any,{
                                 return;
                             }
                             Taro.navigateTo({
-                                url:'/pages/login/set'
+                                url: updateChannelCode('/pages/login/set')
                             })
                         }}>
                         <Text className='name'>密码</Text>

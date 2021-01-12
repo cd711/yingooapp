@@ -348,13 +348,13 @@ export function fixStatusBarHeight() {
 export function jumpToEditor(params: {[key: string] : any} = {}) {
     const paramsStr = getURLParamsStr(urlEncode(params));
     Taro.navigateTo({
-        url: deviceInfo.env === "h5" ? `/pages/editor/pages/shell?${paramsStr}` : `/pages/editor/pages/wxshell?${paramsStr}`
+        url: updateChannelCode(deviceInfo.env === "h5" ? `/pages/editor/pages/shell?${paramsStr}` : `/pages/editor/pages/wxshell?${paramsStr}`)
     })
 }
 export function jumpToPrintEditor(params: {[key: string] : any} = {}) {
     const paramsStr = getURLParamsStr(urlEncode(params));
     Taro.navigateTo({
-        url: deviceInfo.env === "h5" ? `/pages/editor/pages/printedit?${paramsStr}` : `/pages/editor/pages/wxprintedit?${paramsStr}`
+        url: updateChannelCode(deviceInfo.env === "h5" ? `/pages/editor/pages/printedit?${paramsStr}` : `/pages/editor/pages/wxprintedit?${paramsStr}`)
     })
 }
 
@@ -544,20 +544,20 @@ export function allowShowCoupon(parentId: string | number , couponId: string | n
 export function jumpUri(url:string,tabbar:boolean = false){
     if(deviceInfo.env == 'h5'){
         if (tabbar) {
-            window.location.href = url;
+            window.location.href = updateChannelCode(url);
         } else {
             Taro.navigateTo({
-                url
+                url: updateChannelCode(url)
             })
         }
     } else {
         if (tabbar) {
             Taro.switchTab({
-                url
+                url: updateChannelCode(url)
             })
         } else {
             Taro.navigateTo({
-                url
+                url: updateChannelCode(url)
             })
         }
 
@@ -571,12 +571,18 @@ export function photoGetItemStyle() {
     }
 }
 
+export const shareInfo = {
+    title: "免费照片冲印个性化定制手机壳",
+    desc: "[有人@你]，送你一个创意定制品，快来免费领！",
+    link: `https://m.playbox.yingoo.com/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`,
+    imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
+}
 
 export function shareAppExtends() {
     return {
-        title: "免费照片冲印个性化定制手机壳",
+        title: shareInfo.title,
         path: "/pages/tabbar/index/index",
-        imageUrl: "https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m"
+        imageUrl: shareInfo.imgUrl
     }
     return () => {}
 }
@@ -654,7 +660,7 @@ export function jumpToPrivacy(type: 1 | 2) {
         case 2: p = "privacy"; break;
     }
     Taro.navigateTo({
-        url: `/pages/me/pages/me/privacy?pageType=${p}`
+        url: updateChannelCode(`/pages/me/pages/me/privacy?pageType=${p}`)
     })
 }
 
@@ -776,10 +782,101 @@ export function formatPrice(price:string,is:boolean) {
     }
 }
 
+/**
+ * 更新TabBar的ChannelCode， 仅h5可用
+ * @param path {string} 跳转路径
+ * @param code {string} channelCode， 默认为空, 可手动传入
+ */
+export function updateTabBarChannelCode(path: string, code: string = "") {
+    if (notNull(path)) {
+        if (process.env.NODE_ENV !== 'production') {
+            console.error("updateChannelCode方法没有传入地址")
+        }
+        return
+    }
 
-export const shareInfo = {
-    title: "免费照片冲印个性化定制手机壳",
-    desc: "[有人@你]，送你一个创意定制品，快来免费领！",
-    link: `https://m.playbox.yingoo.com/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`,
-    imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
+    if (process.env.TARO_ENV === "h5") {
+        let _path = path;
+        const hasParams = path.indexOf("?") > -1;
+
+        let channelCode = "";
+        if (options && options.channel) {
+            channelCode = options.channel
+        } else if (!notNull(code)) {
+            channelCode = code
+        }
+
+        if (hasParams) {
+            // 有参数
+            // 有无渠道商code
+            const hasCode = path.indexOf("channel") > -1;
+            if (!hasCode) {
+                if (!notNull(channelCode)) {
+                    _path = `${path}&channel=${channelCode}`
+                }
+            }
+        } else {
+            // 没有参数
+            if (!notNull(channelCode)) {
+                _path = `${path}?channel=${channelCode}`
+            }
+        }
+        console.log(_path)
+        window.history.pushState(null, null, _path)
+    }
+}
+
+/**
+ * 更新跳转地址，把channelCode更新到地址栏上去
+ * @param path {string} 跳转路径
+ * @param code {string} channelCode， 默认为空, 可手动传入
+ */
+export function updateChannelCode(path: string, code:string = "") {
+    if (notNull(path)) {
+        if (process.env.NODE_ENV !== 'production') {
+            console.error("updateChannelCode方法没有传入地址")
+        }
+        return
+    }
+    // 在h5下tabbar的路径要单独处理
+    const barPath = [
+        "/pages/tabbar/index/index",
+        "/pages/tabbar/me/me",
+        "/pages/tabbar/order/order",
+        "/pages/tabbar/coupon/ticket",
+        "/pages/tabbar/cart/index"
+    ];
+    let _path = path;
+    const hasParams = path.indexOf("?") > -1;
+
+    let channelCode = "";
+    if (options && options.channel) {
+        channelCode = options.channel
+    } else if (!notNull(code)) {
+        channelCode = code
+    }
+
+    if (hasParams) {
+        // 有参数
+        // 有无渠道商code
+        const hasCode = path.indexOf("channel") > -1;
+        if (!hasCode) {
+            if (!notNull(channelCode)) {
+                _path = `${path}&channel=${channelCode}`
+            }
+            if (process.env.TARO_ENV === "h5" && barPath.indexOf(path) > -1) {
+                window.history.pushState(null, null, _path)
+            }
+        }
+    } else {
+        // 没有参数
+        if (!notNull(channelCode)) {
+            _path = `${path}?channel=${channelCode}`
+        }
+        if (process.env.TARO_ENV === "h5" && barPath.indexOf(path) > -1) {
+            window.history.pushState(null, null, _path)
+        }
+    }
+
+    return _path;
 }

@@ -3,7 +3,7 @@ import { View, Text,Button } from '@tarojs/components'
 import FloatModal from '../floatModal/FloatModal';
 import { api } from '../../utils/net';
 import wx from 'weixin-js-sdk'
-import {deviceInfo, is_weixin,jsApiList} from '../../utils/common';
+import {deviceInfo, is_weixin, jsApiList, updateChannelCode} from '../../utils/common';
 import PayWay from './PayWay';
 import './PayWayModal.less';
 
@@ -102,7 +102,7 @@ const PayWayModal: Taro.FC<{
             });
             setTimeout(() => {
                 Taro.switchTab({
-                    url:'/pages/tabbar/order/order?tab=0'
+                    url: updateChannelCode('/pages/tabbar/order/order?tab=0')
                 })
             }, 2000);
             return;
@@ -172,7 +172,7 @@ const PayWayModal: Taro.FC<{
                         });
                         setTimeout(() => {
                             Taro.switchTab({
-                                url:'/pages/tabbar/order/order?tab=0'
+                                url: updateChannelCode('/pages/tabbar/order/order?tab=0')
                             })
                         }, 2000);
                     });
@@ -186,7 +186,7 @@ const PayWayModal: Taro.FC<{
                     });
                     setTimeout(() => {
                         Taro.switchTab({
-                            url:'/pages/tabbar/order/order?tab=0'
+                            url: updateChannelCode('/pages/tabbar/order/order?tab=0')
                         })
                     }, 2000);
                 })

@@ -5,7 +5,7 @@ import './find.less'
 import IconFont from '../../components/iconfont';
 // import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import { fixStatusBarHeight,deviceInfo } from '../../utils/common';
+import {fixStatusBarHeight, deviceInfo, updateChannelCode} from '../../utils/common';
 import { api } from '../../utils/net';
 
 @inject("userStore")
@@ -98,7 +98,7 @@ export default class Set extends Component<any,{
             this.checkMobile(inputValue,(is)=>{
                 if (is) {
                     Taro.navigateTo({
-                        url:`/pages/login/sms?mobile=${inputValue}&status=f`
+                        url: updateChannelCode(`/pages/login/sms?mobile=${inputValue}&status=f`)
                     })
                 } else {
                     Taro.showToast({

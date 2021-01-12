@@ -9,7 +9,7 @@ import {
     getUserKey,
     jumpToPrintEditor,
     notNull, shareAppExtends,
-    sleep,
+    sleep, updateChannelCode,
     urlEncode
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
@@ -201,7 +201,7 @@ const Index: Taro.FC<any> = () => {
             // 否则 --> 进入照片冲印列表页面
             const str = getURLParamsStr(urlEncode(obj));
             Taro.navigateTo({
-                url: `/pages/editor/pages/printing/change?${str}`
+                url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
             })
         } else {
             setPhotoPickerVisible(true);

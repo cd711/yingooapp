@@ -1,14 +1,14 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { Provider } from '@tarojs/mobx'
+import Taro, {Component, Config} from '@tarojs/taro'
+import {Provider} from '@tarojs/mobx'
 import Index from './pages/tabbar/index'
 import {userStore} from './store/user'
 import {templateStore} from './store/template'
 import 'taro-ui/dist/style/index.scss'
 import './app.less'
-import {options, getUserInfo, api} from './utils/net';
+import {api, getUserInfo, options} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {delCookie, jsApiList, setCookie, shareInfo} from "./utils/common";
+import {delCookie, jsApiList, setCookie, shareInfo, updateChannelCode} from "./utils/common";
 import wx from 'weixin-js-sdk'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -176,13 +176,11 @@ class App extends Component {
             ]
         }
     }
+
     componentDidShow() {
-        
-    }
-    componentDidMount() {
         const params = this.$router.params;
 
-        const {code,state,channel} = params;
+        const {channel} = params;
 
         if (process.env.TARO_ENV === "h5") {
             const path = window.location.pathname;
@@ -209,6 +207,13 @@ class App extends Component {
                 }
             }
         }
+    }
+
+    componentDidMount() {
+
+        const params = this.$router.params;
+
+        const {code, state} = params;
 
         if (!userStore.isLogin) {
             const info = getUserInfo();
@@ -216,8 +221,8 @@ class App extends Component {
                 userStore.setInfo(info);
             }
         }
-        if (process.env.TARO_ENV === 'h5' && code && code.length>5 && state == "login" && !userStore.isLogin) {
-            Taro.showLoading({title:"登录中..."});
+        if (process.env.TARO_ENV === 'h5' && code && code.length > 5 && state == "login" && !userStore.isLogin) {
+            Taro.showLoading({title: "登录中..."});
             let exportUrl = window.location.href.split("?")[0] + (Object.keys(params).length > 0 ? "?" : "");
             Object.keys(params).map((key) => {
                 if (key != "code" && key != "state") {
@@ -225,34 +230,34 @@ class App extends Component {
                 }
             })
             exportUrl = exportUrl[exportUrl.length - 1] === '&' ? exportUrl.substring(0, exportUrl.length - 1) : exportUrl;
-            window.history.replaceState(null, null, exportUrl)
+            window.history.replaceState(null, null, updateChannelCode(exportUrl))
             Xm.login({
                 code
-            }).then(()=>{
+            }).then(() => {
                 setTimeout(() => {
                     Taro.hideLoading();
                     Taro.showToast({
-                        title:"登录成功",
-                        icon:'none',
-                        duration:1500
+                        title: "登录成功",
+                        icon: 'none',
+                        duration: 1500
                     });
                 }, 1200);
-            }).catch((e)=>{
+            }).catch((e) => {
                 setTimeout(() => {
                     Taro.hideLoading();
                     Taro.showToast({
-                        title:e,
-                        icon:'none',
-                        duration:1500
+                        title: e,
+                        icon: 'none',
+                        duration: 1500
                     });
                 }, 1500);
             })
         }
 
         if (process.env.TARO_ENV === 'h5') {
-            api("wechat/jssdkconfig",{
+            api("wechat/jssdkconfig", {
                 url: window.location.href
-            }).then((res)=>{
+            }).then((res) => {
                 const {title, desc, link, imgUrl} = shareInfo;
                 if (process.env.TARO_ENV === 'h5') {
                     wx.config({
@@ -329,7 +334,7 @@ class App extends Component {
                     })
                 }
 
-            }).catch((e)=>{
+            }).catch((e) => {
                 console.log("分享出错：", e)
 
             })
@@ -337,16 +342,15 @@ class App extends Component {
     }
 
 
-
     // 在 App 类中的 render() 函数没有实际作用
     // 请勿修改此函数
     render() {
         return (
             <Provider store={store}>
-                <Index />
+                <Index/>
             </Provider>
         )
     }
 }
 
-Taro.render(<App />, document.getElementById('app'))
+Taro.render(<App/>, document.getElementById('app'))

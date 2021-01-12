@@ -4,7 +4,15 @@ import './detail.less';
 import IconFont from '../../../../components/iconfont';
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx';
-import {deviceInfo, fixStatusBarHeight, jumpToEditor, notNull, ossUrl, setTempDataContainer} from '../../../../utils/common'
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    jumpToEditor,
+    notNull,
+    ossUrl,
+    setTempDataContainer,
+    updateChannelCode
+} from '../../../../utils/common'
 
 import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from '../../../../store/user';
@@ -178,9 +186,9 @@ export default class Detail extends Component<{}, {
             Taro.navigateBack();
         } else {
             if (process.env.TARO_ENV == "h5") {
-                window.location.href = "/";
+                window.location.href = updateChannelCode("/pages/tabbar/index/index");
             } else {
-                Taro.switchTab({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
             }
         }
     }

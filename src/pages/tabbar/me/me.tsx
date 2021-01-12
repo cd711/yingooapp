@@ -6,7 +6,18 @@ import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../../components/empty";
 import {api} from '../../../utils/net';
-import {deviceInfo, fixStatusBarHeight, getImageSize, ListModel, notNull, ossUrl,urlEncode,getURLParamsStr,setTempDataContainer} from '../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    getImageSize,
+    ListModel,
+    notNull,
+    ossUrl,
+    urlEncode,
+    getURLParamsStr,
+    setTempDataContainer,
+    updateChannelCode, updateTabBarChannelCode
+} from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import dayjs from "dayjs";
@@ -199,6 +210,18 @@ export default class Me extends Component<any, MeState> {
         }
     }
 
+    componentDidShow(){
+        updateTabBarChannelCode("/pages/tabbar/me/me")
+        if (userStore.isLogin) {
+            setTempDataContainer("product_preview_sku",null);
+        }
+        observe(userStore,"id",(change)=>{
+            if (change.newValue != change.oldValue && parseInt(change.newValue+"")>0) {
+                setTempDataContainer("product_preview_sku",null);
+            }
+        })
+    }
+
     componentDidMount() {
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue && userStore.isLogin) {
@@ -361,14 +384,14 @@ export default class Me extends Component<any, MeState> {
             self: "t"
         }))
         Taro.navigateTo({
-            url: `/pages/order/pages/template/preview?${str}`
+            url: updateChannelCode(`/pages/order/pages/template/preview?${str}`)
         })
     }
 
     jumpTo = (path: string) => {
         if (userStore.isLogin) {
             userStore.showLoginModal = false;
-            Taro.navigateTo({url: path})
+            Taro.navigateTo({url: updateChannelCode(path)})
         } else {
             userStore.showLoginModal = true;
         }
@@ -395,17 +418,7 @@ export default class Me extends Component<any, MeState> {
             onClick: this.confirmDelete,
         }
     ];
-    componentDidShow(){
-        if (userStore.isLogin) {
-            setTempDataContainer("product_preview_sku",null);
-        }
-        observe(userStore,"id",(change)=>{
-            if (change.newValue != change.oldValue && parseInt(change.newValue+"")>0) {
-                setTempDataContainer("product_preview_sku",null);
-            }
-        })
-    }
-    // @ts-ignore
+
     render() {
         const {switchActive, pageScrollShowTop, switchBarFixed, topHeight, isOpened, loadStatus, works, collectionList} = this.state;
         const {nickname, avatar,bio,isLogin} = userStore;
@@ -467,7 +480,7 @@ export default class Me extends Component<any, MeState> {
                         <View className='orderWarp'>
                             <View className='myorall'>
                                 <Text className='myorder'>我的订单</Text>
-                                <View className='allorder' onClick={() => Taro.switchTab({url:'/pages/tabbar/order/order'})}>
+                                <View className='allorder' onClick={() => Taro.switchTab({url: updateChannelCode('/pages/tabbar/order/order')})}>
                                     <Text>全部订单</Text>
                                     <IconFont name='16_xiayiye' size={36} color='#9C9DA6'/>
                                 </View>
@@ -475,28 +488,28 @@ export default class Me extends Component<any, MeState> {
                             <View className='orderstate'>
                                 <View className='oitem' onClick={() => {
                                     Taro.getApp().tab = 1;
-                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                    Taro.switchTab({url: updateChannelCode('/pages/tabbar/order/order')})
                                 }}>
                                     <IconFont name='24_daifukuan' size={48} color='#121314'/>
                                     <Text className='orderText'>待付款</Text>
                                 </View>
                                 <View className='oitem' onClick={() => {
                                     Taro.getApp().tab = 2;
-                                    Taro.switchTab({url:'/pages/tabbar/order/order'});
+                                    Taro.switchTab({url: updateChannelCode('/pages/tabbar/order/order')});
                                 }}>
                                     <IconFont name='24_daifahuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待发货</Text>
                                 </View>
                                 <View className='oitem' onClick={() =>{
                                     Taro.getApp().tab = 3;
-                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                    Taro.switchTab({url: updateChannelCode('/pages/tabbar/order/order')})
                                 }}>
                                     <IconFont name='24_daishouhuo' size={48} color='#121314'/>
                                     <Text className='orderText'>待收货</Text>
                                 </View>
                                 <View className='oitem' onClick={() =>{
                                     Taro.getApp().tab = 4;
-                                    Taro.switchTab({url:'/pages/tabbar/order/order'})
+                                    Taro.switchTab({url: updateChannelCode('/pages/tabbar/order/order')})
                                 }}>
                                     <IconFont name='24_shouhou' size={48} color='#121314'/>
                                     <Text className='orderText'>售后</Text>
@@ -612,10 +625,10 @@ export default class Me extends Component<any, MeState> {
                                             ? <Empty button="我要创作" onClick={() => {
                                                 if (userStore.isLogin) {
                                                     if (deviceInfo.env == "h5") {
-                                                        window.location.href = '/pages/tabbar/index/index';
+                                                        window.location.href = updateChannelCode('/pages/tabbar/index/index');
                                                     } else {
                                                         Taro.switchTab({
-                                                            url:'/pages/tabbar/index/index'
+                                                            url: updateChannelCode('/pages/tabbar/index/index')
                                                         })
                                                     }
                                                 } else {

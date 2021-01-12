@@ -5,7 +5,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {getURLParamsStr, urlEncode} from "../../../utils/common";
+import {getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
 import {getToken} from "../../../utils/net";
 import dayjs from "dayjs";
 import page from "../../../utils/ext";
@@ -61,9 +61,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             key: this.routerParams.key,
             tok: getToken(),
         }))
-        return process.env.NODE_ENV == 'production'
+        return updateChannelCode(process.env.NODE_ENV == 'production'
             ? `${config.weappUrl}/pages/editor/pages/printedit?${str}`
-            : `${config.h5Url}/pages/editor/pages/printedit?${str}`
+            : `${config.h5Url}/pages/editor/pages/printedit?${str}`)
     }
 
     render() {

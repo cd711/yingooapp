@@ -15,7 +15,7 @@ import {
     getURLParamsStr, getUserKey,
     notNull,
     ossUrl,
-    pageTotal, sleep,
+    pageTotal, sleep, updateChannelCode,
     urlDeCode, urlEncode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
@@ -1521,9 +1521,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             Taro.navigateBack();
         } else {
             if (deviceInfo.env == "h5") {
-                window.location.href = "/";
+                window.location.href = updateChannelCode("/");
             } else {
-                Taro.switchTab({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
             }
         }
     }
@@ -1601,7 +1601,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 if (fastJump) {
                     // 小程序跳转到照片冲印列表页
                     wx.miniProgram.redirectTo({
-                        url: `/pages/editor/pages/printing/change?${str}`
+                        url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
                     })
                 } else {
                     // 小程序返回上一页
@@ -1611,7 +1611,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 // 网页跳转到照片冲印列表页
                 if (fastJump) {
                     Taro.redirectTo({
-                        url: `/pages/editor/pages/printing/change?${str}`
+                        url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
                     })
                 } else {
                     // 网页返回上一页
@@ -1738,6 +1738,12 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         return ele
     }
 
+    getUrl = () => {
+        return updateChannelCode(process.env.NODE_ENV == 'production'
+            ? `/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
+            :`${config.editorUrl}/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`)
+    }
+
     render() {
         const {loadingTemplate, size, hiddenBar} = this.state;
         const {tool} = this.store;
@@ -1758,13 +1764,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 <View onClick={this.next} className='right'>完成</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
-                <iframe className="editor_frame"
-                        src={
-                            process.env.NODE_ENV == 'production'
-                            ? `/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                            :`${config.editorUrl}/editor/mobile?token=${this.getCurrentToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-                        }
-                />
+                <iframe className="editor_frame" src={this.getUrl()}/>
                 {loadingTemplate
                     ? <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
                     : null}

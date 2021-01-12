@@ -6,7 +6,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {getURLParamsStr, urlEncode} from "../../../utils/common";
+import {getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
 import {api, getToken} from "../../../utils/net";
 import dayjs from "dayjs"
 import page from "../../../utils/ext";
@@ -74,9 +74,9 @@ export default class Shell extends Component<{}, {
             Taro.navigateBack();
         } else {
             if (process.env.TARO_ENV == "h5") {
-                window.location.href = "/";
+                window.location.href = updateChannelCode("/");
             } else {
-                Taro.switchTab({url: "/pages/tabbar/index/index"});
+                Taro.switchTab({url: updateChannelCode("/pages/tabbar/index/index")});
             }
         }
     }
@@ -91,9 +91,9 @@ export default class Shell extends Component<{}, {
             hidden: "t",
             workid: Taro.getApp().finishId || "f"
         }))
-        return process.env.NODE_ENV == 'production'
+        return updateChannelCode(process.env.NODE_ENV == 'production'
             ? `${config.weappUrl}/pages/editor/pages/shell?${str}`
-            : `${config.h5Url}/pages/editor/pages/shell?${str}`
+            : `${config.h5Url}/pages/editor/pages/shell?${str}`)
     }
 
 

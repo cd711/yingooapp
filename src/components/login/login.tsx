@@ -2,7 +2,7 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Button} from "@tarojs/components";
 import IconFont from "../iconfont";
 import "./login.less"
-import {is_weixin, deviceInfo, jumpToPrivacy} from "../../utils/common";
+import {is_weixin, deviceInfo, jumpToPrivacy, updateChannelCode} from "../../utils/common";
 import Xm from "../../utils/xm";
 
 interface LoginProps {
@@ -55,7 +55,7 @@ const Logins: Taro.FC<LoginProps> = (props) => {
         _onClose();
         setTimeout(()=>{
             Taro.navigateTo({
-                url:'/pages/login/index'
+                url: updateChannelCode('/pages/login/index')
             })
         },200)
     }

@@ -4,7 +4,7 @@ import './index.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import LoginFooter from './footer'
-import { deviceInfo } from '../../utils/common';
+import {deviceInfo, updateChannelCode} from '../../utils/common';
 
 
 
@@ -74,17 +74,17 @@ export default class Login extends Component<any,{
             textActive:false,
             inputFocus:true
         });
-        
+
         if (deviceInfo.env == "h5") {
             this.inputRef.inputRef.focus();
         }
-        
+
     }
     sendSMS = () => {
         const { codeBtnActive,inputValue } = this.state;
         if (codeBtnActive && inputValue.length == 11) {
             Taro.navigateTo({
-                url:`/pages/login/sms?mobile=${inputValue}&status=l`
+                url: updateChannelCode(`/pages/login/sms?mobile=${inputValue}&status=l`)
             })
         }
     }
@@ -121,7 +121,7 @@ export default class Login extends Component<any,{
                     {
                         deviceInfo.env!="h5"?<View className='pwlogin' onClick={()=>{
                             Taro.navigateTo({
-                                url:'/pages/login/acount'
+                                url: updateChannelCode('/pages/login/acount')
                             })
                         }}>
                             <Text className='txt'>密码登录</Text>

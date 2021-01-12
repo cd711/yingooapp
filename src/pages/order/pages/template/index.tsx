@@ -10,7 +10,7 @@ import {
     notNull,
     ossUrl,
     urlEncode,
-    getSpecialRouter
+    getSpecialRouter, updateChannelCode
 } from '../../../../utils/common'
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
@@ -149,8 +149,8 @@ export default class Template extends Component<any, {
                 icon: "none",
                 duration: 2000
             }).then(() => {
-                Taro.reLaunch({
-                    url: '/pages/tabbar/index/index'
+                Taro.switchTab({
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 })
             });
         })
@@ -337,7 +337,7 @@ export default class Template extends Component<any, {
                 cid,
             }))
             Taro.navigateTo({
-                url: `/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`
+                url: updateChannelCode(`/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`)
             });
         }
         if (tpl_type == "photo") {
@@ -347,7 +347,7 @@ export default class Template extends Component<any, {
                 limit: "t"
             }))
             Taro.navigateTo({
-                url: `/pages/editor/pages/printing/index?${str}`
+                url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
             });
         }
     }
@@ -370,10 +370,10 @@ export default class Template extends Component<any, {
             Taro.navigateBack();
         } else {
             if (deviceInfo.env == 'h5') {
-                window.location.href = '/pages/tabbar/index/index'
+                window.location.href = updateChannelCode('/pages/tabbar/index/index')
             } else {
                 Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 })
             }
         }
@@ -524,7 +524,7 @@ export default class Template extends Component<any, {
                                                   return
                                               }
                                               Taro.navigateTo({
-                                                  url: `/pages/editor/pages/printing/index?id=34`
+                                                  url: updateChannelCode(`/pages/editor/pages/printing/index?id=34`)
                                               })
                                           }}>
                                         <View className='print-warp'

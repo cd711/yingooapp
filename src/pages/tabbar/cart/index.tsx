@@ -3,7 +3,13 @@ import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import IconFont from '../../../components/iconfont';
 import Checkboxs from '../../../components/checkbox/checkbox';
 import Counter from '../../../components/counter/counter';
-import {deviceInfo, fixStatusBarHeight, ossUrl} from '../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    ossUrl,
+    updateChannelCode,
+    updateTabBarChannelCode
+} from '../../../utils/common';
 import {api} from '../../../utils/net';
 import CartLeftIcon from '../../../components/icon/CartLeftIcon';
 import CartRightIcon from '../../../components/icon/CartRightIcon';
@@ -46,6 +52,10 @@ export default class Cart extends Component<{}, {
             selectIds: [],
             showDelTipModal: false
         }
+    }
+
+    componentDidShow() {
+        updateTabBarChannelCode("/pages/tabbar/cart/index")
     }
 
     componentDidMount() {
@@ -192,7 +202,7 @@ export default class Cart extends Component<{}, {
                         <Text className='title'>购物车</Text>
                     </View>
                 </View>
-                
+
                     {
                         list.length>0?<ScrollView scrollY className='center'>
                             <View className='list'>
@@ -277,10 +287,10 @@ export default class Cart extends Component<{}, {
                             <Button className='go_gg_btn' onClick={()=>{
                                 if (userStore.isLogin) {
                                     if (deviceInfo.env == "h5") {
-                                        window.location.href = '/pages/tabbar/index/index';
+                                        window.location.href = updateChannelCode('/pages/tabbar/index/index');
                                     } else {
                                         Taro.switchTab({
-                                            url:'/pages/tabbar/index/index'
+                                            url: updateChannelCode('/pages/tabbar/index/index')
                                         })
                                     }
                                 } else {
@@ -311,7 +321,7 @@ export default class Cart extends Component<{}, {
                                     // /pages/order/pages/template/confirm?skuid=379&total=1&tplid=166&model=343
                                     const cartIds = selectIds.join(',');
                                     Taro.navigateTo({
-                                        url: `/pages/order/pages/template/confirm?cartIds=${Base64.encode(cartIds, true)}`
+                                        url: updateChannelCode(`/pages/order/pages/template/confirm?cartIds=${Base64.encode(cartIds, true)}`)
                                     })
                                 }
                             }}>

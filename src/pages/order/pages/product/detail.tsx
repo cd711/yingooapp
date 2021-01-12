@@ -11,7 +11,7 @@ import {
     notNull,
     ossUrl,
     setTempDataContainer,
-    sleep,
+    sleep, updateChannelCode,
     urlEncode
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
@@ -242,10 +242,10 @@ export default class Login extends Component<{}, {
                         Taro.navigateBack();
                     } else {
                         if (deviceInfo.env == 'h5') {
-                            window.location.href = '/pages/tabbar/index/index'
+                            window.location.href = updateChannelCode('/pages/tabbar/index/index')
                         } else {
                             Taro.switchTab({
-                                url: '/pages/tabbar/index/index'
+                                url: updateChannelCode('/pages/tabbar/index/index')
                             })
                         }
                     }
@@ -262,10 +262,10 @@ export default class Login extends Component<{}, {
                     Taro.navigateBack();
                 } else {
                     if (deviceInfo.env == 'h5') {
-                        window.location.href = '/pages/tabbar/index/index'
+                        window.location.href = updateChannelCode('/pages/tabbar/index/index')
                     } else {
                         Taro.switchTab({
-                            url: '/pages/tabbar/index/index'
+                            url: updateChannelCode('/pages/tabbar/index/index')
                         })
                     }
                 }
@@ -340,10 +340,10 @@ export default class Login extends Component<{}, {
     }
     goUrl = (url) => {
         if (deviceInfo.env == 'h5') {
-            window.location.href = url;
+            window.location.href = updateChannelCode(url);
         } else {
             Taro.navigateTo({
-                url
+                url: updateChannelCode(url)
             })
         }
     }
@@ -389,7 +389,7 @@ export default class Login extends Component<{}, {
             }
             const str = getURLParamsStr(urlEncode(tmp));
             Taro.navigateTo({
-                url: `/pages/editor/pages/printing/change?${str}`
+                url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
             })
 
         } catch (e) {
@@ -441,10 +441,10 @@ export default class Login extends Component<{}, {
                             Taro.navigateBack();
                         } else {
                             if (deviceInfo.env == 'h5') {
-                                window.location.href = '/pages/tabbar/index/index'
+                                window.location.href = updateChannelCode('/pages/tabbar/index/index')
                             } else {
                                 Taro.switchTab({
-                                    url: '/pages/tabbar/index/index'
+                                    url: updateChannelCode('/pages/tabbar/index/index')
                                 });
                             }
                         }
@@ -567,7 +567,7 @@ export default class Login extends Component<{}, {
                         {
                             showOkButton ? null : (data && data.product_type && data.product_type == "customized" ? null :
                                 <View className='cart'
-                                      onClick={() => Taro.switchTab({url: '/pages/tabbar/cart/index'})}>
+                                      onClick={() => Taro.switchTab({url: updateChannelCode('/pages/tabbar/cart/index')})}>
                                     <IconFont name="24_gouwuche" size={48} color="#707177"/>
                                     <Text className='txt'>购物车</Text>
                                 </View>)
@@ -708,7 +708,7 @@ export default class Login extends Component<{}, {
                             placeOrderShow: false
                         })
                         Taro.navigateTo({
-                            url: `/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}`
+                            url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}`)
                         })
                     } else {
                         Taro.showToast({

@@ -7,7 +7,7 @@ import {templateStore} from '../../../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 import Checkboxs from '../../../../../components/checkbox/checkbox'
 import { userStore } from '../../../../../store/user';
-import { deviceInfo, fixStatusBarHeight } from '../../../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../../../../utils/common';
 
 @inject("userStore","templateStore")
 @observer
@@ -31,10 +31,10 @@ export default class Address extends Component<any,{
     componentDidShow(){
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
-                window.location.href = "/pages/tabbar/index/index";
+                window.location.href = updateChannelCode("/pages/tabbar/index/index");
             } else {
                 Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 })
             }
         }
@@ -69,7 +69,7 @@ export default class Address extends Component<any,{
                 res[0]["isChecked"] = true;
                 templateStore.address = res[0];
                 if (deviceInfo.env == 'h5') {
-                    window.history.replaceState(null,null,`/pages/me/pages/me/address/index?t=select&id=${res[0].id}`)
+                    window.history.replaceState(null,null,updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${res[0].id}`))
                 }
             }
             this.setState({
@@ -149,7 +149,7 @@ export default class Address extends Component<any,{
                                 <View className='right' onClick={(e)=>{
                                     e.stopPropagation();
                                     Taro.navigateTo({
-                                        url:`/pages/me/pages/me/address/editor?id=${item.id}`
+                                        url: updateChannelCode(`/pages/me/pages/me/address/editor?id=${item.id}`)
                                     })
                                 }}
                                 >
@@ -173,7 +173,7 @@ export default class Address extends Component<any,{
                 <View className='address_bottom_bar'>
                     <Button className='add-btn' onClick={()=>{
                         Taro.navigateTo({
-                            url:'/pages/me/pages/me/address/editor'
+                            url: updateChannelCode('/pages/me/pages/me/address/editor')
                         })
                     }}>新增收货地址</Button>
                 </View>

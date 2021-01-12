@@ -16,7 +16,7 @@ import {
     getTempDataContainer,
     notNull,
     ossUrl,
-    setTempDataContainer,
+    setTempDataContainer, updateChannelCode,
 } from '../../../../utils/common';
 import {Base64} from 'js-base64';
 import PayWayModal from '../../../../components/payway/PayWayModal';
@@ -154,7 +154,7 @@ export default class Confirm extends Component<any, {
                 this.initPayWayModal = true;
                 Taro.hideLoading();
                 if (deviceInfo.env == 'h5') {
-                    window.history.replaceState(null, null, `/pages/order/pages/template/confirm?orderid=${res.prepay_id}`);
+                    window.history.replaceState(null, null, updateChannelCode(`/pages/order/pages/template/confirm?orderid=${res.prepay_id}`));
                 }
                 this.filterUsedTicket(res.orders);
                 this.setState({
@@ -173,10 +173,10 @@ export default class Confirm extends Component<any, {
                         Taro.navigateBack();
                     } else {
                         if (deviceInfo.env == "h5") {
-                            window.location.href = "/pages/tabbar/index/index"
+                            window.location.href = updateChannelCode("/pages/tabbar/index/index")
                         } else {
                             Taro.switchTab({
-                                url:'/pages/tabbar/index/index'
+                                url: updateChannelCode('/pages/tabbar/index/index')
                             });
                         }
                     }
@@ -278,11 +278,11 @@ export default class Confirm extends Component<any, {
             setTimeout(() => {
                 Taro.getApp().tab = 1;
                 if (deviceInfo.env == 'h5') {
-                    window.history.replaceState(null, null, '/pages/tabbar/me/me');
-                    window.location.href = '/pages/tabbar/order/order?tab=1';
+                    window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
+                    window.location.href = updateChannelCode('/pages/tabbar/order/order?tab=1');
                 }else{
                     Taro.switchTab({
-                        url: '/pages/tabbar/order/order?tab=1'
+                        url: updateChannelCode('/pages/tabbar/order/order?tab=1')
                     });
                 }
             }, 2000);
@@ -326,7 +326,7 @@ export default class Confirm extends Component<any, {
             Taro.hideLoading();
             if (res.status > 0) {
                 Taro.navigateTo({
-                    url: `/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn + "-" + "0")}&pay_order_sn=${res.order_sn}`
+                    url: updateChannelCode(`/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn + "-" + "0")}&pay_order_sn=${res.order_sn}`)
                 });
                 return;
             }
@@ -338,13 +338,13 @@ export default class Confirm extends Component<any, {
         }).catch((e) => {
             Taro.hideLoading();
             setTimeout(() => {
-                window.history.replaceState(null, null, '/pages/tabbar/me/me');
+                window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
                 Taro.getApp().tab = 1;
                 if (deviceInfo.env == 'h5') {
-                    window.location.href = '/pages/tabbar/order/order?tab=1'
+                    window.location.href = updateChannelCode('/pages/tabbar/order/order?tab=1')
                 } else {
                     Taro.switchTab({
-                        url: '/pages/tabbar/order/order?tab=1'
+                        url: updateChannelCode('/pages/tabbar/order/order?tab=1')
                     })
                 }
 
@@ -393,8 +393,8 @@ export default class Confirm extends Component<any, {
             }).catch((e) => {
                 Taro.hideLoading();
                 setTimeout(() => {
-                    Taro.reLaunch({
-                        url: '/pages/tabbar/index/index'
+                    Taro.switchTab({
+                        url: updateChannelCode('/pages/tabbar/index/index')
                     })
                 }, 2000);
                 Taro.showToast({
@@ -422,8 +422,8 @@ export default class Confirm extends Component<any, {
             }).catch((e) => {
                 Taro.hideLoading();
                 setTimeout(() => {
-                    Taro.reLaunch({
-                        url: '/pages/tabbar/index/index'
+                    Taro.switchTab({
+                        url: updateChannelCode('/pages/tabbar/index/index')
                     })
                 }, 2000);
                 Taro.showToast({
@@ -479,16 +479,16 @@ export default class Confirm extends Component<any, {
         setTimeout(() => {
             if (res.code == 2 || res.code == 0) {
                 if (process.env.TARO_ENV == 'h5') {
-                    window.location.href = url;
+                    window.location.href = updateChannelCode(url);
                 } else {
                     Taro.switchTab({
-                        url
+                        url: updateChannelCode(url)
                     });
                 }
 
             } else {
                 Taro.navigateTo({
-                    url
+                    url: updateChannelCode(url)
                 })
             }
         }, 2000);
@@ -532,7 +532,7 @@ export default class Confirm extends Component<any, {
             this.tempContainerKey = `${item.id}_${mainProductId}`;
             if (is) {
                 Taro.navigateTo({
-                    url: `/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`
+                    url: updateChannelCode(`/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`)
                 });
             }
         });
@@ -585,7 +585,7 @@ export default class Confirm extends Component<any, {
                         this.tempContainerKey = `${item.id}_${mainProductId}`;
 
                         Taro.navigateTo({
-                            url: `/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`
+                            url: updateChannelCode(`/pages/order/pages/product/detail?id=${item.id}&pid=${mainProductId}`)
                         })
                     }
                 });
@@ -657,7 +657,7 @@ export default class Confirm extends Component<any, {
                     {
                         address ? <View className='address-part-has' onClick={() => {
                             Taro.navigateTo({
-                                url: `/pages/me/pages/me/address/index?t=select&id=${address.id}`
+                                url: updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${address.id}`)
                             })
                         }}>
                             {/* <Image src={require('../../../../source/addressBackground.png')} className='backimg'/> */}
@@ -675,7 +675,7 @@ export default class Confirm extends Component<any, {
                             <Image src={require("../../../../source/address_part.png")} className='address_line'/>
                         </View> : <View className='address-part' onClick={() => {
                             Taro.navigateTo({
-                                url: '/pages/me/pages/me/address/index?t=select'
+                                url: updateChannelCode('/pages/me/pages/me/address/index?t=select')
                             })
                         }}>
                             <Text className='title'>选择收货地址</Text>
@@ -891,11 +891,11 @@ export default class Confirm extends Component<any, {
                             showPayWayModal: false
                         });
                         if (deviceInfo.env == 'h5') {
-                            window.history.replaceState(null, null, '/pages/tabbar/me/me');
+                            window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
                         }
                         Taro.getApp().tab = 1;
                         Taro.switchTab({
-                            url: '/pages/tabbar/order/order?tab=1'
+                            url: updateChannelCode('/pages/tabbar/order/order?tab=1')
                         })
                     }}/>:null
                 }

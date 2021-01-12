@@ -8,7 +8,7 @@ import { api } from '../../utils/net'
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import IconFont from '../../components/iconfont'
-import { deviceInfo } from '../../utils/common';
+import {deviceInfo, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -52,8 +52,8 @@ export default class Login extends Component<{},{
             }).then((res)=>{
                 userStore.setInfo(res);
                 Taro.hideLoading();
-                Taro.reLaunch({
-                    url:"/pages/tabbar/me/me"
+                Taro.switchTab({
+                    url: updateChannelCode("/pages/tabbar/me/me")
                 })
             }).catch((e)=>{
                 Taro.hideLoading();
@@ -119,7 +119,7 @@ export default class Login extends Component<{},{
                         </View>
                         <View className='forget-pwd' onClick={()=>{
                             Taro.navigateTo({
-                                url:'/pages/login/find'
+                                url: updateChannelCode('/pages/login/find')
                             })
                         }}>
                             <Text className='ftexts'>忘记密码</Text>
@@ -128,7 +128,7 @@ export default class Login extends Component<{},{
                         {
                             deviceInfo.env!="h5"?<View className='pwlogin' onClick={()=>{
                                 Taro.redirectTo({
-                                    url:'/pages/login/index'
+                                    url: updateChannelCode('/pages/login/index')
                                 })
                             }}>
                                 <Text className='txt'>验证码登录</Text>

@@ -6,7 +6,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import { deviceInfo, fixStatusBarHeight } from '../../utils/common';
+import {deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -45,10 +45,10 @@ export default class Mobile extends Component<{},{
             }
         } else {
             if (deviceInfo.env == 'h5') {
-                window.location.href = '/pages/tabbar/index/index'
+                window.location.href = updateChannelCode('/pages/tabbar/index/index')
             } else {
                 Taro.switchTab({
-                    url:'/pages/tabbar/index/index'
+                    url: updateChannelCode('/pages/tabbar/index/index')
                 });
             }
         }
@@ -211,7 +211,7 @@ export default class Mobile extends Component<{},{
     }
     render(){
         const {btnAtive,phoneActive,codeActive,time,check,phone,code} = this.state;
-        
+
         return <View className='set_page mobile_page'>
             {/* @ts-ignore */}
             <View className='nav-bar' style={fixStatusBarHeight()}>
