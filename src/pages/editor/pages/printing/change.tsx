@@ -353,7 +353,7 @@ const PrintChange: Taro.FC<any> = () => {
             const imgPix = attribute.split("*");
             const num = Number(pixArr[0]) / Number(pixArr[1]);
             const cNum = Number(imgPix[0]) / Number(imgPix[1])
-            console.log("超级计算：", num)
+            console.log("旋转计算：", cNum > 1, num < 1, cNum < 1, num > 1)
             /**
              * pixArr: 打印尺寸, imgPix：图片尺寸
              * 打印尺寸 大于 1，就判定为打印的是横图，图片尺寸不满足条件（也就是图片尺寸小于1）的话就旋转
@@ -477,6 +477,8 @@ const PrintChange: Taro.FC<any> = () => {
             if (params.photo.path.length === 0) {
                 selectPhoto()
             }
+
+            console.log("path:", params.photo.path)
             params.photo.path = params.photo.path.map((v) => {
                 const allowRotate = checkHasRotate(v.attr);
                 const arr = [...tArr];
@@ -541,6 +543,16 @@ const PrintChange: Taro.FC<any> = () => {
     const onDeleteImg = async idx => {
         const arr = [...photos];
 
+        console.log(arr[idx].id,
+            arr[idx])
+
+        // removeDuplicationForArr(
+        //     arr.map(v => ({id: v.id, url: v.url})),
+        //     photoStore.photoProcessParams.usefulImages,
+        //     arr[idx].id,
+        //     arr[idx].extraIds || undefined
+        // )
+
         const photo = [...photoStore.photoProcessParams.photo.path];
         photo.splice(idx, 1);
         try {
@@ -549,7 +561,12 @@ const PrintChange: Taro.FC<any> = () => {
                     ...photoStore.photoProcessParams.photo,
                     path: photo
                 },
-                usefulImages: removeDuplicationForArr(arr.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages, arr[idx].id)
+                usefulImages: removeDuplicationForArr(
+                    arr.map(v => ({id: v.id, url: v.url})),
+                    photoStore.photoProcessParams.usefulImages,
+                    arr[idx].id,
+                    arr[idx].extraIds || undefined
+                )
             })
         } catch (e) {
             console.log("更新数量出错：", e)
@@ -850,6 +867,7 @@ const PrintChange: Taro.FC<any> = () => {
             key: photoStore.printKey,
             local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
+            imgID: notNull(item.id) ? -1 : item.id,
             img: item.url,
         };
 
@@ -860,7 +878,7 @@ const PrintChange: Taro.FC<any> = () => {
         try {
             if (!notNull(item.readLocal) && item.readLocal === true) {
                 await photoStore.updateServerParams(photoStore.printKey, {
-                    originalData: item.originalData
+                    originalData: item.originalData,
                 })
             }
         }catch (e) {

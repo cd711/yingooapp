@@ -1199,9 +1199,16 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 const cur = res[currentData.current.curr];
                 if (cur) {
                     renderTemplateDoc(cur.id);
-                    console.log(JSON.parse(JSON.stringify(arr)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
+                    const path = [...photoStore.photoProcessParams.photo.path];
+                    if (!notNull(router.params.idx)) {
+                        path[parseInt(router.params.idx)].extraIds = data.ids;
+                    }
                     await photoStore.updateServerParams(parent.userKey(), {
-                        usefulImages: removeDuplicationForArr(arr, photoStore.photoProcessParams.usefulImages)
+                        usefulImages: removeDuplicationForArr(arr, photoStore.photoProcessParams.usefulImages),
+                        photo: {
+                            ...photoStore.photoProcessParams.photo,
+                            path
+                        }
                     })
                 } else {
                     console.log(`没有查询到对应图片数量（${arr.length}）的模板`, res)
@@ -1566,7 +1573,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 attr: `${doc.width}*${doc.height}`,
                 edited: true,
                 doc,
-                originalData: photoStore.editorPhotos
+                originalData: photoStore.editorPhotos,
             };
 
             // 从模板直接跳转过来的话需要初始化一些参数
@@ -1581,7 +1588,22 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             console.log("本地数据：", this.$router.params.idx, JSON.parse(JSON.stringify(localParams)))
 
             if (temp.path[Number(this.$router.params.idx)]) {
-                temp.path[Number(this.$router.params.idx)] = obj;
+                let ids = photoStore.photoProcessParams.photo.path[Number(this.$router.params.idx)].extraIds;
+                if (!notNull(this.routerParams.imgID) && this.routerParams.imgID != "-1") {
+                    if (!notNull(ids)) {
+                        const idx = ids.indexOf(this.routerParams.imgID);
+                        if (idx == -1) {
+                            ids.push(this.routerParams.imgID)
+                        }
+                    } else {
+                        ids = new Array<string | number>();
+                        ids.push(this.routerParams.imgID)
+                    }
+                }
+                temp.path[Number(this.$router.params.idx)] = {
+                    ...obj,
+                    extraIds: ids
+                }
             } else {
                 temp.path.push(obj)
             }

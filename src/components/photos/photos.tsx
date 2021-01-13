@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {deviceInfo, ossUrl, photoGetItemStyle} from "../../utils/common";
+import {deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
@@ -84,7 +84,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     private total: number = 0;
 
     getList(data) {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             const opt = {
                 start: data.start || 0,
                 size: data.size || 25,
@@ -107,7 +107,30 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 this.setState({loading: false});
                 let list = [];
                 list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
-                this.setState({imageList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"}, () => {
+
+                const usefulList = this.state.usefulList;
+                const {defaultSelect} = this.props;
+                if (defaultSelect && defaultSelect instanceof Array) {
+                    for (let i = 0; i < list.length; i++) {
+                        const parent = list[i];
+                        for (let d = 0; d < defaultSelect.length; d++) {
+                            const child = defaultSelect[d];
+                            if (parent.id == child.id) {
+                                list[i].display = true;
+                                usefulList.push({
+                                    id: parent.id,
+                                    url: parent.url
+                                })
+                            }
+                        }
+                    }
+                    this.setState({usefulList})
+                }
+
+                this.setState({
+                    imageList: list,
+                    loadStatus: Number(res.total) === list.length ? "noMore" : "more"
+                }, () => {
                     resolve()
                 })
             } catch (e) {
@@ -133,33 +156,17 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         });
     }
 
-    filterUsefulImages = () => {
+    getListAgain = () => {
         const {imageList} = this.state;
-        const usefulList = this.state.usefulList;
-        const {defaultSelect} = this.props;
-        console.log(defaultSelect)
-        if (defaultSelect && defaultSelect instanceof Array) {
-            for (let i = 0; i < imageList.length; i++) {
-                const parent = imageList[i];
-                for (let d = 0; d < defaultSelect.length; d++) {
-                    const child = defaultSelect[d];
-                    if (parent.id == child.id) {
-                        usefulList.push({
-                            id: parent.id,
-                            url: parent.url
-                        })
-                    }
-                }
-            }
-            this.setState({usefulList})
-        }
+        const arr = imageList.filter(v => !notNull(v.display));
+
     }
 
     componentWillMount() {
         if (deviceInfo.env === "weapp") {
             this.initPropsToState()
             this.getList({start: 0}).then(() => {
-                this.filterUsefulImages()
+                // this.filterUsefulImages()
             })
         }
     }
@@ -168,7 +175,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     componentDidMount() {
         this.initPropsToState()
         this.getList({start: 0}).then(() => {
-            this.filterUsefulImages()
+            // this.filterUsefulImages()
         })
     }
 
@@ -439,7 +446,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                         }
                                         {
                                             list.map((item, idx) => {
-                                                return <View className="list_item" key={idx + ""}>
+                                                return <View className="list_item" key={idx + ""} style={{display: item.display && item.display === true ? "none" : "flex"}}>
                                                     <View className="img_item" key={idx + ""}
                                                           style={photoGetItemStyle()}
                                                           onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
@@ -467,7 +474,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             : null}
                     </ScrollView>
                     {
-                        _editSelect && list.length > 0 &&navSwitchActive === 0
+                        _editSelect && list.length > 0
                             ? <View className="fix_selector_container">
                                 <View className="photo_edit_selector_container">
                                     <View className="select_head">
