@@ -20,6 +20,7 @@ import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
 import PlaceOrder from "../../../../components/place/place";
+import ChangePackage from "../../../../components/changePackage/changePackage";
 
 
 const PrintChange: Taro.FC<any> = () => {
@@ -1058,6 +1059,7 @@ const PrintChange: Taro.FC<any> = () => {
                     </View>
                     : null
             }
+            {/* <ChangePackage isShow onClose={()=>{}}/> */}
         </View>
     )
 }
