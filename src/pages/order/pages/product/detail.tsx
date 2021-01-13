@@ -568,13 +568,11 @@ export default class Login extends Component<{}, {
                         <View className='price_line'>
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
-                                <Text className='num'>{goodsPrice}</Text>
+                                <Text className='num'>{data && data.price ? data.price:"0.00"}</Text>
                             </View>
-                            {
-                                selectSkuId>0?<View className='ap'>
-                                    <Text className='txt'>￥{goodsMarketPrice}</Text>
-                                </View>:null
-                            }
+                            <View className='ap'>
+                                <Text className='txt'>￥{data && data.market_price ? data.market_price:"0.00"}</Text>
+                            </View>
                             <View className='total'>
                                 <Text className='txt'>{data && data.sold_count ? data.sold_count : 0}人已抢</Text>
                             </View>
