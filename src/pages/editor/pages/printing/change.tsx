@@ -7,6 +7,7 @@ import {
     debounce,
     deviceInfo, getURLParamsStr,
     getUserKey,
+    jumpOrderConfimPreview,
     jumpToPrintEditor,
     notNull, shareAppExtends, sleep, updateChannelCode,
     urlEncode, useDebounceFn
@@ -19,6 +20,7 @@ import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
 import PlaceOrder from "../../../../components/place/place";
+
 
 const PrintChange: Taro.FC<any> = () => {
 
@@ -254,7 +256,7 @@ const PrintChange: Taro.FC<any> = () => {
      * onlyInitPrice  仅仅只是初始化currentSkus， goodsInfo, currentSkus, 不向容器发送新内容
      */
     function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean} = {}) {
-        return new Promise<any>(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             const opt = {
                 path: params.path || [],
                 forDetail: params.forDetail || false,
@@ -595,9 +597,11 @@ const PrintChange: Taro.FC<any> = () => {
             await photoStore.updateServerParams(photoStore.printKey, {
                 changeUrlParams: data
             })
-            Taro.navigateTo({
-                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${skuId}&total=${count}&page=photo`)
-            })
+            jumpOrderConfimPreview({
+                skuid:skuId,
+                total:count,
+                page:"photo"
+            });
         } catch (e) {
             console.log("本地存储失败：", e)
 
@@ -762,8 +766,10 @@ const PrintChange: Taro.FC<any> = () => {
             await photoStore.updateServerParams(photoStore.printKey, {
                 changeUrlParams: data
             })
-            Taro.navigateTo({
-                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${skuInfoID}&total=${count}&page=photo`)
+            jumpOrderConfimPreview({
+                skuid:skuInfoID,
+                total:count,
+                page:"photo"
             })
         } catch (e) {
             console.log("本地存储失败：", e)

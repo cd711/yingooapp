@@ -14,7 +14,8 @@ import {
     shareInfo,
     sleep, updateChannelCode,
     urlEncode,
-    isEmptyX
+    isEmptyX,
+    jumpOrderConfimPreview
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -746,9 +747,11 @@ export default class Login extends Component<{}, {
                         this.setState({
                             placeOrderShow: false
                         })
-                        Taro.navigateTo({
-                            url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}`)
+                        jumpOrderConfimPreview({
+                            skuid:selectSkuId,
+                            total:buyTotal
                         })
+
                     } else {
                         Taro.showToast({
                             title: "请选择规格!",

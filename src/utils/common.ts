@@ -405,7 +405,7 @@ export function getTempDataContainer(key:string,callback:(value:any)=>void){
     }).then((res)=>{
         callback(JSON.parse(res))
     }).catch((e)=>{
-        console.log(e);
+        console.log("获取容器参数出错",e);
         callback(null)
     });
 }
@@ -930,4 +930,59 @@ export function isEmptyX(param){
         //(4)数字0、00等，如果可以只输入0，则需要另外判断。
         return true;
     }
+}
+/**
+ * 跳转到确认订单页面
+ * @param {any} data 页面传递的参数 例如:{skuid:sku_id,page:"photo"}
+ * @return {*} 没有返回值
+ */
+export function jumpOrderConfimPreview(data:any) {
+    const currentUnix = dayjs().unix()
+    const key = "order_preview"+currentUnix;
+    Taro.setStorage({
+        key,
+        data
+    });
+    setTempDataContainer(key,data);
+    Taro.navigateTo({
+        url: updateChannelCode(`/pages/order/pages/template/confirm?order=${currentUnix}`)
+    }) 
+}
+
+/**
+ * 获取确认订单页面参数
+ * @param {string} currentUnix 参数order里面的时间戳
+ * @param {function} callback
+ * @return {*} 无返回值
+ */
+export function getOrderConfimPreviewData(currentUnix:string,callback:(res)=>void) {
+    const key = "order_preview"+currentUnix;
+    getTempDataContainer(key,(res)=>{
+        if (res != null) {
+            Taro.removeStorage({key});
+            callback(res);
+        }else{
+            Taro.getStorage({
+                key,
+                success:(res)=>{
+                    callback(res.data)
+                }
+            })
+        }
+    })
+}
+
+/**
+ * 添加确认订单页面参数
+ * @param {string} currentUnix 参数order里面的时间戳
+ * @param {any} data
+ * @return {*} 无返回值
+ */
+export function addOrderConfimPreviewData(currentUnix:string,data:any) {
+    const key = "order_preview"+currentUnix;
+    Taro.setStorage({
+        key,
+        data
+    });
+    setTempDataContainer(key,data);
 }
