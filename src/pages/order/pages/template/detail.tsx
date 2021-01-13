@@ -148,7 +148,7 @@ export default class Detail extends Component<{}, {
                 tpl_id: currentItem.id,
                 cid: currentItem.category_id
             })
-            setTempDataContainer("product_preview_sku",null,()=>{});
+            setTempDataContainer("product_preview_sku",null);
         } else {
             userStore.showLoginModal = true;
         }

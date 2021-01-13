@@ -17,7 +17,7 @@ export default class Address extends Component<any,{
 }> {
 
     config: Config = {
-        navigationBarTitleText: '我的收获地址'
+        navigationBarTitleText: '我的收货地址'
     }
 
     constructor(props){
@@ -29,6 +29,9 @@ export default class Address extends Component<any,{
     }
 
     componentDidShow(){
+        if (process.env.TARO_ENV == "h5") {
+            document.title = this.config.navigationBarTitleText || "我的收货地址";
+        }
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
                 window.location.href = updateChannelCode("/pages/tabbar/index/index");

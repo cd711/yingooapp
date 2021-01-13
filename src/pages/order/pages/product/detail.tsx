@@ -120,6 +120,9 @@ export default class Login extends Component<{}, {
         }
     }
     componentWillMount() {
+        if (process.env.TARO_ENV == "h5") {
+            document.title = this.config.navigationBarTitleText || "商品详情";
+        }
         const {id, pid} = this.$router.params;
         if (id != "" && id != undefined && id != null && parseInt(id) > 0 && pid != "" && pid != undefined && pid != null) {
             this.setState({
@@ -192,7 +195,7 @@ export default class Login extends Component<{}, {
                 id
             }).then((res) => {
                 Taro.hideLoading();
-                if (deviceInfo.env != "h5") {
+                if (deviceInfo.env == "weapp") {
                     WxParse.wxParse('article', 'html', res.content, this.$scope, 0);
                 }
                 this.modalInit = true;
@@ -553,7 +556,11 @@ export default class Login extends Component<{}, {
                         <View className='title'>
                             <Text
                                 className='txt'>{data && data.title ? (data.title.length > 30 ? `${data.title.substring(0, 30)}...` : data.title) : ""}</Text>
-                            <Image className='icon' src={require("../../../../source/hot.png")}/>
+                                {
+                                    data && data.flag_text ? data.flag_text.map((item)=>(
+                                        <Image className='icon' src={item.url}/>
+                                    )):null
+                                }
                         </View>
 
                         <View className='tags'>
@@ -570,12 +577,13 @@ export default class Login extends Component<{}, {
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
                                 <Text className='num'>{data && data.price ? data.price:"0.00"}</Text>
+                                <Text className='start'>起</Text>
                             </View>
                             <View className='ap'>
                                 <Text className='txt'>￥{data && data.market_price ? data.market_price:"0.00"}</Text>
                             </View>
                             <View className='total'>
-                                <Text className='txt'>{data && data.sold_count ? data.sold_count : 0}人已抢</Text>
+                                <Text className='txt'>销量 {data && data.sold_count ? data.sold_count : 0}</Text>
                             </View>
                         </View>
                     </View>
