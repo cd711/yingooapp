@@ -300,7 +300,7 @@ export default class Cart extends Component<{}, {
                             }}>去逛逛</Button>
                         </View>
                     }
-                    <View className='bottom' style={deviceInfo.env=="h5"?`bottom: ${Taro.pxTransform(100)};`:`bottom: ${Taro.pxTransform(0)};`}>
+                    <View className='bottom' style={deviceInfo.env=="h5"?`bottom: ${Taro.pxTransform(110)};`:`bottom: ${Taro.pxTransform(0)};`}>
                         <View className="all" onClick={this.onAllSelect.bind(this, list, allSelected)}>
                             <Checkboxs isChecked={allSelected} disabled/>
                             <Text className='txt'>全选</Text>

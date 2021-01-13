@@ -11,8 +11,10 @@ import {
     notNull,
     ossUrl,
     setTempDataContainer,
+    shareInfo,
     sleep, updateChannelCode,
-    urlEncode
+    urlEncode,
+    isEmptyX
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -124,6 +126,44 @@ export default class Login extends Component<{}, {
             });
         }
     }
+    onShareAppMessage(){
+        const {data} = this.state;
+        if (data && data.id) {
+            const {id, coupon, rid} = this.$router.params;
+            let uri = "/pages/order/pages/product/detail?"
+            if (!isEmptyX(id)) {
+                uri = `${uri}id=${id}`
+            } else {
+                uri = `${uri}id=${data.id}`
+            }
+            if (!isEmptyX(coupon)) {
+                uri = `${uri}&coupon=${coupon}`
+            }
+            if (!isEmptyX(rid)) {
+                uri = `${uri}&rid=${rid}`
+            }
+            const share = {
+                title:data.title || data.description,
+                path:updateChannelCode(uri),
+                imageUrl:""
+            }
+            if (!isEmptyX(data.share_title)) {
+                share.title = data.share_title;
+            }
+            if (!isEmptyX(data.share_path)) {
+                share.path = data.share_path;
+            }
+            if (!isEmptyX(data.share_image)) {
+                share.imageUrl = data.share_image;
+            }
+            return share
+        }
+        return {
+            title: shareInfo.title,
+            path: shareInfo.link,
+            imageUrl: shareInfo.imgUrl
+        }
+    }
     componentDidMount() {
         if (userStore.isLogin) {
             this.receiveCoupon()
@@ -151,6 +191,9 @@ export default class Login extends Component<{}, {
                 id
             }).then((res) => {
                 Taro.hideLoading();
+                if (deviceInfo.env != "h5") {
+                    WxParse.wxParse('article', 'html', res.content, this.$scope, 0);
+                }
                 this.modalInit = true;
                 res.attrGroup = res.attrGroup.filter((item,index) => {
                     if (item.special_show == "photonumber") {
@@ -226,9 +269,7 @@ export default class Login extends Component<{}, {
                     }
 
                 }
-                if (deviceInfo.env != "h5") {
-                    WxParse.wxParse('article', 'html', res.content, this.$scope, 0);
-                }
+
             }).catch((e) => {
                 console.log(e);
                 Taro.hideLoading();
@@ -527,13 +568,11 @@ export default class Login extends Component<{}, {
                         <View className='price_line'>
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
-                                <Text className='num'>{goodsPrice}</Text>
+                                <Text className='num'>{data && data.price ? data.price:"0.00"}</Text>
                             </View>
-                            {
-                                selectSkuId>0?<View className='ap'>
-                                    <Text className='txt'>￥{goodsMarketPrice}</Text>
-                                </View>:null
-                            }
+                            <View className='ap'>
+                                <Text className='txt'>￥{data && data.market_price ? data.market_price:"0.00"}</Text>
+                            </View>
                             <View className='total'>
                                 <Text className='txt'>{data && data.sold_count ? data.sold_count : 0}人已抢</Text>
                             </View>

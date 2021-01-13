@@ -49,51 +49,10 @@
         }
     }
 
-    .top-search {
-        height: 104px;
-        //background: #FFFFFF;
-        box-sizing: border-box;
-        padding: 14px 32px;
-        position: fixed;
-        z-index: 200;
-        left: 0;
-        width: 100%;
-        transition: all .2s ease;
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 76px;
-            background: #fff;
-            border-radius: 38px;
-
-            .placeholders {
-                color: #9C9DA6;
-                font-size: 28px;
-                padding-left: 2px;
-            }
-        }
-    }
-
     .inde_page_container {
         box-sizing: border-box;
         display: block;
         padding-bottom: 32px;
-
-        .remmond_your_love{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            .love{
-                width: 238px;
-                height: 62px;
-            }
-            .txt{
-                font-size: 32px;
-                font-weight: 600;
-            }
-        }
 
         .temp-warp {
             width: 670px;
@@ -319,6 +278,24 @@
             }
         }
 
+    }
+
+    .remmond_your_love{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        //box-sizing: border-box;
+        transition: all .2s ease-in;
+        width: 100%;
+        z-index: 100;
+        .love{
+            width: 238px;
+            height: 62px;
+        }
+        .txt{
+            font-size: 32px;
+            font-weight: 500;
+        }
     }
 }
 
@@ -1138,4 +1115,31 @@
 }
 .fix_all_margin{
     margin: 40px auto 0;
+}
+.top-search {
+    height: 104px;
+    //background: #FFFFFF;
+    box-sizing: border-box;
+    padding: 14px 32px;
+    position: fixed;
+    z-index: 200;
+    left: 0;
+    top: initial;
+    width: 100%;
+    transition: all .2s ease;
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 76px;
+        background: #fff;
+        border-radius: 38px;
+
+        .placeholders {
+            color: #9C9DA6;
+            font-size: 28px;
+            padding-left: 2px;
+        }
+    }
 }

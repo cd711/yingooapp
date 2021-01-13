@@ -544,6 +544,11 @@ export function allowShowCoupon(parentId: string | number , couponId: string | n
     return status
 }
 
+/**
+ * @description: 跳转地址
+ * @param {string} url
+ * @param {boolean} tabbar
+ */
 export function jumpUri(url:string,tabbar:boolean = false){
     if(deviceInfo.env == 'h5'){
         if (tabbar) {
@@ -577,7 +582,7 @@ export function photoGetItemStyle() {
 export const shareInfo = {
     title: "免费照片冲印个性化定制手机壳",
     desc: "[有人@你]，送你一个创意定制品，快来免费领！",
-    link: `https://m.playbox.yingoo.com/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`,
+    link: deviceInfo.env=="h5"?`https://m.playbox.yingoo.com/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`:`/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`,
     imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
 }
 
@@ -882,4 +887,47 @@ export function updateChannelCode(path: string, code:string = "") {
     }
 
     return _path;
+}
+/**
+ * 判断变量是否为空，
+ * @param  {[type]}  param 变量
+ * @return {Boolean}      为空返回true，否则返回false。
+ */
+export function isEmptyX(param){
+    if(param){
+        const param_type = typeof(param);
+        if(param_type == 'object'){
+            //要判断的是【对象】或【数组】或【null】等
+            if(typeof(param.length) == 'undefined'){
+                if(JSON.stringify(param) == "{}"){
+                    return true;//空值，空对象
+                }
+            }else if(param.length == 0){
+                return true;//空值，空数组
+            }
+        }else if(param_type == 'string'){
+            //如果要过滤空格等字符
+            const new_param = param.trim();
+            if(new_param.length == 0){
+                //空值，例如:带有空格的字符串" "。
+                return true;
+            }
+        }else if(param_type == 'boolean'){
+            if(!param){
+                return true;
+            }
+        }else if(param_type== 'number'){
+            if(!param){
+                return true;
+            }
+        }
+        return false;//非空值
+    }else{
+        //空值,例如：
+        //(1)null
+        //(2)可能使用了js的内置的名称，例如：var name=[],这个打印类型是字符串类型。
+        //(3)空字符串''、""。
+        //(4)数字0、00等，如果可以只输入0，则需要另外判断。
+        return true;
+    }
 }
