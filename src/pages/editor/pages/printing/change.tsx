@@ -352,7 +352,7 @@ const PrintChange: Taro.FC<any> = () => {
             const imgPix = attribute.split("*");
             const num = Number(pixArr[0]) / Number(pixArr[1]);
             const cNum = Number(imgPix[0]) / Number(imgPix[1])
-            console.log("超级计算：", num)
+            console.log("旋转计算：", cNum > 1, num < 1, cNum < 1, num > 1)
             /**
              * pixArr: 打印尺寸, imgPix：图片尺寸
              * 打印尺寸 大于 1，就判定为打印的是横图，图片尺寸不满足条件（也就是图片尺寸小于1）的话就旋转
