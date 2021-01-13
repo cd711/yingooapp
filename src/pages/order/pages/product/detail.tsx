@@ -195,7 +195,7 @@ export default class Login extends Component<{}, {
                 id
             }).then((res) => {
                 Taro.hideLoading();
-                if (deviceInfo.env != "h5") {
+                if (deviceInfo.env == "weapp") {
                     WxParse.wxParse('article', 'html', res.content, this.$scope, 0);
                 }
                 this.modalInit = true;
