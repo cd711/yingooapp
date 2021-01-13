@@ -938,7 +938,7 @@ export function isEmptyX(param){
  */
 export function jumpOrderConfimPreview(data:any) {
     const currentUnix = dayjs().unix()
-    const key = "order_preview"+currentUnix;
+    const key = "order_preview_"+currentUnix;
     Taro.setStorage({
         key,
         data
@@ -955,17 +955,20 @@ export function jumpOrderConfimPreview(data:any) {
  * @param {function} callback
  * @return {*} 无返回值
  */
-export function getOrderConfimPreviewData(currentUnix:string,callback:(res)=>void) {
-    const key = "order_preview"+currentUnix;
+export function getOrderConfimPreviewData(currentUnix:string,callback:(res:any,is:boolean)=>void) {
+    const key = "order_preview_"+currentUnix;
     getTempDataContainer(key,(res)=>{
         if (res != null) {
             Taro.removeStorage({key});
-            callback(res);
+            callback(res,true);
         }else{
             Taro.getStorage({
                 key,
                 success:(res)=>{
-                    callback(res.data)
+                    callback(res.data,true)
+                },
+                fail:()=>{
+                    callback(null,false)
                 }
             })
         }
@@ -979,10 +982,14 @@ export function getOrderConfimPreviewData(currentUnix:string,callback:(res)=>voi
  * @return {*} 无返回值
  */
 export function addOrderConfimPreviewData(currentUnix:string,data:any) {
-    const key = "order_preview"+currentUnix;
+    const key = "order_preview_"+currentUnix;
     Taro.setStorage({
         key,
         data
     });
-    setTempDataContainer(key,data);
+    setTempDataContainer(key,data,(ok)=>{
+        if (ok) {
+            Taro.removeStorage({key});
+        }
+    });
 }
