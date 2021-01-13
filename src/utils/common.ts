@@ -990,14 +990,6 @@ export function addOrderConfimPreviewData(currentUnix:string,data:any) {
         key,
         data
     });
-<<<<<<< HEAD
-    setTempDataContainer(key,data,(ok)=>{
-        if (ok) {
-            Taro.removeStorage({key});
-        }
-    });
-}
-=======
     setTempDataContainer(key,data);
 }
 
@@ -1070,4 +1062,3 @@ export function removeDuplicationForArr(
 
     return temp
 }
->>>>>>> 3ed22924f1d194d98f44cdb7c4ace1353c0b5c22
