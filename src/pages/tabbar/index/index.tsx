@@ -90,7 +90,7 @@ class Index extends Component<any, IndexState> {
     getIndexBlocks = (opt: {start?: number, size?: number, loadMore?: boolean, channelCode?: string } = {}) => {
         return new Promise<any[]>(async (resolve, reject) => {
             const options = {
-                size: opt.size || 50,
+                size: opt.size || 10,
                 start: opt.start || 0,
                 loadMore: opt.loadMore || false
             };
