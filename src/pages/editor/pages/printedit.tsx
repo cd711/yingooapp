@@ -15,7 +15,7 @@ import {
     getURLParamsStr, getUserKey,
     notNull,
     ossUrl,
-    pageTotal, sleep, updateChannelCode,
+    pageTotal, removeDuplicationForArr, sleep, updateChannelCode,
     urlDeCode, urlEncode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
@@ -1190,14 +1190,19 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 }
             })
 
+            console.log("已选择的图片：", arr)
             photoStore.editorPhotos = arr;
 
-            getTemplateForPhotoNum({num: arr.length}).then(res => {
+            getTemplateForPhotoNum({num: arr.length}).then(async res => {
 
                 setTemplateList([...res]);
                 const cur = res[currentData.current.curr];
                 if (cur) {
-                    renderTemplateDoc(cur.id)
+                    renderTemplateDoc(cur.id);
+                    console.log(JSON.parse(JSON.stringify(arr)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
+                    await photoStore.updateServerParams(parent.userKey(), {
+                        usefulImages: removeDuplicationForArr(arr, photoStore.photoProcessParams.usefulImages)
+                    })
                 } else {
                     console.log(`没有查询到对应图片数量（${arr.length}）的模板`, res)
                 }
@@ -1243,10 +1248,11 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 height: deviceInfo.windowHeight,
                 padding: 0
             }}>
-                <PhotosEle editSelect
-                        onClose={cancelMode}
-                        onPhotoSelect={onPhotoSelect}
-                />
+                <PhotosEle
+                    editSelect
+                    onClose={cancelMode}
+                    defaultSelect={photoStore.photoProcessParams.usefulImages}
+                    onPhotoSelect={onPhotoSelect} />
             </View>
             : <View />
 }

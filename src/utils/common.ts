@@ -888,11 +888,13 @@ export function updateChannelCode(path: string, code:string = "") {
 
     return _path;
 }
+
 /**
  * 判断变量是否为空，
  * @param  {[type]}  param 变量
  * @return {Boolean}      为空返回true，否则返回false。
  */
+// @ts-ignore
 export function isEmptyX(param){
     if(param){
         const param_type = typeof(param);
@@ -930,4 +932,74 @@ export function isEmptyX(param){
         //(4)数字0、00等，如果可以只输入0，则需要另外判断。
         return true;
     }
+}
+
+/**
+ * 排除已有图片，
+ * @param newArr
+ * @param oldArr
+ * @param deleteID {string | number} 要删除的ID
+ */
+export function removeDuplicationForArr(
+    newArr: {id: string | number, url: string}[],
+    oldArr: {id: string | number, url: string, count: number}[] = [],
+    deleteID: string | number = ""
+) {
+    // 排除id为空的列表
+    newArr = newArr.filter(v => !notNull(v.id));
+    console.log("排重方法：", JSON.parse(JSON.stringify(newArr)), JSON.parse(JSON.stringify(oldArr)))
+    let temp = [];
+    if (oldArr.length === 0) {
+        temp = newArr.map(value => {
+            return {
+                ...value,
+                count: 1
+            }
+        });
+        console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
+        return temp
+    }
+    const concatArr = [...newArr, ...oldArr];
+
+    // 查重
+    const hash = {};
+    temp = concatArr.reduce(function(item, next) {
+        hash[next.id] ? '' : hash[next.id] = true && item.push(next);
+        return item
+    }, []);
+
+
+    if (!notNull(deleteID)) {
+        const delTemp = [...oldArr];
+        delTemp.forEach((value, index) => {
+            if (deleteID == value.id) {
+                if (value.count > 1) {
+                    delTemp[index].count -= 1;
+                } else if (value.count == 1) {
+                    delTemp.splice(index, 1)
+                } else {
+                    delTemp.splice(index, 1)
+                }
+            }
+        });
+        temp = [...delTemp]
+    } else {
+        temp.forEach((value, index) => {
+
+            for (let i = 0; i < newArr.length; i++) {
+                const cur = newArr[i];
+                if (cur.id == value.id) {
+                    if (temp[index].count) {
+                        temp[index]["count"] += 1;
+                    } else {
+                        temp[index]["count"] = 1;
+                    }
+                }
+            }
+        })
+    }
+
+    console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
+
+    return temp
 }

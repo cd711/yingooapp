@@ -16,7 +16,7 @@ interface PhotosEleProps {
     editSelect?: boolean;
     onPhotoSelect?: ({ids: [], imgs: [], attrs: []}) => void;
     // 已使用的图片数组
-    defaultSelect?: Array<{ id: string | number, img: string }>;
+    defaultSelect?: Array<{ id: string | number, url: string }>;
     onClose?: () => void;
     // 选择图片必选多少张
     count?: number;
@@ -137,6 +137,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         const {imageList} = this.state;
         const usefulList = this.state.usefulList;
         const {defaultSelect} = this.props;
+        console.log(defaultSelect)
         if (defaultSelect && defaultSelect instanceof Array) {
             for (let i = 0; i < imageList.length; i++) {
                 const parent = imageList[i];
@@ -145,7 +146,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     if (parent.id == child.id) {
                         usefulList.push({
                             id: parent.id,
-                            image: parent.url
+                            url: parent.url
                         })
                     }
                 }
@@ -461,12 +462,12 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     </View>
                                 </View>
                         }
-                        {list.length > 0
+                        {list.length > 0 && navSwitchActive === 0
                             ? <LoadMore status={loadStatus} allowFix={!(_editSelect && list.length > 0)} />
                             : null}
                     </ScrollView>
                     {
-                        _editSelect && list.length > 0
+                        _editSelect && list.length > 0 &&navSwitchActive === 0
                             ? <View className="fix_selector_container">
                                 <View className="photo_edit_selector_container">
                                     <View className="select_head">

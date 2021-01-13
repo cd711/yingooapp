@@ -8,7 +8,7 @@ import {
     deviceInfo, getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
-    notNull, shareAppExtends, sleep, updateChannelCode,
+    notNull, removeDuplicationForArr, shareAppExtends, sleep, updateChannelCode,
     urlEncode, useDebounceFn
 } from "../../../../utils/common";
 import {api} from "../../../../utils/net";
@@ -55,6 +55,10 @@ const PrintChange: Taro.FC<any> = () => {
     const currentSkus = useRef<any[]>([]);
     const skuStr = useRef<string>("");
 
+    const scrollVal = useRef<number>(0);
+
+    const runOnlyOne = useRef(0);
+
 
     const backPressHandle = () => {
         if (deviceInfo.env === "h5") {
@@ -90,7 +94,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     }, 800), [skuStr.current])
 
-    const runOnlyOne = useRef(0);
+
     useEffect(() => {
 
         // 统计图片及其count的总数
@@ -533,21 +537,23 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onDeleteImg = async idx => {
         const arr = [...photos];
-        arr.splice(idx, 1);
-        setPhotos([...arr])
 
         const photo = [...photoStore.photoProcessParams.photo.path];
-        photo.splice(idx, 1)
+        photo.splice(idx, 1);
         try {
             await photoStore.updateServerParams(photoStore.printKey, {
                 photo: {
                     ...photoStore.photoProcessParams.photo,
                     path: photo
-                }
+                },
+                usefulImages: removeDuplicationForArr(arr.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages, arr[idx].id)
             })
         } catch (e) {
             console.log("更新数量出错：", e)
         }
+
+        arr.splice(idx, 1);
+        setPhotos([...arr])
     }
 
     function setCount(_, id) {
@@ -820,7 +826,8 @@ const PrintChange: Taro.FC<any> = () => {
             photo: {
                 ...photoStore.photoProcessParams.photo,
                 path: exArr
-            }
+            },
+            usefulImages: removeDuplicationForArr(exArr.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages)
         })
 
         setPhotos([...exArr]);
@@ -881,10 +888,10 @@ const PrintChange: Taro.FC<any> = () => {
             : deviceInfo.windowHeight - 110 + deviceInfo.statusBarHeight + deviceInfo.menu.height + "px"
     }
 
-    const scrollVal = useRef<number>(0);
     const debounceScroll = useDebounceFn(() => {
         setScrolling(false)
-    }, 300, false)
+    }, 300, false);
+
     const onScroll = (e) => {
         const top = e.detail.scrollTop;
         scrollVal.current = top;
@@ -1039,7 +1046,7 @@ const PrintChange: Taro.FC<any> = () => {
                         <PhotosEle editSelect
                                 onClose={closeSelectPhoto}
                                 count={photoStore.photoProcessParams.imageCount}
-                            // defaultSelect={photos.map(v => ({id: v.id, img: v.url}))}
+                                defaultSelect={photoStore.photoProcessParams.usefulImages}
                                 onPhotoSelect={onPhotoSelect}
                         />
                     </View>

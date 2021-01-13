@@ -58,6 +58,8 @@ export class PhotoParams {
     public min: number;
     // 照片冲印模板是否有数量限制
     public limit: boolean = false;
+    // 在流程里面已经使用过的图片
+    public usefulImages: Array<{id: string | number, url: string, count: number}> = new Array<{id: string | number; url: string, count: number}>();
 
     constructor(json?: any) {
         if (!json) {
@@ -76,6 +78,7 @@ export class PhotoParams {
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
         this.limit = json.limit || false;
-        this.min = !notNull(json.min) ? parseInt(json.min) : 1
+        this.min = !notNull(json.min) ? parseInt(json.min) : 1;
+        this.usefulImages = !notNull(json.usefulImages) ? json.usefulImages : new Array<{id: string | number; url: string, count: number}>();
     }
 }
