@@ -35,7 +35,7 @@ const PopLayout: Taro.FC<PopLayoutProps> = props => {
         } else {
             setSelected(idx)
         }
-        onClick && onClick(item, idx)
+        onClick && onClick(item, idx === selected ? -1 : idx)
     }
 
     return (
