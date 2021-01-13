@@ -8,7 +8,7 @@ import {
     getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
-    notNull, shareAppExtends,
+    notNull, removeDuplicationForArr, shareAppExtends,
     sleep, updateChannelCode,
     urlEncode
 } from "../../../../utils/common";
@@ -132,13 +132,14 @@ const Index: Taro.FC<any> = () => {
 
     async function renderParams(path: any[]) {
         Taro.showLoading({title: "请稍后..."});
-        const temp = {path, sku: checked, id: router.params.id};
+        const temp:any = {path, sku: checked, id: router.params.id};
 
         // 存储选择的照片
         await photoStore.updateServerParams(photoStore.printKey, {
             photo: hasTplID.current ? {...temp, path: []} : temp,
             pictureSize: checkAttr,
-            editPhotos: path
+            editPhotos: path,
+            usefulImages: removeDuplicationForArr(temp.path.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages)
         })
 
         Taro.hideLoading();
@@ -296,6 +297,7 @@ const Index: Taro.FC<any> = () => {
                         <PhotosEle
                             editSelect={photoVisible}
                             onClose={closeSelectPhoto}
+                            defaultSelect={photoStore.photoProcessParams.usefulImages}
                             count={photoStore.photoProcessParams.imageCount}
                             onPhotoSelect={onPhotoSelect} />
                     </View>
