@@ -998,15 +998,17 @@ export function addOrderConfimPreviewData(currentUnix:string,data:any) {
  * @param newArr
  * @param oldArr
  * @param deleteID {string | number} 要删除的ID
+ * @param extraIds 额外的ID数组
  */
 export function removeDuplicationForArr(
     newArr: {id: string | number, url: string}[],
     oldArr: {id: string | number, url: string, count: number}[] = [],
-    deleteID: string | number = ""
+    deleteID: string | number = "",
+    extraIds: Array<string | number> | undefined = undefined
 ) {
     // 排除id为空的列表
     newArr = newArr.filter(v => !notNull(v.id));
-    console.log("排重方法：", JSON.parse(JSON.stringify(newArr)), JSON.parse(JSON.stringify(oldArr)))
+    console.log("排重方法：", JSON.parse(JSON.stringify(newArr)), JSON.parse(JSON.stringify(oldArr)), 11, deleteID, 222,extraIds)
     let temp = [];
     if (oldArr.length === 0) {
         temp = newArr.map(value => {
@@ -1042,6 +1044,26 @@ export function removeDuplicationForArr(
             }
         });
         temp = [...delTemp]
+    } else if (notNull(deleteID) && !notNull(extraIds)) {
+        const delTemp = [...oldArr];
+        extraIds = extraIds.filter(v => !notNull(v));
+        const nArr = [...delTemp];
+        extraIds.forEach((item) => {
+            const idx = nArr.findIndex(v => v.id == item);
+            console.log("下标：", idx, item, delTemp, nArr, nArr[idx])
+            if (idx > -1) {
+                const value = nArr[idx];
+                if (value.count > 1) {
+                    nArr[idx].count -= 1;
+                } else if (value.count == 1) {
+                    nArr.splice(idx, 1)
+                } else {
+                    nArr.splice(idx, 1)
+                }
+            }
+        })
+
+        temp = [...nArr];
     } else {
         temp.forEach((value, index) => {
 

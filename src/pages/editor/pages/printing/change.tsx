@@ -476,6 +476,8 @@ const PrintChange: Taro.FC<any> = () => {
             if (params.photo.path.length === 0) {
                 selectPhoto()
             }
+
+            console.log("path:", params.photo.path)
             params.photo.path = params.photo.path.map((v) => {
                 const allowRotate = checkHasRotate(v.attr);
                 const arr = [...tArr];
@@ -540,6 +542,16 @@ const PrintChange: Taro.FC<any> = () => {
     const onDeleteImg = async idx => {
         const arr = [...photos];
 
+        console.log(arr[idx].id,
+            arr[idx])
+
+        // removeDuplicationForArr(
+        //     arr.map(v => ({id: v.id, url: v.url})),
+        //     photoStore.photoProcessParams.usefulImages,
+        //     arr[idx].id,
+        //     arr[idx].extraIds || undefined
+        // )
+
         const photo = [...photoStore.photoProcessParams.photo.path];
         photo.splice(idx, 1);
         try {
@@ -548,7 +560,12 @@ const PrintChange: Taro.FC<any> = () => {
                     ...photoStore.photoProcessParams.photo,
                     path: photo
                 },
-                usefulImages: removeDuplicationForArr(arr.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages, arr[idx].id)
+                usefulImages: removeDuplicationForArr(
+                    arr.map(v => ({id: v.id, url: v.url})),
+                    photoStore.photoProcessParams.usefulImages,
+                    arr[idx].id,
+                    arr[idx].extraIds || undefined
+                )
             })
         } catch (e) {
             console.log("更新数量出错：", e)
@@ -849,6 +866,7 @@ const PrintChange: Taro.FC<any> = () => {
             key: photoStore.printKey,
             local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
+            imgID: notNull(item.id) ? -1 : item.id,
             img: item.url,
         };
 
@@ -859,7 +877,7 @@ const PrintChange: Taro.FC<any> = () => {
         try {
             if (!notNull(item.readLocal) && item.readLocal === true) {
                 await photoStore.updateServerParams(photoStore.printKey, {
-                    originalData: item.originalData
+                    originalData: item.originalData,
                 })
             }
         }catch (e) {

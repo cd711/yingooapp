@@ -27,6 +27,8 @@ interface PhotoParamsPathArray {
     edited: boolean;
     originalData: Array<{ id: string | number, url: string }>;
     count: number;
+    // 在编辑器选图后存储的额外的id
+    extraIds: Array<string | number>
 }
 export interface PhotoParamsPath {
     path: Array<PhotoParamsPathArray>;
