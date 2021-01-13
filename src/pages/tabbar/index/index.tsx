@@ -107,7 +107,7 @@ class Index extends Component<any, IndexState> {
                     arr = res.list
                 }
                 let topFix = [];
-                topFix = arr.filter(value => value.area_type === "search" && value.display === "top");
+                topFix = arr.filter(value => value.display === "top");
 
                 this.setState({
                     loadStatus: parseInt(res.total) <= 10 || arr.length < parseInt(res.total) ? LoadMoreEnum.noMore : LoadMoreEnum.more,
@@ -593,38 +593,53 @@ class Index extends Component<any, IndexState> {
                 <LoginModal isTabbar />
                 {
                     topFix.map((item, index) => {
-                        return item.display === "top" && <View className='top-search' key={index.toString()}
+                        return item.area_type === "search"
+                            ? <View className='top-search' key={index.toString()}
                                      style={{
-                                         paddingTop: item.display === "top" ? deviceInfo.statusBarHeight + 5 + "px" : "7px",
-                                         height: item.display === "top" ? 52 + deviceInfo.statusBarHeight + "px" : "52px",
-                                         background: item.display === "top" ? scrolling ? "#fff" : "transparent" : "#fff",
-                                         boxShadow: item.display === "top" ? scrolling ? "0px 8px 16px 0px #0A246308" : "none" : "none",
-                                         position: item.display === "top" ? "fixed" : "relative",
-                                         top: item.display === "top" ? "0px" : "initial"
+                                         paddingTop: deviceInfo.statusBarHeight + 5 + "px",
+                                         height: 52 + deviceInfo.statusBarHeight + "px",
+                                         background: scrolling ? "#fff" : "transparent",
+                                         boxShadow: scrolling ? "0px 8px 16px 0px #0A246308" : "none",
+                                         position: "fixed",
+                                         top: "0px"
                                      }}
-                        >
-                            <View className='search-box'
-                                  style={{
-                                      width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
-                                      height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
-                                      background: scrolling ? "#f5f5f5" : "#fff"
-                                  }}
-                                  onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/search/index")})}>
-                                <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
-                                <Text className='placeholders'>搜索海量模板</Text>
+                            >
+                                <View className='search-box'
+                                      style={{
+                                          width: deviceInfo.windowWidth - deviceInfo.menu.width - 40 + "px",
+                                          height: deviceInfo.env === "h5" ? 76 / 2 : `${deviceInfo.menu.height}px`,
+                                          background: scrolling ? "#f5f5f5" : "#fff"
+                                      }}
+                                      onClick={() => Taro.navigateTo({url: updateChannelCode("/pages/search/index")})}>
+                                    <IconFont name='20_sousuo' size={40} color='#9C9DA6'/>
+                                    <Text className='placeholders'>搜索海量模板</Text>
+                                </View>
                             </View>
-                        </View>
+                            : <View className="remmond_your_love" key={`${index}`}
+                                    style={{
+                                        position: "fixed",
+                                        top: "0px",
+                                        background:  scrolling ? "#fff" : "transparent",
+                                        boxShadow: scrolling ? "0px 8px 16px 0px #0A246308" : "none",
+                                        paddingTop: `${deviceInfo.env === "h5" ? 0 : deviceInfo.menu.top}px`,
+                                        paddingBottom: `${deviceInfo.env == "h5" ? 0 : 10}px`,
+                                        height: `${deviceInfo.env === "h5" ? 44 : deviceInfo.menu.height}px`,
+                                        zIndex: 210
+                                    }}
+                            >
+                                {item.clist[0].thumb_image
+                                    ? <Image src={item.clist[0].thumb_image} className="love" />
+                                    : <Text className="txt">{item.clist[0].title}</Text>}
+                            </View>
                     })
                 }
                 <ScrollView scrollY
-                            // onTouchEnd={this.onTouchEnd}
                             refresherTriggered={refresherTriggered}
                             refresherEnabled={deviceInfo.env === "h5" ? isTop : true}
                             refresherThreshold={50}
                             onRefresherRefresh={this.onTouchEnd}
                             onScrollToLower={this.loadMore}
                             onScroll={this.onScroll}
-                            // onTouchMove={deviceInfo.env === "h5" && isTop ? () => {} : null}
                             className="index_container_scroll"
                             style={process.env.TARO_ENV === 'h5' ? {height: deviceInfo.windowHeight - 50} : `height:${centerPartyHeight}px`}>
                     <Image src={require("../../../source/ibg.png")} className="index_fixed_top_img" />
@@ -639,7 +654,7 @@ class Index extends Component<any, IndexState> {
                             : null
                     }
                     <View className='inde_page_container' style={{
-                        paddingTop: `${deviceInfo.env === "h5" ? deviceInfo.statusBarHeight : deviceInfo.menu.bottom}px`
+                        paddingTop: `${deviceInfo.env === "h5" ? (topFix.length > 0 ? 44 : deviceInfo.statusBarHeight) : deviceInfo.menu.bottom}px`
                     }}>
                         {
                             data.map((item, index) => {
@@ -941,8 +956,8 @@ class Index extends Component<any, IndexState> {
                                                             ))
                                                         }
                                                     </View>
-                                                    : item.area_type === "title"
-                                                        ? <View className="remmond_your_love fix_all_margin">
+                                                    : item.area_type === "title" && item.display === "fixed"
+                                                        ? <View className="remmond_your_love fix_all_margin" key={`${index}`}>
                                                             {item.clist[0].thumb_image
                                                                 ? <Image src={item.clist[0].thumb_image} className="love" />
                                                                 : <Text className="txt">{item.clist[0].title}</Text>}
