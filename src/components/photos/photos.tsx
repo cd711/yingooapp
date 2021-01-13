@@ -7,7 +7,6 @@ import {api} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
 import {deviceInfo, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
-import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
 import PopLayout, {PopLayoutItemProps} from "../popLayout";
@@ -16,6 +15,7 @@ import PopLayout, {PopLayoutItemProps} from "../popLayout";
 interface PhotosEleProps {
     editSelect?: boolean;
     onPhotoSelect?: ({ids: [], imgs: [], attrs: []}) => void;
+    // 已使用的图片数组
     defaultSelect?: Array<{ id: string | number, img: string }>;
     onClose?: () => void;
     // 选择图片必选多少张
@@ -83,36 +83,40 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     private total: number = 0;
 
-    async getList(data) {
-
-        const opt = {
-            start: data.start || 0,
-            size: data.size || 25,
-            type: data.type || this.state.navSwitchActive,
-            loadMore: data.loadMore || false
-        };
-        const temp = {
-            start: opt.start, size: opt.size, type: "image"
-        }
-        if (data.sort) {
-            Object.assign(temp, {sort: data.sort})
-        }
-        if (data.order) {
-            Object.assign(temp, {order: data.order})
-        }
-        try {
-            const res = await api("app.profile/imgs", temp);
-            this.total = Number(res.total);
-            console.log(res);
-            this.setState({loading: false});
-            let list = [];
-            list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
-            this.setState({imageList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
-        } catch (e) {
-            console.log("获取图库出错：", e)
-            this.setState({loadStatus: "noMore"})
-        }
-        this.setState({loading: false})
+    getList(data) {
+        return new Promise(async (resolve, reject) => {
+            const opt = {
+                start: data.start || 0,
+                size: data.size || 25,
+                type: data.type || this.state.navSwitchActive,
+                loadMore: data.loadMore || false
+            };
+            const temp = {
+                start: opt.start, size: opt.size, type: "image"
+            }
+            if (data.sort) {
+                Object.assign(temp, {sort: data.sort})
+            }
+            if (data.order) {
+                Object.assign(temp, {order: data.order})
+            }
+            try {
+                const res = await api("app.profile/imgs", temp);
+                this.total = Number(res.total);
+                console.log(res);
+                this.setState({loading: false});
+                let list = [];
+                list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
+                this.setState({imageList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"}, () => {
+                    resolve()
+                })
+            } catch (e) {
+                reject(e)
+                console.log("获取图库出错：", e)
+                this.setState({loadStatus: "noMore"})
+            }
+            this.setState({loading: false})
+        })
     }
 
     initPropsToState = () => {
@@ -129,26 +133,32 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         });
     }
 
+    filterUsefulImages = () => {
+        const {imageList} = this.state;
+        const usefulList = this.state.usefulList;
+        const {defaultSelect} = this.props;
+        if (defaultSelect && defaultSelect instanceof Array) {
+            for (let i = 0; i < imageList.length; i++) {
+                const parent = imageList[i];
+                for (let d = 0; d < defaultSelect.length; d++) {
+                    const child = defaultSelect[d];
+                    if (parent.id == child.id) {
+                        usefulList.push({
+                            id: parent.id,
+                            image: parent.url
+                        })
+                    }
+                }
+            }
+            this.setState({usefulList})
+        }
+    }
+
     componentWillMount() {
         if (deviceInfo.env === "weapp") {
             this.initPropsToState()
             this.getList({start: 0}).then(() => {
-                const {defaultSelect} = this.props;
-                const {navSwitchActive} = this.state;
-
-                if (defaultSelect && navSwitchActive === 0) {
-                    // const editSelectImgs = this.state.editSelectImgs;
-                    // const editSelectImgIds = this.state.editSelectImgIds;
-                    // for (const p of imageList) {
-                    //     for (const c of defaultSelect) {
-                    //         if (c.id == p.id) {
-                    //             editSelectImgIds.push(c.id);
-                    //             editSelectImgs.push(c.img);
-                    //         }
-                    //     }
-                    // }
-                    // this.setState({editSelectImgs, editSelectImgIds})
-                }
+                this.filterUsefulImages()
             })
         }
     }
@@ -157,22 +167,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     componentDidMount() {
         this.initPropsToState()
         this.getList({start: 0}).then(() => {
-            const {defaultSelect} = this.props;
-            const {navSwitchActive} = this.state;
-
-            if (defaultSelect && navSwitchActive === 0) {
-                // const editSelectImgs = this.state.editSelectImgs;
-                // const editSelectImgIds = this.state.editSelectImgIds;
-                // for (const p of imageList) {
-                //     for (const c of defaultSelect) {
-                //         if (c.id == p.id) {
-                //             editSelectImgIds.push(c.id);
-                //             editSelectImgs.push(c.img);
-                //         }
-                //     }
-                // }
-                // this.setState({editSelectImgs, editSelectImgIds})
-            }
+            this.filterUsefulImages()
         })
     }
 
@@ -354,8 +349,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             editSelectImgIds,
             visible
         } = this.state;
-        // const list = navSwitchActive === 0 ? imageList : usefulList;
-        const list = imageList;
+        const list = navSwitchActive === 0 ? imageList : usefulList;
+        // const list = imageList;
         const tabs = ["未使用", "已使用"];
         return (
             <View className='photos'>
@@ -423,16 +418,20 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                         </View>
                                     </View>
                                     <View className="list_main">
-                                        <View className="list_item">
-                                            <UploadFile
-                                                extraType={3}
-                                                type="card"
-                                                count={9}
-                                                image={require("../../source/car.png")}
-                                                uploadType="image"
-                                                style={photoGetItemStyle()}
-                                                onChange={this.uploadFile}/>
-                                        </View>
+                                        {
+                                            navSwitchActive === 0
+                                                ? <View className="list_item">
+                                                    <UploadFile
+                                                        extraType={3}
+                                                        type="card"
+                                                        count={9}
+                                                        image={require("../../source/car.png")}
+                                                        uploadType="image"
+                                                        style={photoGetItemStyle()}
+                                                        onChange={this.uploadFile}/>
+                                                </View>
+                                                : null
+                                        }
                                         {
                                             list.map((item, idx) => {
                                                 return <View className="list_item" key={idx + ""}>
