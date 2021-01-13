@@ -1,0 +1,42 @@
+.pop_layout_container{
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+    .pop_layout_body{
+        display: block;
+        width: 100%;
+        position: relative;
+        .pop_layout_main{
+            box-sizing: border-box;
+            width: 100%;
+            display: block;
+            .pop_layout_item{
+                box-sizing: border-box;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 112px;
+                padding: 0 32px;
+                .name{
+                    font-size: 32px;
+                }
+                .selected_item{
+                    width: 40px;
+                    height: 40px;
+                }
+            }
+        }
+    }
+    .pop_layout_modal{
+        .layout-body__content,.layout-body{
+            min-height: auto;
+        }
+        .at-float-layout__container{
+            border-top-left-radius: 32px;
+            border-top-right-radius: 32px;
+            overflow: hidden;
+            min-height: auto;
+        }
+    }
+}

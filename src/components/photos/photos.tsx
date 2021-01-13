@@ -10,6 +10,7 @@ import LoadMore from "../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
+import PopLayout, {PopLayoutItemProps} from "../popLayout";
 
 
 interface PhotosEleProps {
@@ -39,6 +40,8 @@ interface PhotosEleState {
     _editSelect: boolean;
     _count: number;
     _max: number;
+    visible: boolean;
+    active: number;
 }
 
 @observer
@@ -67,12 +70,14 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             loadStatus: "noMore",
             isEdit: false,
             sortActive: {},
+            active: -1,
             editSelectImgs: [],
             editSelectImgIds: [],
             editSelectAttr: [],
             _editSelect: false,
             _count: 0,
-            _max: 100
+            _max: 100,
+            visible: false,
         }
     }
 
@@ -286,67 +291,45 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
 
-    changeSort = (data: PopoverItemClickProps) => {
-        console.log(data.value)
-        if (data.value) {
-            let sort = {};
-            if (typeof data.value === "string") {
-                sort = JSON.parse(data.value);
-            }
-            this.setState({sortActive: sort})
-            this.scrollView.scrollTop = 0;
-            this.getList({
-                start: 0,
-                ...sort
-            })
+    changeSort = (data: PopLayoutItemProps, index: number) => {
+        console.log(data, index)
+        let sort = {};
+        if (typeof data.value === "string") {
+            sort = JSON.parse(data.value);
         }
+        this.setState({
+            sortActive: sort,
+            visible: false,
+            active: index
+        })
+        this.scrollView.scrollTop = 0;
+        this.getList({
+            start: 0,
+            ...sort,
+        })
     }
 
-    private popoverItem: PopoverItemProps[] = [
+    private popoverItem: PopLayoutItemProps[] = [
         {
             title: "时间从远到近排序",
             value: JSON.stringify({sort: "createtime", order: "asc"}),
-            onClick: this.changeSort,
+            key: 1,
         },
         {
             title: "时间从近到远排序",
             value: JSON.stringify({sort: "createtime", order: "desc"}),
-            onClick: this.changeSort,
+            key: 2,
         },
         {
             title: "从大到小降序",
             value: JSON.stringify({sort: "filesize", order: "desc"}),
-            onClick: this.changeSort,
+            key: 3,
         },
         {
             title: "从小到大升序",
             value: JSON.stringify({sort: "filesize", order: "asc"}),
-            onClick: this.changeSort,
+            key: 4,
         },
-        // {
-        //     title: " 时间从远到近排序",
-        //     value: JSON.stringify({sort: "createtime", order: "asc"}),
-        //     onClick: this.changeSort,
-        //     customRender: <View className="sort_item"><Text className="txt">时间从远到近排序</Text></View>
-        // },
-        // {
-        //     title: "时间从近到远排序",
-        //     value: JSON.stringify({sort: "createtime", order: "desc"}),
-        //     onClick: this.changeSort,
-        //     customRender: <View className="sort_item"><Text className="txt">时间从近到远排序</Text></View>
-        // },
-        // {
-        //     title: "从大到小降序",
-        //     value: JSON.stringify({sort: "filesize", order: "desc"}),
-        //     onClick: this.changeSort,
-        //     customRender: <View className="sort_item"><Text className="txt">从大到小降序</Text></View>
-        // },
-        // {
-        //     title: "从小到大升序",
-        //     value: JSON.stringify({sort: "filesize", order: "asc"}),
-        //     onClick: this.changeSort,
-        //     customRender: <View className="sort_item"><Text className="txt">从小到大升序</Text></View>
-        // }
     ]
 
     getScrollHeight = () => {
@@ -365,9 +348,11 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             loading,
             imageList,
             usefulList,
+            active,
             loadStatus,
             editSelectImgs,
-            editSelectImgIds
+            editSelectImgIds,
+            visible
         } = this.state;
         // const list = navSwitchActive === 0 ? imageList : usefulList;
         const list = imageList;
@@ -387,6 +372,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     </View>
                     <View className="right"/>
                 </View>
+                {
+                    visible
+                        ? <PopLayout
+                            data={this.popoverItem}
+                            onClick={this.changeSort}
+                            visible={visible}
+                            defaultActive={active}
+                            onClose={() => this.setState({visible: false})} />
+                        : null
+                }
                 <View className='container'>
                     <ScrollView className="list_scrollview"
                                 style={deviceInfo.env !== "h5" && !(_editSelect && list.length > 0)
@@ -413,8 +408,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_filter">
-                                        <View className="filter_txt">
-                                            <Text className="tit">按大小排序</Text>
+                                        <View className="filter_txt" onClick={() => this.setState({visible: true})}>
+                                            <Text className="tit">{active > -1 ? this.popoverItem[active].title : "排序"}</Text>
                                             <Image src={require("../../source/down.png")} className="filter_icon" />
                                         </View>
                                         <View className="filter_switch_bar">
