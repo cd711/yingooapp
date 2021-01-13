@@ -54,20 +54,6 @@
         display: block;
         padding-bottom: 32px;
 
-        .remmond_your_love{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            .love{
-                width: 238px;
-                height: 62px;
-            }
-            .txt{
-                font-size: 32px;
-                font-weight: 600;
-            }
-        }
-
         .temp-warp {
             width: 670px;
             // height: 912px;
@@ -292,6 +278,24 @@
             }
         }
 
+    }
+
+    .remmond_your_love{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        //box-sizing: border-box;
+        transition: all .2s ease-in;
+        width: 100%;
+        z-index: 100;
+        .love{
+            width: 238px;
+            height: 62px;
+        }
+        .txt{
+            font-size: 32px;
+            font-weight: 500;
+        }
     }
 }
 
