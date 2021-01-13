@@ -15,7 +15,8 @@ import {
     urlEncode,
     getURLParamsStr,
     setTempDataContainer,
-    updateChannelCode
+    updateChannelCode,
+    jumpOrderConfimPreview
 } from '../../../../utils/common';
 import LoginModal from '../../../../components/login/loginModal';
 import page from '../../../../utils/ext'
@@ -413,8 +414,11 @@ export default class Preview extends Component<any, {
                             this.setState({
                                 placeOrderShow:false
                             })
-                            Taro.navigateTo({
-                                url: updateChannelCode(`/pages/order/pages/template/confirm?skuid=${selectSkuId}&total=${buyTotal}&tplid=${workId}&model=${modalId}`)
+                            jumpOrderConfimPreview({
+                                skuid:selectSkuId,
+                                total:buyTotal,
+                                tplid:workId,
+                                model:modalId
                             })
                         } else {
                             Taro.showToast({

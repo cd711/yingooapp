@@ -226,7 +226,7 @@ class Index extends Component<any, IndexState> {
     }
 
     getIndexList = () => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             try {
                 const res = await this.getIndexBlocks();
                 this.setState({data: [...res]}, () => {

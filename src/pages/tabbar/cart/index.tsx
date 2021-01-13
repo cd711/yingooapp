@@ -6,6 +6,7 @@ import Counter from '../../../components/counter/counter';
 import {
     deviceInfo,
     fixStatusBarHeight,
+    jumpOrderConfimPreview,
     ossUrl,
     updateChannelCode,
     updateTabBarChannelCode
@@ -318,11 +319,11 @@ export default class Cart extends Component<{}, {
                             </View>
                             <View className='right' onClick={() => {
                                 if (total > 0) {
-                                    // /pages/order/pages/template/confirm?skuid=379&total=1&tplid=166&model=343
                                     const cartIds = selectIds.join(',');
-                                    Taro.navigateTo({
-                                        url: updateChannelCode(`/pages/order/pages/template/confirm?cartIds=${Base64.encode(cartIds, true)}`)
+                                    jumpOrderConfimPreview({
+                                        cartIds:Base64.encode(cartIds, true)
                                     })
+
                                 }
                             }}>
                                 <CartRightIcon width={220} height={88} linght={total > 0}/>

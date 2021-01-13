@@ -11,8 +11,10 @@ import Counter from '../../../../components/counter/counter';
 import FloatModal from '../../../../components/floatModal/FloatModal';
 import Ticket from '../../../../components/ticket/Ticket';
 import {
+    addOrderConfimPreviewData,
     deviceInfo,
     fixStatusBarHeight,
+    getOrderConfimPreviewData,
     getTempDataContainer,
     notNull,
     ossUrl,
@@ -99,90 +101,92 @@ export default class Confirm extends Component<any, {
                 this.initData();
             }
         });
-
-        this.initData();
-
+        if (userStore.isLogin) {
+            this.initData();
+        }
     }
 
-    initData = async () => {
-        const {page, skuid, total}: any = this.$router.params;
-        this.isPhoto = page && page === "photo";
-        let params = {};
-        if (this.isPhoto) {
-            try {
-                await photoStore.getServerParams({setLocal: true});
-                console.log(photoStore.photoProcessParams.changeUrlParams)
-                params = photoStore.photoProcessParams.changeUrlParams
-            } catch (e) {
-                console.log("读取参数出错：", e)
-
-            }
-        } else {
-            params = this.$router.params
-        }
-        const {tplid, model, orderid, cartIds, parintImges}: any = params;
-        if (orderid) {
-            this.checkOrder(orderid);
-        } else {
-            let data: any = {
-                sku_id: skuid,
-                quantity: total,
-                user_tpl_id: this.isPhoto ? -1 : (tplid?tplid:0),
-            };
-            if (!this.isPhoto) {
-                data = {
-                    ...data,
-                    phone_model_id: model ? model : 336
+    initData = () => {
+        Taro.showLoading({title: "加载中"});
+        const {order}: any = this.$router.params;
+        getOrderConfimPreviewData(order,async (res)=>{
+            const {page, skuid, total}: any = res;
+            this.isPhoto = page && page === "photo";
+            let params = {};
+            if (this.isPhoto) {
+                try {
+                    await photoStore.getServerParams({setLocal: true});
+                    console.log(photoStore.photoProcessParams.changeUrlParams)
+                    params = photoStore.photoProcessParams.changeUrlParams
+                } catch (e) {
+                    console.log("读取参数出错：", e)
+    
                 }
+            } else {
+                params = res
             }
-            if (cartIds) {
-                data = {
-                    cart_ids: Base64.decode(cartIds)
-                }
-            }
-            if (!isEmpty(userStore.address)) {
-                console.log(userStore)
-                templateStore.address = userStore.address;
-                data["address_id"] = userStore.address.id;
-            }
-            if (this.isPhoto && parintImges) {
-                data = {...data, print_images: JSON.stringify(parintImges)}
-            }
-
-            Taro.showLoading({title: "加载中"});
-            api("app.order_temp/add", data).then((res) => {
-                this.initPayWayModal = true;
-                Taro.hideLoading();
-                if (deviceInfo.env == 'h5') {
-                    window.history.replaceState(null, null, updateChannelCode(`/pages/order/pages/template/confirm?orderid=${res.prepay_id}`));
-                }
-                this.filterUsedTicket(res.orders);
-                this.setState({
-                    data: this.handleData(res),
-                    orderid: res.prepay_id
-                });
-            }).catch((e) => {
-                Taro.hideLoading();
-                Taro.showToast({
-                    title: e,
-                    icon: "none",
-                    duration: 2000
-                });
-                setTimeout(() => {
-                    if (Taro.getCurrentPages().length>0) {
-                        Taro.navigateBack();
-                    } else {
-                        if (deviceInfo.env == "h5") {
-                            window.location.href = updateChannelCode("/pages/tabbar/index/index")
-                        } else {
-                            Taro.switchTab({
-                                url: updateChannelCode('/pages/tabbar/index/index')
-                            });
-                        }
+            const {tplid, model, orderid, cartIds, parintImges}: any = params;
+            if (orderid) {
+                this.checkOrder(orderid);
+            } else {
+                let data: any = {
+                    sku_id: skuid,
+                    quantity: total,
+                    user_tpl_id: this.isPhoto ? -1 : (tplid?tplid:0),
+                };
+                if (!this.isPhoto) {
+                    data = {
+                        ...data,
+                        phone_model_id: model ? model : 336
                     }
-                }, 2000);
-            })
-        }
+                }
+                if (cartIds) {
+                    data = {
+                        cart_ids: Base64.decode(cartIds)
+                    }
+                }
+                if (!isEmpty(userStore.address)) {
+                    console.log(userStore)
+                    templateStore.address = userStore.address;
+                    data["address_id"] = userStore.address.id;
+                }
+                if (this.isPhoto && parintImges) {
+                    data = {...data, print_images: JSON.stringify(parintImges)}
+                }            
+                api("app.order_temp/add", data).then((res) => {
+                    this.initPayWayModal = true;
+                    Taro.hideLoading();
+                    Object.assign(res,{orderid:res.prepay_id})
+                    addOrderConfimPreviewData(order,res)
+                    this.filterUsedTicket(res.orders);
+                    this.setState({
+                        data: this.handleData(res),
+                        orderid: res.prepay_id
+                    });
+                }).catch((e) => {
+                    Taro.hideLoading();
+                    Taro.showToast({
+                        title: e,
+                        icon: "none",
+                        duration: 2000
+                    });
+                    setTimeout(() => {
+                        if (Taro.getCurrentPages().length>0) {
+                            Taro.navigateBack();
+                        } else {
+                            if (deviceInfo.env == "h5") {
+                                window.location.href = updateChannelCode("/pages/tabbar/index/index")
+                            } else {
+                                Taro.switchTab({
+                                    url: updateChannelCode('/pages/tabbar/index/index')
+                                });
+                            }
+                        }
+                    }, 2000);
+                })
+            }
+        })
+
     }
     handleData = (res: any) => {
         const temp = res;
@@ -204,54 +208,56 @@ export default class Confirm extends Component<any, {
     }
 
     componentDidShow() {
-        const {data: {address}} = this.state;
-        if (this.tempContainerKey != "") {
-            getTempDataContainer(this.tempContainerKey, (value) => {
-                if (value != null && value != undefined && value) {
-                    const currentAddBuyItem = value.currentAddBuyItem
-                    console.log("value.sku",value)
-                    if (value.isOk && currentAddBuyItem.checked == false) {
-                        this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
-                    }else{
-                        const temp = value.mainProduct.merge_products.filter((item)=>{
-                            return item.product.id == currentAddBuyItem.id
-                        })
-                        console.log("temp",temp)
-                        this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+        const {order}: any = this.$router.params;
+        getOrderConfimPreviewData(order,async (res)=>{
+            const {data: {address}} = this.state;
+            if (this.tempContainerKey != "") {
+                getTempDataContainer(this.tempContainerKey, (value) => {
+                    if (value != null && value != undefined && value) {
+                        const currentAddBuyItem = value.currentAddBuyItem
+                        console.log("value.sku",value)
+                        if (value.isOk && currentAddBuyItem.checked == false) {
                             this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
-                        });
+                        }else{
+                            const temp = value.mainProduct.merge_products.filter((item)=>{
+                                return item.product.id == currentAddBuyItem.id
+                            })
+                            console.log("temp",temp)
+                            this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+                                this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
+                            });
+                        }
                     }
-                }
-                setTempDataContainer(this.tempContainerKey,null);
-            })
-        }
-        if (!isEmpty(address) && !isEmpty(templateStore.address)) {
-            console.log("a");
-            if (address.id == templateStore.address.id) {
-                console.log("B");
-                return;
-            }
-        }
-        const {orderid} = this.$router.params;
-        let prepay_id = orderid;
-        if (!orderid) {
-            prepay_id = this.state.orderid;
-        }
-        if (!isEmpty(templateStore.address) && prepay_id) {
-            Taro.showLoading({title: "加载中"});
-            api("app.order_temp/address", {
-                prepay_id: prepay_id,
-                address_id: templateStore.address.id
-            }).then((res) => {
-                Taro.hideLoading();
-                this.filterUsedTicket(res.orders)
-                this.setState({
-                    data: this.handleData(res)
+                    setTempDataContainer(this.tempContainerKey,null);
                 })
-            }).catch((e) => {
-                console.log(e);
-            })
-        }
+            }
+            if (!isEmpty(address) && !isEmpty(templateStore.address)) {
+                if (address.id == templateStore.address.id) {
+                    return;
+                }
+            }
+            
+            const {orderid} = res;
+            let prepay_id = orderid;
+            if (!orderid) {
+                prepay_id = this.state.orderid;
+            }
+            if (!isEmpty(templateStore.address) && prepay_id) {
+                Taro.showLoading({title: "加载中"});
+                api("app.order_temp/address", {
+                    prepay_id: prepay_id,
+                    address_id: templateStore.address.id
+                }).then((res) => {
+                    Taro.hideLoading();
+                    this.filterUsedTicket(res.orders)
+                    this.setState({
+                        data: this.handleData(res)
+                    })
+                }).catch((e) => {
+                    console.log(e);
+                })
+            }
+        })
     }
 
     checkOrder = (id) => {
