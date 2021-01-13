@@ -130,7 +130,7 @@ const Index: Taro.FC<any> = () => {
         setCheckAttr(attr)
     }
 
-    async function renderParams(path: any[]) {
+    async function renderParams(path: any[], photo = []) {
         Taro.showLoading({title: "请稍后..."});
         const temp:any = {path, sku: checked, id: router.params.id};
 
@@ -139,7 +139,7 @@ const Index: Taro.FC<any> = () => {
             photo: hasTplID.current ? {...temp, path: []} : temp,
             pictureSize: checkAttr,
             editPhotos: path,
-            usefulImages: removeDuplicationForArr(temp.path.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages)
+            usefulImages: removeDuplicationForArr(photo, photoStore.photoProcessParams.usefulImages)
         })
 
         Taro.hideLoading();
@@ -166,7 +166,7 @@ const Index: Taro.FC<any> = () => {
             })
         }
 
-        renderParams(path)
+        renderParams(path, data.ids.map((value, index) => ({id: value, url: data.imgs[index]})))
 
     }
 

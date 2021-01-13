@@ -520,13 +520,16 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                     </View>
                 ))}
             </View>
-            <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
+            <ScrollView className="shell_list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
                 <View className="list_main">
                     {active === 0
                         ? <View className="list_item">
                             <UploadFile
                                 extraType={0}
                                 type="card"
+                                style={{
+                                    height: "124px"
+                                }}
                                 uploadType="image"
                                 onChange={uploadFile}/>
                         </View>
@@ -1204,7 +1207,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                         path[parseInt(router.params.idx)].extraIds = data.ids;
                     }
                     await photoStore.updateServerParams(parent.userKey(), {
-                        usefulImages: removeDuplicationForArr(arr, photoStore.photoProcessParams.usefulImages),
+                        usefulImages: removeDuplicationForArr(data.ids.map((value, index) => ({id: value, url: data.imgs[index]})), photoStore.photoProcessParams.usefulImages),
                         photo: {
                             ...photoStore.photoProcessParams.photo,
                             path

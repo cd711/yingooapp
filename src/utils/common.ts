@@ -1020,14 +1020,36 @@ export function removeDuplicationForArr(
         console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
         return temp
     }
+    // const concatArr = [...oldArr, ...newArr];
     const concatArr = [...newArr, ...oldArr];
 
+    // let concatArr = [];
+
+    // let map = new Map();
+    // for (let item of concatArr) {
+    //     console.log("cccccccc：", JSON.parse(JSON.stringify(item)))
+    //     if (!map.has(item.id)) {
+    //         map.set(item.id, item);
+    //     } else {
+    //         if (map.has(item.count)) {
+    //             map.set(item.id, )
+    //         }
+    //     }
+    // }
+    //
+    // temp = Array.from(map.values())
+
+
+
     // 查重
-    const hash = {};
-    temp = concatArr.reduce(function(item, next) {
-        hash[next.id] ? '' : hash[next.id] = true && item.push(next);
-        return item
-    }, []);
+    // const hash = {};
+    // temp = concatArr.reduce(function(item, next) {
+    //     console.log("reduce888888888888:", next)
+    //     hash[next.id] ? '' : hash[next.id] = true && item.push(next);
+    //     return item
+    // }, []);
+
+    console.log("查重的结果：-----", JSON.parse(JSON.stringify(temp)))
 
 
     if (!notNull(deleteID)) {
@@ -1050,7 +1072,7 @@ export function removeDuplicationForArr(
         const nArr = [...delTemp];
         extraIds.forEach((item) => {
             const idx = nArr.findIndex(v => v.id == item);
-            console.log("下标：", idx, item, delTemp, nArr, nArr[idx])
+            console.log("下标：", idx, item, JSON.parse(JSON.stringify(delTemp)), JSON.parse(JSON.stringify(nArr)), JSON.parse(JSON.stringify(nArr[idx])))
             if (idx > -1) {
                 const value = nArr[idx];
                 if (value.count > 1) {
@@ -1065,19 +1087,40 @@ export function removeDuplicationForArr(
 
         temp = [...nArr];
     } else {
-        temp.forEach((value, index) => {
 
-            for (let i = 0; i < newArr.length; i++) {
-                const cur = newArr[i];
-                if (cur.id == value.id) {
-                    if (temp[index].count) {
-                        temp[index]["count"] += 1;
-                    } else {
-                        temp[index]["count"] = 1;
-                    }
+        for (let i = 0; i < newArr.length; i ++) {
+            const parent = newArr[i];
+            let has = false;
+            let obj = {};
+            for (let c = 0; c < oldArr.length; c++) {
+                const child = {...oldArr[c]};
+                if (parent.id == child.id) {
+                    obj = {...child, count: child.count + 1};
+                    oldArr[c].find = true
+                    has = true;
+                    break;
                 }
             }
+            if (has) {
+                temp.push(obj)
+            } else {
+                temp.push({
+                    ...parent,
+                    count: 1
+                })
+            }
+        }
+        console.log("000000000000：", JSON.parse(JSON.stringify(oldArr)))
+        oldArr.forEach((value, index, array) => {
+            if (!value.find ) {
+                // value.find = false
+                temp.push(value);
+            } else {
+
+            }
         })
+
+
     }
 
     console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))

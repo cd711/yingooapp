@@ -850,7 +850,7 @@ const PrintChange: Taro.FC<any> = () => {
                 ...photoStore.photoProcessParams.photo,
                 path: exArr
             },
-            usefulImages: removeDuplicationForArr(exArr.map(v => ({id: v.id, url: v.url})), photoStore.photoProcessParams.usefulImages)
+            usefulImages: removeDuplicationForArr(data.ids.map((value, index) => ({id: value, url: data.imgs[index]})), photoStore.photoProcessParams.usefulImages)
         })
 
         setPhotos([...exArr]);

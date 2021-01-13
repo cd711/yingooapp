@@ -15,7 +15,7 @@ import {
     sleep, updateChannelCode,
     urlEncode,
     isEmptyX,
-    jumpOrderConfimPreview
+    jumpOrderConfimPreview, removeDuplicationForArr
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -416,7 +416,8 @@ export default class Login extends Component<{}, {
                     path,
                     id: "",
                     sku: ""
-                }
+                },
+                usefulImages: removeDuplicationForArr(ids.map((v, idx) => ({id: v, url: imgs[idx]})), photoStore.photoProcessParams.usefulImages)
             })
             Taro.hideLoading()
             const tmp = {
@@ -829,6 +830,7 @@ export default class Login extends Component<{}, {
                     showPicSelector
                         ? <View className="photo_picker_container">
                             <PhotosEle editSelect={showPicSelector} onClose={() => this.setState({showPicSelector: false})}
+                                       defaultSelect={photoStore.photoProcessParams.usefulImages}
                                        onPhotoSelect={this.onPhotoSelect}/>
                         </View>
                         : null
