@@ -388,7 +388,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 ref={r => this.scrollView = r}
                                 onScrollToLower={this.loadMore}>
                         {
-                            list.length === 0
+                            list.length === 0 && navSwitchActive === 0
                                 ? <View className='empty'>
                                     <Image src={require('../../source/empty/nophoto.png')} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
@@ -403,10 +403,14 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_filter">
-                                        <View className="filter_txt" onClick={() => this.setState({visible: true})}>
-                                            <Text className="tit">{active > -1 ? this.popoverItem[active].title : "排序"}</Text>
-                                            <Image src={require("../../source/down.png")} className="filter_icon" />
-                                        </View>
+                                        {
+                                            navSwitchActive === 0
+                                                ? <View className="filter_txt" onClick={() => this.setState({visible: true})}>
+                                                    <Text className="tit">{active > -1 ? this.popoverItem[active].title : "排序"}</Text>
+                                                    <Image src={require("../../source/down.png")} className="filter_icon" />
+                                                </View>
+                                                : <View />
+                                        }
                                         <View className="filter_switch_bar">
                                             {tabs.map((value, index) => (
                                                 <View className={`filter_switch_item ${index === navSwitchActive ? "active" : ""}`}
