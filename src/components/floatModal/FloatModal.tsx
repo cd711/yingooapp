@@ -2,7 +2,6 @@
 import Taro, { useState,useEffect } from '@tarojs/taro'
 import { View,Text } from '@tarojs/components'
 import './FloatModal.less'
-import { AtFloatLayout } from "taro-ui"
 import IconFont from '../iconfont';
 
 // let n = 0;
