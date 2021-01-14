@@ -25,7 +25,7 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
     const {visible, currentSetMeal, setMealData = [], onChange, onClose, onConfirm} = props;
 
     const [current, setCurrent] = Taro.useState(currentSetMeal);
-    const [index, setIndex] = Taro.useState(0);
+    const [modIndex, setIndex] = Taro.useState(0);
 
     Taro.useEffect(() => {
         const idx = setMealData.findIndex(v => v.id == current.id);
@@ -34,12 +34,12 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
 
     const _onChange = (item, idx) => {
         setCurrent({...item});
-        setIndex(index)
+        setIndex(idx)
         onChange && onChange(item, idx)
     }
 
     const _onConfirm = () => {
-        onConfirm && onConfirm(current, index);
+        onConfirm && onConfirm(current, modIndex);
         onClose && onClose()
     }
 
