@@ -1017,12 +1017,8 @@ export function removeDuplicationForArr(
                 count: 1
             }
         });
-        console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
         return temp
     }
-
-    console.log("查重的结果：-----", JSON.parse(JSON.stringify(temp)))
-
 
     if (!notNull(deleteID)) {
         const delTemp = [...oldArr];
@@ -1044,7 +1040,6 @@ export function removeDuplicationForArr(
         const nArr = [...delTemp];
         extraIds.forEach((item) => {
             const idx = nArr.findIndex(v => v.id == item);
-            console.log("下标：", idx, item, JSON.parse(JSON.stringify(delTemp)), JSON.parse(JSON.stringify(nArr)), JSON.parse(JSON.stringify(nArr[idx])))
             if (idx > -1) {
                 const value = nArr[idx];
                 if (value.count > 1) {
@@ -1082,7 +1077,7 @@ export function removeDuplicationForArr(
                 })
             }
         }
-        console.log("000000000000：", JSON.parse(JSON.stringify(oldArr)))
+
         oldArr.forEach((value, index, array) => {
             if (!value.find ) {
                 // value.find = false

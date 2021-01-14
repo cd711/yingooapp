@@ -410,6 +410,9 @@ export default class Login extends Component<{}, {
             })
         }
 
+        // 查询是否有套餐价
+        const setMealIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "setmeal");
+
         try {
             await photoStore.setActionParamsToServer(getUserKey(), {
                 photo: {
@@ -424,14 +427,20 @@ export default class Login extends Component<{}, {
                 id: data.id,
                 cid: data.tpl_category_id,
                 sku_id: sku.length>0 && selectSkuId == 0 ? sku.join(",") : selectSkuId,
+                meal: "f"
             }
             if (sku) {
                 if (sku.length>0 && selectSkuId == 0) {
+                    // sku_id是残缺的子项ID
                     tmp["inc"] = "xxxx";
                 }
             }
             if (sku != null) {
                 tmp["detail"] = "t";
+                // 如果是套餐价就带上meal参数并未 "t"
+                if (setMealIdx > -1) {
+                    tmp.meal = "t"
+                }
             }
             const str = getURLParamsStr(urlEncode(tmp));
             Taro.navigateTo({

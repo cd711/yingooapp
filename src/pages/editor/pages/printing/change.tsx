@@ -54,7 +54,10 @@ const PrintChange: Taro.FC<any> = () => {
     const [distCountList, setDiscountList] = useState<Array<{id: string | number, name: string, price: string, value: string}>>([]);
     const [discountInfo, setDiscountInfo] = useState<{count: number, price: number, status: boolean}>({status: false, count: 0, price: 0.00});
 
-    const [setMealTxt, setMealTxtInfo] = useState<{title: string, desc: string}>({title: "", desc: ""})
+    // 顶部的所有文案
+    const [setMealTxt, setMealTxtInfo] = useState<{title: string, desc: string}>({title: "", desc: ""});
+    // 套餐的信息列表
+    const [setMealArr, updateSetMealArr] = useState([])
 
     const currentSkus = useRef<any[]>([]);
     const skuStr = useRef<string>("");
@@ -62,6 +65,9 @@ const PrintChange: Taro.FC<any> = () => {
     const scrollVal = useRef<number>(0);
 
     const runOnlyOne = useRef(0);
+
+    // 当前套餐的信息
+    const currentSetMeal = useRef<any>({});
 
 
     const backPressHandle = () => {
@@ -112,6 +118,10 @@ const PrintChange: Taro.FC<any> = () => {
 
     }, 800), [skuStr.current])
 
+    function updateDescribe(title: string, status: 1 | 2 | 3 | 4) {
+        setDescribe(title);
+        setCountStatus(status)
+    }
 
     useEffect(() => {
 
@@ -129,31 +139,27 @@ const PrintChange: Taro.FC<any> = () => {
         const min = photoStore.photoProcessParams.min;
         const max = photoStore.photoProcessParams.max;
 
-        if (min === max) {
-            setDescribe(`请上传${min}张照片`);
-            if (count === min) {
-                setCountStatus(4);
-            } else {
-                setCountStatus(1)
-            }
+        if (!notNull(router.params.meal) && router.params.meal === "t") {
+            updateDescribe(`套餐打印张数：${currentSetMeal.current.value || 0}张`, count == currentSetMeal.current.value ? 4 : 1)
         } else {
-            if (count < min) {  // 小于
+            if (min === max) {
+                updateDescribe(`请上传${min}张照片`, count === min ? 4 : 1)
+            } else {
+                if (count < min) {  // 小于
 
-                if (notNull(min)) {
-                    return
-                }
-                setDescribe(`最低打印${min}张照片`);
-                setCountStatus(1)
-            } else if (count >= min && count <= max) {   // 等于最小/最大值
-                setDescribe("");
-                setCountStatus(2)
-            } else if (count > max) {  // 大于
+                    if (notNull(min)) {
+                        return
+                    }
+                    updateDescribe(`最低打印${min}张照片`, 1)
+                } else if (count >= min && count <= max) {   // 等于最小/最大值
+                    updateDescribe("", 2)
+                } else if (count > max) {  // 大于
 
-                if (notNull(max)) {
-                    return;
+                    if (notNull(max)) {
+                        return;
+                    }
+                    updateDescribe(`最多打印${max}张照片`, 3)
                 }
-                setDescribe(`最多打印${max}张照片`);
-                setCountStatus(3)
             }
         }
 
@@ -275,13 +281,14 @@ const PrintChange: Taro.FC<any> = () => {
      * forDetail  默认false， 为true就代表是从商品详情页跳转过来的，已经选好图片了, 此时的sku_id是所有规格都选好了的
      * onlyInitPrice  仅仅只是初始化currentSkus， goodsInfo, currentSkus, 不向容器发送新内容
      */
-    function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean} = {}) {
+    function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean, isSetMeal?: boolean} = {}) {
         return new Promise<void>(async (resolve, reject) => {
             const opt = {
                 path: params.path || [],
                 forDetail: params.forDetail || false,
                 incomplete: params.incomplete || false,
-                onlyInitPrice: params.onlyInitPrice || false
+                onlyInitPrice: params.onlyInitPrice || false,
+                isSetMeal: params.isSetMeal || false
             }
             try {
                 if ((!opt.onlyInitPrice && !router.params.sku_id) || !router.params.id) {
@@ -308,7 +315,7 @@ const PrintChange: Taro.FC<any> = () => {
                     // 从服务器获取基本数据信息
                     const serPar = await api("app.product/info", {id: router.params.id});
                     const temp = {...serPar};
-                    // temp.attrGroup = temp.attrGroup.map(val => ({...val, disable: !notNull(val.special_show)}))
+
                     temp.skus = temp.skus.filter(v => v.stock > 0);
                     useMoreThan.current = {...temp};
 
@@ -325,24 +332,57 @@ const PrintChange: Taro.FC<any> = () => {
                     currentSkus.current = temp.skus.filter(v => v.value.includes(arr.join(",")));
                     console.log("第一次产生的currentSkus：", skuStr.current, currentSkus.current);
 
+                    const idx = serPar.attrGroup.findIndex(v => v.special_show === "photosize");
+                    const numIdx = serPar.attrGroup.findIndex(v => v.special_show === "photonumber");
+                    const setMealIdx = serPar.attrGroup.findIndex(v => v.special_show === "setmeal");
+                    console.log("查找的下标：", idx, numIdx, setMealIdx);
+
+                    if (opt.isSetMeal && setMealIdx > -1) {
+                        updateSetMealArr([...serPar.attrItems[setMealIdx]])
+                    }
+
                     // 如果是完整的SkuID
                     if (opt.forDetail) {
                         const tArr = serPar.skus.filter(v => v.id == obj.sku);
+                        console.log("如果是完整的SkuID：", obj.sku, tArr)
                         if (tArr.length > 0) {
                             setPrice([tArr[0].price]);
-                            setMealTxtInfo(prev => {
-                                return {
-                                    ...prev,
-                                    title: `现单价：￥${tArr[0].price}${!detailStatus ? "起" : ""}`,
-                                    desc: `${discountInfo.status ? `再加${discountInfo.count}张,单价低至￥${discountInfo.price}` : ""}`
+                            if (opt.isSetMeal) {
+                                const setMealList = [...serPar.attrItems[setMealIdx]];
+                                const skuVal = tArr[0].value.split(",");
+                                if (skuVal.length === serPar.attrGroup.length) {
+                                    currentSetMeal.current = setMealList.filter(value => skuVal.indexOf(String(value.id)) > -1)[0] || {};
+                                    console.log("查询到的当前套餐：", skuVal, currentSetMeal.current)
+                                    setMealTxtInfo(prev => {
+                                        return {
+                                            ...prev,
+                                            title: `套餐价：￥${tArr[0].price}`,
+                                            desc: `当前套餐：${currentSetMeal.current.value || 0}张`
+                                        }
+                                    })
+                                    setDiscountInfo(prev => ({...prev, status: true}))
+                                } else {
+                                    Taro.showToast({
+                                        title: "套餐Sku不完整",
+                                        icon: "none",
+                                        success: async () => {
+                                            await sleep(2000);
+                                            Taro.navigateBack()
+                                        }
+                                    })
                                 }
-                            })
+                            } else {
+                                setMealTxtInfo(prev => {
+                                    return {
+                                        ...prev,
+                                        title: `现单价：￥${tArr[0].price}${!detailStatus ? "起" : ""}`,
+                                        desc: `${discountInfo.status ? `再加${discountInfo.count}张,单价低至￥${discountInfo.price}` : ""}`
+                                    }
+                                })
+                            }
                         }
                     }
 
-                    const idx = serPar.attrGroup.findIndex(v => v.special_show === "photosize");
-                    const numIdx = serPar.attrGroup.findIndex(v => v.special_show === "photonumber");
-                    console.log("查找的下标：", idx, numIdx)
                     if (idx > -1 && !opt.onlyInitPrice) {
 
                         // 向本地存储attrItems
@@ -351,6 +391,7 @@ const PrintChange: Taro.FC<any> = () => {
                             attrItems: serPar.attrItems,
                             index: idx,
                             numIdx,
+                            setMealIdx,
                             pictureSize: serPar.attrItems[idx][0].value,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
@@ -463,8 +504,10 @@ const PrintChange: Taro.FC<any> = () => {
                 Taro.redirectTo({
                     url: updateChannelCode(`/pages/editor/pages/printing/change?${getURLParamsStr(urlEncode(ap))}`)
                 })
-            } else if (router.params.detail && router.params.detail === "t") {  // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
-                await getRouterParams({path: [], forDetail: true});
+            } else if (router.params.detail && router.params.detail === "t") {
+                // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
+                // 此处还存在一个情况，就是如果是套餐价，说明所有的规格也已经选好了，那么isSetMeal就为true
+                await getRouterParams({path: [], forDetail: true, isSetMeal: !notNull(router.params.meal) && router.params.meal == "t"});
                 params = {...photoStore.photoProcessParams}
                 setDetailStatus(true)
             } else if (router.params.inc) {
