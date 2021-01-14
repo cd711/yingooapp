@@ -54,9 +54,9 @@ const ChangePackage: Taro.FC<ChangePackageParmes> = ({isShow,onClose}) => {
                             <View className='more_vote_package'>
                                 <Text className='txt'>更多优惠套餐</Text>
                             </View>
-                            <ScrollView scrollY>
+                            <ScrollView scrollY className='vote_list_scroll'>
                                 <View className='more_vote_list'>
-                                    <View className='vote_item'>
+                                    <View className='vote_item vote_item_active'>
                                         <View className='vote_left'>
                                             <Checkboxs isChecked onChange={()=>{}}/>
                                             <Text className='vote_offset'>20张</Text>
@@ -89,8 +89,10 @@ const ChangePackage: Taro.FC<ChangePackageParmes> = ({isShow,onClose}) => {
                                 </View>
                             </ScrollView>
                         </View>
+                        <View className='vote_bottom_button'>
+                            <Button className='red_change_button'>确定更换</Button>
+                        </View>
                         
-                        <Button className='red_change_button'>确定更换</Button>
 
                     </View>
                 </View>
