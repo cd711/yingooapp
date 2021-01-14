@@ -83,5 +83,120 @@
                 right: 32px;
             }
         }
+        .vote_list_container{
+            padding: 0 32px;
+            .current_package{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 116px;
+                .current_package_name{
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #121314;
+                }
+                .current_package_right{
+                    display: flex;
+                    align-items: center;
+                    .num{
+                        font-size: 32px;
+                        font-weight: 500;
+                        color: #121314;
+                        display: flex;
+                    }
+                    .price{
+                        display: flex;
+                        align-items: baseline;
+                        color: #FF4966;
+                        padding-left: 32px;
+                        .symbol{
+                            font-size: 24px;
+                            font-weight: 400;
+                            color: #ff4966;
+                            display: flex;
+                        }
+                        .number{
+                            font-size: 36px;
+                            font-weight: 500;
+                            color: #ff4966;
+                        }
+                    }
+                }
+            }
+            .more_vote_package{
+                margin-bottom: 32px;
+                .txt{
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #121314;
+                }
+            }
+            .vote_list_scroll{
+                .more_vote_list{
+                    max-height: 380px;
+                    .vote_item{
+                        display: flex;
+                        height: 112px;
+                        padding: 0 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        
+                        border-radius: 16px;
+                        margin-bottom: 16px;
+                        .vote_left{
+                            display: flex;
+                            align-items: center;
+                            .vote_offset{
+                                font-size: 32px;
+                                font-weight: 500;
+                                color: #121314;
+                                padding-left: 32px;
+                            }
+                        }
+                        .price{
+                            display: flex;
+                            align-items: baseline;
+                            color: #FF4966;
+                            padding-left: 32px;
+                            .symbol{
+                                font-size: 24px;
+                                font-weight: 400;
+                                color: #ff4966;
+                                display: flex;
+                            }
+                            .number{
+                                font-size: 36px;
+                                font-weight: 500;
+                                color: #ff4966;
+                            }
+                        }
+                    }
+                    .vote_item_active{
+                        background: #f5f6f9;
+                    }
+                }
+            }
+        }
+        .vote_bottom_button{
+            height: 120px;
+            padding: 16px 0 0;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .red_change_button{
+                width: 670px;
+                height: 88px;
+                background: #ff4966;
+                border-radius: 200px;
+                line-height: 88px;
+                text-align: center;
+                font-size: 28px;
+                font-weight: 500;
+                color: #ffffff;
+            }
+        }
     }
 }
