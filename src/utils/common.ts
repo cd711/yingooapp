@@ -993,25 +993,39 @@ export function addOrderConfimPreviewData(currentUnix:string,data:any) {
     setTempDataContainer(key,data);
 }
 
+interface RemoveDuplicationForArrProps {
+    newArr: {id: string | number, url: string}[];
+    oldArr: {id: string | number, url: string, count: number}[];
+    deleteID?: string | number;
+    extraIds?: Array<string | number> | undefined;
+    replace?: boolean;
+    replaceIdx?: number;
+}
 /**
  * 排除已有图片，
- * @param newArr
- * @param oldArr
- * @param deleteID {string | number} 要删除的ID
- * @param extraIds 额外的ID数组
+ * @param params {RemoveDuplicationForArrProps}
+ * oldArr
+ * deleteID {string | number} 要删除的ID
+ * extraIds 额外的ID数组
+ * replace 是否为替换  替换只能为单个替换
+ * replaceIdx  要替换的下标
  */
-export function removeDuplicationForArr(
-    newArr: {id: string | number, url: string}[],
-    oldArr: {id: string | number, url: string, count: number}[] = [],
-    deleteID: string | number = "",
-    extraIds: Array<string | number> | undefined = undefined
-) {
+export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
+    const opt = {
+        newArr: params.newArr,
+        oldArr: params.oldArr,
+        deleteID: params.deleteID || "",
+        extraIds: params.extraIds || undefined,
+        replace: params.replace || false,
+        replaceIdx: params.replaceIdx || -1,
+    }
+    let {newArr, oldArr, deleteID, extraIds, replace, replaceIdx} = JSON.parse(JSON.stringify(opt));
     // 排除id为空的列表
-    newArr = newArr.filter(v => !notNull(v.id));
-    console.log("排重方法：", JSON.parse(JSON.stringify(newArr)), JSON.parse(JSON.stringify(oldArr)), 11, deleteID, 222,extraIds)
+    const tNewArr = newArr.filter(v => !notNull(v.id));
+    console.log("排重方法：", JSON.parse(JSON.stringify(tNewArr)), JSON.parse(JSON.stringify(oldArr)), 11, deleteID, 222,extraIds)
     let temp = [];
     if (oldArr.length === 0) {
-        temp = newArr.map(value => {
+        temp = tNewArr.map(value => {
             return {
                 ...value,
                 count: 1
@@ -1039,7 +1053,11 @@ export function removeDuplicationForArr(
         extraIds = extraIds.filter(v => !notNull(v));
         const nArr = [...delTemp];
         extraIds.forEach((item) => {
-            const idx = nArr.findIndex(v => v.id == item);
+            const idx = nArr.findIndex(v => {
+                console.log("22222222222222-------------：", idx, v.id, item, parseInt(v.id) == parseInt(item))
+                return parseInt(v.id) == parseInt(item)
+            });
+
             if (idx > -1) {
                 const value = nArr[idx];
                 if (value.count > 1) {
@@ -1053,10 +1071,29 @@ export function removeDuplicationForArr(
         })
 
         temp = [...nArr];
+    } else if (replace) {
+        if (replaceIdx > -1) {
+            console.log("替换---------开始：", tNewArr)
+            const rArr = JSON.parse(JSON.stringify(oldArr));
+            if (rArr[replaceIdx].count > 1) {
+                console.log("替换---------大于1:", rArr[replaceIdx])
+                rArr[replaceIdx].count -= 1;
+                rArr.push({
+                    id: tNewArr[0].id,
+                    url: tNewArr[0].url
+                })
+            } else {
+                console.log("替换---------等于1:", rArr[replaceIdx])
+                rArr[replaceIdx].id = tNewArr[0].id;
+                rArr[replaceIdx].url = tNewArr[0].url;
+            }
+            console.log("替换---------结果:", rArr)
+            temp = [...rArr]
+        }
     } else {
 
-        for (let i = 0; i < newArr.length; i ++) {
-            const parent = newArr[i];
+        for (let i = 0; i < tNewArr.length; i ++) {
+            const parent = tNewArr[i];
             let has = false;
             let obj = {};
             for (let c = 0; c < oldArr.length; c++) {

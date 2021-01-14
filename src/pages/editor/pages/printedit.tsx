@@ -251,12 +251,13 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
 interface ChangeImageProps {
     onClose: () => void,
     onOk?: () => void,
+    parent: PrintEdit
 }
 
 // 换图、换颜色
 const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
 
-    const {onClose, onOk} = props;
+    const {onClose, onOk, parent} = props;
 
     const bars = ["素材库", "贴纸", "颜色"];
     const [active, setActive] = useState(0);
@@ -267,6 +268,8 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     const stickersTotal = Taro.useRef(0);
     const [historyColor, setHistoryColor] = useState([]);
     const [colorActive, setColorActive] = useState(null);
+
+    const router = Taro.useRouter();
 
     const colors = [
         {key: 1, color: "#5B8FF9"},
@@ -469,8 +472,10 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
         }
     }
 
-    const onSelect = (item, idx) => {
-        console.log(idx)
+    const onSelect = async (item, idx) => {
+        console.log("9999999999999999-------------")
+        console.log(JSON.parse(JSON.stringify(photoStore.photoProcessParams.photo.path)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
+        console.log(item, idx)
         const src = list[idx];
 
         if (!notNull(selected) && idx === selected) {
@@ -480,6 +485,49 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
         }
         setSelected(idx);
         if (src) {
+            const current = photoStore.photoProcessParams.photo.path[parseInt(router.params.idx)];
+            const useArr = photoStore.photoProcessParams.usefulImages;
+            console.log("历史：" ,current.originalData)
+            // if (!notNull(current.originalData) && current.originalData.length > 0) {
+                // 已编辑过的模板，存在多张图
+                const url = parent.currentData.r.url || undefined;
+                if (!notNull(url)) {
+                    const idx = list.findIndex(value => value.url == url);
+                    if (idx > -1) {
+                        const current = list[idx];
+                        const oIdx = useArr.findIndex(v => v.id == current.id);
+                        try {
+                            await photoStore.updateServerParams(router.params.key, {
+                                usefulImages: removeDuplicationForArr({
+                                    newArr: [{id: item.id, url: item.url}],
+                                    oldArr: useArr,
+                                    replace: true,
+                                    replaceIdx: oIdx
+                                })
+                            })
+                        } catch (e) {
+
+                        }
+                    }
+                }
+            // } else {
+            //     // 没有编辑过的模板，只是单张图
+            //     const idx = useArr.findIndex(v => v.id == current.id);
+            //     if (idx > -1) {
+            //         try {
+            //             await photoStore.updateServerParams(router.params.key, {
+            //                 usefulImages: removeDuplicationForArr({
+            //                     newArr: [{id: item.id, url: item.url}],
+            //                     oldArr: useArr,
+            //                     replace: true,
+            //                     replaceIdx: idx
+            //                 })
+            //             })
+            //         } catch (e) {
+            //
+            //         }
+            //     }
+            // }
             changeEditImg(getSrc(item))
         }
 
@@ -1207,7 +1255,10 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                         path[parseInt(router.params.idx)].extraIds = data.ids;
                     }
                     await photoStore.updateServerParams(parent.userKey(), {
-                        usefulImages: removeDuplicationForArr(data.ids.map((value, index) => ({id: value, url: data.imgs[index]})), photoStore.photoProcessParams.usefulImages),
+                        usefulImages: removeDuplicationForArr({
+                            newArr: data.ids.map((value, index) => ({id: value, url: data.imgs[index]})),
+                            oldArr: photoStore.photoProcessParams.usefulImages
+                        }),
                         photo: {
                             ...photoStore.photoProcessParams.photo,
                             path
@@ -1303,6 +1354,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
 
     public editorProxy: WindowProxy | null | undefined;
     public routerParams = this.$router.params;
+    public currentData: any = {};
 
     userKey() {
         if (this.routerParams.key) {
@@ -1346,7 +1398,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         }
 
         await photoStore.getServerParams({key: this.userKey(), setLocal: true});
-        console.log(89898989898, photoStore.photoProcessParams.originalData)
+
         if (this.routerParams.init && this.routerParams.init == "t") {
             photoStore.editorPhotos = [...photoStore.photoProcessParams.editPhotos]
         }
@@ -1513,6 +1565,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onSelected = (item?: { id: any, type: "img" | "text" | "container", userEditable: number}) => {
+        this.currentData = item;
         if (this.store.isEdit) {
             return;
         }
@@ -1756,7 +1809,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 </View>
             </View>
         } else if (tool == 4) {
-            ele = <ChangeImage onClose={this.cancelEdit} onOk={this.onOk}/>
+            ele = <ChangeImage onClose={this.cancelEdit} onOk={this.onOk} parent={this} />
         } else if (tool == 5) {
             ele = <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
         } else if (tool == 6) {

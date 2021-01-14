@@ -141,7 +141,10 @@ const Index: Taro.FC<any> = () => {
             photo: hasTplID.current ? {...temp, path: []} : temp,
             pictureSize: checkAttr,
             editPhotos: path,
-            usefulImages: removeDuplicationForArr(photo, photoStore.photoProcessParams.usefulImages)
+            usefulImages: removeDuplicationForArr({
+                newArr: photo,
+                oldArr: photoStore.photoProcessParams.usefulImages
+            })
         })
 
         Taro.hideLoading();

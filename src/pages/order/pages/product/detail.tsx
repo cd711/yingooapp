@@ -420,7 +420,10 @@ export default class Login extends Component<{}, {
                     id: "",
                     sku: ""
                 },
-                usefulImages: removeDuplicationForArr(ids.map((v, idx) => ({id: v, url: imgs[idx]})), photoStore.photoProcessParams.usefulImages)
+                usefulImages: removeDuplicationForArr({
+                    newArr: ids.map((v, idx) => ({id: v, url: imgs[idx]})),
+                    oldArr: photoStore.photoProcessParams.usefulImages
+                })
             })
             Taro.hideLoading()
             const tmp = {

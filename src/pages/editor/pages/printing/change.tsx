@@ -732,12 +732,12 @@ const PrintChange: Taro.FC<any> = () => {
                     ...photoStore.photoProcessParams.photo,
                     path: photo
                 },
-                usefulImages: removeDuplicationForArr(
-                    arr.map(v => ({id: v.id, url: v.url})),
-                    photoStore.photoProcessParams.usefulImages,
-                    arr[idx].id,
-                    arr[idx].extraIds || undefined
-                )
+                usefulImages: removeDuplicationForArr({
+                    newArr: arr.map(v => ({id: v.id, url: v.url})),
+                    oldArr: photoStore.photoProcessParams.usefulImages,
+                    deleteID: arr[idx].id,
+                    extraIds: arr[idx].extraIds || undefined
+                })
             })
         } catch (e) {
             console.log("更新数量出错：", e)
@@ -1047,7 +1047,10 @@ const PrintChange: Taro.FC<any> = () => {
                         ...photoStore.photoProcessParams.photo,
                         path: exArr
                     },
-                    usefulImages: removeDuplicationForArr(data.ids.map((value, index) => ({id: value, url: data.imgs[index]})), photoStore.photoProcessParams.usefulImages)
+                    usefulImages: removeDuplicationForArr({
+                        newArr: data.ids.map((value, index) => ({id: value, url: data.imgs[index]})),
+                        oldArr: photoStore.photoProcessParams.usefulImages
+                    })
                 })
 
                 setPhotos([...exArr]);
