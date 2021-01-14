@@ -994,11 +994,6 @@ const PrintChange: Taro.FC<any> = () => {
     return (
         <View className="printing_container">
             <LoginModal isTabbar={false} />
-            {
-                discountStatus
-                    ? <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
-                    : null
-            }
             <AtNavBar onClickLeftIcon={onBackHandle}
                       customStyle={{
                           paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
@@ -1131,6 +1126,11 @@ const PrintChange: Taro.FC<any> = () => {
                                 onPhotoSelect={onPhotoSelect}
                         />
                     </View>
+                    : null
+            }
+            {
+                discountStatus
+                    ? <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
                     : null
             }
         </View>
