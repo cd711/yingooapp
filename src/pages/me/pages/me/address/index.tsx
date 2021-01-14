@@ -2,12 +2,12 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Image, Button,ScrollView } from '@tarojs/components'
 import './index.less'
 import IconFont from '../../../../../components/iconfont';
-import { api } from '../../../../../utils/net';
+import { api,options } from '../../../../../utils/net';
 import {templateStore} from '../../../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 import Checkboxs from '../../../../../components/checkbox/checkbox'
 import { userStore } from '../../../../../store/user';
-import {deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, updateChannelCode,getOrderConfimPreviewData} from '../../../../../utils/common';
 
 @inject("userStore","templateStore")
 @observer
@@ -53,31 +53,42 @@ export default class Address extends Component<any,{
         console.log(this.$router.params)
         this.getList();
     }
+    private unixOrder = "";
+    private disableAddressId = 0;
     getList(){
         Taro.showLoading({title:"加载中..."});
-        const {t,id} = this.$router.params;
+        const {order} = this.$router.params;
         api("app.address/list").then((res)=>{
-            Taro.hideLoading();
-            let delId = true;
-            res = res.map((item)=>{
-                item["isChecked"] = false;
-                if (t && t=="select" && id && parseInt(id)>0 && id == item.id) {
-                    item["isChecked"] = true;
-                    templateStore.address = item;
-                    delId = false;
+            this.unixOrder = order;
+            getOrderConfimPreviewData(this.unixOrder,(resp,has)=>{
+                Taro.hideLoading();
+                if (has) {
+                    
+                    this.disableAddressId = parseInt(resp.disableAddressId);
+                    res = res.map((item)=>{
+                        item["isChecked"] = false;
+                        if (resp && parseInt(resp.addressId)>0 && parseInt(resp.addressId) == parseInt(item.id)) {
+                            item["isChecked"] = true;
+                            if (parseInt(resp.disableAddressId) == parseInt(item.id)) {
+                                item["isChecked"] = false;
+                            }
+                            templateStore.address = item;
+                        }
+                        return item;
+                    });
+                    if (deviceInfo.env == 'h5') {
+                        window.history.replaceState(null,null,updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`))
+                    }
+                    this.setState({
+                        addressList:res
+                    });
+                } else {
+                    this.setState({
+                        addressList:res
+                    });
                 }
-                return item;
-            });
-            if (t && t=="select" && delId && res.length>0) {
-                res[0]["isChecked"] = true;
-                templateStore.address = res[0];
-                if (deviceInfo.env == 'h5') {
-                    window.history.replaceState(null,null,updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${res[0].id}`))
-                }
-            }
-            this.setState({
-                addressList:res
-            });
+            })
+
 
         }).catch((e)=>{
             Taro.hideLoading();
@@ -93,6 +104,18 @@ export default class Address extends Component<any,{
     }
 
     switchChecked = (item,index) => {
+        if (this.unixOrder == "") {
+            return;
+        }
+        console.log("哈哈啊",this.unixOrder,this.disableAddressId,item);
+        if (parseInt(this.disableAddressId+"") == parseInt(item.id)) {
+            Taro.showToast({
+                title:"该地址无法配送!",
+                icon:"none",
+                duration:1500
+            })
+            return;
+        }
         const { addressList } = this.state;
         const isCheck = item["isChecked"];
         const temp = addressList.map((iter)=>{
@@ -100,16 +123,26 @@ export default class Address extends Component<any,{
             return iter;
         })
         temp[index]["isChecked"] = !isCheck;
+
         this.setState({
             addressList:temp
         })
         templateStore.address = item;
-        Taro.navigateBack();
+        if (Taro.getCurrentPages().length>1) {
+            Taro.navigateBack();
+        } else {
+            if (this.unixOrder != "") {
+                Taro.navigateTo({
+                    url: updateChannelCode(`/pages/order/pages/template/confirm?order=${this.unixOrder}`)
+                })
+            }
+        }
+        
     }
 
     render() {
         const { addressList,centerPartyHeight } = this.state;
-        const {t} = this.$router.params;
+        // const {t} = this.$router.params;
         // console.log(addressList)
         // @ts-ignore
         return (
@@ -132,7 +165,7 @@ export default class Address extends Component<any,{
                             <View className='item' key={item.id}>
                                 <View className='left-part' onClick={this.switchChecked.bind(this,item,index)}>
                                     {
-                                        t === 'select' ? <Checkboxs isChecked={item.isChecked} disabled />:null
+                                        this.unixOrder != "" ? <Checkboxs isChecked={item.isChecked} disabled />:null
                                     }
                                     <View className='left'>
                                         <View className='info'>
@@ -160,7 +193,7 @@ export default class Address extends Component<any,{
                                 </View>
                             </View>
                         )):<View className='black'>
-                            <Image src={require('../../../../../source/empty/noaddress.png')} className='img' />
+                            <Image src={`${options.sourceUrl}appsource/empty/noaddress.png`} className='img' />
                             <Text className='txt'>暂无收货地址</Text>
                             {/* <Button className='add-btn' onClick={()=>{
                                 Taro.navigateTo({

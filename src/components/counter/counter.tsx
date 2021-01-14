@@ -2,6 +2,7 @@ import Taro, {useEffect, useState} from '@tarojs/taro'
 import {Image, Text, View} from '@tarojs/components'
 import './counter.less'
 import {notNull} from "../../utils/common";
+import { options } from '../../utils/net';
 
 interface CounterProps {
     num?: number;
@@ -51,7 +52,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             }
             setNumber(number + 1);
         }}>
-            <Image src={!notNull(max) && number >= parseInt(max+"")?require("../../source/disable_add.png"):require("../../source/add.png")} className='img'/>
+            <Image src={!notNull(max) && number >= parseInt(max+"")?require("../../source/disable_add.png"):`${options.sourceUrl}appsource/add.png`} className='img'/>
         </View>
     </View>
 }

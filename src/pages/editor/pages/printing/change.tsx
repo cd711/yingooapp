@@ -12,7 +12,7 @@ import {
     notNull, removeDuplicationForArr, shareAppExtends, sleep, updateChannelCode,
     urlEncode, useDebounceFn
 } from "../../../../utils/common";
-import {api} from "../../../../utils/net";
+import {api,options} from "../../../../utils/net";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -1005,7 +1005,7 @@ const PrintChange: Taro.FC<any> = () => {
                                             </View>
                                             <Text className='num'>{value.count || 1}</Text>
                                             <View className='add' onClick={() => onAddCount(value.count, index)}>
-                                                <Image src={require(`../../../../source/add.png`)} className='img'/>
+                                                <Image src={`${options.sourceUrl}appsource/add.png`} className='img'/>
                                             </View>
                                         </View>
                                     </View>
