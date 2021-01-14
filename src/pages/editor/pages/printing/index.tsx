@@ -43,6 +43,7 @@ const Index: Taro.FC<any> = () => {
                 let arr = [];
                 const idx = res.attrGroup.findIndex(v => v.special_show === "photosize");
                 const numIdx = res.attrGroup.findIndex(v => v.special_show === "photonumber");
+                const setMealIdx = res.attrGroup.findIndex(v => v.special_show === "setmeal");
                 console.log("查找的下标：", idx, numIdx)
                 if (idx > -1) {
                     arr = [...res.attrItems[idx]];
@@ -54,6 +55,7 @@ const Index: Taro.FC<any> = () => {
                         attrItems: res.attrItems,
                         index: idx,
                         numIdx,
+                        setMealIdx,
                         pictureSize: res.attrItems[idx][0].value,
                         photoStyle: res.photostyle,
                         max: res.max,

@@ -971,7 +971,7 @@ class Index extends Component<any, IndexState> {
                                                                         style={{
                                                                             background: "transparent",
                                                                             position: "relative",
-                                                                            marginTop: topFix.length === 0 ? "20px" : 0,
+                                                                            marginTop: "20px",
                                                                             padding: "0 16px"
                                                                         }}
                                                                 >
