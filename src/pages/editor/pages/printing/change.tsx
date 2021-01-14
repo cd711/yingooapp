@@ -20,6 +20,8 @@ import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
 import PlaceOrder from "../../../../components/place/place";
+import SetMealSelectorModal from "../../../../components/changePackage/changePackage";
+import TipModal from "../../../../components/tipmodal/TipModal";
 
 
 const PrintChange: Taro.FC<any> = () => {
@@ -49,6 +51,7 @@ const PrintChange: Taro.FC<any> = () => {
     // 根据当前的总数要展示的SKU价格
     const [price, setPrice] = useState<string[]>(["0.00"]);
     const [scrolling, setScrolling] = useState<boolean>(false);
+    const [tipStatus, showTip] = useState(false);
 
     const [discountStatus, setDiscountStatus] = useState<boolean>(false);
     const [distCountList, setDiscountList] = useState<Array<{id: string | number, name: string, price: string, value: string}>>([]);
@@ -57,7 +60,10 @@ const PrintChange: Taro.FC<any> = () => {
     // 顶部的所有文案
     const [setMealTxt, setMealTxtInfo] = useState<{title: string, desc: string}>({title: "", desc: ""});
     // 套餐的信息列表
-    const [setMealArr, updateSetMealArr] = useState([])
+    const [setMealArr, updateSetMealArr] = useState([]);
+
+    // 当前套餐价所有正常的skus的value
+    const normalSkusArr = useRef([]);
 
     const currentSkus = useRef<any[]>([]);
     const skuStr = useRef<string>("");
@@ -67,7 +73,9 @@ const PrintChange: Taro.FC<any> = () => {
     const runOnlyOne = useRef(0);
 
     // 当前套餐的信息
-    const currentSetMeal = useRef<any>({});
+    const [currentSetMeal, setCurrentMeal] = useState<any>({})
+    // 是否为套餐，且已经初始化成功了
+    const setMealSuccess = useRef(false);
 
 
     const backPressHandle = () => {
@@ -76,6 +84,32 @@ const PrintChange: Taro.FC<any> = () => {
                 setPhotoPickerVisible(false)
             }
         }
+    }
+
+    function updateDescribe(title: string, status: 1 | 2 | 3 | 4) {
+        setDescribe(title);
+        setCountStatus(status)
+    }
+
+    // 检查图片的数量
+    function inspectionQuantityLimit(arr = []) {
+        return new Promise<boolean>((resolve, _) => {
+            if (setMealSuccess.current) {
+                let count = 0;
+                for (let i = 0; i < arr.length; i ++) {
+                    const item = arr[i];
+                    count += (notNull(item.count) ? 1 : item.count)
+                }
+                if (count > parseInt(currentSetMeal.value)) {
+                    showTip(true);
+                    resolve(false)
+                } else {
+                    resolve(true)
+                }
+            } else {
+                resolve(true)
+            }
+        })
     }
 
     useEffect(() => {
@@ -92,6 +126,10 @@ const PrintChange: Taro.FC<any> = () => {
     useEffect(debounce(() => {
 
         console.log("当前预定的skuStr：", skuStr.current)
+
+        if (setMealSuccess.current) {
+            return
+        }
 
         const arr = currentSkus.current.filter(v => v.value.includes(skuStr.current));
         if (arr.length > 1) {
@@ -118,10 +156,27 @@ const PrintChange: Taro.FC<any> = () => {
 
     }, 800), [skuStr.current])
 
-    function updateDescribe(title: string, status: 1 | 2 | 3 | 4) {
-        setDescribe(title);
-        setCountStatus(status)
-    }
+    // 如果当前的套餐信息发生变化
+    useEffect(() => {
+
+        let count = 0;
+        for (let i = 0; i < photos.length; i ++) {
+            const item = photos[i];
+            count += (notNull(item.count) ? 1 : item.count)
+        }
+
+        updateDescribe(`套餐打印张数：${currentSetMeal.value || 0}张`, count == currentSetMeal.value ? 4 : 1);
+
+        setMealTxtInfo({
+            title: `套餐价：${currentSetMeal.price || 0}`,
+            desc: `当前套餐：${currentSetMeal.value || 0}张`
+        });
+
+        photoStore.updateServerParams(photoStore.printKey, {
+            currentSetMeal
+        })
+
+    }, [currentSetMeal])
 
     useEffect(() => {
 
@@ -140,7 +195,7 @@ const PrintChange: Taro.FC<any> = () => {
         const max = photoStore.photoProcessParams.max;
 
         if (!notNull(router.params.meal) && router.params.meal === "t") {
-            updateDescribe(`套餐打印张数：${currentSetMeal.current.value || 0}张`, count == currentSetMeal.current.value ? 4 : 1)
+            updateDescribe(`套餐打印张数：${currentSetMeal.value || 0}张`, count == currentSetMeal.value ? 4 : 1)
         } else {
             if (min === max) {
                 updateDescribe(`请上传${min}张照片`, count === min ? 4 : 1)
@@ -280,6 +335,7 @@ const PrintChange: Taro.FC<any> = () => {
      * path 图片路径
      * forDetail  默认false， 为true就代表是从商品详情页跳转过来的，已经选好图片了, 此时的sku_id是所有规格都选好了的
      * onlyInitPrice  仅仅只是初始化currentSkus， goodsInfo, currentSkus, 不向容器发送新内容
+     * isSetMeal 如果是套餐的话就为true， 并且forDetail此时也为true， sku_id是所有规格都选好了的
      */
     function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean, isSetMeal?: boolean} = {}) {
         return new Promise<void>(async (resolve, reject) => {
@@ -330,16 +386,17 @@ const PrintChange: Taro.FC<any> = () => {
                     arr = arr.sort((a, b) => a - b);
                     skuStr.current = arr.join(",");
                     currentSkus.current = temp.skus.filter(v => v.value.includes(arr.join(",")));
-                    console.log("第一次产生的currentSkus：", skuStr.current, currentSkus.current);
+                    console.log("第一次产生的currentSkus：", "id", skuStr.current, "列表：", currentSkus.current);
 
                     const idx = serPar.attrGroup.findIndex(v => v.special_show === "photosize");
                     const numIdx = serPar.attrGroup.findIndex(v => v.special_show === "photonumber");
                     const setMealIdx = serPar.attrGroup.findIndex(v => v.special_show === "setmeal");
                     console.log("查找的下标：", idx, numIdx, setMealIdx);
 
-                    if (opt.isSetMeal && setMealIdx > -1) {
-                        updateSetMealArr([...serPar.attrItems[setMealIdx]])
-                    }
+                    // if (opt.isSetMeal && setMealIdx > -1) {
+                    //
+                    //     updateSetMealArr([...serPar.attrItems[setMealIdx]])
+                    // }
 
                     // 如果是完整的SkuID
                     if (opt.forDetail) {
@@ -351,16 +408,49 @@ const PrintChange: Taro.FC<any> = () => {
                                 const setMealList = [...serPar.attrItems[setMealIdx]];
                                 const skuVal = tArr[0].value.split(",");
                                 if (skuVal.length === serPar.attrGroup.length) {
-                                    currentSetMeal.current = setMealList.filter(value => skuVal.indexOf(String(value.id)) > -1)[0] || {};
-                                    console.log("查询到的当前套餐：", skuVal, currentSetMeal.current)
-                                    setMealTxtInfo(prev => {
-                                        return {
-                                            ...prev,
-                                            title: `套餐价：￥${tArr[0].price}`,
-                                            desc: `当前套餐：${currentSetMeal.current.value || 0}张`
+                                    /**
+                                     * 查询套餐下对应的价格，形成一个包含价格的新的套餐列表
+                                     * 先从skuVal（已知的所有sku规格ID）中找到对应套餐的下标位(idx)，以便循环生成sku列表，去匹配对应的大项sku信息
+                                     * setMealSkuIdArr：已知的所有套餐ID数组
+                                     */
+                                    const idx = skuVal.findIndex(ci => ci == setMealList[0].id);
+                                    console.log("查找的套餐sku对应的下标位置：", idx);
+                                    const setMealSkuIdArr = setMealList.map(v => v.id);
+                                    const tempArr = [];
+
+                                    // 循环已知的所有套餐ID数组
+                                    setMealSkuIdArr.forEach((item, index) => {
+                                        // 深拷贝
+                                        const tempIdArr = JSON.parse(JSON.stringify(skuVal));
+                                        // 删除并添加，形成新的sku列表
+                                        tempIdArr.splice(idx, 1, item);
+                                        const idStr = tempIdArr.join(",");
+                                        // 在normalSkusArr里面查找已有的id， 如果没有就push，以便提交订单
+                                        const localMatch = normalSkusArr.current.findIndex(v => v == idStr);
+                                        if (localMatch === -1) {
+                                            normalSkusArr.current.push(idStr)
+                                        }
+                                        // 在所有的skus列表里面匹配 tempIdArr.join(",")（上面生成的新sku列表组成的字符串）
+                                        const matchArr = temp.skus.filter(v => v.value == idStr);
+                                        // 找到结果后就组成新的数组
+                                        if (matchArr.length > 0) {
+                                            tempArr.push({
+                                                ...setMealList[index],
+                                                price: matchArr[0].price || 0.00,
+                                                skuValue: matchArr[0].value || idStr,
+                                                skuID: matchArr[0].id || ""
+                                            })
                                         }
                                     })
-                                    setDiscountInfo(prev => ({...prev, status: true}))
+                                    console.log("查找的所有的包含价格的新的套餐列表：", tempArr, "，所有的正常的sku列表：", normalSkusArr.current)
+
+                                    const current = tempArr.filter(value => skuVal.findIndex(cv => cv == value.id) > -1)[0] || {};
+                                    setCurrentMeal({...current})
+                                    console.log("查询到的当前套餐：", skuVal, current)
+                                    updateSetMealArr([...tempArr])
+
+                                    setDiscountInfo(prev => ({...prev, status: true}));
+                                    setMealSuccess.current = true;
                                 } else {
                                     Taro.showToast({
                                         title: "套餐Sku不完整",
@@ -562,9 +652,18 @@ const PrintChange: Taro.FC<any> = () => {
             setPhotos([...params.photo.path] || []);
         }
 
+        if (Object.keys(photoStore.photoProcessParams.currentSetMeal).length > 0) {
+            setCurrentMeal({...photoStore.photoProcessParams.currentSetMeal})
+        }
+
         Taro.hideLoading();
 
     })
+
+    const onSetMealChange = (item, idx) => {
+        console.log("当前选择的套餐：", item, idx);
+        setCurrentMeal({...item})
+    }
 
     const debounceUpdateCount = useDebounceFn(async (idx, num) => {
         const photo = [...photoStore.photoProcessParams.photo.path];
@@ -585,11 +684,18 @@ const PrintChange: Taro.FC<any> = () => {
         let _num = Number(num);
         _num = _num + 1;
 
-        const arr = [...photos];
+        const arr = JSON.parse(JSON.stringify(photos));
 
         arr[idx].count = Number(_num);
-        setPhotos([...arr]);
-        debounceUpdateCount(idx, Number(_num))
+        try {
+            const allow = await inspectionQuantityLimit(arr);
+            if (allow) {
+                setPhotos([...arr]);
+                debounceUpdateCount(idx, Number(_num))
+            }
+        } catch (e) {
+
+        }
     }
 
     const onReducer = async (prevNum, idx) => {
@@ -599,7 +705,7 @@ const PrintChange: Taro.FC<any> = () => {
             num = 1
         }
 
-        const arr = [...photos];
+        const arr = JSON.parse(JSON.stringify(photos));
         arr[idx].count = Number(num);
         setPhotos([...arr]);
         debounceUpdateCount(idx, Number(num))
@@ -654,7 +760,7 @@ const PrintChange: Taro.FC<any> = () => {
         setSkus([...arr])
     }
 
-    const forIDJumpToDatail = async (skuId) => {
+    const forIDJumpToDatail = async (skuId, isSetMeal: boolean = false) => {
         let count = 0;
         photos.forEach(value => {
             count += parseInt(value.count)
@@ -662,7 +768,7 @@ const PrintChange: Taro.FC<any> = () => {
 
         const data = {
             skuid: skuId,
-            total: count,
+            total: isSetMeal ? 1 : count,
             page: "photo",
             parintImges: photos.map(v => {
                 const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
@@ -687,9 +793,9 @@ const PrintChange: Taro.FC<any> = () => {
                 changeUrlParams: data
             })
             jumpOrderConfimPreview({
-                skuid:skuId,
-                total:count,
-                page:"photo"
+                skuid: skuId,
+                total:isSetMeal ? 1 : count,
+                page: "photo"
             });
         } catch (e) {
             console.log("本地存储失败：", e)
@@ -705,7 +811,27 @@ const PrintChange: Taro.FC<any> = () => {
 
         if (detailStatus && notNull(router.params.inc)) {
             // 已选好所有规格，直接跳转
-            forIDJumpToDatail(router.params.sku_id)
+            if (setMealSuccess.current) {
+                // 如果是套餐价
+                // let currentSkuId = null;
+                // console.log(currentSkus)
+                // for (let i = 0; i < currentSkus.current.length; i++) {
+                //     const item = currentSkus.current[i];
+                //     const cur = normalSkusArr.current.filter(v => v == item.value)[0];
+                //     console.log(cur, normalSkusArr.current)
+                //     if (!notNull(cur) && Object.keys(cur).length > 0 && item.value == cur) {
+                //         currentSkuId = item.id;
+                //         break;
+                //     }
+                // }
+                console.log("当前找到的ID：", currentSetMeal)
+                if (!notNull(currentSetMeal.skuID)) {
+                    forIDJumpToDatail(currentSetMeal.skuID, true)
+                }
+            } else {
+                // 非套餐价
+                forIDJumpToDatail(router.params.sku_id)
+            }
             return
         }
 
@@ -875,52 +1001,60 @@ const PrintChange: Taro.FC<any> = () => {
 
     const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
 
-        const arr = [...photos];
-        for (let i = 0; i < data.ids.length; i++) {
-            arr.push({
-                id: data.ids[i],
-                url: data.imgs[i],
-                attr: data.attrs[i],
-                count: 1,
-                edited: false,
-                doc: ""
-            });
+        setPhotoPickerVisible(false);
+        try {
+
+            const arr = [...photos];
+            for (let i = 0; i < data.ids.length; i++) {
+                arr.push({
+                    id: data.ids[i],
+                    url: data.imgs[i],
+                    attr: data.attrs[i],
+                    count: 1,
+                    edited: false,
+                    doc: ""
+                });
+            }
+
+            let exArr = [...arr];
+            if (sizeArr.current[0] && sizeArr.current[1]) {
+                const tArr = [
+                    {key: "w", val: sizeArr.current[0]},
+                    {key: "h", val: sizeArr.current[1]},
+                    {key: "r", val: 0},
+                ];
+                exArr = arr.map(v => {
+                    const allowRotate = checkHasRotate(v.attr);
+                    const arr = [...tArr];
+
+                    if (allowRotate) {
+                        arr[2].val = 90;
+                    }
+                    console.log("处理后的旋转度：", arr[2],allowRotate, sizeArr.current, v.attr)
+                    return {
+                        ...v,
+                        hasRotate: allowRotate,
+                        osx: getTailoringImg(arr),
+                        url: v.url,
+                    }
+                })
+            }
+
+            const allow = await inspectionQuantityLimit(exArr);
+            if (allow) {
+                await photoStore.updateServerParams(photoStore.printKey, {
+                    photo: {
+                        ...photoStore.photoProcessParams.photo,
+                        path: exArr
+                    },
+                    usefulImages: removeDuplicationForArr(data.ids.map((value, index) => ({id: value, url: data.imgs[index]})), photoStore.photoProcessParams.usefulImages)
+                })
+
+                setPhotos([...exArr]);
+            }
+        } catch (e) {
+            console.log("选择图片后处理出错：", e)
         }
-
-        let exArr = [...arr];
-        if (sizeArr.current[0] && sizeArr.current[1]) {
-            const tArr = [
-                {key: "w", val: sizeArr.current[0]},
-                {key: "h", val: sizeArr.current[1]},
-                {key: "r", val: 0},
-            ];
-            exArr = arr.map(v => {
-                const allowRotate = checkHasRotate(v.attr);
-                const arr = [...tArr];
-
-                if (allowRotate) {
-                    arr[2].val = 90;
-                }
-                console.log("处理后的旋转度：", arr[2],allowRotate, sizeArr.current, v.attr)
-                return {
-                    ...v,
-                    hasRotate: allowRotate,
-                    osx: getTailoringImg(arr),
-                    url: v.url,
-                }
-            })
-        }
-
-        await photoStore.updateServerParams(photoStore.printKey, {
-            photo: {
-                ...photoStore.photoProcessParams.photo,
-                path: exArr
-            },
-            usefulImages: removeDuplicationForArr(data.ids.map((value, index) => ({id: value, url: data.imgs[index]})), photoStore.photoProcessParams.usefulImages)
-        })
-
-        setPhotos([...exArr]);
-        setPhotoPickerVisible(false)
     }
 
     const onEditClick = async (item ,index) => {
@@ -1077,6 +1211,9 @@ const PrintChange: Taro.FC<any> = () => {
             </ScrollView>
             <View className="print_foot">
                 <View className={`print_fixed_select_button ${scrolling ? "print_fixed_btn_ainm" : ""}`}
+                      style={{
+
+                      }}
                       onClick={selectPhoto}
                 >
                     <IconFont name="24_jiahao" size={40} color="#fff" />
@@ -1130,7 +1267,27 @@ const PrintChange: Taro.FC<any> = () => {
             }
             {
                 discountStatus
-                    ? <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
+                    ? setMealSuccess.current
+                        ? <SetMealSelectorModal
+                            visible={discountStatus}
+                            currentSetMeal={currentSetMeal}
+                            setMealData={setMealArr}
+                            onClose={() => setDiscountStatus(false)}
+                            onConfirm={onSetMealChange} />
+                        : <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
+                    : null
+            }
+            {
+                tipStatus
+                    ? <TipModal
+                        isShow={tipStatus}
+                        title="超出打印照片数量"
+                        tip={`当前套餐照片数量最多打印${currentSetMeal.value}张照片，是否更改套餐打印更多照片？`}
+                        cancelText="取消"
+                        okText="更换套餐"
+                        onCancel={() => showTip(false)}
+                        onOK={() => setDiscountStatus(true)}
+                    />
                     : null
             }
         </View>

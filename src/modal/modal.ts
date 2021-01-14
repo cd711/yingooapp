@@ -66,6 +66,8 @@ export class PhotoParams {
     public limit: boolean = false;
     // 在流程里面已经使用过的图片
     public usefulImages: Array<{id: string | number, url: string, count: number}> = new Array<{id: string | number; url: string, count: number}>();
+    // 照片冲印当为套餐的时候存储的当前使用的套餐信息
+    public currentSetMeal: {[key: string]: any} = {};
 
     constructor(json?: any) {
         if (!json) {
@@ -81,11 +83,13 @@ export class PhotoParams {
         this.setMealIdx = !notNull(json.setMealIdx) ? json.setMealIdx : -1;
         this.imageCount = !notNull(json.imageCount) ? parseInt(json.imageCount) : 0;
         this.changeUrlParams = json.changeUrlParams || {};
+        this.currentSetMeal = json.currentSetMeal || {};
         this.photoStyle = json.photoStyle || "";
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
         this.limit = json.limit || false;
         this.min = !notNull(json.min) ? parseInt(json.min) : 1;
         this.usefulImages = !notNull(json.usefulImages) ? json.usefulImages : new Array<{id: string | number; url: string, count: number}>();
+
     }
 }

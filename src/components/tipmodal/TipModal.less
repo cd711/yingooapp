@@ -29,8 +29,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             min-height: 209px;
             padding: 0;
+            .title{
+                font-size: 32px;
+                box-sizing: border-box;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #121314;
+                margin-bottom: 16px;
+            }
             .tip-txt{
                 font-size: 32px;
                 color: #121314;
@@ -117,7 +128,7 @@
         -webkit-transform: scaleY(0.5);
         -ms-transform: scaleY(0.5);
         transform: scaleY(0.5);
-        border-top: 1PX solid #E5E5E5;   
+        border-top: 1PX solid #E5E5E5;
     }
 }
 .TipModal_active{
