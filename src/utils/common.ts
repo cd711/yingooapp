@@ -1020,34 +1020,6 @@ export function removeDuplicationForArr(
         console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
         return temp
     }
-    // const concatArr = [...oldArr, ...newArr];
-    const concatArr = [...newArr, ...oldArr];
-
-    // let concatArr = [];
-
-    // let map = new Map();
-    // for (let item of concatArr) {
-    //     console.log("cccccccc：", JSON.parse(JSON.stringify(item)))
-    //     if (!map.has(item.id)) {
-    //         map.set(item.id, item);
-    //     } else {
-    //         if (map.has(item.count)) {
-    //             map.set(item.id, )
-    //         }
-    //     }
-    // }
-    //
-    // temp = Array.from(map.values())
-
-
-
-    // 查重
-    // const hash = {};
-    // temp = concatArr.reduce(function(item, next) {
-    //     console.log("reduce888888888888:", next)
-    //     hash[next.id] ? '' : hash[next.id] = true && item.push(next);
-    //     return item
-    // }, []);
 
     console.log("查重的结果：-----", JSON.parse(JSON.stringify(temp)))
 
