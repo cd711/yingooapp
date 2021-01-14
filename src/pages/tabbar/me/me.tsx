@@ -5,7 +5,7 @@ import IconFont from '../../../components/iconfont';
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import Empty from "../../../components/empty";
-import {api} from '../../../utils/net';
+import {api,options} from '../../../utils/net';
 import {
     deviceInfo,
     fixStatusBarHeight,
@@ -464,7 +464,7 @@ export default class Me extends Component<any, MeState> {
                         <View className='top_weapp' />
                         <View className='baseInfo' onClick={() => this.jumpTo('/pages/me/pages/me/profile')}>
                             <View className='avator'>
-                                <Image src={avatar.length > 0 ? avatar : require('../../../source/defaultAvatar.png')}
+                                <Image src={avatar.length > 0 ? avatar : `${options.sourceUrl}appsource/defaultAvatar.png`}
                                        className='avatarImg'/>
                                 {
                                     isLogin?<View className='see'>

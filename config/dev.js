@@ -10,7 +10,7 @@ module.exports = {
       port: 80,
       proxy: {
         '/api/': {
-          target: "http://192.168.0.166",
+          target: "http://192.169.3.108",
           changeOrigin: true
         }
       }

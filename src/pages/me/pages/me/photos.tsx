@@ -3,7 +3,7 @@ import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './photos.less'
 import IconFont from '../../../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
-import {api} from "../../../../utils/net";
+import {api,options} from "../../../../utils/net";
 import UploadFile from "../../../../components/Upload/Upload";
 import {deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
 import LoadMore from "../../../../components/listMore/loadMore";
@@ -320,7 +320,7 @@ export default class Photos extends Component<{}, PhotosState> {
                         {
                             list.length === 0
                                 ? <View className='empty'>
-                                    <Image src={require('../../../../source/empty/nophoto.png')} className='img'/>
+                                    <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
                                     <UploadFile extraType={navSwitchActive === 0 ? 3 : 4}
                                                 uploadType={navSwitchActive === 0 ? "image" : "video"}

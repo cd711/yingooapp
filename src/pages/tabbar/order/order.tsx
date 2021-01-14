@@ -5,7 +5,7 @@ import IconFont from '../../../components/iconfont';
 import {userStore} from "../../../store/user";
 import {templateStore} from "../../../store/template";
 import { observer, inject } from '@tarojs/mobx'
-import { api } from '../../../utils/net';
+import { api,options } from '../../../utils/net';
 import {
     deviceInfo,
     fixStatusBarHeight,
@@ -79,10 +79,22 @@ export default class Order extends Component<any,{
             })
         }
         Taro.getApp().tab = -1;
-
     }
 
     componentDidMount(){
+        if (process.env.TARO_ENV == 'h5') {
+            setTimeout(() => {
+                const nav_bar = Object.assign([],document.querySelectorAll(".nav-bar"));
+                const status_switch_bar = Object.assign([],document.querySelectorAll(".status-switch-bar"));
+                const tabbar = Object.assign([],document.querySelectorAll(".taro-tabbar__tabbar"));
+                const nHeight = nav_bar.length>1?nav_bar.filter((item)=>item.clientHeight>0)[0].clientHeight:nav_bar[0].clientHeight;
+                const sHeight = status_switch_bar.length>1?status_switch_bar.filter((item)=>item.clientHeight>0)[0].clientHeight:status_switch_bar[0].clientHeight;
+                const tHeight = tabbar.length>1?tabbar.filter((item)=>item.clientHeight>0)[0].clientHeight:tabbar[0].clientHeight;
+                this.setState({
+                    centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nHeight-sHeight-tHeight
+                });
+            }, 200);
+        }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react)=>{
@@ -317,11 +329,11 @@ export default class Order extends Component<any,{
                         ))
                     }
                 </View>
-                <ScrollView scrollY className='order_list_page_scroll' style={deviceInfo.env === 'h5'?"":`height:${centerPartyHeight}px`}>
+                <ScrollView scrollY className='order_list_page_scroll' style={`height:${centerPartyHeight}px`}>
                 <View className='container'>
                     {
                         list.length == 0 ? <View className='empty'>
-                            <Image src={require('../../../source/empty/nullorder.png')} className='pic' />
+                            <Image src={`${options.sourceUrl}appsource/empty/nullorder.png`} className='pic' />
                             <Text className='txt'>暂无订单</Text>
                             <Button className='gofind' onClick={()=>{
                                 Taro.switchTab({

@@ -3,7 +3,7 @@ import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './photos.less'
 import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
-import {api} from "../../utils/net";
+import {api,options} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
 import {deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
@@ -398,7 +398,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                         {
                             list.length === 0 && navSwitchActive === 0
                                 ? <View className='empty'>
-                                    <Image src={require('../../source/empty/nophoto.png')} className='img'/>
+                                    <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
                                     <UploadFile extraType={3}
                                                 uploadType="image"
@@ -437,7 +437,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                                         extraType={3}
                                                         type="card"
                                                         count={9}
-                                                        image={require("../../source/car.png")}
+                                                        image={`${options.sourceUrl}appsource/car.png`}
                                                         uploadType="image"
                                                         style={photoGetItemStyle()}
                                                         onChange={this.uploadFile}/>

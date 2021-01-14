@@ -10,6 +10,9 @@ import config from './config';
 import Xm from './utils/xm'
 import {jsApiList, shareInfo, updateChannelCode} from "./utils/common";
 import wx from 'weixin-js-sdk'
+// import 'zg-sdk-wechart/zhuge-wx.min'
+// import sdk from 'zg-sdk-wechart/zhuge-wx.min'
+// const zhuge_app = require("./utils/zhuge-wx.min.js")
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -177,7 +180,7 @@ class App extends Component {
         }
     }
 
-    componentDidShow() {
+    setChannel = () => {
         const params = this.$router.params;
 
         const {channel} = params;
@@ -211,12 +214,107 @@ class App extends Component {
         }
     }
 
+    registerZhuGeIO = () => {
+        if (process.env.TARO_ENV === 'h5') {
+            // @ts-ignore
+            if (window.zhuge) return;
+            // @ts-ignore
+            window.zhuge = [];
+            // @ts-ignore
+            window.zhuge.methods = "_init identify track trackRevenue getDid getSid getKey setSuperProperty setUserProperties setWxProperties setPlatform".split(" ");
+            // @ts-ignore
+            window.zhuge.factory = function(b) {
+              return function() {
+                // @ts-ignore
+                const a = Array.prototype.slice.call(arguments);
+                a.unshift(b);
+                // @ts-ignore
+                window.zhuge.push(a);
+                // @ts-ignore
+                return window.zhuge;
+              }
+            };
+            // @ts-ignore
+            for (let i = 0; i < window.zhuge.methods.length; i++) {
+                // @ts-ignore
+              const key = window.zhuge.methods[i];
+              // @ts-ignore
+              window.zhuge[key] = window.zhuge.factory(key);
+            }
+            // @ts-ignore
+            window.zhuge.load = function(b, x) {
+              if (!document.getElementById("zhuge-js")) {
+                  // @ts-ignore
+                const a = document.createElement("script");
+                // @ts-ignore
+                const verDate = new Date();
+                // @ts-ignore
+                const verStr = verDate.getFullYear().toString() + verDate.getMonth().toString() + verDate.getDate().toString();
+        
+                a.type = "text/javascript";
+                a.id = "zhuge-js";
+                a.async = !0;
+                a.src = 'https://zgsdk.zhugeio.com/zhuge.min.js?v=' + verStr;
+                a.onerror = function() {
+                    // @ts-ignore
+                  window.zhuge.identify = window.zhuge.track = function(ename, props, callback) {
+                    if(callback && Object.prototype.toString.call(callback) === '[object Function]') {
+                      callback();
+                    } else if (Object.prototype.toString.call(props) === '[object Function]') {
+                      props();
+                    }
+                  };
+                };
+                // @ts-ignore
+                const c = document.getElementsByTagName("script")[0];
+                c.parentNode.insertBefore(a, c);
+                // @ts-ignore
+                window.zhuge._init(b, x)
+              }
+            };
+            // @ts-ignore
+            window.zhuge.load('978c85218b5c4faf9f3bb8abd3dd5928', { //配置应用的AppKey
+                debug:true,
+                superProperty: { //全局的事件属性(选填)
+                '应用名称': '映果'
+                },
+                adTrack: false,//广告监测开关，默认为false
+                zgsee: false,//视屏采集开关， 默认为false
+                autoTrack: false,
+                //启用全埋点采集（选填，默认false）
+                singlePage: true //是否是单页面应用（SPA），启用autoTrack后生效（选填，默认false）
+            });
+            // @ts-ignore
+            options.zhugeio = window.zhuge
+            console.log(options.zhugeio)
+        }
+        if (process.env.TARO_ENV === 'weapp') {
+            
+            // zhuge_app.App.zhuge.load("978c85218b5c4faf9f3bb8abd3dd5928",{
+            //     debug: true, // 打开实时调试
+            //     pv: true, // 是否启用页面访问统计功能
+            //     forwardShare: false, // 是否启用转发分享数据采集开关，默认为false
+            // })
+            // options.zhugeio = zhuge_app.zhuge;
+            
+        }
+    }
+
+    componentDidShow() {
+        this.setChannel();
+
+    }
+
     componentDidMount() {
-
+        this.registerZhuGeIO();
+        // console.log("诸葛 ",options.zhugeio,zhuge_app)
+        // options.zhugeio.identify('wx123');
+        // options.zhugeio.track('wx购买商品',{
+        //     "渠道商":"yunlaba"
+        // });
+        this.setChannel();
         const params = this.$router.params;
-
         const {code, state} = params;
-
         if (!userStore.isLogin) {
             const info = getUserInfo();
             if (info) {
@@ -243,7 +341,7 @@ class App extends Component {
                         icon: 'none',
                         duration: 1500
                     });
-                }, 1200);
+                }, 1000);
             }).catch((e) => {
                 setTimeout(() => {
                     Taro.hideLoading();
@@ -338,7 +436,6 @@ class App extends Component {
 
             }).catch((e) => {
                 console.log("分享出错：", e)
-
             })
         }
     }

@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import {AtFloatLayout} from 'taro-ui'
-import { api,updateLocalUserInfo } from '../../../../utils/net';
+import { api,updateLocalUserInfo,options } from '../../../../utils/net';
 import dayjs from "dayjs";
 import UploadFile from "../../../../components/Upload/Upload";
 import { fixStatusBarHeight } from '../../../../utils/common';
@@ -39,6 +39,7 @@ export default class Profile extends Component<any,{
             showBio:false,
             inputBio:""
         }
+
     }
 
 
@@ -167,7 +168,7 @@ export default class Profile extends Component<any,{
                         <View className='item'>
                             <Text className='title'>头像</Text>
                             <View className='right'>
-                                <Image className='img' mode="aspectFill" src={avatar.length>0?avatar:require('../../../../source/defaultAvatar.png')} />
+                                <Image className='img' mode="aspectFill" src={avatar.length>0?avatar:`${options.sourceUrl}appsource/defaultAvatar.png`} />
                                 <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                             </View>
                         </View>

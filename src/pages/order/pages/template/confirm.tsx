@@ -2,7 +2,7 @@ import Taro, {Component, Config} from '@tarojs/taro'
 import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './confirm.less';
 import IconFont from '../../../../components/iconfont';
-import {api} from '../../../../utils/net'
+import {api,options} from '../../../../utils/net'
 import {templateStore} from '../../../../store/template';
 import {userStore} from '../../../../store/user';
 import {inject, observer} from '@tarojs/mobx';
@@ -16,6 +16,7 @@ import {
     fixStatusBarHeight,
     getOrderConfimPreviewData,
     getTempDataContainer,
+    isEmptyX,
     jumpUri,
     notNull,
     ossUrl,
@@ -106,11 +107,12 @@ export default class Confirm extends Component<any, {
             this.initData();
         }
     }
-
+    private unixOrder:any = ""
     initData = () => {
         Taro.showLoading({title: "加载中"});
         const {order}: any = this.$router.params;
-        getOrderConfimPreviewData(order,async (resp,has)=>{
+        this.unixOrder = order;
+        getOrderConfimPreviewData(this.unixOrder,async (resp,has)=>{
             if (has) {
                 const {page, skuid, total}: any = resp;
                 this.isPhoto = page && page === "photo";
@@ -148,7 +150,6 @@ export default class Confirm extends Component<any, {
                         }
                     }
                     if (!isEmpty(userStore.address)) {
-                        console.log(userStore)
                         templateStore.address = userStore.address;
                         data["address_id"] = userStore.address.id;
                     }
@@ -158,13 +159,27 @@ export default class Confirm extends Component<any, {
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;
                         Taro.hideLoading();
-                        Object.assign(resp,{orderid:res.prepay_id})
-                        addOrderConfimPreviewData(order,resp)
+                        if (resp && isEmptyX(resp.orderid)) {
+                            Object.assign(resp,{
+                                orderid:res.prepay_id,
+                                addressId:res.address && res.address.id?res.address.id:0,
+                                disableAddressId:isEmptyX(res.address) && !isEmptyX(data["address_id"]) ? data["address_id"]:0
+                            })
+                        }
+                        addOrderConfimPreviewData(this.unixOrder,resp)
                         this.filterUsedTicket(res.orders);
+                        templateStore.address = res.data;
                         this.setState({
                             data: this.handleData(res),
                             orderid: res.prepay_id
                         });
+                        if (parseInt(data["address_id"]+"") > 0 && !isEmptyX(data["address_id"]) && data["address_id"] == userStore.address.id && res.address == null && !res.delivery) {
+                            Taro.showToast({
+                                title:"默认收货地址无法配送,请重新选择",
+                                icon:"none",
+                                duration:2000
+                            });
+                        }
                     }).catch((e) => {
                         Taro.hideLoading();
                         Taro.showToast({
@@ -227,7 +242,8 @@ export default class Confirm extends Component<any, {
 
     componentDidShow() {
         const {order}: any = this.$router.params;
-        getOrderConfimPreviewData(order,async (resp,has)=>{
+        this.unixOrder = order;
+        getOrderConfimPreviewData(this.unixOrder,async (resp,has)=>{
             if (has) {
                 const {page} = resp;
                 if (page) {
@@ -276,6 +292,13 @@ export default class Confirm extends Component<any, {
                         this.setState({
                             data: this.handleData(res)
                         })
+                        if (res.address == null && !res.delivery) {
+                            Taro.showToast({
+                                title:"当前收货地址无法配送,请重新选择",
+                                icon:"none",
+                                duration:2000
+                            });
+                        }
                     }).catch((e) => {
                         console.log(e);
                     })
@@ -706,7 +729,7 @@ export default class Confirm extends Component<any, {
                     {
                         address ? <View className='address-part-has' onClick={() => {
                             Taro.navigateTo({
-                                url: updateChannelCode(`/pages/me/pages/me/address/index?t=select&id=${address.id}`)
+                                url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
                             })
                         }}>
                             {/* <Image src={require('../../../../source/addressBackground.png')} className='backimg'/> */}
@@ -721,10 +744,10 @@ export default class Confirm extends Component<any, {
                                 </View>
                                 <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
                             </View>
-                            <Image src={require("../../../../source/address_part.png")} className='address_line'/>
+                            <Image src={`${options.sourceUrl}appsource/address_part.png`} className='address_line'/>
                         </View> : <View className='address-part' onClick={() => {
                             Taro.navigateTo({
-                                url: updateChannelCode('/pages/me/pages/me/address/index?t=select')
+                                url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
                             })
                         }}>
                             <Text className='title'>选择收货地址</Text>

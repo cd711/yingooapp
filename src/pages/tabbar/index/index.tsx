@@ -4,7 +4,7 @@ import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import {inject, observer} from '@tarojs/mobx'
 import './index.less'
 import IconFont from '../../../components/iconfont'
-import {api} from "../../../utils/net";
+import {api,options} from "../../../utils/net";
 import {
     allowShowCoupon,
     deviceInfo,
@@ -913,7 +913,7 @@ class Index extends Component<any, IndexState> {
                                                         </View>
                                                         <View className="read_fast_link_wrap">
                                                             <View className="read_fast_link" onClick={this.uncShow}>
-                                                                <Image src={require("../../../source/cnxh.svg")} className="fast_img" mode="widthFix" />
+                                                                <Image src={`${options.sourceUrl}appsource/cnxh.svg`} className="fast_img" mode="widthFix" />
                                                                 <View className="info">
                                                                     <Text className="h2">当面冲印文档</Text>
                                                                     <Text className="txt">极速打印文档</Text>
@@ -931,7 +931,7 @@ class Index extends Component<any, IndexState> {
                                                         </View>
                                                         <View className="fast_order_link_wrap">
                                                             <View className="fast_order_link" onClick={() => this.jumpToTemplate(2)}>
-                                                                <Image src={require("../../../source/az.svg")} className="fast_img" />
+                                                                <Image src={`${options.sourceUrl}appsource/az.svg`} className="fast_img" />
                                                                 <Text className="h2">手机壳定制</Text>
                                                                 <Text className="info">多种精美模板</Text>
                                                             </View>

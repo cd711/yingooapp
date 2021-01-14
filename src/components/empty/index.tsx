@@ -1,6 +1,7 @@
 import "./index.less";
 import Taro from '@tarojs/taro';
 import {View, Text, Image} from "@tarojs/components";
+import { options } from "../../utils/net";
 
 interface EmptyProps {
     content?: string | JSX.Element;
@@ -16,10 +17,11 @@ const Empty: Taro.FC<EmptyProps> = (props) => {
             return typeof obj === "string"
         }
         return false
+        
     }
     return (
         <View className="empty_container">
-            <Image src={icon ? icon : require('../../source/empty/nullorder.png')} className='pic' />
+            <Image src={icon ? icon : `${options.sourceUrl}appsource/empty/nullorder.png`} className='pic' />
             {
                 content
                     ? is_string(content)

@@ -10,14 +10,16 @@ export const options: {
     editorUrl: string;
     h5Url: string;
     weappUrl:string;
-    channel:string
+    channel:string;
+    zhugeio:any
 } = {
     apiUrl: '',
     sourceUrl:'',
     editorUrl: "",
     h5Url: "",
     weappUrl:"",
-    channel:""
+    channel:"",
+    zhugeio:null
 }
 let accessToken;
 

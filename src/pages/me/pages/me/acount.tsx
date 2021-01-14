@@ -6,6 +6,7 @@ import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
 import {fixStatusBarHeight, updateChannelCode} from '../../../../utils/common';
+import { options } from '../../../../utils/net';
 
 @inject("userStore")
 @observer
@@ -28,6 +29,7 @@ export default class Setting extends Component<any,{
 
     componentDidMount(){
         console.log(userStore.mobile)
+
     }
 
 
@@ -116,7 +118,7 @@ export default class Setting extends Component<any,{
                     }}>
                         <Text className='name'>微信</Text>
                         <View className='right'>
-                            <Image src={userStore.isLogin?userStore.avatar:require('../../../../source/defaultAvatar.png')} className='rimg' />
+                            <Image src={userStore.isLogin?userStore.avatar:`${options.sourceUrl}appsource/defaultAvatar.png`} className='rimg' />
                             <Text className='rtxt'>{userStore.nickname}</Text>
                             <IconFont name='20_xiayiye' size={40} color='#9C9DA6' />
                         </View>

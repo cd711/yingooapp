@@ -13,7 +13,7 @@ import {
     shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../utils/common";
-import {api} from "../../utils/net";
+import {api,options} from "../../utils/net";
 import searchStore from "../../store/search";
 
 const Search:Taro.FC<any> = () => {
@@ -132,7 +132,7 @@ const Search:Taro.FC<any> = () => {
                         ))
                     }
                     {
-                        touched && searchList.length === 0 ? <Empty icon={require("../../source/empty/searchnull.png")} content="什么都没有，换个词试试呢" /> : null
+                        touched && searchList.length === 0 ? <Empty icon={`${options.sourceUrl}appsource/empty/searchnull.png`} content="什么都没有，换个词试试呢" /> : null
                     }
                 </View>
             </ScrollView>

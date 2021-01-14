@@ -2,7 +2,7 @@ const config = {
     apiUrl: `https://${process.env.NODE_ENV !== 'production' ? "test" : "test"}.playbox.yingoo.com/api/`,
     // apiUrl:"https://yin.gaozhenzhen.com/api/",
     // 静态资源地址
-    sourceUrl: "",
+    sourceUrl: "https://cdn.playbox.yingoo.com/",
     // 编辑器本地地址
     editorUrl: process.env.NODE_ENV !== 'production' ? "https://test.playbox.yingoo.com" : "https://test.playbox.yingoo.com",
     // editorUrl:"https://yin.gaozhenzhen.com",
