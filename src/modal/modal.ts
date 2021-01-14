@@ -44,8 +44,12 @@ export class PhotoParams {
     public attrItems: any[] = [];
     public editPhotos: any[] = [];
     public originalData: any[] = [];
+    // 照片冲印尺寸在attrGroup的下标，对应attrItems的位置
     public index: number;
+    // 照片冲印图片数量在attrGroup的下标，对应attrItems的位置
     public numIdx: number;
+    // 照片冲印套餐在attrGroup的下标，对应attrItems的位置
+    public setMealIdx: number;
     // 照片冲印当前模板的照片数量
     public imageCount: number = 0;
     // 在照片冲印列表需要使用的路由参数
@@ -74,6 +78,7 @@ export class PhotoParams {
         this.originalData = json.originalData ? [...json.originalData] : [];
         this.numIdx = !notNull(json.numIdx) ? json.numIdx : -1;
         this.index = !notNull(json.index) ? json.index : -1;
+        this.setMealIdx = !notNull(json.setMealIdx) ? json.setMealIdx : -1;
         this.imageCount = !notNull(json.imageCount) ? parseInt(json.imageCount) : 0;
         this.changeUrlParams = json.changeUrlParams || {};
         this.photoStyle = json.photoStyle || "";

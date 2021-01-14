@@ -20,7 +20,6 @@ import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import Discount from "../../../../components/discount";
 import PlaceOrder from "../../../../components/place/place";
-import ChangePackage from "../../../../components/changePackage/changePackage";
 
 
 const PrintChange: Taro.FC<any> = () => {
@@ -54,6 +53,8 @@ const PrintChange: Taro.FC<any> = () => {
     const [discountStatus, setDiscountStatus] = useState<boolean>(false);
     const [distCountList, setDiscountList] = useState<Array<{id: string | number, name: string, price: string, value: string}>>([]);
     const [discountInfo, setDiscountInfo] = useState<{count: number, price: number, status: boolean}>({status: false, count: 0, price: 0.00});
+
+    const [setMealTxt, setMealTxtInfo] = useState<{title: string, desc: string}>({title: "", desc: ""})
 
     const currentSkus = useRef<any[]>([]);
     const skuStr = useRef<string>("");
@@ -90,9 +91,23 @@ const PrintChange: Taro.FC<any> = () => {
         if (arr.length > 1) {
             const first = arr[0];
             const last = arr[arr.length - 1];
-            setPrice([first.price, last.price])
+            setPrice([first.price, last.price]);
+            setMealTxtInfo(prev => {
+                return {
+                    ...prev,
+                    title: `现单价：￥${first.price}${!detailStatus ? "起" : ""}`,
+                    desc: `${discountInfo.status ? `再加${discountInfo.count}张,单价低至￥${discountInfo.price}` : ""}`
+                }
+            })
         } else if (arr.length > 0) {
-            setPrice([arr[0].price])
+            setPrice([arr[0].price]);
+            setMealTxtInfo(prev => {
+                return {
+                    ...prev,
+                    title: `现单价：￥${arr[0].price}${!detailStatus ? "起" : ""}`,
+                    desc: `${discountInfo.status ? `再加${discountInfo.count}张,单价低至￥${discountInfo.price}` : ""}`
+                }
+            })
         }
 
     }, 800), [skuStr.current])
@@ -310,11 +325,18 @@ const PrintChange: Taro.FC<any> = () => {
                     currentSkus.current = temp.skus.filter(v => v.value.includes(arr.join(",")));
                     console.log("第一次产生的currentSkus：", skuStr.current, currentSkus.current);
 
-                    // 如果是完成的SkuID
+                    // 如果是完整的SkuID
                     if (opt.forDetail) {
                         const tArr = serPar.skus.filter(v => v.id == obj.sku);
                         if (tArr.length > 0) {
-                            setPrice([tArr[0].price])
+                            setPrice([tArr[0].price]);
+                            setMealTxtInfo(prev => {
+                                return {
+                                    ...prev,
+                                    title: `现单价：￥${tArr[0].price}${!detailStatus ? "起" : ""}`,
+                                    desc: `${discountInfo.status ? `再加${discountInfo.count}张,单价低至￥${discountInfo.price}` : ""}`
+                                }
+                            })
                         }
                     }
 
@@ -945,13 +967,13 @@ const PrintChange: Taro.FC<any> = () => {
                 top: `${deviceInfo.env === "weapp" ? deviceInfo.menu.bottom + 4 : 44}px`
             }}>
                 <View className="left">
-                    <Text className="txt">现单价：￥{price.length === 1 ? price[0] : `${price[0]}${!detailStatus ? "起" : ""}`}</Text>
+                    <Text className="txt">{setMealTxt.title}</Text>
                 </View>
                 <View className="right">
                     {
                         discountInfo.status
                             ? <View className="more_price_info" onClick={() => setDiscountStatus(true)}>
-                                <Text className="red_txt">再加{discountInfo.count}张,单价低至￥{discountInfo.price}</Text>
+                                <Text className="red_txt">{setMealTxt.desc}</Text>
                                 <IconFont name="24_xiayiye" color="#FF4966" size={28} />
                             </View>
                             : null
@@ -1048,21 +1070,12 @@ const PrintChange: Taro.FC<any> = () => {
             </View>
             {
                 visible
-                    ? <View>
-                        {/*<OrderModal data={goodsInfo.current}*/}
-                        {/*            isShow={visible}*/}
-                        {/*            defaultActive={skus || []}*/}
-                        {/*            onClose={() => setVisible(false)}*/}
-                        {/*            onSkuChange={orderSkuChange}*/}
-                        {/*            onNowBuy={onSubmitOrder}*/}
-                        {/*/>*/}
-                        <PlaceOrder  data={goodsInfo.current} isShow={visible}
-                                     onClose={() => setVisible(false)}
-                                     onSkuChange={orderSkuChange}
-                                     quoteType="photo"
-                                     defaultSelectIds={skus || []}
-                                     onNowBuy={onSubmitOrder} />
-                    </View>
+                    ? <PlaceOrder  data={goodsInfo.current} isShow={visible}
+                                   onClose={() => setVisible(false)}
+                                   onSkuChange={orderSkuChange}
+                                   quoteType="photo"
+                                   defaultSelectIds={skus || []}
+                                   onNowBuy={onSubmitOrder} />
                     : null
             }
             {
@@ -1077,7 +1090,6 @@ const PrintChange: Taro.FC<any> = () => {
                     </View>
                     : null
             }
-            {/* <ChangePackage isShow onClose={()=>{}}/> */}
         </View>
     )
 }
