@@ -419,7 +419,22 @@ export default class Login extends Component<{}, {
         // 查询是否有套餐价
         const setMealIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "setmeal");
         const sizeIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "photosize");
-        const pixSize = data.attrItems[sizeIdx].value || "";
+        let skuSizeIdx = -1;
+        for (let i = 0; i < data.attrItems[sizeIdx].length; i ++) {
+            let has = false;
+            for (let j = 0; j < sku.length; j++) {
+                if (parseInt(sku) == parseInt(data.attrItems[sizeIdx][i].id)) {
+                    has = true;
+                    break;
+                }
+            }
+            if (has) {
+                skuSizeIdx = i;
+                break;
+            }
+        }
+        const pixSize = data.attrItems[sizeIdx][skuSizeIdx].value || "";
+        debuglog("当前打印的尺寸参数：", pixSize)
         try {
             await photoStore.setActionParamsToServer(getUserKey(), {
                 photo: {

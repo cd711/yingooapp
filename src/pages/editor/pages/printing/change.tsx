@@ -497,7 +497,7 @@ const PrintChange: Taro.FC<any> = () => {
                             index: idx,
                             numIdx,
                             setMealIdx,
-                            pictureSize: serPar.attrItems[idx][0].value,
+                            // pictureSize: serPar.attrItems[idx][0].value,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
                             max: serPar.max,
@@ -788,6 +788,7 @@ const PrintChange: Taro.FC<any> = () => {
             page: "photo",
             parintImges: photos.map(v => {
                 const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
+                debuglog("当前的尺寸参数：", pixArr)
                 if (v.hasRotate && v.hasRotate === true) {
                     return {
                         url: v.url,
