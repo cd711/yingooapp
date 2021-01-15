@@ -1,18 +1,25 @@
-import Taro, {useEffect, useState, useRef} from "@tarojs/taro";
+import Taro, {useEffect, useRef, useState} from "@tarojs/taro";
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
 import {
-    debounce, debuglog,
-    deviceInfo, getURLParamsStr,
+    debounce,
+    debuglog,
+    deviceInfo,
+    getURLParamsStr,
     getUserKey,
     jumpOrderConfimPreview,
     jumpToPrintEditor,
-    notNull, removeDuplicationForArr, shareAppExtends, sleep, updateChannelCode,
-    urlEncode, useDebounceFn
+    notNull,
+    removeDuplicationForArr,
+    shareAppExtends,
+    sleep,
+    updateChannelCode,
+    urlEncode,
+    useDebounceFn
 } from "../../../../utils/common";
-import {api,options} from "../../../../utils/net";
+import {api, options} from "../../../../utils/net";
 import {PhotoParams} from "../../../../modal/modal";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
@@ -30,8 +37,12 @@ const PrintChange: Taro.FC<any> = () => {
 
     const [photos, setPhotos] = useState([]);
     const [visible, setVisible] = useState(false);
-    const goodsInfo = Taro.useRef<any>({});
+    const goodsInfo = useRef<any>({});
     const useMoreThan = useRef<any>({});
+
+    // 列表每个ITem的宽高
+    const [itemStyle, setItemStyle] = useState<{width: number, height: number}>({width: deviceInfo.windowWidth / 2 - 26, height: 203});
+
     // sku子项ID列表
     const [skus, setSkus] = useState<any[]>([]);
     // skus ID， 已选好所有子项sku的大项ID
@@ -54,11 +65,15 @@ const PrintChange: Taro.FC<any> = () => {
     const [tipStatus, showTip] = useState(false);
 
     const [discountStatus, setDiscountStatus] = useState<boolean>(false);
-    const [distCountList, setDiscountList] = useState<Array<{id: string | number, name: string, price: string, value: string}>>([]);
-    const [discountInfo, setDiscountInfo] = useState<{count: number, price: number, status: boolean}>({status: false, count: 0, price: 0.00});
+    const [distCountList, setDiscountList] = useState<Array<{ id: string | number, name: string, price: string, value: string }>>([]);
+    const [discountInfo, setDiscountInfo] = useState<{ count: number, price: number, status: boolean }>({
+        status: false,
+        count: 0,
+        price: 0.00
+    });
 
     // 顶部的所有文案
-    const [setMealTxt, setMealTxtInfo] = useState<{title: string, desc: string}>({title: "", desc: ""});
+    const [setMealTxt, setMealTxtInfo] = useState<{ title: string, desc: string }>({title: "", desc: ""});
     // 套餐的信息列表
     const [setMealArr, updateSetMealArr] = useState([]);
 
@@ -96,7 +111,7 @@ const PrintChange: Taro.FC<any> = () => {
         return new Promise<boolean>((resolve, _) => {
             if (setMealSuccess.current) {
                 let count = 0;
-                for (let i = 0; i < arr.length; i ++) {
+                for (let i = 0; i < arr.length; i++) {
                     const item = arr[i];
                     count += (notNull(item.count) ? 1 : item.count)
                 }
@@ -110,6 +125,80 @@ const PrintChange: Taro.FC<any> = () => {
                 resolve(true)
             }
         })
+    }
+
+    function transformPx(obj: { [key: string]: any }) {
+        const temp = {};
+        for (const k in obj) {
+            temp[k] = `${obj[k]}px`
+        }
+        return temp
+    }
+
+    // 根据选择的尺寸来计算每个Item的高度
+    function computedHeightAccordingToSize(imgSize: string, containerH: number): { width: number, height: number } {
+        const obj = {
+            width: 152,
+            height: 203
+        };
+        if (notNull(imgSize) || imgSize.indexOf("*") === -1) {
+            return obj
+        }
+        const imgW = parseInt(imgSize.split("*")[0]);
+        const imgH = parseInt(imgSize.split("*")[1]);
+        const containerW = itemStyle.width;
+
+        // if ((imgW / imgH) > 1) {
+        //     // 横图
+        //     debuglog("横图：", size, imgSize, containerW, containerH)
+        //
+        // } else if ((imgW / imgH) < 1) {
+        //     // 竖图
+        //     debuglog("竖图：", size, imgSize, containerW, containerH)
+        //     obj.height = containerH;
+        //     obj.width = imgW * (containerW / containerH);
+        // } else {
+        //     debuglog("方图：", size, imgSize, containerW, containerH)
+        //     // 等宽高, 方图
+        // }
+
+        if (imgW / imgH >= containerW / containerH)    //如果原图片的比例大于或等于需要适应的比例
+        {
+            if (imgW > containerW)    //如果原图片宽度大于容器的宽度，那么就按宽度压缩
+            {
+                obj.width = containerW;
+                obj.height = (imgH * containerW) / imgW;
+
+            } else {
+                obj.width = imgW;
+                obj.height = imgH;
+
+            }
+            if (obj.height > containerH)  //如果压缩后的图片高度仍然大于容器高度，那么再继续将图片宽度/高度压缩
+            {
+                obj.width = obj.width * containerH / obj.height;
+                obj.height = containerH;
+            }
+        } else //如果原图片比例小于需要适应的比例
+        {
+            if (imgH > containerH)       //如果原图片高度大于需要容器的高度，那么就按高度压缩
+            {
+                obj.height = containerH;
+                obj.width = (imgW * containerH) / imgH;
+
+            } else {
+                obj.width = imgW;
+                obj.height = imgH;
+            }
+            if (obj.width > containerW)  //如果压缩后的图片宽度仍然大于容器宽度，那么再继续将图片宽度/高度压缩
+            {
+                obj.height = obj.height * containerW / obj.width;
+                obj.width = containerW;
+            }
+        }
+
+        debuglog("图片计算的值：", obj)
+        return obj
     }
 
     useEffect(() => {
@@ -160,7 +249,7 @@ const PrintChange: Taro.FC<any> = () => {
     useEffect(() => {
 
         let count = 0;
-        for (let i = 0; i < photos.length; i ++) {
+        for (let i = 0; i < photos.length; i++) {
             const item = photos[i];
             count += (notNull(item.count) ? 1 : item.count)
         }
@@ -178,11 +267,12 @@ const PrintChange: Taro.FC<any> = () => {
 
     }, [currentSetMeal])
 
+    // photo变化时要做 的事
     useEffect(() => {
 
         // 统计图片及其count的总数
         let count = 0;
-        for (let i = 0; i < photos.length; i ++) {
+        for (let i = 0; i < photos.length; i++) {
             const item = photos[i];
             count += (notNull(item.count) ? 1 : item.count)
         }
@@ -231,7 +321,7 @@ const PrintChange: Taro.FC<any> = () => {
                 const len = countAttrArr.length;
                 debuglog("当前的countAttrArr：", JSON.parse(JSON.stringify(countAttrArr)))
                 for (let i = 0; i < countAttrArr.length; i++) {
-                    const item =  countAttrArr[i];
+                    const item = countAttrArr[i];
                     if (parseInt(item.value) >= count) {
                         let c = i - 1;
                         if (c <= 0) {
@@ -337,7 +427,7 @@ const PrintChange: Taro.FC<any> = () => {
      * onlyInitPrice  仅仅只是初始化currentSkus， goodsInfo, currentSkus, 不向容器发送新内容
      * isSetMeal 如果是套餐的话就为true， 并且forDetail此时也为true， sku_id是所有规格都选好了的
      */
-    function getRouterParams(params:{path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean, isSetMeal?: boolean} = {}) {
+    function getRouterParams(params: { path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean, isSetMeal?: boolean } = {}) {
         return new Promise<void>(async (resolve, reject) => {
             const opt = {
                 path: params.path || [],
@@ -357,7 +447,7 @@ const PrintChange: Taro.FC<any> = () => {
                     if (deviceInfo.env === "weapp") {
                         try {
                             await photoStore.getServerParams({key: getUserKey(), setLocal: true})
-                        }catch (e) {
+                        } catch (e) {
                             debuglog("初始获取参数错误：", e)
                         }
                     }
@@ -494,7 +584,7 @@ const PrintChange: Taro.FC<any> = () => {
                         debuglog("初始化尺寸时没找到尺寸：", serPar)
                     }
                 }
-            }catch (e) {
+            } catch (e) {
                 reject(e)
             }
         })
@@ -598,7 +688,11 @@ const PrintChange: Taro.FC<any> = () => {
             } else if (router.params.detail && router.params.detail === "t") {
                 // 如果是从商品详情页过来，此时已经有选好的图片了，并且规格已经选好了
                 // 此处还存在一个情况，就是如果是套餐价，说明所有的规格也已经选好了，那么isSetMeal就为true
-                await getRouterParams({path: [], forDetail: true, isSetMeal: !notNull(router.params.meal) && router.params.meal == "t"});
+                await getRouterParams({
+                    path: [],
+                    forDetail: true,
+                    isSetMeal: !notNull(router.params.meal) && router.params.meal == "t"
+                });
                 params = {...photoStore.photoProcessParams}
                 setDetailStatus(true)
             } else if (router.params.inc) {
@@ -609,7 +703,7 @@ const PrintChange: Taro.FC<any> = () => {
                 await getRouterParams({onlyInitPrice: true})
                 params = await photoStore.getServerParams({setLocal: true});
             }
-        }catch (e) {
+        } catch (e) {
             debuglog("初始化获取服务器的数据出错：", e)
         }
 
@@ -634,6 +728,14 @@ const PrintChange: Taro.FC<any> = () => {
                 selectPhoto()
             }
 
+            const containerH = itemStyle.width * (parseInt(pixArr[0]) / parseInt(pixArr[1]))
+            setItemStyle(prev => {
+                return {
+                    ...prev,
+                    height: containerH
+                }
+            })
+
             debuglog("path:", params.photo.path)
             params.photo.path = params.photo.path.map((v) => {
                 const allowRotate = checkHasRotate(v.attr);
@@ -641,13 +743,16 @@ const PrintChange: Taro.FC<any> = () => {
                 if (allowRotate) {
                     arr[2].val = 90;
                 }
+                const {width, height} = computedHeightAccordingToSize(v.attr, containerH)
                 return {
                     ...v,
                     url: v.url,
                     count: notNull(v.count) ? 1 : parseInt(v.count),
                     hasRotate: allowRotate,
                     osx: getTailoringImg(arr),
-                    readLocal: v.originalData && v.originalData.length > 0
+                    readLocal: v.originalData && v.originalData.length > 0,
+                    width,
+                    height
                 }
             })
             setPhotos([...params.photo.path] || []);
@@ -795,7 +900,7 @@ const PrintChange: Taro.FC<any> = () => {
             })
             jumpOrderConfimPreview({
                 skuid: skuId,
-                total:isSetMeal ? 1 : count,
+                total: isSetMeal ? 1 : count,
                 page: "photo"
             });
         } catch (e) {
@@ -983,9 +1088,9 @@ const PrintChange: Taro.FC<any> = () => {
                 changeUrlParams: data
             })
             jumpOrderConfimPreview({
-                skuid:skuInfoID,
-                total:count,
-                page:"photo"
+                skuid: skuInfoID,
+                total: count,
+                page: "photo"
             })
         } catch (e) {
             debuglog("本地存储失败：", e)
@@ -1000,7 +1105,7 @@ const PrintChange: Taro.FC<any> = () => {
         }, 500)
     }
 
-    const onPhotoSelect = async (data: {ids: [], imgs: [], attrs: []}) => {
+    const onPhotoSelect = async (data: { ids: [], imgs: [], attrs: [] }) => {
 
         setPhotoPickerVisible(false);
         try {
@@ -1031,7 +1136,7 @@ const PrintChange: Taro.FC<any> = () => {
                     if (allowRotate) {
                         arr[2].val = 90;
                     }
-                    debuglog("处理后的旋转度：", arr[2],allowRotate, sizeArr.current, v.attr)
+                    debuglog("处理后的旋转度：", arr[2], allowRotate, sizeArr.current, v.attr)
                     return {
                         ...v,
                         hasRotate: allowRotate,
@@ -1061,7 +1166,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }
 
-    const onEditClick = async (item ,index) => {
+    const onEditClick = async (item, index) => {
 
         const obj: any = {
             idx: index,
@@ -1084,7 +1189,7 @@ const PrintChange: Taro.FC<any> = () => {
                     originalData: item.originalData,
                 })
             }
-        }catch (e) {
+        } catch (e) {
             debuglog("向本地存储旧数据出错：", e)
         }
 
@@ -1135,7 +1240,7 @@ const PrintChange: Taro.FC<any> = () => {
 
     return (
         <View className="printing_container">
-            <LoginModal isTabbar={false} />
+            <LoginModal isTabbar={false}/>
             <AtNavBar onClickLeftIcon={onBackHandle}
                       customStyle={{
                           paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
@@ -1154,13 +1259,14 @@ const PrintChange: Taro.FC<any> = () => {
                         discountInfo.status
                             ? <View className="more_price_info" onClick={() => setDiscountStatus(true)}>
                                 <Text className="red_txt">{setMealTxt.desc}</Text>
-                                <IconFont name="24_xiayiye" color="#FF4966" size={28} />
+                                <IconFont name="24_xiayiye" color="#FF4966" size={28}/>
                             </View>
                             : null
                     }
                 </View>
             </View>
-            <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}} onScroll={onScroll}>
+            <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}}
+                        onScroll={onScroll}>
                 <View className="printing_change_main"
                       style={
                           deviceInfo.env === "weapp"
@@ -1169,41 +1275,48 @@ const PrintChange: Taro.FC<any> = () => {
                                   paddingBottom: 22 + "px"
                               }
                               : {
-                                paddingBottom: "88px",
-                                paddingTop: 56
+                                  paddingBottom: "88px",
+                                  paddingTop: 56
                               }
                       }
                 >
                     {
                         photos.map((value, index) => (
-                            <View className="print_change_item_wrap" key={index+""}
+                            <View className="print_change_item_wrap" key={index + ""}
                                   style={{
                                       width: deviceInfo.windowWidth / 2 + "px"
                                   }}>
                                 <View className="print_change_item"
                                       style={{
-                                          width: deviceInfo.windowWidth / 2 - 26 + "px"
+                                          width: `${itemStyle.width}px`,
                                       }}
                                 >
                                     <View className="print_change_del" onClick={() => onDeleteImg(index)}>
                                         <IconFont name="32_guanbi" size={32}/>
                                     </View>
-                                    <View className="print_change_img">
+                                    <View className="print_change_img"
+                                          style={{
+                                              width: `${itemStyle.width}px`,
+                                              height: `${itemStyle.height}px`
+                                          }}
+                                    >
                                         <Image src={value.hasRotate ? `${value.url}?${value.osx}` : value.url}
                                                className="p_img"
                                                mode="aspectFill"
                                                onClick={() => onEditClick(value, index)}
                                                style={{
                                                    // transform: value.hasRotate ? "rotateZ(90deg)" : "none",
-                                                   // width: value.hasRotate ? 203 : 152,
-                                                   // height: value.hasRotate ? 152 : 203
+                                                   width: `${value.width}px`,
+                                                   height: `${value.height}px`
                                                }}
                                         />
                                     </View>
                                     <View className="print_change_count">
                                         <View className='counter-fc'>
                                             <View className='reduce' onClick={() => onReducer(value.count, index)}>
-                                                <Image src={require(`../../../../source/${value.count > 1 ? "reduceActive" : "reduce"}.png`)} className='img'/>
+                                                <Image
+                                                    src={require(`../../../../source/${value.count > 1 ? "reduceActive" : "reduce"}.png`)}
+                                                    className='img'/>
                                             </View>
                                             <Text className='num'>{value.count || 1}</Text>
                                             <View className='add' onClick={() => onAddCount(value.count, index)}>
@@ -1219,12 +1332,10 @@ const PrintChange: Taro.FC<any> = () => {
             </ScrollView>
             <View className="print_foot">
                 <View className={`print_fixed_select_button ${scrolling ? "print_fixed_btn_ainm" : ""}`}
-                      style={{
-
-                      }}
+                      style={{}}
                       onClick={selectPhoto}
                 >
-                    <IconFont name="24_jiahao" size={40} color="#fff" />
+                    <IconFont name="24_jiahao" size={40} color="#fff"/>
                     <Text className="txt">加图</Text>
                 </View>
                 <View className="print_foot_main" style={{justifyContent: "space-around"}}>
@@ -1232,7 +1343,7 @@ const PrintChange: Taro.FC<any> = () => {
                         {
                             !notNull(describe)
                                 ? <View className="top">
-                                    <Image src={require("../../../../source/waing.png")} className="top_icon" />
+                                    <Image src={require("../../../../source/waing.png")} className="top_icon"/>
                                     <Text className="v_txt">{describe}</Text>
                                 </View>
                                 : null
@@ -1253,23 +1364,23 @@ const PrintChange: Taro.FC<any> = () => {
             </View>
             {
                 visible
-                    ? <PlaceOrder  data={goodsInfo.current} isShow={visible}
-                                   onClose={() => setVisible(false)}
-                                   onSkuChange={orderSkuChange}
-                                   quoteType="photo"
-                                   defaultSelectIds={skus || []}
-                                   onNowBuy={onSubmitOrder} />
+                    ? <PlaceOrder data={goodsInfo.current} isShow={visible}
+                                  onClose={() => setVisible(false)}
+                                  onSkuChange={orderSkuChange}
+                                  quoteType="photo"
+                                  defaultSelectIds={skus || []}
+                                  onNowBuy={onSubmitOrder}/>
                     : null
             }
             {
                 photoVisible
                     ? <View className={`photo_picker_container ${animating ? "photo_picker_animate" : ""}`}>
                         <PhotosEle editSelect
-                                onClose={closeSelectPhoto}
-                                count={photoStore.photoProcessParams.imageCount}
-                                max={setMealSuccess.current ? parseInt(currentSetMeal.value) - pictureSize : photoStore.photoProcessParams.max}
-                                defaultSelect={photoStore.photoProcessParams.usefulImages}
-                                onPhotoSelect={onPhotoSelect}
+                                   onClose={closeSelectPhoto}
+                                   count={photoStore.photoProcessParams.imageCount}
+                                   max={setMealSuccess.current ? parseInt(currentSetMeal.value) - pictureSize : photoStore.photoProcessParams.max}
+                                   defaultSelect={photoStore.photoProcessParams.usefulImages}
+                                   onPhotoSelect={onPhotoSelect}
                         />
                     </View>
                     : null
@@ -1277,14 +1388,14 @@ const PrintChange: Taro.FC<any> = () => {
             {
                 discountStatus
                     ? setMealSuccess.current
-                        ? <SetMealSelectorModal
-                            visible={discountStatus}
-                            count={pictureSize}
-                            currentSetMeal={currentSetMeal}
-                            setMealData={setMealArr}
-                            onClose={() => setDiscountStatus(false)}
-                            onConfirm={onSetMealChange} />
-                        : <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
+                    ? <SetMealSelectorModal
+                        visible={discountStatus}
+                        count={pictureSize}
+                        currentSetMeal={currentSetMeal}
+                        setMealData={setMealArr}
+                        onClose={() => setDiscountStatus(false)}
+                        onConfirm={onSetMealChange}/>
+                    : <Discount list={distCountList} onClose={() => setDiscountStatus(false)}/>
                     : null
             }
             {
