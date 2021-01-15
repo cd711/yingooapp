@@ -101,7 +101,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
      */
     const handlePriceArea = (skus: Array<any>) => {
         const prices = skus.map((item) => {
-            return item.price;
+            return showOkButton?item.merge_price:item.price;
         })
         prices.sort(function (a, b) {
             return parseFloat(a + "") - parseFloat(b + "")
@@ -165,14 +165,14 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
             }
             if (current != null) {
                 if (current.stock && current.stock>0) {
-                    setPrice(current.price);
+                    setPrice(showOkButton?current.merge_price:current.price);
                     setMarketPriceShow(true);
                     setMarketPrice(current.market_price);
                     setTimeout(() => {
-                        setPrice(current.price);
+                        setPrice(showOkButton?current.merge_price:current.price);
                     }, 100);
                     onSkuChange && onSkuChange(selectIds, current.id);
-                    onPriceChange && onPriceChange(current.price, current.market_price)
+                    onPriceChange && onPriceChange(showOkButton?current.merge_price:current.price, current.market_price)
                 } else {
                     Taro.showToast({
                         title: '库存不足',
