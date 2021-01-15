@@ -6,7 +6,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
+import {debuglog, deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -118,7 +118,7 @@ export default class Mobile extends Component<{},{
                 event:check?'changemobile':'changephone'
             }).then((res)=>{
                 Taro.hideLoading();
-                console.log(res);
+                debuglog(res);
                 this.setState({
                     time:parseInt(res.time+"")
                 });

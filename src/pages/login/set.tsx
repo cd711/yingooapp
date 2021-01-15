@@ -5,7 +5,7 @@ import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import { observer, inject } from '@tarojs/mobx';
-import { fixStatusBarHeight } from '../../utils/common';
+import {debuglog, fixStatusBarHeight} from '../../utils/common';
 import {userStore} from "../../store/user";
 
 @inject("userStore")
@@ -40,7 +40,7 @@ export default class Set extends Component<any,{
             api("user/newpwd",{
                 newpassword:again
             }).then((res)=>{
-                console.log(res);
+                debuglog(res);
                 userStore.getUserInfo();
                 Taro.hideLoading();
                 Taro.showToast({

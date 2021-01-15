@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
-import {deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
+import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
 
 
 @inject("userStore")
@@ -64,7 +64,7 @@ export default class Setting extends Component<any,{
                 }
             }, 1501)
         }catch (e) {
-            console.log(e)
+            debuglog(e)
         }
     }
 

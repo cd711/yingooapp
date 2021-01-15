@@ -128,7 +128,7 @@ class Index extends Component<any, IndexState> {
                 const res = await api("app.coupon/receiveCoupinId");
                 cIds = res || {}
             } catch (e) {
-                console.log(e)
+                debuglog(e)
             }
         }
         let localCoupon = new LocalCoupon();
@@ -138,7 +138,7 @@ class Index extends Component<any, IndexState> {
                 localCoupon = {...res};
             }
         } catch (e) {
-            console.log(e)
+            debuglog(e)
         }
         try {
             const {data} = this.state;
@@ -150,15 +150,15 @@ class Index extends Component<any, IndexState> {
                 this.getCateInfo()
             }
 
-            console.log("所有优惠券：", tempArr)
+            debuglog("所有优惠券：", tempArr)
 
             // 筛选已经领取过的优惠券
-            console.log("已领取过的优惠券：", cIds)
+            debuglog("已领取过的优惠券：", cIds)
             for (const item of JSON.parse(JSON.stringify(tempArr))) {
                 let temp = null;
                 temp = {...item}
                 // const temp = JSON.parse(JSON.stringify(item));
-                console.log(temp)
+                debuglog(temp)
                 temp.clist.forEach((val, idx) => {
                     if (cIds[`${val.info.id}`]) {
                         temp.clist.splice(idx, 1)
@@ -167,7 +167,7 @@ class Index extends Component<any, IndexState> {
                 popArr.push(item)
             }
 
-            console.log("已排除领取过的优惠券：", popArr)
+            debuglog("已排除领取过的优惠券：", popArr)
 
 
             // 如果优惠券已经领取就不显示了
@@ -191,12 +191,12 @@ class Index extends Component<any, IndexState> {
                 }
             }
 
-            console.log("弹窗优惠券信息：", parent, current)
+            debuglog("弹窗优惠券信息：", parent, current)
 
             if (Object.keys(current).length > 0) {
                 const type = parent.popup_config.type;
                 const status = allowShowCoupon(parent.id, current.info.id, type, localCoupon);
-                console.log("弹窗优惠券状态：", status)
+                debuglog("弹窗优惠券状态：", status)
                 if (status) {
                     const obj = {...localCoupon};
                     if (type === "only_one") {
@@ -214,14 +214,14 @@ class Index extends Component<any, IndexState> {
                             expirationTime
                         })
                     }
-                    console.log(obj)
+                    debuglog(obj)
                     updateLocalCoupon(obj)
                     this.setState({curtain: current});
                 }
             }
 
         } catch (e) {
-            console.log("检查用户已领取的优惠券出错：", e)
+            debuglog("检查用户已领取的优惠券出错：", e)
         }
     }
 
@@ -233,7 +233,7 @@ class Index extends Component<any, IndexState> {
                     resolve()
                 });
             } catch (e) {
-                console.log("获取首页列表出错：", e)
+                debuglog("获取首页列表出错：", e)
                 reject(e)
             }
         })
@@ -242,7 +242,7 @@ class Index extends Component<any, IndexState> {
     componentDidMount() {
 
         debuglog(1,2,3,4,5,6)
-        console.log(deviceInfo)
+        debuglog(deviceInfo)
         if (process.env.TARO_ENV != 'h5') {
             this.setState({
                 centerPartyHeight: deviceInfo.windowHeight
@@ -261,7 +261,7 @@ class Index extends Component<any, IndexState> {
     }
 
     onItemClick = (item, _) => {
-        console.log(item)
+        debuglog(item)
 
         if (!userStore.isLogin && item.info.category.type === "photo") {
             userStore.showLoginModal = true;
@@ -295,7 +295,7 @@ class Index extends Component<any, IndexState> {
     }
 
     viewMoreSpecial = (item) => {
-        console.log(item)
+        debuglog(item)
         if (item.more_url) {
             Taro.navigateTo({url: updateChannelCode(item.more_url)});
             return
@@ -353,7 +353,7 @@ class Index extends Component<any, IndexState> {
     }
 
     singleProdAndReceiveCoupon = async (prod, coupon) => {
-        console.log(prod, coupon)
+        debuglog(prod, coupon)
         let obj = {};
         if (prod.info.jump_url) {
             if (coupon) {
@@ -382,14 +382,14 @@ class Index extends Component<any, IndexState> {
     }
 
     jumpToDetail = item => {
-        console.log(item)
+        debuglog(item)
         Taro.navigateTo({
             url: updateChannelCode(`/pages/order/pages/product/detail?id=${item.info.id}&rid=${item.id}`)
         })
     }
 
     onCouponColumnClick = (val) => {
-        console.log(val)
+        debuglog(val)
         if (val.info.jump_url) {
             Taro.navigateTo({
                 url: updateChannelCode(val.info.jump_url)
@@ -499,7 +499,7 @@ class Index extends Component<any, IndexState> {
 
     loadMore = async () => {
         const {data} = this.state;
-        console.log(this.total <= 10 , data.length == this.total)
+        debuglog(this.total <= 10 , data.length == this.total)
         if (this.total <= 10 || data.length == this.total) {
             return
         }
@@ -527,7 +527,7 @@ class Index extends Component<any, IndexState> {
 
     onCurtainClick = async () => {
         const data = {...this.state.curtain};
-        console.log(data);
+        debuglog(data);
 
         if (!userStore.isLogin) {
             userStore.showLoginModal = true;
@@ -547,7 +547,7 @@ class Index extends Component<any, IndexState> {
     }
 
     onBannerClick = (data, idx) => {
-        console.log(data, idx)
+        debuglog(data, idx)
 
         if (!userStore.isLogin) {
             userStore.showLoginModal = true;
@@ -575,7 +575,7 @@ class Index extends Component<any, IndexState> {
 
     // 小程序其实是触发了onRefresherRefresh, h5触发的才是onTouchEnd
     onTouchEnd = async () => {
-        console.log("结束touch")
+        debuglog("结束touch")
         if (deviceInfo.env === "h5") {  // 此处判断的原因是：小程序中touch事件和onRefresher事件都会触发
             if (this.state.isTop) {
                 this.loadRefresh()

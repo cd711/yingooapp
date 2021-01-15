@@ -3,7 +3,7 @@ import { View, Text,Button } from '@tarojs/components'
 import FloatModal from '../floatModal/FloatModal';
 import { api } from '../../utils/net';
 import wx from 'weixin-js-sdk'
-import {deviceInfo, is_weixin, jsApiList, updateChannelCode} from '../../utils/common';
+import {debuglog, deviceInfo, is_weixin, jsApiList, updateChannelCode} from '../../utils/common';
 import PayWay from './PayWay';
 import './PayWayModal.less';
 
@@ -79,7 +79,7 @@ const PayWayModal: Taro.FC<{
             }
 
         }).catch((e)=>{
-            console.log(e)
+            debuglog(e)
             errorback(e)
         })
     }
@@ -87,7 +87,7 @@ const PayWayModal: Taro.FC<{
         api("app.pay/index",d).then((res)=>{
             callback && callback(res);
         }).catch((e)=>{
-            console.log("app.pay/index",e);
+            debuglog("app.pay/index",e);
             errorback && errorback(e);
         })
     }
@@ -144,7 +144,7 @@ const PayWayModal: Taro.FC<{
                                 onResult && onResult(d);
                             },
                             cancel:(e)=>{
-                                console.log(e)
+                                debuglog(e)
                                 Taro.hideLoading();
                                 const d = {
                                     code:2,
@@ -243,7 +243,7 @@ const PayWayModal: Taro.FC<{
                         data:e
                     }
                     onResult && onResult(d);
-                    console.log(e);
+                    debuglog(e);
                 })
 
                 // setIsOpened(false)

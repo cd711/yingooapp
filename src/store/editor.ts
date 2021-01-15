@@ -1,5 +1,6 @@
 import {action} from "mobx";
 import {api} from "../utils/net";
+import {debuglog} from "../utils/common";
 
 class Editor {
 
@@ -41,7 +42,7 @@ class Editor {
 
             }).catch(e => {
                 reject(e)
-                console.log("获取商品分类出错：", e)
+                debuglog("获取商品分类出错：", e)
             })
         })
     }

@@ -16,7 +16,7 @@ import {
     urlEncode,
     getURLParamsStr,
     setTempDataContainer,
-    updateChannelCode, updateTabBarChannelCode
+    updateChannelCode, updateTabBarChannelCode, debuglog
 } from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
@@ -138,7 +138,7 @@ export default class Me extends Component<any, MeState> {
             for (let i = 0; i < works.length; i ++) {
                 const item = works[i];
                 const year = dayjs.unix(item.create_time).year();
-                console.log(year)
+                debuglog(year)
                 const obj = {key: year, children: []};
                 const idx = temp.list.findIndex(v => v.key === year);
                 if (idx === -1) {
@@ -158,7 +158,7 @@ export default class Me extends Component<any, MeState> {
                 temp.list[n] = current;
             }
 
-            console.log(temp)
+            debuglog(temp)
 
 
             this.setState({
@@ -168,7 +168,7 @@ export default class Me extends Component<any, MeState> {
                 this.isLoading = 0
             })
         }catch (e) {
-            console.log("获取作品出错：", e)
+            debuglog("获取作品出错：", e)
             this.isLoading = 0
         }
     }
@@ -205,7 +205,7 @@ export default class Me extends Component<any, MeState> {
                 this.isLoading = 0
             })
         }catch (e) {
-            console.log("获取作品出错：", e)
+            debuglog("获取作品出错：", e)
             this.isLoading = 0
         }
     }
@@ -270,7 +270,7 @@ export default class Me extends Component<any, MeState> {
 
     lodeMore = () => {
         const { works, switchActive, collectionList } = this.state;
-        console.log("加载更多", this.isLoading, this.total, works.total)
+        debuglog("加载更多", this.isLoading, this.total, works.total)
 
         if (switchActive === 0) {
             if (this.total === works.total || this.total < works.total || this.total < 15) {
@@ -322,7 +322,7 @@ export default class Me extends Component<any, MeState> {
 
     private deleteObj: any = {};  // 存储 --> idx：父级下标, index：子级下标, value：当前点击对象
     confirmDelete = async (data: PopoverItemClickProps) => {
-        console.log(2222, data.corrValue)
+        debuglog(2222, data.corrValue)
         if (data.corrValue) {
             this.deleteObj = data.corrValue
             this.setState({isOpened: true})
@@ -348,7 +348,7 @@ export default class Me extends Component<any, MeState> {
                     works.list.splice(index, 1)
                 }
             })
-            console.log(works)
+            debuglog(works)
             works.total -= 1;
             this.setState({works})
 
@@ -357,7 +357,7 @@ export default class Me extends Component<any, MeState> {
             this.setState({isOpened: false});
             this.total--;
         }catch (e) {
-            console.log("删除失败：", e)
+            debuglog("删除失败：", e)
         }
         Taro.hideLoading()
     }
@@ -378,7 +378,7 @@ export default class Me extends Component<any, MeState> {
 
     // 跳转预览页
     previewOrder = (item: WorksProps) => {
-        console.log(item.id)
+        debuglog(item.id)
         const str = getURLParamsStr(urlEncode({
             workid: item.id,
             self: "t"

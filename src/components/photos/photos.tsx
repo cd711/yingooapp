@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api,options} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
+import {debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
@@ -103,7 +103,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             try {
                 const res = await api("app.profile/imgs", temp);
                 this.total = Number(res.total);
-                console.log(res);
+                debuglog(res);
                 this.setState({loading: false});
                 let list = [];
                 list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
@@ -135,7 +135,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 })
             } catch (e) {
                 reject(e)
-                console.log("获取图库出错：", e)
+                debuglog("获取图库出错：", e)
                 this.setState({loadStatus: "noMore"})
             }
             this.setState({loading: false})
@@ -190,7 +190,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     uploadFile = async files => {
-        console.log(files)
+        debuglog(files)
         this.getList({start: 0})
     }
 
@@ -295,7 +295,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
 
     changeSort = (data: PopLayoutItemProps, index: number) => {
-        console.log(data, index)
+        debuglog(data, index)
         let sort = {};
         if (typeof data.value === "string") {
             sort = JSON.parse(data.value);

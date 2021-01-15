@@ -8,7 +8,7 @@ import {AtFloatLayout} from 'taro-ui'
 import { api,updateLocalUserInfo,options } from '../../../../utils/net';
 import dayjs from "dayjs";
 import UploadFile from "../../../../components/Upload/Upload";
-import { fixStatusBarHeight } from '../../../../utils/common';
+import {debuglog, fixStatusBarHeight} from '../../../../utils/common';
 
 const sexList = [
     '保密',
@@ -44,7 +44,7 @@ export default class Profile extends Component<any,{
 
 
     componentDidMount() {
-        console.log(Taro.getSystemInfoSync())
+        debuglog(Taro.getSystemInfoSync())
 
     }
 
@@ -121,7 +121,7 @@ export default class Profile extends Component<any,{
     }
 
     onDateChange = e => {
-        console.log(e.detail.value)
+        debuglog(e.detail.value)
         const birthday = e.detail.value;
         this.updateInfo({birthday}).then(() => {
             userStore.birthday = birthday;

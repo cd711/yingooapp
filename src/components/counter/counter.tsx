@@ -39,7 +39,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
         <Text className='num'>{number}</Text>
         <View className='add' onClick={(e) => {
             e.stopPropagation();
-            // console.log(num,max)
+            // debuglog(num,max)
             if (!notNull(max) && number >= parseInt(max+"")) {
                 return
             }

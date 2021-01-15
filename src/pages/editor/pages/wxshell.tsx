@@ -6,7 +6,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
+import {debuglog, getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
 import {api, getToken} from "../../../utils/net";
 import dayjs from "dayjs"
 import page from "../../../utils/ext";
@@ -56,7 +56,7 @@ export default class Shell extends Component<{}, {
 
     async componentDidShow() {
         const finishId = Taro.getApp().finishId;
-        console.log("finishId：", finishId)
+        debuglog("finishId：", finishId)
         if (finishId) {
             try {
                 const res = await api("editor.user_tpl/info", {id: finishId});

@@ -5,7 +5,7 @@ import IconFont from "../../components/iconfont";
 import {AtInput} from "taro-ui";
 import Empty from "../../components/empty";
 import {
-    debounce,
+    debounce, debuglog,
     deviceInfo,
     getSpecialRouter,
     getURLParamsStr,
@@ -29,7 +29,7 @@ const Search:Taro.FC<any> = () => {
             setSearchList([...res]);
             searchStore.searchList = [...res];
         }catch (e) {
-            console.log("获取搜索数据出错：", e)
+            debuglog("获取搜索数据出错：", e)
         }
     }
 
@@ -48,7 +48,7 @@ const Search:Taro.FC<any> = () => {
     const debounceFn = debounce(getSearchList, 1000)
 
     const onSearch = (val, _) => {
-        console.log(val)
+        debuglog(val)
         if (!notNull(val)) {
             // @ts-ignore
             debounceFn(val)

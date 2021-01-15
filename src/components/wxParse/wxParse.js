@@ -2,9 +2,9 @@
  * author: Di (微信小程序开发工程师)
  * organization: WeAppDev(微信小程序开发论坛)(http://weappdev.com)
  *               垂直微信小程序开发交流社区
- * 
+ *
  * github地址: https://github.com/icindy/wxParse
- * 
+ *
  * for: 微信小程序富文本解析
  * detail : http://weappdev.com/t/wxparse-alpha0-1-html-markdown/184
  */
@@ -35,12 +35,12 @@ function wxParse(bindName = 'wxParseData', type='html', data='<div class="color:
   var transData = {};//存放转化后的数据
   if (type == 'html') {
     transData = HtmlToJson.html2json(data, bindName);
-    // console.log(JSON.stringify(transData, ' ', ' '));
+    // debuglog(JSON.stringify(transData, ' ', ' '));
   } else if (type == 'md' || type == 'markdown') {
     var converter = new showdown.Converter();
     var html = converter.makeHtml(data);
     transData = HtmlToJson.html2json(html, bindName);
-    // console.log(JSON.stringify(transData, ' ', ' '));
+    // debuglog(JSON.stringify(transData, ' ', ' '));
   }
   transData.view = {};
   transData.view.imagePadding = 0;
@@ -67,7 +67,7 @@ function wxParseImgTap(e) {
 }
 
 /**
- * 图片视觉宽高计算函数区 
+ * 图片视觉宽高计算函数区
  **/
 function wxParseImgLoad(e) {
   var that = this;
@@ -75,7 +75,7 @@ function wxParseImgLoad(e) {
   var idx = e.target.dataset.idx;
   if (typeof (tagFrom) != 'undefined' && tagFrom.length > 0) {
     calMoreImageInfo(e, idx, that, tagFrom)
-  } 
+  }
 }
 // 假循环获取计算图片视觉最佳宽高
 function calMoreImageInfo(e, idx, that, bindName) {
@@ -85,9 +85,9 @@ function calMoreImageInfo(e, idx, that, bindName) {
   }
   var temImages = temData.images;
   //因为无法获取view宽度 需要自定义padding进行计算，稍后处理
-  var recal = wxAutoImageCal(e.detail.width, e.detail.height,that,bindName); 
+  var recal = wxAutoImageCal(e.detail.width, e.detail.height,that,bindName);
   // temImages[idx].width = recal.imageWidth;
-  // temImages[idx].height = recal.imageheight; 
+  // temImages[idx].height = recal.imageheight;
   // temData.images = temImages;
   // var bindData = {};
   // bindData[bindName] = temData;
@@ -113,12 +113,12 @@ function wxAutoImageCal(originalWidth, originalHeight,that,bindName) {
   windowWidth = realWindowWidth-2*padding;
   windowHeight = realWindowHeight;
   //判断按照那种方式进行缩放
-  // console.log("windowWidth" + windowWidth);
+  // debuglog("windowWidth" + windowWidth);
   if (originalWidth > windowWidth) {//在图片width大于手机屏幕width时候
     autoWidth = windowWidth;
-    // console.log("autoWidth" + autoWidth);
+    // debuglog("autoWidth" + autoWidth);
     autoHeight = (autoWidth * originalHeight) / originalWidth;
-    // console.log("autoHeight" + autoHeight);
+    // debuglog("autoHeight" + autoHeight);
     results.imageWidth = autoWidth;
     results.imageheight = autoHeight;
   } else {//否则展示原来的数据
@@ -145,7 +145,7 @@ function wxParseTemArray(temArrayName,bindNameReg,total,that){
 
 /**
  * 配置emojis
- * 
+ *
  */
 
 function emojisInit(reg='',baseSrc="/wxParse/emojis/",emojis){

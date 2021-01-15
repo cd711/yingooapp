@@ -11,7 +11,7 @@ import Counter from '../../../../components/counter/counter';
 import FloatModal from '../../../../components/floatModal/FloatModal';
 import Ticket from '../../../../components/ticket/Ticket';
 import {
-    addOrderConfimPreviewData,
+    addOrderConfimPreviewData, debuglog,
     deviceInfo,
     fixStatusBarHeight,
     getOrderConfimPreviewData,
@@ -120,11 +120,11 @@ export default class Confirm extends Component<any, {
                 if (this.isPhoto) {
                     try {
                         await photoStore.getServerParams({setLocal: true});
-                        console.log(photoStore.photoProcessParams.changeUrlParams)
+                        debuglog(photoStore.photoProcessParams.changeUrlParams)
                         params = photoStore.photoProcessParams.changeUrlParams
                     } catch (e) {
-                        console.log("读取参数出错：", e)
-        
+                        debuglog("读取参数出错：", e)
+
                     }
                 } else {
                     params = resp
@@ -155,7 +155,7 @@ export default class Confirm extends Component<any, {
                     }
                     if (this.isPhoto && parintImges) {
                         data = {...data, print_images: JSON.stringify(parintImges)}
-                    }            
+                    }
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;
                         Taro.hideLoading();
@@ -217,7 +217,7 @@ export default class Confirm extends Component<any, {
                     }
                 }, 1500);
             }
-            
+
         })
 
     }
@@ -254,14 +254,14 @@ export default class Confirm extends Component<any, {
                     getTempDataContainer(this.tempContainerKey, (value) => {
                         if (value != null && value != undefined && value) {
                             const currentAddBuyItem = value.currentAddBuyItem
-                            console.log("value.sku",value)
+                            debuglog("value.sku",value)
                             if (value.isOk && currentAddBuyItem.checked == false) {
                                 this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
                             }else{
                                 const temp = value.mainProduct.merge_products.filter((item)=>{
                                     return item.product.id == currentAddBuyItem.id
                                 })
-                                console.log("temp",temp)
+                                debuglog("temp",temp)
                                 this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
                                     this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
                                 });
@@ -275,7 +275,7 @@ export default class Confirm extends Component<any, {
                         return;
                     }
                 }
-                
+
                 const {orderid} = resp;
                 let prepay_id = orderid;
                 if (!orderid) {
@@ -300,7 +300,7 @@ export default class Confirm extends Component<any, {
                             });
                         }
                     }).catch((e) => {
-                        console.log(e);
+                        debuglog(e);
                     })
                 }
             } else {
@@ -316,7 +316,7 @@ export default class Confirm extends Component<any, {
                     } else {
                         jumpUri("/pages/tabbar/index/index",true)
                     }
-                    
+
                 }, 1500);
             }
         })
@@ -335,7 +335,7 @@ export default class Confirm extends Component<any, {
             this.initPayWayModal = true;
             this.filterUsedTicket(res.orders);
             templateStore.address = res.address;
-            console.log(res);
+            debuglog(res);
             this.setState({
                 data: this.handleData(res),
                 // showPayWayModal:isInfo?false:true
@@ -390,7 +390,7 @@ export default class Confirm extends Component<any, {
             prepay_id: data.prepay_id,
             remarks: ""
         }).then((res) => {
-            console.log("ccc",res);
+            debuglog("ccc",res);
             Taro.hideLoading();
             if (res.status > 0) {
                 Taro.navigateTo({
@@ -429,7 +429,7 @@ export default class Confirm extends Component<any, {
 
     // 选择优惠券
     onSelectTicket = (tickets, tId) => {
-        console.log(tickets, tId)
+        debuglog(tickets, tId)
         const discounts = tickets.map((item) => {
             item["checked"] = false;
             if (tId == item.id) {
@@ -515,14 +515,14 @@ export default class Confirm extends Component<any, {
         })
     }
     onResult = (res) => {
-        console.log("支付订单号码:",res.data)
+        debuglog("支付订单号码:",res.data)
         this.setState({
             showPayWayModal: false,
         });
         let title = '';
         Taro.getApp().tab = 1;
         let url = '/pages/tabbar/order/order?tab=1';
-        console.log("支付订单号码:",res.data)
+        debuglog("支付订单号码:",res.data)
 
         switch (res.code) {
             case 1:
@@ -585,7 +585,7 @@ export default class Confirm extends Component<any, {
 
     }
     onAddBuyItemDetailClick = (mainProduct, preOrderId, mainProductId, item) => {
-        console.log("onAddBuyItemDetailClick")
+        debuglog("onAddBuyItemDetailClick")
         const {data} = this.state;
         const subItem = mainProduct.merge_products.find((obj) => obj.product.id == item.id)
         setTempDataContainer(`${item.id}_${mainProductId}`, {
@@ -623,7 +623,7 @@ export default class Confirm extends Component<any, {
                 });
             }
         }).catch((e) => {
-            console.log("删除加购失败", e);
+            debuglog("删除加购失败", e);
             Taro.hideLoading();
             Taro.showToast({
                 title: "出了一点小问题，请稍后再试!",
@@ -671,7 +671,7 @@ export default class Confirm extends Component<any, {
         }
     }
     addBuyProduct = (preOrderId, mainProductId, sku_id, quantity) => {
-        console.log(preOrderId, mainProductId, sku_id, quantity)
+        debuglog(preOrderId, mainProductId, sku_id, quantity)
         Taro.showLoading({title: "处理中..."})
         const {data} = this.state;
         api("app.order_temp/product", {
@@ -686,7 +686,7 @@ export default class Confirm extends Component<any, {
                 data: this.handleData(res)
             })
         }).catch((e) => {
-            console.log("加购失败", e);
+            debuglog("加购失败", e);
             Taro.hideLoading();
             Taro.showToast({
                 title: "出了一点小问题，请稍后再试!",
@@ -704,7 +704,7 @@ export default class Confirm extends Component<any, {
     render() {
         const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight} = this.state;
         const {address} = data;
-        console.log("templateStore",address)
+        debuglog("templateStore",address)
         // @ts-ignore
         return (
             <View className='confirm'>

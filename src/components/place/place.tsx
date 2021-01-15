@@ -5,6 +5,7 @@ import IconFont from '../iconfont'
 import Counter from '../counter/counter'
 import isEmpty from 'lodash/isEmpty';
 import {flattens, intersection} from '../../utils/tool'
+import {debuglog} from "../../utils/common";
 
 interface OderParams {
     //商品信息
@@ -117,7 +118,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
      * @return {*}
      */
     const selectSkuItem = (selectIds: Array<any>, items: Array<Array<any>>) => {
-        console.log("已选择的sku id", selectIds)
+        debuglog("已选择的sku id", selectIds)
         let tt = [];
         for (let index = 0; index < selectIds.length; index++) {
             const element = selectIds[index];
@@ -270,7 +271,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
 
 
     useEffect(() => {
-        console.log("data被初始化", data)
+        debuglog("data被初始化", data)
         if (!isEmpty(data) && data != undefined && data != null) {
             setIsLoad(true);
             initSku(data.attrGroup, data.attrItems, data.skus)
@@ -283,7 +284,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
         const sc = skuNotStock.current;
         for (let index = 0; index < selectIds.length; index++) {
             const element = selectIds[index];
-            // console.log("选择的项目",sc[element])
+            // debuglog("选择的项目",sc[element])
             names.push(sc[element]["key"])
         }
         return names;

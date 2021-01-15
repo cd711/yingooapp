@@ -9,7 +9,7 @@ import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../../../store/user';
 import {templateStore} from '../../../../../store/template';
 import isEmpty from 'lodash/isEmpty';
-import {fixStatusBarHeight, updateChannelCode} from '../../../../../utils/common';
+import {debuglog, fixStatusBarHeight, updateChannelCode} from '../../../../../utils/common';
 
 interface CityModal {
     province:any,
@@ -190,7 +190,7 @@ export default class Editor extends Component<any,{
             pickerRange: rangeTemp,
             pickerValue: valueTemp
         })
-        console.log(regionTemp,rangeTemp,valueTemp)
+        debuglog(regionTemp,rangeTemp,valueTemp)
 
     }
 
@@ -233,7 +233,7 @@ export default class Editor extends Component<any,{
         })
     }
     onAtSwitchChange = (value) => {
-        // console.log(value)
+        // debuglog(value)
         this.setState({
             atSwitchValue:value
         })
@@ -298,7 +298,7 @@ export default class Editor extends Component<any,{
         if (id && parseInt(id)>0) {
             url = 'app.address/edit';
             data["id"] = id;
-            console.log(id);
+            debuglog(id);
         }
         api(url,data).then(()=>{
             Taro.hideLoading();

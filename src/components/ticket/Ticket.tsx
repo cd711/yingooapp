@@ -1,22 +1,21 @@
-
 import Taro, { useEffect,useState } from '@tarojs/taro'
 import { View, Text,Image } from '@tarojs/components'
 import './Ticket.less';
 import IconFont from '../iconfont';
 import Checkboxs from '../checkbox/checkbox';
 import dayjs from "dayjs"
-import { convertClassName, formatPrice } from '../../utils/common';
+import { formatPrice } from '../../utils/common';
 
 const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, ticket,children}) => {
     const [showDes,setShowDes] = useState(false)
     useEffect(() => {
-        // console.log(ticket)
+        // debuglog(ticket)
 
     }, [])
 
 
     useEffect(() => {
-        // console.log(isSelected)
+        // debuglog(isSelected)
     }, [isSelected])
 
 
@@ -41,7 +40,7 @@ const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, 
                 </Text>
                 <View className='apply' onClick={(e)=>{
                     e.stopPropagation();
-                    // console.log(ticket.remark)
+                    // debuglog(ticket.remark)
                     if (ticket.description) {
                         setShowDes(!showDes)
                     }

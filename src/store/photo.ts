@@ -1,6 +1,6 @@
 import {action, observable} from "mobx";
 import {PhotoParams} from "../modal/modal";
-import {getUserKey} from "../utils/common";
+import {debuglog, getUserKey} from "../utils/common";
 import {api} from "../utils/net";
 
 class Photo {
@@ -22,14 +22,14 @@ class Photo {
     @action
     public setActionParamsToServer(_key = "", data:{[key: string] : any} = {}) {
         return new Promise<any>(async (resolve, reject) => {
-            console.log("key:", getUserKey())
+            debuglog("key:", getUserKey())
             try {
-                console.log("进来的值：", JSON.parse(JSON.stringify(data)))
+                debuglog("进来的值：", JSON.parse(JSON.stringify(data)))
                 const temp = new PhotoParams({
                     ...this.photoProcessParams,
                     ...data
                 })
-                console.log(JSON.parse(JSON.stringify(temp)))
+                debuglog(JSON.parse(JSON.stringify(temp)))
                 const k = await api("app.order_temp/container", {
                     field_key: _key || getUserKey(),
                     content: JSON.stringify(temp)
@@ -39,7 +39,7 @@ class Photo {
                 resolve()
             } catch (e) {
                 reject(e)
-                console.log("初始化photoParams出错：", e)
+                debuglog("初始化photoParams出错：", e)
             }
         })
     }

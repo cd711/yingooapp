@@ -5,6 +5,7 @@ import {api} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import {
+    debuglog,
     deviceInfo,
     fixStatusBarHeight,
     ListModel,
@@ -66,7 +67,7 @@ export default class Login extends Component<{}, {
         // if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".status-switch-bar").boundingClientRect((status_react) => {
-                    console.log(nav_rect.height, status_react.height)
+                    debuglog(nav_rect.height, status_react.height)
                     this.setState({
                         centerPartyHeight: deviceInfo.windowHeight - nav_rect.height - (deviceInfo.env === "weapp" ? 50 : 120)
                     });
@@ -144,7 +145,7 @@ export default class Login extends Component<{}, {
         })
     }
     onLoadMore = () => {
-        console.log("触底")
+        debuglog("触底")
         const {data, listLoading, switchTabActive} = this.state;
         if (!listLoading && data.total > data.list.length) {
             this.getList(switchTabActive);

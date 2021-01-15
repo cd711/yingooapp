@@ -1,5 +1,5 @@
 import Taro, { useEffect,useState } from '@tarojs/taro'
-import { View, Text,Button } from '@tarojs/components'
+import { View, Text } from '@tarojs/components'
 import './PayWayModal.less';
 import IconFont from '../iconfont';
 import Checkboxs from '../checkbox/checkbox';

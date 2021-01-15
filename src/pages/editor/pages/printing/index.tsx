@@ -4,6 +4,7 @@ import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
 import {
+    debuglog,
     deviceInfo,
     getURLParamsStr,
     getUserKey,
@@ -44,7 +45,7 @@ const Index: Taro.FC<any> = () => {
                 const idx = res.attrGroup.findIndex(v => v.special_show === "photosize");
                 const numIdx = res.attrGroup.findIndex(v => v.special_show === "photonumber");
                 const setMealIdx = res.attrGroup.findIndex(v => v.special_show === "setmeal");
-                console.log("查找的下标：", idx, numIdx)
+                debuglog("查找的下标：", idx, numIdx)
                 if (idx > -1) {
                     arr = [...res.attrItems[idx]];
                     setSizeItem([...arr]);
@@ -63,11 +64,11 @@ const Index: Taro.FC<any> = () => {
                     }
 
                 } else {
-                    console.log("初始化尺寸时没找到尺寸：", res)
+                    debuglog("初始化尺寸时没找到尺寸：", res)
                 }
             }
         } catch (e) {
-            console.log("获取--app.product/info出错：", e)
+            debuglog("获取--app.product/info出错：", e)
         }
 
         if (hasTplID.current) {
@@ -84,7 +85,7 @@ const Index: Taro.FC<any> = () => {
                     }
                 }
             }catch (e) {
-                console.log(`获取照片模板详情出错：${router.params.tplid}`, e)
+                debuglog(`获取照片模板详情出错：${router.params.tplid}`, e)
             }
         }
 
@@ -96,7 +97,7 @@ const Index: Taro.FC<any> = () => {
             }
         }
 
-        console.log("初始化的参数 getBasicInfo：", params)
+        debuglog("初始化的参数 getBasicInfo：", params)
 
         await photoStore.setActionParamsToServer(getUserKey(), new PhotoParams(params));
 
@@ -153,7 +154,7 @@ const Index: Taro.FC<any> = () => {
 
 
     const onPhotoSelect = (data: {ids: [], imgs: [], attrs: []}) => {
-        console.log("返回的结果：", data)
+        debuglog("返回的结果：", data)
         if (data.ids.length === 0) {
             return
         }

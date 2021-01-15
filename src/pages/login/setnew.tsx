@@ -4,7 +4,7 @@ import './index.less'
 import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
-import {fixStatusBarHeight, updateChannelCode} from '../../utils/common';
+import {debuglog, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
 
 export default class Set extends Component<any,{
     btnAtive:boolean;
@@ -33,7 +33,7 @@ export default class Set extends Component<any,{
         //
         const {pwd,again} = this.state;
         const {mobile,code} = this.$router.params;
-        console.log(pwd,again,mobile,code)
+        debuglog(pwd,again,mobile,code)
         if (pwd.length>=6 && again.length>=6 && again == pwd && mobile.length==11 && code.length==6) {
             Taro.showLoading({title:"正在设置"})
             api("user/resetpwd",{
@@ -41,7 +41,7 @@ export default class Set extends Component<any,{
                 newpassword:again,
                 captcha:code
             }).then((res)=>{
-                console.log(res);
+                debuglog(res);
                 // userStore.getUserInfo();
                 Taro.hideLoading();
                 Taro.showToast({

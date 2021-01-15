@@ -1,3 +1,5 @@
+import {debuglog} from "./common";
+
 export const wxColors = {
     makeRGB: function (name) {
         return ['rgb(', name, ')'].join('');
@@ -61,14 +63,14 @@ export const wxColors = {
                 width: width,
                 height: height,
                 success(res) {
-                    console.log(res.width)
-                    console.log(res.height)
-                    console.log(res.data instanceof Uint8ClampedArray)
-                    console.log(res.data.length) // res.width * res.height * 4
+                    debuglog(res.width)
+                    debuglog(res.height)
+                    debuglog(res.data instanceof Uint8ClampedArray)
+                    debuglog(res.data.length) // res.width * res.height * 4
                     u.calculate(res.data, opts);
                 },
                 fail(e) {
-                    console.log("fail",e);
+                    debuglog("fail",e);
                 }
             },parentThis)
         }, 50);
@@ -113,7 +115,7 @@ export const wxColors = {
             if (palette[0].name == palette[1].name && palette[1].name == "rgb(0,0,0)") {
 
                 if (this.retrySum-- <= 0) {
-                    console.log("retrySum: " + this.retrySum);
+                    debuglog("retrySum: " + this.retrySum);
                     palette.length = 0;
                     palette.push(this.frmtPobj("0,0,0", 0));
                     palette.push(this.frmtPobj("0,0,0", 1));
@@ -164,7 +166,7 @@ export const wxColors = {
      */
     isLight: function (rgb) {
         var color = rgb.toString().match(/\d+/g);
-        console.log("color: " + color);
+        debuglog("color: " + color);
         return (
             0.213 * color[0] +
             0.715 * color[1] +

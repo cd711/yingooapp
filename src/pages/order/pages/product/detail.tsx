@@ -15,7 +15,7 @@ import {
     sleep, updateChannelCode,
     urlEncode,
     isEmptyX,
-    jumpOrderConfimPreview, removeDuplicationForArr
+    jumpOrderConfimPreview, removeDuplicationForArr, debuglog
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -106,7 +106,7 @@ export default class Login extends Component<{}, {
             this.toastClose();
             this.requesting = 0;
         } catch (e) {
-            console.log("领取优惠券失败：", e)
+            debuglog("领取优惠券失败：", e)
             this.setState({
                 toast: {
                     title: e,
@@ -206,11 +206,11 @@ export default class Login extends Component<{}, {
                     return item.special_show != "photonumber"
                 })
 
-                console.log(res.attrGroup)
+                debuglog(res.attrGroup)
                 if (pid != "" && pid != undefined && pid != null) {
                     getTempDataContainer(`${id}_${pid}`, (value) => {
                         if (value != null) {
-                            console.log(value);
+                            debuglog(value);
                             this.tempDataContainerData = value;
                             this.tempDataContainerKey = `${id}_${pid}`;
                             if (value.hasOldSku) {
@@ -222,7 +222,7 @@ export default class Login extends Component<{}, {
                                         return true;
                                     })
                                 })
-                                console.log(res.attrItems)
+                                debuglog(res.attrItems)
                             }
                             let select_ids = [];
                             if (value && value.selectSku) {
@@ -245,7 +245,7 @@ export default class Login extends Component<{}, {
                 } else {
                     if (!notNull(rid)) {
                         this.getProductConfig(rid, (result) => {
-                            // console.log(result);
+                            // debuglog(result);
                             // result.attr_ids = [58,59,60,64,66,67,70];
                             // result.defalut_attr_ids = [59,64];
                             if (result.attr_ids.length > 0) {
@@ -275,7 +275,7 @@ export default class Login extends Component<{}, {
                 }
 
             }).catch((e) => {
-                console.log(e);
+                debuglog(e);
                 Taro.hideLoading();
                 Taro.showToast({
                     title: e,
@@ -451,7 +451,7 @@ export default class Login extends Component<{}, {
             })
 
         } catch (e) {
-            console.log("存储临时数据出错：", e)
+            debuglog("存储临时数据出错：", e)
             Taro.hideLoading()
             Taro.showToast({title: "出错啦~，稍后试试吧"})
         }
@@ -489,7 +489,7 @@ export default class Login extends Component<{}, {
         // const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
         const tags_text: Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0, 4) : [];
         const attrGroup: Array<any> = data && !notNull(data.attrGroup) ? data.attrGroup : [];
-        console.log()
+        debuglog()
         // @ts-ignore
         return (
             <View className='p_detail'>
@@ -548,7 +548,7 @@ export default class Login extends Component<{}, {
                                                 <Image lazyLoad src={ossUrl(item, 2)}
                                                        style={`width:${deviceInfo.windowWidth}px;height:${deviceInfo.windowWidth}px`}
                                                        onClick={() => {
-                                                        //    console.log("当前点击的图片",ossUrl(item, 3),index)
+                                                        //    debuglog("当前点击的图片",ossUrl(item, 3),index)
                                                            Taro.previewImage({
                                                                current: image[index],
                                                                urls: image
@@ -668,7 +668,7 @@ export default class Login extends Component<{}, {
                                 <View className='ops'>
                                     <Button className='red-ok-btn' onClick={() => {
                                         const {sku, data, selectSkuId} = this.state;
-                                        console.log("当前类型：", data.tpl_product_type)
+                                        debuglog("当前类型：", data.tpl_product_type)
                                         if (!userStore.isLogin) {
                                             userStore.showLoginModal = true;
                                             return;
@@ -717,7 +717,7 @@ export default class Login extends Component<{}, {
                             defaultSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
                             isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                             onBuyNumberChange={(n) => {
-                                console.log(n)
+                                debuglog(n)
                                 this.setState({
                                     buyTotal: n,
                                     // defalutSkuIds: []
@@ -729,7 +729,7 @@ export default class Login extends Component<{}, {
                     }
                     const {sku, selectSkuId, data, buyTotal} = this.state;
                     // const {attrGroup} = data;
-                    // console.log(sku,skuName,buyTotal)
+                    // debuglog(sku,skuName,buyTotal)
                     if (sku.length == data.attrGroup.length && buyTotal > 0) {
                         Taro.showLoading({title: "加载中"})
                         api("app.cart/add", {
@@ -782,7 +782,7 @@ export default class Login extends Component<{}, {
                     }
 
                 }} onSkuChange={(sku, id) => {
-                    console.log("sku change", sku, id);
+                    debuglog("sku change", sku, id);
                     this.setState({
                         sku,
                         selectSkuId: parseInt(id + "")
@@ -790,7 +790,7 @@ export default class Login extends Component<{}, {
                 }} onOkButtonClick={() => this.onOkButtonClick()} onNowButtonClick={() => {
                     //立即制作
                     const {sku, data, selectSkuId} = this.state;
-                    console.log("当前类型：", data.tpl_product_type)
+                    debuglog("当前类型：", data.tpl_product_type)
                     if (!userStore.isLogin) {
                         userStore.showLoginModal = true;
                         return;
@@ -832,7 +832,7 @@ export default class Login extends Component<{}, {
                         skuName: names,
                     });
                 }} onPriceChange={(price,market)=>{
-                    console.log("goodsMarketPrice",price,market)
+                    debuglog("goodsMarketPrice",price,market)
                     this.setState({
                         goodsPrice:price,
                         goodsMarketPrice:market

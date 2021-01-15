@@ -3,6 +3,7 @@ import Taro from "@tarojs/taro";
 import {ScrollView, Text, View} from "@tarojs/components";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {AtActivityIndicator} from "taro-ui";
+import {debuglog} from "../../utils/common";
 
 interface PullScrollViewProps {
     // 主容器高度
@@ -78,7 +79,7 @@ class PullScrollView extends Taro.Component<PullScrollViewProps & ScrollViewProp
     }
 
     touchmove = (e) => {
-        console.log(e.touches[0])
+        debuglog(e.touches[0])
         const move_p = e.touches[0],  // 移动时的位置
             deviationX = 0.30,  // 左右偏移量(超过这个偏移量不执行下拉操作)
             deviationY = 70,  // 拉动长度（低于这个值的时候不执行）
@@ -129,28 +130,28 @@ class PullScrollView extends Taro.Component<PullScrollViewProps & ScrollViewProp
 
     // 上拉
     pull = () => {
-        console.log('上拉')
+        debuglog('上拉')
         const {onPull} = this.props;
         onPull && onPull()
     }
 
     // 下拉
     down = () => {
-        console.log('下拉')
+        debuglog('下拉')
         const {onDown} = this.props;
         onDown && onDown()
     }
 
     // 滚动到顶部事件
     _scrollToUpper = () => {
-        console.log("滚动到顶部事件")
+        debuglog("滚动到顶部事件")
         const {onUpper} = this.props;
         onUpper && onUpper()
     }
 
     // 滚动到底部事件
     _scrollToLower = () => {
-        console.log("滚动到底部事件")
+        debuglog("滚动到底部事件")
         const {onLower} = this.props;
         onLower && onLower()
     }

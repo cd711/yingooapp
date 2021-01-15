@@ -9,7 +9,7 @@ import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import UploadFile from "../../../components/Upload/Upload";
 import {
-    debounce,
+    debounce, debuglog,
     deviceInfo,
     getNextPage,
     getURLParamsStr, getUserKey,
@@ -103,7 +103,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
             }
             setTemplateList([...list])
         }catch (e) {
-            console.log("根据ID获取模板列表出错：", e)
+            debuglog("根据ID获取模板列表出错：", e)
         }
     }
 
@@ -115,7 +115,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
                 await callEditor("setDoc", defaultDoc.current, photoStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -123,7 +123,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -146,7 +146,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
             getListOfCategory({tagId: arr[0].id, page: 0})
             setTypeList([...arr])
         }).catch(e => {
-            console.log("获取商品分类出错：", e)
+            debuglog("获取商品分类出错：", e)
         })
 
         getDefaultDoc()
@@ -166,26 +166,26 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
             resetTemplate()
             return
         }
-        console.log("选择的docid：", item.id)
+        debuglog("选择的docid：", item.id)
         setSelected(Number(item.id));
 
         // 获取模板详情并向DOC更新
         Taro.showLoading({title: "正在为您设置..."})
         try {
             const res = await api("editor.tpl/one", {id: item.id});
-            console.log("修改前：",res)
+            debuglog("修改前：",res)
             const temp = {...res};
             temp.pages[0].thumbnail = "";
-            console.log("修改后：", temp)
+            debuglog("修改后：", temp)
             await callEditor("setDoc", temp, photoStore.editorPhotos.map(v => v.url))
         }catch (e) {
-            console.log("设置DOC出错：", e)
+            debuglog("设置DOC出错：", e)
         }
         Taro.hideLoading()
     }
 
     const loadMore = () => {
-        console.log("加载更多")
+        debuglog("加载更多")
         if (total === templateList.length || total <= 15) {
             return
         }
@@ -291,7 +291,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
         Taro.getStorage({
             key: `historyColor_${id}`,
             success: res => {
-                console.log(res)
+                debuglog(res)
                 if (res.data) {
                     const hc = JSON.parse(res.data) || [];
                     const arr = [...hc, item];
@@ -302,7 +302,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 }
             },
             fail: err => {
-                console.log("在存储颜色时获取颜色失败：", err)
+                debuglog("在存储颜色时获取颜色失败：", err)
                 const arr = [item];
                 Taro.setStorage({
                     key: `historyColor_${id}`,
@@ -327,7 +327,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 type: opt.type === 0 ? "image" : "video"
             });
             total = Number(res.total);
-            console.log(res);
+            debuglog(res);
             let tempArr = [];
             if (opt.loadMore) {
                 tempArr = [...list, ...res.list]
@@ -336,7 +336,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
             }
             setList([...tempArr]);
         } catch (e) {
-            console.log("获取图库出错：", e)
+            debuglog("获取图库出错：", e)
         }
         Taro.hideLoading()
     }
@@ -353,7 +353,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 start: opt.start,
                 size: opt.size,
             });
-            console.log(res)
+            debuglog(res)
             stickersTotal.current = Number(res.total)
             let tempArr = [];
             if (opt.loadMore) {
@@ -371,7 +371,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -384,7 +384,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 await callEditor("setDoc", defaultDoc.current, photoStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -394,7 +394,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 resetImage()
             } else {
                 const doc = await callEditor("changeImage", src);
-                console.log(doc)
+                debuglog(doc)
             }
         } catch (e) {
 
@@ -416,14 +416,14 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 }
             },
             fail: err => {
-                console.log("获取历史颜色出错：", err)
+                debuglog("获取历史颜色出错：", err)
             }
         })
 
     }, [])
 
     const uploadFile = async files => {
-        console.log(files)
+        debuglog(files)
         getList({start: 0})
     }
 
@@ -452,7 +452,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
             }
             getList({start: list.length, loadMore: true})
         } else {
-            console.log(stickersTotal.current, list.length)
+            debuglog(stickersTotal.current, list.length)
             if (stickersTotal.current === list.length || list.length < 15 || list.length > stickersTotal.current) {
                 return
             }
@@ -473,9 +473,9 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     const onSelect = async (item, idx) => {
-        console.log("9999999999999999-------------")
-        console.log(JSON.parse(JSON.stringify(photoStore.photoProcessParams.photo.path)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
-        console.log(item, idx)
+        debuglog("9999999999999999-------------")
+        debuglog(JSON.parse(JSON.stringify(photoStore.photoProcessParams.photo.path)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
+        debuglog(item, idx)
         const src = list[idx];
 
         if (!notNull(selected) && idx === selected) {
@@ -487,7 +487,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
         if (src) {
             const current = photoStore.photoProcessParams.photo.path[parseInt(router.params.idx)];
             const useArr = photoStore.photoProcessParams.usefulImages;
-            console.log("历史：" ,current.originalData)
+            debuglog("历史：" ,current.originalData)
             // if (!notNull(current.originalData) && current.originalData.length > 0) {
                 // 已编辑过的模板，存在多张图
                 const url = parent.currentData.r.url || undefined;
@@ -672,7 +672,7 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -685,7 +685,7 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
                 await callEditor("setDoc", defaultDoc.current, photoStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -693,7 +693,7 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
         try{
             await callEditor("changeText", txt)
         }catch (e) {
-            console.log("修改文字失败：", e)
+            debuglog("修改文字失败：", e)
         }
     }
 
@@ -704,7 +704,7 @@ const ChangeText:Taro.FC<BaseProps & ChangeTextProps> = props => {
     const debounceFn = debounce(updateTxt, 1000)
 
     const onTextChange = (val, _) => {
-        console.log(val)
+        debuglog(val)
         setTxt(val)
         if (!notNull(val)) {
             // @ts-ignore
@@ -758,7 +758,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
                 page: opt.page,
                 size: opt.size
             });
-            console.log(res.total)
+            debuglog(res.total)
             _total.current = Number(res.total) || 0;
             let arr = [];
             if (opt.loadMore) {
@@ -768,14 +768,14 @@ const SelectFont: Taro.FC<BaseProps> = props => {
             }
             setFontList([...arr])
         }catch (e) {
-            console.log("获取字体列表出错：", e)
+            debuglog("获取字体列表出错：", e)
         }
     }
 
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -788,7 +788,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
                 await callEditor("setDoc", defaultDoc.current, photoStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -807,9 +807,9 @@ const SelectFont: Taro.FC<BaseProps> = props => {
     }
 
     const loadMore = () => {
-        console.log("加载更多", _total.current)
+        debuglog("加载更多", _total.current)
         const pagtion = getNextPage(page, pageTotal(_total.current, 15));
-        console.log("分页参数：", pagtion)
+        debuglog("分页参数：", pagtion)
 
         if (_total.current === fontList.length || _total.current < 15 || !pagtion.more) {
             return
@@ -833,7 +833,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
         try{
             await callEditor("changeTextFont", font["font-family"], font.font)
         }catch (e) {
-            console.log("更换字体出错：", e)
+            debuglog("更换字体出错：", e)
         }
     }
 
@@ -942,7 +942,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -955,7 +955,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
                 await callEditor("setDoc", defaultDoc.current, photoStore.editorPhotos.map(v => v.url));
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -970,7 +970,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         try{
             await callEditor("changeTextAttr", typeof value === "string" ? temp : value )
         }catch (e) {
-            console.log("修改文字样式出错：", e)
+            debuglog("修改文字样式出错：", e)
         }
     }
 
@@ -991,7 +991,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
 
     const onSelectColor = (value) => {
         let _colors = [...styleSelect.colors];
-        console.log(value, activeColor.current)
+        debuglog(value, activeColor.current)
         if (!notNull(activeColor.current) && value.key === activeColor.current) {
             const idx = _colors.findIndex(v => v.key === activeColor.current);
 
@@ -1019,7 +1019,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
                 }
             }
         }
-        console.log("变更过的值：", _colors)
+        debuglog("变更过的值：", _colors)
         setStyleSelect(prev => ({...prev, colors: [..._colors]}));
         _fontAttribute.current.style[activeStyle.current].colors = [..._colors];
 
@@ -1034,7 +1034,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         }
         activeStyle.current = num;
         setStyleSelect({..._fontAttribute.current.style[num]});
-        console.log("当前下标：",num, "当前样式：",_fontAttribute.current.style[num] )
+        debuglog("当前下标：",num, "当前样式：",_fontAttribute.current.style[num] )
     }
 
     const onAlignClick = () => {
@@ -1119,7 +1119,7 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc")
-            console.log(doc)
+            debuglog(doc)
         } catch (e) {
 
         }
@@ -1130,7 +1130,7 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     }, [])
 
     const onChange = async val => {
-        console.log(val)
+        debuglog(val)
         setAlpha(val);
 
         try {
@@ -1173,10 +1173,10 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         Taro.showLoading({title: "正在为您设置..."})
         try {
             const res = await api("editor.tpl/one", {id});
-            console.log("将要设置的图片：", JSON.parse(JSON.stringify(photoStore.editorPhotos)))
+            debuglog("将要设置的图片：", JSON.parse(JSON.stringify(photoStore.editorPhotos)))
             await callEditor("setDoc", res, photoStore.editorPhotos.map(v => v.url))
         }catch (e) {
-            console.log("设置DOC出错：", e)
+            debuglog("设置DOC出错：", e)
         }
         Taro.hideLoading()
     }
@@ -1204,7 +1204,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
     }
 
     useEffect(() => {
-        console.log("编辑图片的长度：", photoStore.editorPhotos.length)
+        debuglog("编辑图片的长度：", photoStore.editorPhotos.length)
         getTemplateForPhotoNum({num: photoStore.editorPhotos.length}).then(res => {
             setTemplateList([...res])
         })
@@ -1241,7 +1241,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                 }
             })
 
-            console.log("已选择的图片：", arr)
+            debuglog("已选择的图片：", arr)
             photoStore.editorPhotos = arr;
 
             getTemplateForPhotoNum({num: arr.length}).then(async res => {
@@ -1265,12 +1265,12 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
                         }
                     })
                 } else {
-                    console.log(`没有查询到对应图片数量（${arr.length}）的模板`, res)
+                    debuglog(`没有查询到对应图片数量（${arr.length}）的模板`, res)
                 }
             })
 
         }catch (e) {
-            console.log("选图出错：", e)
+            debuglog("选图出错：", e)
         }
     }
 
@@ -1284,7 +1284,7 @@ const ToolBar0: Taro.FC<{ parent: PrintEdit }> = ({parent}) => {
         if (curr) {
             renderTemplateDoc(curr.id)
         }
-        console.log("自增结果：", obj)
+        debuglog("自增结果：", obj)
         currentData.current = {...obj}
     }
 
@@ -1367,7 +1367,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         // 当为小程序直接跳转时执行
         if (this.routerParams.hidden && this.routerParams.hidden == "t") {
 
-            console.log("是否隐藏返回按钮：", this.routerParams.hidden == "t")
+            debuglog("是否隐藏返回按钮：", this.routerParams.hidden == "t")
             this.setState({hiddenBar: true})
 
             if (this.routerParams.key) {
@@ -1445,7 +1445,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         try {
 
             const res = await api("editor.tpl/index", {cid: routerParams.tplid, num: photoStore.editorPhotos.length});
-            console.log("查询结果：", res)
+            debuglog("查询结果：", res)
             const pictureSize = photoStore.photoProcessParams.pictureSize;
 
             const proId = photoStore.photoProcessParams.photoTplId;
@@ -1453,7 +1453,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             if (!notNull(routerParams.init) && routerParams.init == "t") {
 
                 const id = !notNull(proId) ? proId : res.list[0].id;
-                console.log("开始初始化图片：", id, photoStore.editorPhotos.map(v => v.url))
+                debuglog("开始初始化图片：", id, photoStore.editorPhotos.map(v => v.url))
                 await callEditor("setDoc", id, photoStore.editorPhotos.map(v => v.url), pictureSize)
             } else {
                 let data = process.env.NODE_ENV == 'production' ? "20201251" : proId ? proId : res.list[0].id;
@@ -1464,24 +1464,24 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 const {img}: any = urlDeCode(routerParams);
                 if (current && current.edited && current.edited == true && !notNull(current.doc)) {
                     data = current.doc;
-                    console.log("已编辑过的模板：", data)
-                    console.log("当前照片曾经使用的图片", JSON.parse(JSON.stringify(current.originalData)))
+                    debuglog("已编辑过的模板：", data)
+                    debuglog("当前照片曾经使用的图片", JSON.parse(JSON.stringify(current.originalData)))
                     photoStore.editorPhotos = [...current.originalData]
                     imgArr = current.originalData.map(v => v.url)
                 } else {
-                    console.log("没有编辑过的模板")
+                    debuglog("没有编辑过的模板")
 
                     imgArr = [img]
                     photoStore.editorPhotos = [{id: "", url: img}]
                 }
 
-                console.log("最终传递的值：", JSON.parse(JSON.stringify(data)), imgArr, pictureSize)
+                debuglog("最终传递的值：", JSON.parse(JSON.stringify(data)), imgArr, pictureSize)
                 await callEditor("setDoc", JSON.parse(JSON.stringify(data)), imgArr, pictureSize)
             }
 
         }catch (e) {
 
-            console.log("初始化失败：", e)
+            debuglog("初始化失败：", e)
         }
     }
 
@@ -1504,7 +1504,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     onMsg: { (e: MessageEvent): void } = async ({data}) => {
-        console.log("msg", data);
+        debuglog("msg", data);
 
         if (!data) {
             return;
@@ -1608,7 +1608,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             const fastJump: boolean = this.routerParams.init == "t";
 
             const doc: any = await callEditor("getDoc");
-            console.log(doc)
+            debuglog(doc)
 
             const res = await api("editor.upload/preview", {
                 content: {
@@ -1641,7 +1641,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 }
             }
 
-            console.log("本地数据：", this.$router.params.idx, JSON.parse(JSON.stringify(localParams)))
+            debuglog("本地数据：", this.$router.params.idx, JSON.parse(JSON.stringify(localParams)))
 
             if (temp.path[Number(this.$router.params.idx)]) {
                 let ids = photoStore.photoProcessParams.photo.path[Number(this.$router.params.idx)].extraIds;
@@ -1664,7 +1664,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
                 temp.path.push(obj)
             }
 
-            console.log("更新后的params：", JSON.parse(JSON.stringify(temp)));
+            debuglog("更新后的params：", JSON.parse(JSON.stringify(temp)));
 
             await photoStore.updateServerParams(this.userKey(), {
                 photo: temp,
@@ -1704,7 +1704,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
             }
 
         }catch (e) {
-            console.log("生成预览图出错：", e)
+            debuglog("生成预览图出错：", e)
             Taro.hideLoading()
             Taro.showToast({
                 title: "生成预览图出错",
@@ -1811,7 +1811,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         } else if (tool == 4) {
             ele = <ChangeImage onClose={this.cancelEdit} onOk={this.onOk} parent={this} />
         } else if (tool == 5) {
-            ele = <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk}/>
+            ele = <ChangeAlpha onClose={this.cancelEdit} onOk={this.onOk} parent={this}/>
         } else if (tool == 6) {
             ele = <ChangeText onClose={this.cancelEdit} data={this.state.textInfo} onOk={this.onOk} />
         } else if (tool == 7) {
