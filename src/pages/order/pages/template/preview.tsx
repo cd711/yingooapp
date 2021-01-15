@@ -75,7 +75,7 @@ export default class Preview extends Component<any, {
             placeOrderShow: false,
             workId: 0,
             productInfo: {},
-            buyTotal:0,
+            buyTotal:1,
             sku:{},
             isOpened: false,
             modalId:0,
