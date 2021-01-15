@@ -1098,7 +1098,11 @@ const PrintChange: Taro.FC<any> = () => {
             });
             return
         }
-        photoStore.updateServerParams(getUserKey(), new PhotoParams())
+        try {
+            await photoStore.updateServerParams(getUserKey(), new PhotoParams())
+        } catch (e) {
+
+        }
         if (Taro.getCurrentPages().length > 1) {
             Taro.navigateBack();
         } else {

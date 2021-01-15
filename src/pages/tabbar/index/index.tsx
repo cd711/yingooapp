@@ -240,8 +240,6 @@ class Index extends Component<any, IndexState> {
     }
 
     componentDidMount() {
-
-        debuglog(1,2,3,4,5,6)
         debuglog(deviceInfo)
         if (process.env.TARO_ENV != 'h5') {
             this.setState({
