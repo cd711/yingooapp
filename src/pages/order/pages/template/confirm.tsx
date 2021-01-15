@@ -50,7 +50,8 @@ export default class Confirm extends Component<any, {
     order_sn: string;
     payStatus: number,
     orderid: string,
-    centerPartyHeight: number
+    centerPartyHeight: number;
+    orderMessages:any
 }> {
 
     config: Config = {
@@ -72,7 +73,8 @@ export default class Confirm extends Component<any, {
             usedTickets: [],
             payStatus: 0,
             orderid: "",
-            centerPartyHeight: 500
+            centerPartyHeight: 500,
+            orderMessages:{}
         }
     }
 
@@ -88,7 +90,6 @@ export default class Confirm extends Component<any, {
             setTempDataContainer("product_preview_sku",null);
         }
         if (process.env.TARO_ENV != 'h5') {
-
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".bottom").boundingClientRect((status_react) => {
                     this.setState({
@@ -114,27 +115,26 @@ export default class Confirm extends Component<any, {
         this.unixOrder = order;
         getOrderConfimPreviewData(this.unixOrder,async (resp,has)=>{
             if (has) {
-                const {page, skuid, total}: any = resp;
-                this.isPhoto = page && page === "photo";
-                let params = {};
-                if (this.isPhoto) {
-                    try {
-                        await photoStore.getServerParams({setLocal: true});
-                        params = JSON.parse(JSON.stringify(photoStore.photoProcessParams.changeUrlParams));
-                        params = photoStore.photoProcessParams.changeUrlParams
-                        Object.assign(params,resp)
-                    } catch (e) {
-                        debuglog("读取参数出错：", e)
-
+                if (resp.orderid) {
+                    this.checkOrder(resp.orderid);
+                } else {
+                    const {page, skuid, total}: any = resp;
+                    this.isPhoto = page && page === "photo";
+                    let params = {};
+                    if (this.isPhoto) {
+                        try {
+                            await photoStore.getServerParams({setLocal: true});
+                            params = JSON.parse(JSON.stringify(photoStore.photoProcessParams.changeUrlParams));
+                            params = photoStore.photoProcessParams.changeUrlParams
+                            Object.assign(params,resp)
+                        } catch (e) {
+                            debuglog("读取参数出错：", e)
+    
+                        }
+                    } else {
+                        params = resp
                     }
-                } else {
-                    params = resp
-                }
-                const {tplid, model, orderid, cartIds, parintImges}: any = params;
-                console.log("orderid",params);
-                if (orderid) {
-                    this.checkOrder(orderid);
-                } else {
+                    const {tplid, model, orderid, cartIds, parintImges}: any = params;
                     let data: any = {
                         sku_id: skuid,
                         quantity: total,
@@ -234,6 +234,7 @@ export default class Confirm extends Component<any, {
                         product["checked"] = false;
                         const isSelectItem: Array<any> = iterator.products.filter((obj) => obj.merge_products.some((ibj) => ibj.product.id == product.id));
                         if (isSelectItem.length == 1) {
+                            console.log("选择的加购",product,isSelectItem)
                             product["checked"] = true;
                         }
                     }
@@ -272,7 +273,7 @@ export default class Confirm extends Component<any, {
                     getTempDataContainer(this.tempContainerKey, (value) => {
                         if (value != null && value != undefined && value) {
                             const currentAddBuyItem = value.currentAddBuyItem
-                            debuglog("value.sku",value)
+                            debuglog("加购回来的参数",value)
                             if (value.isOk && currentAddBuyItem.checked == false) {
                                 this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
                             }else{
@@ -402,12 +403,12 @@ export default class Confirm extends Component<any, {
         //     showPayWayModal:true
         // })
         this.initPayWayModal = true;
-        const {data} = this.state;
+        const {data,orderMessages} = this.state;
         // this.checkOrder(data.prepay_id,false);
         Taro.showLoading({title: '加载中...'})
         api('app.order/add', {
             prepay_id: data.prepay_id,
-            remarks: ""
+            remarks: isEmptyX(orderMessages)?"":JSON.stringify(orderMessages)
         }).then((res) => {
             debuglog("ccc",res);
             Taro.hideLoading();
@@ -721,9 +722,9 @@ export default class Confirm extends Component<any, {
     }
 
     render() {
-        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight} = this.state;
+        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight,orderMessages} = this.state;
         const {address} = data;
-        debuglog("templateStore",address)
+        debuglog("data数据",data)
         // @ts-ignore
         return (
             <View className='confirm'>
@@ -920,7 +921,12 @@ export default class Confirm extends Component<any, {
                                 </View>
                                 <View className='goods-item'>
                                     <Text className='title'>留言</Text>
-                                    <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={()=>{}}/>
+                                    <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={({detail:{value}})=>{
+                                        orderMessages[item.pre_order_id] = value;
+                                        this.setState({
+                                            orderMessages:orderMessages
+                                        });
+                                    }}/>
                                 </View>
                             </Fragment>
                         ))

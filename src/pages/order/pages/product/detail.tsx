@@ -489,7 +489,7 @@ export default class Login extends Component<{}, {
         // const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
         const tags_text: Array<any> = data && !notNull(data.tags_text) ? data.tags_text.slice(0, 4) : [];
         const attrGroup: Array<any> = data && !notNull(data.attrGroup) ? data.attrGroup : [];
-        debuglog()
+        // debuglog()
         // @ts-ignore
         return (
             <View className='p_detail'>
@@ -570,8 +570,8 @@ export default class Login extends Component<{}, {
                             <Text
                                 className='txt'>{data && data.title ? (data.title.length > 30 ? `${data.title.substring(0, 30)}...` : data.title) : ""}</Text>
                                 {
-                                    data && data.flag_text ? data.flag_text.map((item)=>(
-                                        <Image className='icon' src={item.url}/>
+                                    data && data.flag_text ? data.flag_text.map((obj,index)=>(
+                                        <Image className='icon' src={obj.url} key={index+""}/>
                                     )):null
                                 }
                         </View>
@@ -590,7 +590,9 @@ export default class Login extends Component<{}, {
                             <View className='dp'>
                                 <Text className='smy'>￥</Text>
                                 <Text className='num'>{data && data.price ? data.price:"0.00"}</Text>
-                                <Text className='start'>起</Text>
+                                {
+                                   data && data.skus && data.skus.length==1? <Text className='start'>起</Text> :null
+                                }
                             </View>
                             <View className='ap'>
                                 <Text className='txt'>￥{data && data.market_price ? data.market_price:"0.00"}</Text>
