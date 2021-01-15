@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api,options} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
+import {debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import {observer} from "@tarojs/mobx";
@@ -103,7 +103,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             try {
                 const res = await api("app.profile/imgs", temp);
                 this.total = Number(res.total);
-                console.log(res);
+                debuglog(res);
                 this.setState({loading: false});
                 let list = [];
                 list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
@@ -135,7 +135,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 })
             } catch (e) {
                 reject(e)
-                console.log("获取图库出错：", e)
+                debuglog("获取图库出错：", e)
                 this.setState({loadStatus: "noMore"})
             }
             this.setState({loading: false})
@@ -190,12 +190,12 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     uploadFile = async files => {
-        console.log(files)
+        debuglog(files)
         this.getList({start: 0})
     }
 
     imageSelect = (id: any, url, attr) => {
-        const {_editSelect, _count} = this.state;
+        const {_editSelect, _count, _max} = this.state;
 
         if (_editSelect) {
             const editSelectImgs = this.state.editSelectImgs;
@@ -211,16 +211,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     Taro.showToast({title: `只能选择${_count}张`, icon: "none"})
                     return;
                 }
-                if (editSelectImgIds.length >= 100) {
-                    Taro.showToast({title: `最多选择100张`, icon: "none"})
+                if (editSelectImgIds.length >= _max) {
+                    Taro.showToast({title: `最多选择${_max}张`, icon: "none"})
                     return;
+                } else {
+                    editSelectImgs.push(url);
+                    editSelectImgIds.push(id);
+                    editSelectAttr.push(attr)
                 }
-                editSelectImgs.push(url);
-                editSelectImgIds.push(id);
-                editSelectAttr.push(attr)
             }
             this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
-            return
         }
     }
 
@@ -295,7 +295,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
 
     changeSort = (data: PopLayoutItemProps, index: number) => {
-        console.log(data, index)
+        debuglog(data, index)
         let sort = {};
         if (typeof data.value === "string") {
             sort = JSON.parse(data.value);

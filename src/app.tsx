@@ -8,7 +8,7 @@ import './app.less'
 import {api, getUserInfo, options} from './utils/net';
 import config from './config';
 import Xm from './utils/xm'
-import {jsApiList, shareInfo, updateChannelCode} from "./utils/common";
+import {debuglog, jsApiList, shareInfo, updateChannelCode} from "./utils/common";
 import wx from 'weixin-js-sdk'
 // import 'zg-sdk-wechart/zhuge-wx.min'
 // import sdk from 'zg-sdk-wechart/zhuge-wx.min'
@@ -250,7 +250,7 @@ class App extends Component {
                 const verDate = new Date();
                 // @ts-ignore
                 const verStr = verDate.getFullYear().toString() + verDate.getMonth().toString() + verDate.getDate().toString();
-        
+
                 a.type = "text/javascript";
                 a.id = "zhuge-js";
                 a.async = !0;
@@ -286,17 +286,17 @@ class App extends Component {
             });
             // @ts-ignore
             options.zhugeio = window.zhuge
-            console.log(options.zhugeio)
+            debuglog(options.zhugeio)
         }
         if (process.env.TARO_ENV === 'weapp') {
-            
+
             // zhuge_app.App.zhuge.load("978c85218b5c4faf9f3bb8abd3dd5928",{
             //     debug: true, // 打开实时调试
             //     pv: true, // 是否启用页面访问统计功能
             //     forwardShare: false, // 是否启用转发分享数据采集开关，默认为false
             // })
             // options.zhugeio = zhuge_app.zhuge;
-            
+
         }
     }
 
@@ -307,7 +307,7 @@ class App extends Component {
 
     componentDidMount() {
         this.registerZhuGeIO();
-        // console.log("诸葛 ",options.zhugeio,zhuge_app)
+        // debuglog("诸葛 ",options.zhugeio,zhuge_app)
         // options.zhugeio.identify('wx123');
         // options.zhugeio.track('wx购买商品',{
         //     "渠道商":"yunlaba"
@@ -376,7 +376,7 @@ class App extends Component {
                             imgUrl, // 分享图标
                             success: function () {
                                 // 设置成功
-                                console.log("分享成功")
+                                debuglog("分享成功")
                             }
                         })
                         wx.updateTimelineShareData({
@@ -385,7 +385,7 @@ class App extends Component {
                             imgUrl, // 分享图标
                             success: function () {
                                 // 设置成功
-                                console.log("分享成功")
+                                debuglog("分享成功")
                             }
                         })
                         wx.onMenuShareTimeline({
@@ -435,7 +435,7 @@ class App extends Component {
                 }
 
             }).catch((e) => {
-                console.log("分享出错：", e)
+                debuglog("分享出错：", e)
             })
         }
     }

@@ -3,7 +3,6 @@ import { View, Text,Input } from '@tarojs/components'
 import './index.less'
 import './find.less'
 import IconFont from '../../components/iconfont';
-// import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import {fixStatusBarHeight, deviceInfo, updateChannelCode} from '../../utils/common';
 import { api } from '../../utils/net';
@@ -37,7 +36,7 @@ export default class Set extends Component<any,{
     }
     private inputRef: { inputRef: { focus: () => void; }; };
     componentDidMount(){
-        // console.log("find~~~~~~~~~~~~~~~~")
+        // debuglog("find~~~~~~~~~~~~~~~~")
         // if (!userStore.isLogin) {
         //     if (deviceInfo.env == 'h5') {
         //         window.location.href = "/pages/tabbar/index/index";

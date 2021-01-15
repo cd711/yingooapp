@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
 import {Base64} from 'js-base64';
 import {userStore} from "../store/user";
-import {is_weixin} from './common';
+import {debuglog, is_weixin} from './common';
 
 
 export const options: {
@@ -102,7 +102,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
         if (getToken()) {
             url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
         }
-        // console.log(url);
+        // debuglog(url);
         // const pl: string[] = [];
         // for (let key in params) {
         //   pl.push(`${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
@@ -116,7 +116,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
                 'content-type': allowJson ? "application/json" : 'application/x-www-form-urlencoded',
             }
         }).then((res: any) => {
-            console.log("api接口请求：", res.data)
+            debuglog("api接口请求：", res.data)
             if(res.data.code == 401){
                 Taro.hideLoading();
                 Taro.removeStorage({key:'token'});
@@ -132,7 +132,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
                 //         url:"/pages/login/index"
                 //     });
                 // });
-                // console.log(modals);
+                // debuglog(modals);
 
 
                 // return;
@@ -146,7 +146,7 @@ export function api(name: string, params?: any, allowJson = false): Promise<any>
                 }
             }
         }).catch(function (e) {
-            console.log("接口报错:",name,e);
+            debuglog("接口报错:",name,e);
             if (e && e.status && (e.status == 500||e.status == 501)) {
                 e = "服务器走丢了，请稍后再试。"
             }

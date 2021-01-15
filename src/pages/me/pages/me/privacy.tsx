@@ -3,7 +3,7 @@ import Taro, {Component, Config} from "@tarojs/taro";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../../../utils/net";
 import "./privacy.less";
-import {deviceInfo} from "../../../../utils/common";
+import {debuglog, deviceInfo} from "../../../../utils/common";
 import page from "../../../../utils/ext";
 
 interface PrivacyState{
@@ -30,7 +30,7 @@ export default class Privacy extends Component<any, PrivacyState> {
             api("app.about/info", {name: params.pageType}).then(privacyTxt => {
                 this.setState({privacyTxt})
             }).catch(e => {
-                console.log("获取内容出错：", e)
+                debuglog("获取内容出错：", e)
             })
         }
     }

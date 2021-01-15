@@ -5,6 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {api} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx';
 import {
+    debuglog,
     deviceInfo,
     fixStatusBarHeight,
     jumpToEditor,
@@ -69,7 +70,7 @@ export default class Detail extends Component<{}, {
             // window.history.pushState(null, '模板详情', url);
         }
         const {id, cid} = this.$router.params
-        console.log(id, cid)
+        debuglog(id, cid)
         if (!id || !cid) {
             Taro.navigateBack();
         }
@@ -135,7 +136,7 @@ export default class Detail extends Component<{}, {
     //         const nowUnixTime = moment().unix();
     //         if ((scrollTop + clientHeight) >= (scrollHeight - distance) && nowUnixTime - this.lastBottomTime>2) {
     //             this.lastBottomTime = nowUnixTime;
-    //             console.log("触及底线了...");
+    //             debuglog("触及底线了...");
     //         }
     //     }).exec();
     // }
@@ -167,12 +168,12 @@ export default class Detail extends Component<{}, {
             })
             this.setState({isLike: !isLike})
         } catch (e) {
-            console.log(`${isLike ? "取消收藏失败" : "收藏失败"}：`, e)
+            debuglog(`${isLike ? "取消收藏失败" : "收藏失败"}：`, e)
         }
     }
 
     goBack = () => {
-        // console.log(Taro.getCurrentPages())
+        // debuglog(Taro.getCurrentPages())
         // const status = !notNull(this.$router.params.cp);
         // const {cp}: any = urlDeCode(this.$router.params);
         // if (status) {

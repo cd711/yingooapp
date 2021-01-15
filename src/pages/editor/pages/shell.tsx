@@ -10,7 +10,7 @@ import {observer} from '@tarojs/mobx';
 import Fragment from '../../../components/Fragment';
 import UploadFile from "../../../components/Upload/Upload";
 import {
-    debounce,
+    debounce, debuglog,
     getFirstTemplateDoc,
     getNextPage,
     notNull,
@@ -115,7 +115,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
             setStatus(list.length == res.total ? "noMore" : "more")
             setTemplateList([...list])
         } catch (e) {
-            console.log("根据ID获取模板列表出错：", e)
+            debuglog("根据ID获取模板列表出错：", e)
         }
     }
 
@@ -127,7 +127,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
                 await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -135,7 +135,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -158,7 +158,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
             getListOfCategory({tagId: arr[0].id, page: 1})
             setTypeList([...arr])
         }).catch(e => {
-            console.log("获取商品分类出错：", e)
+            debuglog("获取商品分类出错：", e)
         })
 
         getDefaultDoc()
@@ -178,7 +178,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
             resetTemplate()
             return
         }
-        console.log("选择的docid：", item.id)
+        debuglog("选择的docid：", item.id)
         setSelected(Number(item.id));
 
         // 获取模板详情并向DOC更新
@@ -187,13 +187,13 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
             const res = await api("editor.tpl/one", {id: item.id});
             await callEditor("setDoc", res)
         } catch (e) {
-            console.log("设置DOC出错：", e)
+            debuglog("设置DOC出错：", e)
         }
         Taro.hideLoading()
     }
 
     const loadMore = () => {
-        console.log("加载更多")
+        debuglog("加载更多")
 
         const pagtion = getNextPage(page, pageTotal(total.current, 15));
 
@@ -300,7 +300,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
         Taro.getStorage({
             key: `historyColor_${id}`,
             success: res => {
-                console.log(res)
+                debuglog(res)
                 if (res.data) {
                     const hc = JSON.parse(res.data) || [];
                     const arr = [...hc, item];
@@ -311,7 +311,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 }
             },
             fail: err => {
-                console.log("在存储颜色时获取颜色失败：", err)
+                debuglog("在存储颜色时获取颜色失败：", err)
                 const arr = [item];
                 Taro.setStorage({
                     key: `historyColor_${id}`,
@@ -336,7 +336,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 type: opt.type === 0 ? "image" : "video"
             });
             total = Number(res.total);
-            console.log(res);
+            debuglog(res);
             let tempArr = [];
             if (opt.loadMore) {
                 tempArr = [...list, ...res.list]
@@ -345,7 +345,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
             }
             setList([...tempArr]);
         } catch (e) {
-            console.log("获取图库出错：", e)
+            debuglog("获取图库出错：", e)
         }
         Taro.hideLoading()
     }
@@ -362,7 +362,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 start: opt.start,
                 size: opt.size,
             });
-            console.log(res)
+            debuglog(res)
             stickersTotal.current = Number(res.total)
             let tempArr = [];
             if (opt.loadMore) {
@@ -380,7 +380,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -393,7 +393,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -403,7 +403,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 resetImage()
             } else {
                 const doc = await callEditor("changeImage", src);
-                console.log(doc)
+                debuglog(doc)
             }
         } catch (e) {
 
@@ -425,14 +425,14 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 }
             },
             fail: err => {
-                console.log("获取历史颜色出错：", err)
+                debuglog("获取历史颜色出错：", err)
             }
         })
 
     }, [])
 
     const uploadFile = async files => {
-        console.log(files)
+        debuglog(files)
         getList({start: 0})
     }
 
@@ -461,7 +461,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
             }
             getList({start: list.length, loadMore: true})
         } else {
-            console.log(stickersTotal.current, list.length)
+            debuglog(stickersTotal.current, list.length)
             if (stickersTotal.current === list.length || list.length < 15 || list.length > stickersTotal.current) {
                 return
             }
@@ -482,7 +482,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     const onSelect = (item, idx) => {
-        console.log(idx)
+        debuglog(idx)
         const src = list[idx];
 
         if (!notNull(selected) && idx === selected) {
@@ -634,7 +634,7 @@ const ChangeText: Taro.FC<BaseProps & ChangeTextProps> = props => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -647,7 +647,7 @@ const ChangeText: Taro.FC<BaseProps & ChangeTextProps> = props => {
                 await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -655,7 +655,7 @@ const ChangeText: Taro.FC<BaseProps & ChangeTextProps> = props => {
         try {
             await callEditor("changeText", txt)
         } catch (e) {
-            console.log("修改文字失败：", e)
+            debuglog("修改文字失败：", e)
         }
     }
 
@@ -666,7 +666,7 @@ const ChangeText: Taro.FC<BaseProps & ChangeTextProps> = props => {
     const debounceFn = debounce(updateTxt, 1000)
 
     const onTextChange = (val, _) => {
-        console.log(val)
+        debuglog(val)
         setTxt(val)
         if (!notNull(val)) {
             // @ts-ignore
@@ -719,7 +719,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
                 page: opt.page,
                 size: opt.size
             });
-            console.log(res.total)
+            debuglog(res.total)
             _total.current = Number(res.total) || 0;
             let arr = [];
             if (opt.loadMore) {
@@ -729,14 +729,14 @@ const SelectFont: Taro.FC<BaseProps> = props => {
             }
             setFontList([...arr])
         } catch (e) {
-            console.log("获取字体列表出错：", e)
+            debuglog("获取字体列表出错：", e)
         }
     }
 
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -749,7 +749,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
                 await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -768,9 +768,9 @@ const SelectFont: Taro.FC<BaseProps> = props => {
     }
 
     const loadMore = () => {
-        console.log("加载更多", _total.current)
+        debuglog("加载更多", _total.current)
         const pagtion = getNextPage(page, pageTotal(_total.current, 15));
-        console.log("分页参数：", pagtion)
+        debuglog("分页参数：", pagtion)
 
         if (_total.current === fontList.length || _total.current < 15 || !pagtion.more) {
             return
@@ -794,7 +794,7 @@ const SelectFont: Taro.FC<BaseProps> = props => {
         try {
             await callEditor("changeTextFont", font["font-family"], font.font)
         } catch (e) {
-            console.log("更换字体出错：", e)
+            debuglog("更换字体出错：", e)
         }
     }
 
@@ -903,7 +903,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc");
-            console.log("doc", doc)
+            debuglog("doc", doc)
             defaultDoc.current = doc;
         } catch (e) {
 
@@ -916,7 +916,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
                 await callEditor("setDoc", defaultDoc.current);
             }
         } catch (e) {
-            console.log("重置出错：", e)
+            debuglog("重置出错：", e)
         }
     }
 
@@ -939,7 +939,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         try {
             await callEditor("changeTextAttr", typeof value === "string" ? temp : value)
         } catch (e) {
-            console.log("修改文字样式出错：", e)
+            debuglog("修改文字样式出错：", e)
         }
     }
 
@@ -960,7 +960,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
 
     const onSelectColor = (value) => {
         let _colors = [...styleSelect.colors];
-        console.log(value, activeColor.current)
+        debuglog(value, activeColor.current)
         if (!notNull(activeColor.current) && value.key === activeColor.current) {
             const idx = _colors.findIndex(v => v.key === activeColor.current);
 
@@ -988,7 +988,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
                 }
             }
         }
-        console.log("变更过的值：", _colors)
+        debuglog("变更过的值：", _colors)
         setStyleSelect(prev => ({...prev, colors: [..._colors]}));
         _fontAttribute.current.style[activeStyle.current].colors = [..._colors];
 
@@ -1003,7 +1003,7 @@ const ChangeFontStyle: Taro.FC<BaseProps> = props => {
         }
         activeStyle.current = num;
         setStyleSelect({..._fontAttribute.current.style[num]});
-        console.log("当前下标：", num, "当前样式：", _fontAttribute.current.style[num])
+        debuglog("当前下标：", num, "当前样式：", _fontAttribute.current.style[num])
     }
 
     const onAlignClick = () => {
@@ -1088,7 +1088,7 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     async function getDefaultDoc() {
         try {
             const doc = await callEditor("getDoc")
-            console.log(doc)
+            debuglog(doc)
         } catch (e) {
 
         }
@@ -1099,7 +1099,7 @@ const ChangeAlpha: Taro.FC<ChangeImageProps> = (props) => {
     }, [])
 
     const onChange = async val => {
-        console.log(val)
+        debuglog(val)
         setAlpha(val);
 
         try {
@@ -1205,7 +1205,7 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
                 list = await api("/editor.phone_shell/series", {
                     id: brandList[brandIndex].id
                 });
-                console.log(list);
+                debuglog(list);
             } catch (e) {
                 console.warn(e);
             }
@@ -1230,7 +1230,7 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
                 await callEditor("setDoc", res)
             }
         } catch (e) {
-            console.log("初始化出错：", e)
+            debuglog("初始化出错：", e)
         }
     }
 
@@ -1452,17 +1452,17 @@ export default class Shell extends Component<{}, {
 
     onLoadEmpty = async () => {
         const {tpl_id, id} = this.$router.params;
-        console.log(tpl_id, id)
+        debuglog(tpl_id, id)
         if (tpl_id == "0" || notNull(tpl_id)) {
             try {
                 const doc = await getFirstTemplateDoc(this.$router.params.cid)
-                console.log(doc)
+                debuglog(doc)
                 if (doc) {
                     await callEditor("setDoc", doc);
                 }
                 // this.tplId = tplId;
             } catch (e) {
-                console.log("没有模板时初始化出错：", e)
+                debuglog("没有模板时初始化出错：", e)
             }
         }
     }
@@ -1482,7 +1482,7 @@ export default class Shell extends Component<{}, {
     }
 
     onMsg: { (e: MessageEvent): void } = async ({data}) => {
-        console.log("msg", data);
+        debuglog("msg", data);
         if (!data) {
             return;
         }
@@ -1594,12 +1594,12 @@ export default class Shell extends Component<{}, {
 
             const doc = await callEditor("getDoc");
             const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
-            console.log(res)
+            debuglog(res)
             wx.miniProgram.navigateTo({
                 url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`),
             })
         }catch (e) {
-            console.log("点击下一步出错：", e)
+            debuglog("点击下一步出错：", e)
         }
 
         Taro.hideLoading();

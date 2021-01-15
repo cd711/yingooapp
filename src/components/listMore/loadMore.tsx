@@ -35,7 +35,7 @@ class LoadMore extends Component<LoadMoreProps, any> {
         const {status, allowFix} = this.props;
         return (
             <View className={`load_more_view ${allowFix ? "load_more_view_fix_bottom" : ""}`}>
-                {status === "loading" ? <AtActivityIndicator /> : null}
+                {status === "loading" ? <AtActivityIndicator /> : <View/>}
                 <Text className="txt">{this.getContent()}</Text>
             </View>
         );

@@ -3,7 +3,7 @@ import Taro, {Component} from '@tarojs/taro';
 import {View, Text, Image} from "@tarojs/components";
 import IconFont from "../iconfont";
 import {getToken, options} from "../../utils/net";
-import {notNull} from "../../utils/common";
+import {debuglog, notNull} from "../../utils/common";
 import {userStore} from "../../store/user";
 
 export interface UploadFileChangeProps {
@@ -59,7 +59,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                 count,
                 sourceType,
                 success: function (res) {
-                    console.log(res)
+                    debuglog(res)
                     if (count > 1) {
                         that.uploadMultipleFile(res.tempFiles, 0, 0, 0)
                     } else {
@@ -107,7 +107,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                 Taro.showToast({title: "上传成功", icon: "none"})
             },
             fail: err => {
-                console.log("UploadFile文件上传出错：", err)
+                debuglog("UploadFile文件上传出错：", err)
                 Taro.hideLoading();
                 Taro.showToast({title: "上传失败", icon: "none"})
             }
@@ -156,17 +156,17 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                 }
             },
             fail: err => {
-                console.log("UploadFile文件上传出错：", err)
+                debuglog("UploadFile文件上传出错：", err)
                 // Taro.hideLoading();
                 // Taro.showToast({title: "上传失败", icon: "none"})
                 _fail++
             },
             complete: () => {
                 i++;
-                console.log(i, files.length)
+                debuglog(i, files.length)
                 if (i === files.length) {
                     Taro.hideLoading();
-                    console.log("多图上传---成功：", _success, "  失败：", _fail)
+                    debuglog("多图上传---成功：", _success, "  失败：", _fail)
                     if (files.length === _fail) {
                         Taro.showToast({title: "上传失败", icon: "none"})
                     }

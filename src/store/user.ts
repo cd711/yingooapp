@@ -1,6 +1,6 @@
 import {action, observable} from 'mobx'
 import {api, setUserInfo} from '../utils/net'
-import {is_weixin} from "../utils/common";
+import {debuglog, is_weixin} from "../utils/common";
 
 const sexList = {
     0: '保密',
@@ -46,7 +46,7 @@ export class UserStore {
             info.birthday == ""
         }
         setUserInfo(info);
-        console.log("用户信息",info);
+        debuglog("用户信息",info);
         this.id = info.id;
         this.mobile = info.mobile;
         this.avatar = info.avatar;

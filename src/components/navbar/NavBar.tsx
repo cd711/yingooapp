@@ -47,7 +47,7 @@ class NavBar extends Component<{
     }
     render() {
         const config = this.props.config || {};
-        // console.log(this.props.left === NavBar.EmptyLeft, this.props.left, NavBar.EmptyLeft)
+        // debuglog(this.props.left === NavBar.EmptyLeft, this.props.left, NavBar.EmptyLeft)
         const closeLeft = this.props.left === NavBar.EmptyLeft;
         const left = closeLeft ? <View style="width: 44PX" /> : (this.props.left ? this.props.left : <Image src={require("../res/back_icon.png")} onClick={this.onLeft} className="left" />);
         let title = this.props.title;

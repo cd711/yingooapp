@@ -4,6 +4,7 @@ import IconFont from '../../../components/iconfont';
 import Checkboxs from '../../../components/checkbox/checkbox';
 import Counter from '../../../components/counter/counter';
 import {
+    debuglog,
     deviceInfo,
     fixStatusBarHeight,
     jumpOrderConfimPreview,
@@ -85,7 +86,7 @@ export default class Cart extends Component<{}, {
             start: 0
         }).then((res) => {
             Taro.hideLoading();
-            console.log(res);
+            debuglog(res);
             if (res) {
                 res.list = res.list.map((item) => {
                     item["checked"] = false;
@@ -97,7 +98,7 @@ export default class Cart extends Component<{}, {
                 })
             }
         }).catch((e) => {
-            console.log(e);
+            debuglog(e);
         })
     }
     onItemClick = (list, index) => {
@@ -177,7 +178,7 @@ export default class Cart extends Component<{}, {
     render() {
         const {source, allSelected, total, selectIds, showDelTipModal} = this.state;
         const list = source && source.list && source.list.length > 0 ? source.list : [];
-        console.log("list",list.length>0)
+        debuglog("list",list.length>0)
         const delOption = [{
             text: '删除',
             style: {

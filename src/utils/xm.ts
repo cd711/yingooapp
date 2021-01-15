@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { userStore } from '../store/user';
-import { deviceInfo,is_weixin,notNull } from './common';
+import {debuglog, deviceInfo, is_weixin, notNull} from './common';
 import { api } from './net';
 
 interface LoginParams{
@@ -43,14 +43,14 @@ export default class Xm {
     private static weappLogin(params:LoginParams,resolve,reject){
         if (!notNull(params.userInfo)) {
             Taro.login().then((res)=>{
-                console.log(res);
+                debuglog(res);
                 this.thirdLoginApi({
                     platform: "wxapp",
                     code: res.code,
                     data: params.userInfo
                 },resolve,reject);
             }).catch((e)=>{
-                console.log(e);
+                debuglog(e);
                 reject(e);
             });
         }

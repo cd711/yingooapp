@@ -3,6 +3,7 @@ import Taro, {Component} from '@tarojs/taro';
 import {View, Text} from "@tarojs/components";
 import BoundingClientRectCallbackResult = Taro.NodesRef.BoundingClientRectCallbackResult;
 import IconFont from "../iconfont";
+import {debuglog} from "../../utils/common";
 
 
 // 此组件未兼容react-native
@@ -112,7 +113,7 @@ export default class Popover extends Component<PopoverProps, PopoverState> {
             // 距离顶部的偏移量
             temp = {...temp, top: top + height + 10};
 
-            console.log("最终渲染位置：", temp)
+            debuglog("最终渲染位置：", temp)
 
             // 点击元素与屏幕底部是否不足以完全显示容器
             const newBottom = temp.top + cHeight + offsetBottom;  // 点击元素新的底部坐标
@@ -133,7 +134,7 @@ export default class Popover extends Component<PopoverProps, PopoverState> {
             this.changeOverflow(!visible)
 
         }catch (e) {
-            console.log("获取坐标出错：", e)
+            debuglog("获取坐标出错：", e)
         }
     }
 
@@ -267,7 +268,7 @@ export default class Popover extends Component<PopoverProps, PopoverState> {
 //             // 距离顶部的偏移量
 //             temp = {...temp, top: top + height + 10};
 //
-//             console.log("最终渲染位置：", temp)
+//             debuglog("最终渲染位置：", temp)
 //
 //             // 点击元素与屏幕底部是否不足以完全显示容器
 //             const newBottom = temp.top + cHeight + offsetBottom;  // 点击元素新的底部坐标
@@ -285,7 +286,7 @@ export default class Popover extends Component<PopoverProps, PopoverState> {
 //             changeOverflow(!visible)
 //
 //         }catch (e) {
-//             console.log("获取坐标出错：", e)
+//             debuglog("获取坐标出错：", e)
 //         }
 //     }
 //

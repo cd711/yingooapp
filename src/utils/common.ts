@@ -205,10 +205,10 @@ export function urlDeCode(params) {
                 obj[key] = paramsVal
             }
         }
-        console.log("解析URL为Object：", obj)
+        debuglog("解析URL为Object：", obj)
         return obj
     } catch (e) {
-        console.log("解析URL为Object出错：", e)
+        debuglog("解析URL为Object出错：", e)
         return {}
     }
 }
@@ -273,7 +273,7 @@ export function clearStorge(key: string) {
 export function backHandlePress() {
     if (Taro.getEnv() === ENV_TYPE.WEB) {
         window.addEventListener("popstate", () => {
-            console.log("监听到返回")
+            debuglog("监听到返回")
         })
     }
 }
@@ -405,7 +405,7 @@ export function getTempDataContainer(key:string,callback:(value:any)=>void){
     }).then((res)=>{
         callback(JSON.parse(res))
     }).catch((e)=>{
-        console.log("获取容器参数出错",e);
+        debuglog("获取容器参数出错",e);
         callback(null)
     });
 }
@@ -472,7 +472,7 @@ export function getFirstTemplateDoc(cid) {
 
         }).catch(e => {
             reject(e)
-            console.log("获取商品分类出错：", e)
+            debuglog("获取商品分类出错：", e)
         })
     })
 }
@@ -829,7 +829,7 @@ export function updateTabBarChannelCode(path: string, code: string = "") {
                 _path = `${path}?channel=${channelCode}`
             }
         }
-        console.log(_path)
+        debuglog(_path)
         window.history.pushState(null, null, _path)
     }
 }
@@ -1019,10 +1019,11 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
         replace: params.replace || false,
         replaceIdx: params.replaceIdx || -1,
     }
+    // eslint-disable-next-line prefer-const
     let {newArr, oldArr, deleteID, extraIds, replace, replaceIdx} = JSON.parse(JSON.stringify(opt));
     // 排除id为空的列表
     const tNewArr = newArr.filter(v => !notNull(v.id));
-    console.log("排重方法：", JSON.parse(JSON.stringify(tNewArr)), JSON.parse(JSON.stringify(oldArr)), 11, deleteID, 222,extraIds)
+    debuglog("排重方法：", JSON.parse(JSON.stringify(tNewArr)), JSON.parse(JSON.stringify(oldArr)), 11, deleteID, 222,extraIds)
     let temp = [];
     if (oldArr.length === 0) {
         temp = tNewArr.map(value => {
@@ -1054,7 +1055,7 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
         const nArr = [...delTemp];
         extraIds.forEach((item) => {
             const idx = nArr.findIndex(v => {
-                console.log("22222222222222-------------：", idx, v.id, item, parseInt(v.id) == parseInt(item))
+                debuglog("22222222222222-------------：", idx, v.id, item, parseInt(v.id) == parseInt(item))
                 return parseInt(v.id) == parseInt(item)
             });
 
@@ -1073,21 +1074,21 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
         temp = [...nArr];
     } else if (replace) {
         if (replaceIdx > -1) {
-            console.log("替换---------开始：", tNewArr)
+            debuglog("替换---------开始：", tNewArr)
             const rArr = JSON.parse(JSON.stringify(oldArr));
             if (rArr[replaceIdx].count > 1) {
-                console.log("替换---------大于1:", rArr[replaceIdx])
+                debuglog("替换---------大于1:", rArr[replaceIdx])
                 rArr[replaceIdx].count -= 1;
                 rArr.push({
                     id: tNewArr[0].id,
                     url: tNewArr[0].url
                 })
             } else {
-                console.log("替换---------等于1:", rArr[replaceIdx])
+                debuglog("替换---------等于1:", rArr[replaceIdx])
                 rArr[replaceIdx].id = tNewArr[0].id;
                 rArr[replaceIdx].url = tNewArr[0].url;
             }
-            console.log("替换---------结果:", rArr)
+            debuglog("替换---------结果:", rArr)
             temp = [...rArr]
         }
     } else {
@@ -1115,7 +1116,7 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
             }
         }
 
-        oldArr.forEach((value, index, array) => {
+        oldArr.forEach((value) => {
             if (!value.find ) {
                 // value.find = false
                 temp.push(value);
@@ -1127,7 +1128,13 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
 
     }
 
-    console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
+    debuglog("产生的新数组：", JSON.parse(JSON.stringify(temp)))
 
     return temp
+}
+
+export function debuglog(arg, ...rest) {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(arg, ...rest)
+    }
 }

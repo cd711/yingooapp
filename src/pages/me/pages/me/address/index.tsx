@@ -7,7 +7,13 @@ import {templateStore} from '../../../../../store/template';
 import { observer, inject } from '@tarojs/mobx';
 import Checkboxs from '../../../../../components/checkbox/checkbox'
 import { userStore } from '../../../../../store/user';
-import {deviceInfo, fixStatusBarHeight, updateChannelCode,getOrderConfimPreviewData} from '../../../../../utils/common';
+import {
+    deviceInfo,
+    fixStatusBarHeight,
+    updateChannelCode,
+    getOrderConfimPreviewData,
+    debuglog
+} from '../../../../../utils/common';
 
 @inject("userStore","templateStore")
 @observer
@@ -50,7 +56,7 @@ export default class Address extends Component<any,{
                 }).exec();
             }).exec();
         }
-        console.log(this.$router.params)
+        debuglog(this.$router.params)
         this.getList();
     }
     private unixOrder = "";
@@ -63,12 +69,10 @@ export default class Address extends Component<any,{
             getOrderConfimPreviewData(this.unixOrder,(resp,has)=>{
                 Taro.hideLoading();
                 if (has) {
-                    console.log("传过的参数是",resp);
                     this.disableAddressId = parseInt(resp.disableAddressId);
                     res = res.map((item)=>{
                         item["isChecked"] = false;
                         if (resp && parseInt(resp.addressId)>0 && parseInt(resp.addressId) == parseInt(item.id)) {
-                            console.log("当前选择的地址",item)
                             item["isChecked"] = true;
                             if (parseInt(resp.disableAddressId) == parseInt(item.id)) {
                                 item["isChecked"] = false;
@@ -108,7 +112,6 @@ export default class Address extends Component<any,{
         if (this.unixOrder == "") {
             return;
         }
-        console.log("哈哈啊",this.unixOrder,this.disableAddressId,item);
         if (parseInt(this.disableAddressId+"") == parseInt(item.id)) {
             Taro.showToast({
                 title:"该地址无法配送!",
@@ -138,13 +141,13 @@ export default class Address extends Component<any,{
                 })
             }
         }
-        
+
     }
 
     render() {
         const { addressList,centerPartyHeight } = this.state;
         // const {t} = this.$router.params;
-        // console.log(addressList)
+        // debuglog(addressList)
         // @ts-ignore
         return (
             <View className='address'>

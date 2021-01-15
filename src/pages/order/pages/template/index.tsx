@@ -10,7 +10,7 @@ import {
     notNull,
     ossUrl,
     urlEncode,
-    getSpecialRouter, updateChannelCode
+    getSpecialRouter, updateChannelCode, debuglog
 } from '../../../../utils/common'
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
@@ -91,7 +91,7 @@ export default class Template extends Component<any, {
 
     fastInitCate = async () => {
         const {c, t} = this.$router.params;
-        console.log(c, t)
+        debuglog(c, t)
         try {
             let res = await api("app.product/cate");
             res = res.map(v => {
@@ -106,7 +106,7 @@ export default class Template extends Component<any, {
             const ta = 0;
             for (let index = 0; index < res.length; index++) {
                 const element = res[index];
-                console.log(parseInt(c) == element.tpl_category_id, element.tpl_category_id, index)
+                debuglog(parseInt(c) == element.tpl_category_id, element.tpl_category_id, index)
                 if (parseInt(c) == element.tpl_category_id) {
                     ca = index
                     break;
@@ -297,7 +297,7 @@ export default class Template extends Component<any, {
                 });
                 Taro.hideLoading();
             }).catch((e) => {
-                console.log(e)
+                debuglog(e)
                 this.setState({
                     loadStatus: LoadMoreEnum.noMore
                 });

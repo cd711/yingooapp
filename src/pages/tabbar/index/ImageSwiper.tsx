@@ -1,7 +1,7 @@
 import Taro, {useState} from "@tarojs/taro";
 import {View, Text, Image, Swiper, SwiperItem, Button} from "@tarojs/components";
 import "./imageSwiper.less";
-import {deviceInfo, ossUrl, RGBAster} from "../../../utils/common";
+import {debuglog, deviceInfo, ossUrl, RGBAster} from "../../../utils/common";
 
 interface ImageSwiperProps {
     item: any;
@@ -48,7 +48,7 @@ const ImageSwiper: Taro.FC<ImageSwiperProps> = props => {
             setColor(`rgba(${colorArr.join(",")}, .5)`)
 
         }).catch(e => {
-            console.log(e)
+            debuglog(e)
         })
     }
 

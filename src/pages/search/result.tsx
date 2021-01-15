@@ -5,6 +5,7 @@ import {AtNavBar} from "taro-ui";
 import {api} from "../../utils/net";
 import LoadMore from "../../components/listMore/loadMore";
 import {
+    debuglog,
     deviceInfo,
     fixStatusBarHeight,
     getSpecialRouter,
@@ -46,7 +47,7 @@ const SearchResult:Taro.FC<any> = () => {
                 setStatus(arr.length === Number(res.total || 0) ? "more" : "noMore")
             }
         } catch (e) {
-            console.log("获取列表出错：", e)
+            debuglog("获取列表出错：", e)
             setStatus("more")
         }
     }

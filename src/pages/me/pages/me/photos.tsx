@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api,options} from "../../../../utils/net";
 import UploadFile from "../../../../components/Upload/Upload";
-import {deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
+import {debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
 import LoadMore from "../../../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
@@ -82,7 +82,7 @@ export default class Photos extends Component<{}, PhotosState> {
         try {
             const res = await api("app.profile/imgs", temp);
             this.total = Number(res.total);
-            console.log(res);
+            debuglog(res);
             this.setState({loading: false});
             let list = [];
             if (opt.type === 0) {
@@ -93,7 +93,7 @@ export default class Photos extends Component<{}, PhotosState> {
                 this.setState({videoList: list, loadStatus: Number(res.total) === list.length ? "noMore" : "more"})
             }
         } catch (e) {
-            console.log("获取图库出错：", e)
+            debuglog("获取图库出错：", e)
             this.setState({loadStatus: "noMore"})
         }
         this.setState({loading: false})
@@ -105,7 +105,7 @@ export default class Photos extends Component<{}, PhotosState> {
     }
 
     uploadFile = async files => {
-        console.log(files)
+        debuglog(files)
         this.getList({start: 0})
     }
 
@@ -129,10 +129,10 @@ export default class Photos extends Component<{}, PhotosState> {
                 temp = {...temp, path: _arr}
                 Taro.setStorageSync(`${userStore.id}_photo_${dayjs().date()}`, JSON.stringify(temp))
             } else {
-                console.log("选图没有本地存储")
+                debuglog("选图没有本地存储")
             }
         } catch (e) {
-            console.log("选图本地存储失败")
+            debuglog("选图本地存储失败")
         }
     }
 
@@ -150,7 +150,7 @@ export default class Photos extends Component<{}, PhotosState> {
     loadMore = () => {
         const {navSwitchActive, imageList, videoList, sortActive} = this.state;
         const len = navSwitchActive === 0 ? imageList.length : videoList.length;
-        console.log(len, this.total)
+        debuglog(len, this.total)
         if (this.total === len) {
             this.setState({loadStatus: "noMore"})
             return
@@ -198,13 +198,13 @@ export default class Photos extends Component<{}, PhotosState> {
             this.setState({selects: [], isEdit: false})
             this.getList({start: 0})
         } catch (e) {
-            console.log("删除出错：", e)
+            debuglog("删除出错：", e)
         }
         this.setState({isOpened: false})
     }
 
     changeSort = (data: PopoverItemClickProps) => {
-        console.log(data.value)
+        debuglog(data.value)
         if (data.value) {
             let sort = {};
             if (typeof data.value === "string") {

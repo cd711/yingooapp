@@ -2,7 +2,7 @@ import "./index.less";
 import Taro, {useEffect, useState} from "@tarojs/taro";
 import {View, Image, Text} from "@tarojs/components";
 import {AtFloatLayout} from "taro-ui";
-import {notNull} from "../../utils/common";
+import {debuglog, notNull} from "../../utils/common";
 
 export interface PopLayoutItemProps {
     title: string;
@@ -24,7 +24,7 @@ const PopLayout: Taro.FC<PopLayoutProps> = props => {
 
     useEffect(() => {
         if (!notNull(defaultActive) && typeof defaultActive === "number") {
-            console.log(defaultActive)
+            debuglog(defaultActive)
             setSelected(defaultActive)
         }
     }, [])

@@ -4,7 +4,7 @@ import Taro, {useState} from "@tarojs/taro";
 import IconFont from "../../../../components/iconfont";
 import UploadFile from "../../../../components/Upload/Upload";
 import "./feedback.less";
-import {deviceInfo, shareAppExtends} from "../../../../utils/common";
+import {debuglog, deviceInfo, shareAppExtends} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 
 const Feedback: Taro.FC<any> = (_) => {
@@ -61,7 +61,7 @@ const Feedback: Taro.FC<any> = (_) => {
             })
             return
         }
-        console.log(console.log(formData))
+        debuglog(formData)
         Taro.showLoading({title: "请稍后..."});
         try {
             await api("app.feedback/add", {
@@ -78,7 +78,7 @@ const Feedback: Taro.FC<any> = (_) => {
             setFormData({...initObj})
         } catch (e) {
             Taro.hideLoading();
-            console.log("提交出错：", e)
+            debuglog("提交出错：", e)
         }
 
     }

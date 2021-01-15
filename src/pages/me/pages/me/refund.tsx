@@ -4,6 +4,7 @@ import { View, Text,Image,Input, Button } from '@tarojs/components'
 import './refund.less'
 import IconFont from '../../../../components/iconfont';
 import { AtNavBar,AtTextarea} from 'taro-ui'
+import {debuglog} from "../../../../utils/common";
 
 export default class Refund extends Component<any,{
     textValue:string
@@ -87,7 +88,7 @@ export default class Refund extends Component<any,{
                     <View className='upload'>
                         {/* @ts-ignore */}
                         <Input type='file' accept='image/*;' className='input' onChange={(e)=>{
-                            console.log(e.detail.value)
+                            debuglog(e.detail.value)
                         }} />
                         <IconFont name='24_jiahao' size={48} color='#D7D7DA' />
                     </View>

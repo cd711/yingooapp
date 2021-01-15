@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import {deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
+import {debuglog, deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -31,7 +31,7 @@ export default class SMS extends Component<any,{
     componentDidMount(){
 
         // setTimeout(()=>{
-        //     console.log(this.input);
+        //     debuglog(this.input);
         //
         // },500)
         if (deviceInfo.env == "h5") {
@@ -51,7 +51,7 @@ export default class SMS extends Component<any,{
             event:status=="l"?"login":"resetpwd"
         }).then((res)=>{
             Taro.hideLoading();
-            console.log(res)
+            debuglog(res)
             if (res && res.time) {
                 this.setState({
                     time:res.time
@@ -92,7 +92,7 @@ export default class SMS extends Component<any,{
                 })
             }).catch((e)=>{
                 Taro.hideLoading();
-                console.log(e)
+                debuglog(e)
                 Taro.showToast({
                     title:e,
                     icon:"none",
@@ -111,7 +111,7 @@ export default class SMS extends Component<any,{
                 })
             }).catch((e)=>{
                 Taro.hideLoading();
-                console.log(e)
+                debuglog(e)
                 Taro.showToast({
                     title:e,
                     icon:"none",
@@ -122,7 +122,7 @@ export default class SMS extends Component<any,{
 
     }
     onCodeInput = ({detail:{value}})=>{
-        // console.log(value)
+        // debuglog(value)
         this.setState({
             smsCode:value
         });

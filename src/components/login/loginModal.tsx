@@ -3,6 +3,7 @@ import {userStore} from "../../store/user";
 import Logins from './login';
 import Fragment from '../Fragment';
 import { observe } from 'mobx';
+import {debuglog} from "../../utils/common";
 
 class LoginModal extends Component<{
     isTabbar?:boolean
@@ -20,7 +21,7 @@ class LoginModal extends Component<{
                     show:change.newValue
                 })
                 if (change.newValue) {
-                    console.log("显示了.....____",Taro.getCurrentPages()[0].route)
+                    debuglog("显示了.....____",Taro.getCurrentPages()[0].route)
                 }
             }
         });
@@ -35,10 +36,10 @@ class LoginModal extends Component<{
         const {showLoginModal} = userStore;
         if (showLoginModal) {
             if (this.props.isTabbar) {
-                
+
                 Taro.showTabBar();
             }
-            
+
             userStore.showLoginModal = false;
         }
     }

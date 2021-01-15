@@ -3,7 +3,7 @@ import {View, Text, Image, ScrollView} from "@tarojs/components";
 import "../../tabbar/index/index.less";
 import IconFont from "../../../components/iconfont";
 import {
-    cutString,
+    cutString, debuglog,
     deviceInfo,
     fixStatusBarHeight,
     getURLParamsStr,
@@ -56,7 +56,7 @@ const Special: Taro.FC<any> = () => {
                 }
 
             }catch (e) {
-                console.log("获取专题列表出错：", e)
+                debuglog("获取专题列表出错：", e)
             }
         }
     }
@@ -73,7 +73,7 @@ const Special: Taro.FC<any> = () => {
             api("app.special/info", {special_id: id}).then(res => {
                 setInfo({...res})
             }).catch(e => {
-                console.log("获取专题信息出错：", e)
+                debuglog("获取专题信息出错：", e)
             })
         }
 
@@ -107,7 +107,7 @@ const Special: Taro.FC<any> = () => {
     }
 
     const viewDetail = (item) => {
-        console.log(item)
+        debuglog(item)
         const {type} = router.params;
         if (notNull(userStore.id) && type === "phone") {
             userStore.showLoginModal = true

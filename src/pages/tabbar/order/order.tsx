@@ -147,7 +147,7 @@ export default class Order extends Component<any,{
             size:40,
             status
         }).then((res)=>{
-            // console.log("list",res)
+            // debuglog("list",res)
             Taro.hideLoading();
             this.setState({
                 data:res

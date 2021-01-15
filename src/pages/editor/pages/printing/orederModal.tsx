@@ -4,6 +4,7 @@ import "./orderModal.less"
 import {AtFloatLayout} from "taro-ui"
 import isEmpty from 'lodash/isEmpty';
 import {flattens, intersection} from "../../../../utils/tool";
+import {debuglog} from "../../../../utils/common";
 
 const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], onSkuChange, onNowBuy}) => {
 
@@ -97,7 +98,7 @@ const OrderModal: Taro.FC<any> = ({data, isShow, onClose, defaultActive = [], on
 
 
     const selectSkuItem = (selectIds: Array<any>, items: Array<Array<any>>) => {
-        console.log("已选择的sku id", selectIds)
+        debuglog("已选择的sku id", selectIds)
         let tt = [];
         for (let index = 0; index < selectIds.length; index++) {
             const element = selectIds[index];

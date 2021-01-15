@@ -16,7 +16,7 @@ import {
     getURLParamsStr,
     setTempDataContainer,
     updateChannelCode,
-    jumpOrderConfimPreview
+    jumpOrderConfimPreview, debuglog
 } from '../../../../utils/common';
 import LoginModal from '../../../../components/login/loginModal';
 import page from '../../../../utils/ext'
@@ -152,7 +152,7 @@ export default class Preview extends Component<any, {
 
 
     onMsg: { (e: MessageEvent): void } = async ({ data }) => {
-        console.log("msg", data);
+        debuglog("msg", data);
         if (!data) {
             return;
         }
@@ -242,10 +242,10 @@ export default class Preview extends Component<any, {
             })
 
             callback && callback();
-            // console.log("api-----",res);
+            // debuglog("api-----",res);
         }).catch((e)=>{
             Taro.hideLoading();
-            console.log(e);
+            debuglog(e);
             Taro.showToast({
                 title:e,
                 icon:"none",
@@ -257,7 +257,7 @@ export default class Preview extends Component<any, {
         api('app.product/info',{
             id:30
         }).then((res)=>{
-            // console.log("aaa",res);
+            // debuglog("aaa",res);
             getTempDataContainer("product_preview_sku",(val)=>{
 
                 if (val && val.sku.length>0) {
@@ -284,7 +284,7 @@ export default class Preview extends Component<any, {
     }
     onEditor = () => {
         const { workId,workInfo, doc} = this.state;
-        console.log(workId, workInfo)
+        debuglog(workId, workInfo)
         Taro.getApp().finishId =  workInfo.id && workInfo.id || workId;
         if (deviceInfo.env === "h5") {
             window.location.replace(updateChannelCode(`/pages/editor/pages/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`));

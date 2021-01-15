@@ -4,7 +4,7 @@ import './orderdetail.less'
 import IconFont from '../../../../components/iconfont';
 import { api } from '../../../../utils/net'
 import isEmpty from 'lodash/isEmpty';
-import {deviceInfo, fixStatusBarHeight, ossUrl, updateChannelCode} from '../../../../utils/common';
+import {debuglog, deviceInfo, fixStatusBarHeight, ossUrl, updateChannelCode} from '../../../../utils/common';
 import dayjs from "dayjs";
 import PayWayModal from '../../../../components/payway/PayWayModal';
 import { templateStore } from '../../../../store/template';
@@ -68,9 +68,9 @@ export default class OrderDetail extends Component<{},{
         }
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
-                console.log(nav_rect)
+                debuglog(nav_rect)
                 Taro.createSelectorQuery().select(".ops").boundingClientRect((status_react)=>{
-                    console.log(status_react)
+                    debuglog(status_react)
                     this.setState({
                         centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-status_react.height
                     });
@@ -221,7 +221,7 @@ export default class OrderDetail extends Component<{},{
                     icon:'none',
                     duration:2000
                 });
-    
+
             }).catch(()=>{
                 this.setState({
                     showDeleteModal:false
@@ -455,7 +455,7 @@ export default class OrderDetail extends Component<{},{
                         </View>
                     </View>:null
                 }
-                
+
                 <View className='order-plist'>
                     <View className='box'>
                         <View className='order-num'>
