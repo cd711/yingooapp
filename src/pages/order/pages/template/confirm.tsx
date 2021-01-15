@@ -811,8 +811,8 @@ export default class Confirm extends Component<any, {
                                                         <Text className='num'>{product.price}</Text>
                                                     </View>
                                                     {
-                                                        this.isPhoto ? <Text className='nums_right'>x{parseInt(product.quantity)}</Text> :
-                                                            <Counter num={parseInt(product.quantity)}
+                                                        this.isPhoto ? <Text className='nums_right'>x{parseInt(product.quantity)>0?parseInt(product.quantity):1}</Text> :
+                                                            <Counter num={parseInt(product.quantity)>0?parseInt(product.quantity):1}
                                                                      onButtonClick={(e) => {
                                                                          this.onCounterChange(e, data.prepay_id, item.pre_order_id, product);
                                                                      }}/>

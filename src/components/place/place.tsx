@@ -350,7 +350,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                                 {
                                     productType == "customized" || quoteType === "photo" ? null : <View className='buy-number'>
                                         <Text className='title'>购买数量</Text>
-                                        <Counter num={buyNumber} max={maxBuyNum == 0 ? 999 : maxBuyNum}
+                                        <Counter num={buyNumber>0?buyNumber:1} max={maxBuyNum == 0 ? 999 : maxBuyNum}
                                                     onButtonClick={onBuyNumberChange}/>
                                     </View>
                                 }
