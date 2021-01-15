@@ -66,7 +66,7 @@ export default class Photos extends Component<{}, PhotosState> {
 
         const opt = {
             start: data.start || 0,
-            size: data.size || 15,
+            size: data.size || 30,
             type: data.type || this.state.navSwitchActive,
             loadMore: data.loadMore || false
         };
