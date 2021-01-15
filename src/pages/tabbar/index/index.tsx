@@ -671,7 +671,7 @@ class Index extends Component<any, IndexState> {
                                 const onlyThreePhone = phoneArr.length > 3 ? phoneArr.slice(0, 3) : [];
 
                                 return item.area_type === "product"
-                                    ? <Fragment key={index+""}>
+                                    ? <View key={index+""}>
                                         {
                                             len === 1
                                                 ? <View className="single_index_product_item fix_all_margin">
@@ -746,9 +746,9 @@ class Index extends Component<any, IndexState> {
                                                     </View>
                                                 </View>
                                         }
-                                    </Fragment>
+                                    </View>
                                     : item.area_type === "tpl_product"
-                                        ?  <Fragment>
+                                        ?  <View>
                                             {
                                                 phoneArr.length === 1
                                                     ? <View className='temp-warp' key={index + ""}>
@@ -882,7 +882,7 @@ class Index extends Component<any, IndexState> {
                                                     </View>
                                                     : null
                                             }
-                                        </Fragment>
+                                        </View>
                                         : item.area_type === "coupon"
                                             ? <Fragment>
                                                 {
@@ -957,7 +957,7 @@ class Index extends Component<any, IndexState> {
                                                             ))
                                                         }
                                                     </View>
-                                                    : item.area_type === "title" && item.display === "fixed"
+                                                    : (item.area_type === "title" && item.display === "fixed")
                                                         ? <View className="remmond_your_love fix_all_margin" key={`${index}`}>
                                                             {item.clist[0].thumb_image
                                                                 ? <Image src={item.clist[0].thumb_image} className="love" />
@@ -967,7 +967,7 @@ class Index extends Component<any, IndexState> {
                                                             ? <View className="index_banner_container fix_all_margin" key={`${index}`}>
                                                                 <BannerSwiper banners={item.clist} onItemClick={this.onBannerClick} />
                                                             </View>
-                                                            : item.area_type === "search" && item.display !== "top"
+                                                            : (item.area_type === "search" && item.display !== "top")
                                                                 ? <View className='top-search' key={index.toString()}
                                                                         style={{
                                                                             background: "transparent",
@@ -986,7 +986,7 @@ class Index extends Component<any, IndexState> {
                                                                         <Text className='placeholders'>搜索海量模板</Text>
                                                                     </View>
                                                                 </View>
-                                                                : null
+                                                                : <View />
                             })
                         }
                     </View>
