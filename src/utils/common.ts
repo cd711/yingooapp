@@ -1019,6 +1019,7 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
         replace: params.replace || false,
         replaceIdx: params.replaceIdx || -1,
     }
+    // eslint-disable-next-line prefer-const
     let {newArr, oldArr, deleteID, extraIds, replace, replaceIdx} = JSON.parse(JSON.stringify(opt));
     // 排除id为空的列表
     const tNewArr = newArr.filter(v => !notNull(v.id));
@@ -1115,7 +1116,7 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
             }
         }
 
-        oldArr.forEach((value, index, array) => {
+        oldArr.forEach((value) => {
             if (!value.find ) {
                 // value.find = false
                 temp.push(value);
@@ -1130,4 +1131,10 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
     console.log("产生的新数组：", JSON.parse(JSON.stringify(temp)))
 
     return temp
+}
+
+export function debuglog(arg, ...rest) {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(arg, ...rest)
+    }
 }

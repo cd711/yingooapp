@@ -548,9 +548,10 @@ const PrintChange: Taro.FC<any> = () => {
         for (const item of photos) {
             num += parseInt(item.count)
         }
-        if (num >= photoStore.photoProcessParams.max) {
+        const allowCount = setMealSuccess.current ? parseInt(currentSetMeal.value) : photoStore.photoProcessParams.max;
+        if (num >= allowCount) {
             Taro.showToast({
-                title: `最多打印${photoStore.photoProcessParams.max}张`,
+                title: setMealSuccess.current ? `当前套餐只能选择${allowCount}张` : `最多打印${allowCount}张`,
                 icon: "none"
             })
             return
@@ -1262,6 +1263,7 @@ const PrintChange: Taro.FC<any> = () => {
                         <PhotosEle editSelect
                                 onClose={closeSelectPhoto}
                                 count={photoStore.photoProcessParams.imageCount}
+                                max={setMealSuccess.current ? parseInt(currentSetMeal.value) - pictureSize : photoStore.photoProcessParams.max}
                                 defaultSelect={photoStore.photoProcessParams.usefulImages}
                                 onPhotoSelect={onPhotoSelect}
                         />

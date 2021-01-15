@@ -195,7 +195,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     imageSelect = (id: any, url, attr) => {
-        const {_editSelect, _count} = this.state;
+        const {_editSelect, _count, _max} = this.state;
 
         if (_editSelect) {
             const editSelectImgs = this.state.editSelectImgs;
@@ -211,16 +211,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     Taro.showToast({title: `只能选择${_count}张`, icon: "none"})
                     return;
                 }
-                if (editSelectImgIds.length >= 100) {
-                    Taro.showToast({title: `最多选择100张`, icon: "none"})
+                if (editSelectImgIds.length >= _max) {
+                    Taro.showToast({title: `最多选择${_max}张`, icon: "none"})
                     return;
+                } else {
+                    editSelectImgs.push(url);
+                    editSelectImgIds.push(id);
+                    editSelectAttr.push(attr)
                 }
-                editSelectImgs.push(url);
-                editSelectImgIds.push(id);
-                editSelectAttr.push(attr)
             }
             this.setState({editSelectImgs, editSelectImgIds, editSelectAttr})
-            return
         }
     }
 

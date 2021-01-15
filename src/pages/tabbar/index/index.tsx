@@ -19,7 +19,7 @@ import {
     sleep,
     updateLocalCoupon,
     urlEncode,
-    setTempDataContainer, updateChannelCode, updateTabBarChannelCode
+    setTempDataContainer, updateChannelCode, updateTabBarChannelCode, debuglog
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -241,6 +241,7 @@ class Index extends Component<any, IndexState> {
 
     componentDidMount() {
 
+        debuglog(1,2,3,4,5,6)
         console.log(deviceInfo)
         if (process.env.TARO_ENV != 'h5') {
             this.setState({

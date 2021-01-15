@@ -304,6 +304,7 @@ const Index: Taro.FC<any> = () => {
                             onClose={closeSelectPhoto}
                             defaultSelect={photoStore.photoProcessParams.usefulImages}
                             count={photoStore.photoProcessParams.imageCount}
+                            max={photoStore.photoProcessParams.max}
                             onPhotoSelect={onPhotoSelect} />
                     </View>
                     : null
