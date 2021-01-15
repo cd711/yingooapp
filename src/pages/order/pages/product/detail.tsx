@@ -418,7 +418,8 @@ export default class Login extends Component<{}, {
 
         // 查询是否有套餐价
         const setMealIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "setmeal");
-
+        const sizeIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "photosize");
+        const pixSize = data.attrItems[sizeIdx].value || "";
         try {
             await photoStore.setActionParamsToServer(getUserKey(), {
                 photo: {
@@ -429,7 +430,8 @@ export default class Login extends Component<{}, {
                 usefulImages: removeDuplicationForArr({
                     newArr: ids.map((v, idx) => ({id: v, url: imgs[idx]})),
                     oldArr: photoStore.photoProcessParams.usefulImages
-                })
+                }),
+                pictureSize: pixSize
             })
             Taro.hideLoading()
             const tmp = {
