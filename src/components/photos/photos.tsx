@@ -156,9 +156,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         });
     }
 
+    // 在排除已使用的图片后可能存在数量不够导致的不能上拉加载更多的问题
     getListAgain = () => {
         const {imageList} = this.state;
         const arr = imageList.filter(v => !notNull(v.display));
+        if (arr.length !== 25) {
+            this.getList({
+                start: arr.length,
+                size: 25 - arr.length
+            })
+        }
 
     }
 
@@ -166,7 +173,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         if (deviceInfo.env === "weapp") {
             this.initPropsToState()
             this.getList({start: 0}).then(() => {
-                // this.filterUsefulImages()
+                this.getListAgain()
             })
         }
     }
@@ -175,7 +182,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     componentDidMount() {
         this.initPropsToState()
         this.getList({start: 0}).then(() => {
-            // this.filterUsefulImages()
+            this.getListAgain()
         })
     }
 
