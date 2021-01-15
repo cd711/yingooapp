@@ -1,5 +1,12 @@
+const testApiUrl = "https://test.playbox.yingoo.com/api/";
+let productionUrl = "https://m.playbox.yingoo.com/api/";
+if (process.env.TARO_ENV == "h5") {
+    // @ts-ignore
+    // eslint-disable-next-line no-undef
+    productionUrl = common_config.url;
+}
 const config = {
-    apiUrl: `https://${process.env.NODE_ENV !== 'production' ? "test" : "test"}.playbox.yingoo.com/api/`,
+    apiUrl: process.env.NODE_ENV !== 'production' ?testApiUrl:productionUrl,
     // apiUrl:"https://yin.gaozhenzhen.com/api/",
     // 静态资源地址
     sourceUrl: "https://cdn.playbox.yingoo.com/",

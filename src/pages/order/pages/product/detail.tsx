@@ -208,6 +208,7 @@ export default class Login extends Component<{}, {
 
                 debuglog(res.attrGroup)
                 if (pid != "" && pid != undefined && pid != null) {
+                    //处理加购商品
                     getTempDataContainer(`${id}_${pid}`, (value) => {
                         if (value != null) {
                             debuglog(value);
@@ -228,6 +229,10 @@ export default class Login extends Component<{}, {
                             if (value && value.selectSku) {
                                 select_ids = value.selectSku.value_id.split(",");
                             }
+                            let currentAddBuyGoods = [];
+                            if (value.mainProduct) {
+                                currentAddBuyGoods = value.mainProduct.merge_products.filter((item)=>item.product.id == res.id);
+                            }
                             this.setState({
                                 defalutSkuIds: select_ids,
                                 skuName: value && value.selectSku ? value.selectSku.value.map((item, index) => {
@@ -238,7 +243,8 @@ export default class Login extends Component<{}, {
                                     return item;
                                 }) : [],
                                 maxBuyNum: value && value.currentAddBuyItem && value.currentAddBuyItem.max_quantity ? parseInt(value.currentAddBuyItem.max_quantity + "") : 0,
-                                data: res
+                                data: res,
+                                buyTotal: currentAddBuyGoods.length == 1?parseInt(currentAddBuyGoods[0].quantity+""):1
                             });
                         }
                     })
@@ -591,7 +597,7 @@ export default class Login extends Component<{}, {
                                 <Text className='smy'>￥</Text>
                                 <Text className='num'>{data && data.price ? data.price:"0.00"}</Text>
                                 {
-                                   data && data.skus && data.skus.length==1? <Text className='start'>起</Text> :null
+                                   data && data.skus && data.skus.length>1? <Text className='start'>起</Text> :null
                                 }
                             </View>
                             <View className='ap'>
@@ -715,11 +721,12 @@ export default class Login extends Component<{}, {
                     </View>
                 </View>
                 <PlaceOrder maxBuyNum={maxBuyNum}
+                            buyNumber={this.state.buyTotal}
                             productType={data && data.product_type ? data.product_type : ""}
                             defaultSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
                             isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
                             onBuyNumberChange={(n) => {
-                                debuglog(n)
+
                                 this.setState({
                                     buyTotal: n,
                                     // defalutSkuIds: []

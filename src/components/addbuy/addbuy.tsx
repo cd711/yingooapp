@@ -17,18 +17,24 @@ const AddBuy: Taro.FC<{
     onDetailClick:()=>void;
 }> = ({product,mainProducts,isChecked,onItemClick,onCounterChange,onDetailClick}) => {
     const [selectSku,setSelectSku] = useState(null);
+    const [number,setNumber] = useState(1);
     useEffect(()=>{
         const currentP=mainProducts.merge_products.find((obj)=>obj.product.id==product.id);
-        if (currentP && currentP.sku != null) {
-            setSelectSku(currentP.sku);
+        // console.log("当前sku_______",currentP.sku)
+        if(currentP){
+            setNumber(parseInt(currentP.quantity+""))
         }
-        
+        if (currentP && currentP.sku) {
+            setSelectSku(currentP.sku)
+        } else {
+            setSelectSku(null)
+        }
     },[mainProducts])
 
-    return  <View className='xy_add_buy' onClick={()=>{
+    return  <View className='xy_add_buy'>
+            <Checkboxs isChecked={isChecked} disabled onCheckedClick={()=>{
                 onItemClick && onItemClick()
-            }}>
-            <Checkboxs isChecked={isChecked} disabled/>
+            }}/>
             <Image className='pre_image' src={ossUrl(product && product.thumb_image?product.thumb_image:"",0)} />
 
             <View className='xy_add_buy_center'>
@@ -64,7 +70,10 @@ const AddBuy: Taro.FC<{
                         </View>
                     </View>
                     {
-                        isChecked?<Counter num={1} max={product.max_quantity} onButtonClick={onCounterChange}/>:<Button className='add_buy_btn'>加购</Button>
+                        isChecked?<Counter num={number} max={product.max_quantity} onButtonClick={onCounterChange}/>:<Button className='add_buy_btn'  onClick={(e)=>{
+                            e.stopPropagation();
+                            onItemClick && onItemClick()
+                        }}>加购</Button>
                     }
                 </View>
             </View>
