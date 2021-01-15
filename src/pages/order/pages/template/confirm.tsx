@@ -1,5 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
+import {Button, Image, Input, ScrollView, Text, View} from '@tarojs/components'
 import './confirm.less';
 import IconFont from '../../../../components/iconfont';
 import {api,options} from '../../../../utils/net'
@@ -120,8 +120,9 @@ export default class Confirm extends Component<any, {
                 if (this.isPhoto) {
                     try {
                         await photoStore.getServerParams({setLocal: true});
-                        console.log(photoStore.photoProcessParams.changeUrlParams)
-                        params = photoStore.photoProcessParams.changeUrlParams
+                        console.log(resp,JSON.stringify(photoStore.photoProcessParams.changeUrlParams))
+                        params = JSON.parse(JSON.stringify(photoStore.photoProcessParams.changeUrlParams));
+                        Object.assign(params,resp)
                     } catch (e) {
                         console.log("读取参数出错：", e)
         
@@ -130,6 +131,7 @@ export default class Confirm extends Component<any, {
                     params = resp
                 }
                 const {tplid, model, orderid, cartIds, parintImges}: any = params;
+                console.log("orderid",params);
                 if (orderid) {
                     this.checkOrder(orderid);
                 } else {
@@ -162,10 +164,11 @@ export default class Confirm extends Component<any, {
                         if (resp && isEmptyX(resp.orderid)) {
                             Object.assign(resp,{
                                 orderid:res.prepay_id,
-                                addressId:res.address && res.address.id?res.address.id:0,
                                 disableAddressId:isEmptyX(res.address) && !isEmptyX(data["address_id"]) ? data["address_id"]:0
                             })
                         }
+                        
+                        Object.assign(resp,{addressId:res.address && res.address.id?res.address.id:0});
                         addOrderConfimPreviewData(this.unixOrder,resp)
                         this.filterUsedTicket(res.orders);
                         templateStore.address = res.data;
@@ -243,6 +246,21 @@ export default class Confirm extends Component<any, {
     componentDidShow() {
         const {order}: any = this.$router.params;
         this.unixOrder = order;
+        if (isEmptyX(order)) {
+            Taro.showToast({
+                title:'参数错误，请稍后再试!',
+                icon:'none',
+                duration:1500
+            });
+            setTimeout(() => {
+                if (Taro.getCurrentPages().length>1) {
+                    Taro.navigateBack();
+                } else {
+                    jumpUri("/pages/tabbar/index/index",true)
+                }
+            }, 1500);
+            return;
+        }
         getOrderConfimPreviewData(this.unixOrder,async (resp,has)=>{
             if (has) {
                 const {page} = resp;
@@ -275,7 +293,6 @@ export default class Confirm extends Component<any, {
                         return;
                     }
                 }
-                
                 const {orderid} = resp;
                 let prepay_id = orderid;
                 if (!orderid) {
@@ -288,6 +305,8 @@ export default class Confirm extends Component<any, {
                         address_id: templateStore.address.id
                     }).then((res) => {
                         Taro.hideLoading();
+                        Object.assign(resp,{addressId:res.address && res.address.id?res.address.id:0});
+                        addOrderConfimPreviewData(this.unixOrder,resp)
                         this.filterUsedTicket(res.orders)
                         this.setState({
                             data: this.handleData(res)
@@ -898,6 +917,10 @@ export default class Confirm extends Component<any, {
                                         <Text
                                             className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "00.00"}</Text>
                                     </View>
+                                </View>
+                                <View className='goods-item'>
+                                    <Text className='title'>留言</Text>
+                                    <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={()=>}/>
                                 </View>
                             </Fragment>
                         ))

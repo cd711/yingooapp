@@ -63,11 +63,12 @@ export default class Address extends Component<any,{
             getOrderConfimPreviewData(this.unixOrder,(resp,has)=>{
                 Taro.hideLoading();
                 if (has) {
-                    
+                    console.log("传过的参数是",resp);
                     this.disableAddressId = parseInt(resp.disableAddressId);
                     res = res.map((item)=>{
                         item["isChecked"] = false;
                         if (resp && parseInt(resp.addressId)>0 && parseInt(resp.addressId) == parseInt(item.id)) {
+                            console.log("当前选择的地址",item)
                             item["isChecked"] = true;
                             if (parseInt(resp.disableAddressId) == parseInt(item.id)) {
                                 item["isChecked"] = false;
