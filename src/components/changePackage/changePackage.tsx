@@ -2,7 +2,6 @@ import Taro from '@tarojs/taro'
 import {Button, ScrollView, Text, View, Image} from '@tarojs/components'
 import './changePackage.less'
 import IconFont from '../iconfont';
-import Checkboxs from '../checkbox/checkbox';
 
 
 interface SetMealSelectorModalProps {
@@ -99,7 +98,7 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
                                             <View className='vote_left'>
                                                 {item.disable
                                                     ? <Image src={require("../../source/disable.png")} className="disable_img" />
-                                                    : <Checkboxs isChecked={item.id == current.id} />
+                                                    : <IconFont name={item.id == current.id ? "22_yixuanzhong" : "22_touming-weixuanzhong"} size={44} />
                                                 }
                                                 <View className="vote_num_txt">
                                                     <Text className={`vote_offset ${item.disable ? "delete_line" : ""}`} style={{
@@ -109,7 +108,9 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
                                                     </Text>
                                                 </View>
                                                 {
-                                                    current.value == item.value ? <Text className="current_txt">当前套餐</Text> : null
+                                                    parseInt(currentSetMeal.value) == parseInt(item.value)
+                                                        ? <Text className="current_txt">当前套餐</Text>
+                                                        : null
                                                 }
                                                 {
                                                     item.disable
