@@ -12,6 +12,8 @@ interface SetMealSelectorModalProps {
     currentSetMeal: {[key: string]: any};
     // 所有套餐列表
     setMealData: any[];
+    // 当前图片及数量的总数
+    count: number;
     // 关闭回调
     onClose?: () => void;
     // 点击确定的回调
@@ -22,10 +24,24 @@ interface SetMealSelectorModalProps {
 
 const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
 
-    const {visible, currentSetMeal, setMealData = [], onChange, onClose, onConfirm} = props;
+    const {visible, currentSetMeal, setMealData = [], onChange, onClose, onConfirm, count} = props;
 
     const [current, setCurrent] = Taro.useState(currentSetMeal);
     const [modIndex, setIndex] = Taro.useState(0);
+    const [data, setData] = Taro.useState([]);
+
+    Taro.useEffect(() => {
+        // 检测是否禁用
+        let arr = [];
+        arr = setMealData.map(value => {
+            return {
+                ...value,
+                disable: count > parseInt(value.value)
+            }
+        });
+        setData([...arr])
+
+    }, [setMealData])
 
     Taro.useEffect(() => {
         const idx = setMealData.findIndex(v => v.id == current.id);
@@ -33,6 +49,9 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
     }, [])
 
     const _onChange = (item, idx) => {
+        if (item.disable === true) {
+            return
+        }
         setCurrent({...item});
         setIndex(idx)
         onChange && onChange(item, idx)
@@ -77,8 +96,9 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
                         <ScrollView scrollY className='vote_list_scroll'>
                             <View className='more_vote_list'>
                                 {
-                                    setMealData.map((item, index) => (
+                                    data.map((item, index) => (
                                         <View className={`vote_item ${item.id == current.id ? "vote_item_active" : ""}`}
+                                              style={{opacity: item.disable === true ? 0.5 : 1}}
                                               key={index.toString()}
                                               onClick={() => _onChange(item, index)}>
                                             <View className='vote_left'>

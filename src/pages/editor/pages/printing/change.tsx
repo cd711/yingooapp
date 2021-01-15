@@ -1273,6 +1273,7 @@ const PrintChange: Taro.FC<any> = () => {
                     ? setMealSuccess.current
                         ? <SetMealSelectorModal
                             visible={discountStatus}
+                            count={pictureSize}
                             currentSetMeal={currentSetMeal}
                             setMealData={setMealArr}
                             onClose={() => setDiscountStatus(false)}
