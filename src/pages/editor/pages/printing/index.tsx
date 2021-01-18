@@ -128,9 +128,17 @@ const Index: Taro.FC<any> = () => {
         })
     }
 
-    const selectSize = (id, attr) => {
+    const selectSize = async (id, attr) => {
+        console.log("当前选择的尺寸：", id, attr)
         setChecked(Number(id));
         setCheckAttr(attr)
+        try {
+            await photoStore.updateServerParams(photoStore.printKey, {
+                pictureSize: attr
+            })
+        } catch (e) {
+
+        }
     }
 
     async function renderParams(path: any[], photo = []) {
