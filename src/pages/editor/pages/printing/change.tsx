@@ -29,6 +29,8 @@ import Discount from "../../../../components/discount";
 import PlaceOrder from "../../../../components/place/place";
 import SetMealSelectorModal from "../../../../components/changePackage/changePackage";
 import TipModal from "../../../../components/tipmodal/TipModal";
+import FillStyleModal from "./fillStyleModal";
+import FillStyleChange from "./fillStyleChangeModal";
 
 
 const PrintChange: Taro.FC<any> = () => {
@@ -51,6 +53,10 @@ const PrintChange: Taro.FC<any> = () => {
     const [animating, setAnimating] = useState(false);
     const _imgstyle = Taro.useRef("");
     const sizeArr = Taro.useRef<any[]>([]);
+    const [fillStyleStatus, setFillStyleStatus] = useState(false);
+
+    const [fillStyle, setFillStyle] = useState<{style: "fill" | "allowBlank", exclude: boolean}>({style: "fill", exclude: true});
+    const [changeFill, setFillStatus] = useState(false);
     // 只有从商品详情页跳转过来才会为true
     const [detailStatus, setDetailStatus] = useState(false);
     const skuArr = useRef([]);
@@ -127,16 +133,11 @@ const PrintChange: Taro.FC<any> = () => {
         })
     }
 
-    function transformPx(obj: { [key: string]: any }) {
-        const temp = {};
-        for (const k in obj) {
-            temp[k] = `${obj[k]}px`
-        }
-        return temp
-    }
-
     // 根据选择的尺寸来计算每个Item的高度
-    function computedHeightAccordingToSize(imgSize: string, containerH: number): { width: number, height: number } {
+    function computedHeightAccordingToSize(imgSize: string, containerH: number, radio: number = 1, style: "fill" | "allowBlank" = "fill"): { width: number, height: number } {
+        debuglog("-----------------分割线-------------------")
+
+        // w: 304, h: 406
         const obj = {
             width: 152,
             height: 203
@@ -144,62 +145,77 @@ const PrintChange: Taro.FC<any> = () => {
         if (notNull(imgSize) || imgSize.indexOf("*") === -1) {
             return obj
         }
-        const imgW = parseInt(imgSize.split("*")[0]);
-        const imgH = parseInt(imgSize.split("*")[1]);
+
+        let imgW = parseInt(imgSize.split("*")[0]);
+        let imgH = parseInt(imgSize.split("*")[1]);
+        debuglog("图片原始宽高：", {imgW, imgH})
         const containerW = itemStyle.width;
+        const scaleC = containerW / containerH;
 
-        // if ((imgW / imgH) > 1) {
-        //     // 横图
-        //     debuglog("横图：", size, imgSize, containerW, containerH)
-        //
-        // } else if ((imgW / imgH) < 1) {
-        //     // 竖图
-        //     debuglog("竖图：", size, imgSize, containerW, containerH)
-        //     obj.height = containerH;
-        //     obj.width = imgW * (containerW / containerH);
-        // } else {
-        //     debuglog("方图：", size, imgSize, containerW, containerH)
-        //     // 等宽高, 方图
-        // }
+        // 是否发生旋转
+        const hasRotate = checkHasRotate(imgSize);
 
-        if (imgW / imgH >= containerW / containerH)    //如果原图片的比例大于或等于需要适应的比例
-        {
-            if (imgW > containerW)    //如果原图片宽度大于容器的宽度，那么就按宽度压缩
-            {
-                obj.width = containerW;
-                obj.height = (imgH * containerW) / imgW;
-
-            } else {
-                obj.width = imgW;
-                obj.height = imgH;
-
+        if (style === "fill") {
+            if (hasRotate) {
+                return {
+                    width: containerH,
+                    height: itemStyle.width
+                }
             }
-            if (obj.height > containerH)  //如果压缩后的图片高度仍然大于容器高度，那么再继续将图片宽度/高度压缩
-            {
-                obj.width = obj.width * containerH / obj.height;
-                obj.height = containerH;
-            }
-        } else //如果原图片比例小于需要适应的比例
-        {
-            if (imgH > containerH)       //如果原图片高度大于需要容器的高度，那么就按高度压缩
-            {
-                obj.height = containerH;
-                obj.width = (imgW * containerH) / imgH;
-
-            } else {
-                obj.width = imgW;
-                obj.height = imgH;
-            }
-            if (obj.width > containerW)  //如果压缩后的图片宽度仍然大于容器宽度，那么再继续将图片宽度/高度压缩
-            {
-                obj.height = obj.height * containerW / obj.width;
-                obj.width = containerW;
+            return {
+                width: itemStyle.width,
+                height: containerH
             }
         }
 
+        if (hasRotate) {
+            const [w, h] = [imgH, imgW]
+            imgW = w;
+            imgH = h;
+            debuglog("发生交换的值：", {imgW, imgH})
+        }
+
+        const scaleI = imgW / imgH;
+
+        if (scaleC > scaleI) {
+            // 说明图片比较高 以高度为准
+            debuglog("说明图片比较高 以高度为准：", scaleC, scaleI)
+            obj.height = radio * containerH;
+            obj.width = containerH * scaleI;
+        } else if (scaleC < scaleI) {
+            // 说明图片比较宽 以宽度为准
+            debuglog("说明图片比较宽 以宽度为准：", scaleC, scaleI)
+            obj.width = radio * containerW;
+            obj.height = containerW / scaleI;
+        } else {
+            debuglog("说明图片等宽高为准：", scaleC, scaleI)
+            obj.width = radio * containerW;
+            obj.height = containerW / scaleI
+        }
         debuglog("图片计算的值：", obj)
         return obj
     }
+
+    useEffect(() => {
+        setFillStyleStatus(true)
+    }, [])
+
+    // 根据改变的相框展示方式(fillStyle)作出更新
+    useEffect(() => {
+        let arr = [...photos];
+        arr = arr.map(val => {
+            const {width, height} = computedHeightAccordingToSize(val.attr, itemStyle.height, 1, fillStyle.style)
+            if (fillStyle.exclude && val.edited === true) {
+                return val
+            }
+            return {
+                ...val,
+                width,
+                height
+            }
+        });
+        setPhotos([...arr])
+    }, [fillStyle])
 
     useEffect(() => {
         if (deviceInfo.env !== "h5") {
@@ -605,20 +621,32 @@ const PrintChange: Taro.FC<any> = () => {
         })
     }
 
+    // 检测是否需要旋转
     function checkHasRotate(attribute: string): boolean {
         if (router.params.id) {
             const pixArr = sizeArr.current;
             const imgPix = attribute.split("*");
+            // 容器宽高比
             const num = Number(pixArr[0]) / Number(pixArr[1]);
+            // 图片宽高比
             const cNum = Number(imgPix[0]) / Number(imgPix[1])
-            debuglog("旋转计算：", cNum > 1, num < 1, cNum < 1, num > 1)
+            debuglog("旋转计算：", {imgPix, cNum, num})
             /**
              * pixArr: 打印尺寸, imgPix：图片尺寸
              * 打印尺寸 大于 1，就判定为打印的是横图，图片尺寸不满足条件（也就是图片尺寸小于1）的话就旋转
              * 或
              * 打印尺寸小于1，就能判定为竖图，但是图片尺寸不满足条件的话（也就是图片尺寸大于1）就旋转
              */
-            return cNum > 1 && num < 1 || cNum < 1 && num > 1
+            // return cNum > 1 && num < 1 || cNum < 1 && num > 1
+            let rotate = false;
+            if (num > 1) {
+                rotate = cNum < 1;
+            } else if (num < 1) {
+                if (cNum > 1) {
+                    rotate = true
+                }
+            }
+            return rotate
         }
         return false
     }
@@ -743,13 +771,14 @@ const PrintChange: Taro.FC<any> = () => {
                 selectPhoto()
             }
 
-            const containerH = itemStyle.width * (parseInt(pixArr[0]) / parseInt(pixArr[1]))
-            setItemStyle(prev => {
-                return {
-                    ...prev,
-                    height: containerH
-                }
-            })
+            const containerH = itemStyle.width * (parseInt(pixArr[1]) / parseInt(pixArr[0]));
+            // containerW / containerH
+            const obj = {
+                width: itemStyle.width,
+                height: containerH
+            }
+            debuglog("默认初始化的列表宽高：", obj)
+            setItemStyle({...obj})
 
             debuglog("path:", params.photo.path)
             params.photo.path = params.photo.path.map((v) => {
@@ -758,7 +787,7 @@ const PrintChange: Taro.FC<any> = () => {
                 if (allowRotate) {
                     arr[2].val = 90;
                 }
-                const {width, height} = computedHeightAccordingToSize(v.attr, containerH)
+                const {width, height} = computedHeightAccordingToSize(v.attr, containerH, 1, fillStyle.style)
                 return {
                     ...v,
                     url: v.url,
@@ -784,6 +813,12 @@ const PrintChange: Taro.FC<any> = () => {
     const onSetMealChange = (item, idx) => {
         debuglog("当前选择的套餐：", item, idx);
         setCurrentMeal({...item})
+    }
+
+    const onFillStyleChange = (style, exclude) => {
+        debuglog(style, exclude)
+        setFillStyle({style, exclude});
+        setFillStatus(false)
     }
 
     const debounceUpdateCount = useDebounceFn(async (idx, num) => {
@@ -1154,11 +1189,13 @@ const PrintChange: Taro.FC<any> = () => {
                         arr[2].val = 90;
                     }
                     debuglog("处理后的旋转度：", arr[2], allowRotate, sizeArr.current, v.attr)
+                    const {width, height} = computedHeightAccordingToSize(v.attr, itemStyle.height, 1, fillStyle.style)
                     return {
                         ...v,
                         hasRotate: allowRotate,
                         osx: getTailoringImg(arr),
                         url: v.url,
+                        width, height
                     }
                 })
             }
@@ -1239,7 +1276,7 @@ const PrintChange: Taro.FC<any> = () => {
     const getScrollHeight = () => {
         return deviceInfo.env === "h5"
             ? deviceInfo.windowHeight - 110 + "px"
-            : deviceInfo.windowHeight - 110 + deviceInfo.statusBarHeight + deviceInfo.menu.height + "px"
+            : deviceInfo.windowHeight - 200 + deviceInfo.statusBarHeight - deviceInfo.menu.height + "px"
     }
 
     const debounceScroll = useDebounceFn(() => {
@@ -1275,8 +1312,17 @@ const PrintChange: Taro.FC<any> = () => {
                       color='#121314' title="照片冲印列表" border fixed
                       leftIconType={{value: 'chevron-left', color: '#121314', size: 24}}
             />
-            <View className="fixed_top_price_container" style={{
+            <View className="fixed_top_fill_style_container" style={{
                 top: `${deviceInfo.env === "weapp" ? deviceInfo.menu.bottom + 4 : 44}px`
+            }}>
+                <Text className="txt">显示方式</Text>
+                <View className="act_txt" onClick={() => setFillStatus(true)}>
+                    <Text className="a_txt">{fillStyle.style === "fill" ? "填充相纸" : "留白相纸"}</Text>
+                    <View className="arrow" />
+                </View>
+            </View>
+            <View className="fixed_top_price_container" style={{
+                top: `${deviceInfo.env === "weapp" ? deviceInfo.menu.bottom + 48 : 88}px`
             }}>
                 <View className="left">
                     <Text className="txt">{setMealTxt.title}</Text>
@@ -1306,12 +1352,12 @@ const PrintChange: Taro.FC<any> = () => {
                       style={
                           deviceInfo.env === "weapp"
                               ? {
-                                  paddingTop: deviceInfo.statusBarHeight + 56 + "px",
+                                  paddingTop: deviceInfo.statusBarHeight + 95 + "px",
                                   paddingBottom: 22 + "px"
                               }
                               : {
                                 paddingBottom: "88px",
-                                paddingTop: 56
+                                paddingTop: 95
                               }
                       }
                 >
@@ -1335,15 +1381,17 @@ const PrintChange: Taro.FC<any> = () => {
                                               height: `${itemStyle.height}px`
                                           }}
                                     >
-                                        <Image src={value.hasRotate ? `${value.url}?${value.osx}` : value.url}
-                                               className="p_img"
-                                               mode="aspectFill"
-                                               onClick={() => onEditClick(value, index)}
-                                               style={{
-                                                   // transform: value.hasRotate ? "rotateZ(90deg)" : "none",
-                                                   width: `${value.width}px`,
-                                                   height: `${value.height}px`
-                                               }}
+                                        <Image
+                                            // src={value.hasRotate ? `${value.url}?${value.osx}` : value.url}
+                                            src={value.url}
+                                            className="p_img"
+                                            mode="aspectFill"
+                                            onClick={() => onEditClick(value, index)}
+                                            style={{
+                                                transform: value.hasRotate ? "rotateZ(90deg)" : "none",
+                                                width: `${value.width}px`,
+                                                height: `${value.height}px`
+                                            }}
                                         />
                                     </View>
                                     <View className="print_change_count">
@@ -1443,6 +1491,21 @@ const PrintChange: Taro.FC<any> = () => {
                         okText={setMealArr.length > 1 ? "更换套餐" : "知道了"}
                         onCancel={() => showTip(false)}
                         onOK={() => setMealArr.length > 1 ? setDiscountStatus(true) : showTip(false)}
+                    />
+                    : null
+            }
+            {
+                fillStyleStatus
+                    ? <FillStyleModal onClose={() => setFillStyleStatus(false)} />
+                    : null
+            }
+            {
+                changeFill
+                    ? <FillStyleChange
+                        visible={changeFill}
+                        defaultFill={fillStyle}
+                        onClose={() => setFillStatus(false)}
+                        onConfirm={onFillStyleChange}
                     />
                     : null
             }
