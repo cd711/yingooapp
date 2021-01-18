@@ -104,11 +104,7 @@ const PrintChange: Taro.FC<any> = () => {
             if (photoVisible) {
                 setPhotoPickerVisible(false)
             }
-            try {
-                await photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
-            } catch (e) {
-
-            }
+            photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
         }
     }
 
