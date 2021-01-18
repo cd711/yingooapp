@@ -135,6 +135,14 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     // 根据选择的尺寸来计算每个Item的高度
+    /**
+     * 3寸：756*1051  --->  161*223
+     * 4寸：898*1205  --->  161*216
+     * 5寸：1051*1500  --->  161*229
+     * 6寸：1205*1795  --->  161*239
+     * 7寸：1500*2102  --->  161*225
+     * 8寸：1795*2398  --->  161*215
+     */
     function computedHeightAccordingToSize(imgSize: string, containerH: number, radio: number = 1, style: "fill" | "allowBlank" = "fill"): { width: number, height: number } {
         debuglog("-----------------分割线-------------------")
 
