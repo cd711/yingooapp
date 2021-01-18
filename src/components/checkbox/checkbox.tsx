@@ -9,8 +9,9 @@ const Checkbox: Taro.FC<{
     className?:string;
     disabled?:boolean;
     isChecked:boolean;
-    onChange?:Function
-}> = ({className,disabled=false,isChecked,onChange}) => {
+    onChange?:Function;
+    onCheckedClick?:()=>void;
+}> = ({className,disabled=false,isChecked,onChange,onCheckedClick}) => {
 
     const [checked,setChecked] = useState(isChecked);
 
@@ -25,7 +26,9 @@ const Checkbox: Taro.FC<{
     },[isChecked])
 
     // 22_yixuanzhong
-    return  <View className={`xy-checkbox ${className}`} onClick={()=>{
+    return  <View className={`xy-checkbox ${className}`} onClick={(e)=>{
+                e.stopPropagation();
+                onCheckedClick && onCheckedClick();
                 if (!disabled) {
                     setChecked(!checked);
                     onChange && onChange(!checked)

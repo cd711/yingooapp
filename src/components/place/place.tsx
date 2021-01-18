@@ -39,7 +39,8 @@ interface OderParams {
     //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
     onPriceChange?: (price: string, marketPrice: string) => void;
     // 引用类型，"photo" | "base"
-    quoteType?: "photo" | "base"
+    quoteType?: "photo" | "base",
+    buyNumber?: number
 }
 
 const PlaceOrder: Taro.FC<OderParams> = props => {
@@ -52,6 +53,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
         showOkButton = false,
         defaultSelectIds,
         quoteType = "base",
+        buyNumber = 1,
         onClose, onBuyNumberChange,
         onSkuChange, onAddCart, onNowBuy, onOkButtonClick,
         onNowButtonClick, onNamesChange, onPriceChange
@@ -348,8 +350,8 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                                 {
                                     productType == "customized" || quoteType === "photo" ? null : <View className='buy-number'>
                                         <Text className='title'>购买数量</Text>
-                                        <Counter num={1} max={maxBuyNum == 0 ? 999 : maxBuyNum}
-                                                 onCounterChange={onBuyNumberChange}/>
+                                        <Counter num={buyNumber>0?buyNumber:1} max={maxBuyNum == 0 ? 999 : maxBuyNum}
+                                                    onButtonClick={onBuyNumberChange}/>
                                     </View>
                                 }
                             </View>

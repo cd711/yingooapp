@@ -19,6 +19,7 @@ import wx from 'weixin-js-sdk'
 // if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
 //   require('nerv-devtools')
 // }
+
 options.apiUrl = config.apiUrl;
 options.sourceUrl = config.sourceUrl;
 options.editorUrl = config.editorUrl;

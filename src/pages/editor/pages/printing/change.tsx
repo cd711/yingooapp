@@ -503,7 +503,22 @@ const PrintChange: Taro.FC<any> = () => {
                                      * 先从skuVal（已知的所有sku规格ID）中找到对应套餐的下标位(idx)，以便循环生成sku列表，去匹配对应的大项sku信息
                                      * setMealSkuIdArr：已知的所有套餐ID数组
                                      */
-                                    const idx = skuVal.findIndex(ci => ci == setMealList[0].id);
+                                    debuglog("skuVal：", skuVal, setMealList)
+                                    // const idx = skuVal.findIndex(ci => ci == setMealList[0].id);
+                                    let idx = -1;
+                                    for (let j = 0; j < skuVal.length; j++) {
+                                        let match = false;
+                                        for (let m = 0; m < setMealList.length; m++) {
+                                            if (parseInt(setMealList[m].id) == parseInt(skuVal[j])) {
+                                                match = true;
+                                                break;
+                                            }
+                                        }
+                                        if (match) {
+                                            idx = j;
+                                            break;
+                                        }
+                                    }
                                     debuglog("查找的套餐sku对应的下标位置：", idx);
                                     const setMealSkuIdArr = setMealList.map(v => v.id);
                                     const tempArr = [];
@@ -572,7 +587,7 @@ const PrintChange: Taro.FC<any> = () => {
                             index: idx,
                             numIdx,
                             setMealIdx,
-                            pictureSize: serPar.attrItems[idx][0].value,
+                            // pictureSize: serPar.attrItems[idx][0].value,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
                             max: serPar.max,
@@ -878,6 +893,7 @@ const PrintChange: Taro.FC<any> = () => {
             page: "photo",
             parintImges: photos.map(v => {
                 const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
+                debuglog("当前的尺寸参数：", pixArr)
                 if (v.hasRotate && v.hasRotate === true) {
                     return {
                         url: v.url,
@@ -1067,6 +1083,7 @@ const PrintChange: Taro.FC<any> = () => {
             page: "photo",
             parintImges: photos.map(v => {
                 const pixArr = pix.split("*");
+                debuglog("选择的宽高：", pixArr)
                 if (v.hasRotate && v.hasRotate === true) {
                     return {
                         url: v.url,
@@ -1238,6 +1255,16 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }
 
+    const showMoreMeal = () => {
+        if (setMealSuccess.current) {
+            if (setMealArr.length > 1) {
+                setDiscountStatus(true)
+            }
+            return
+        }
+        setDiscountStatus(true)
+    }
+
     return (
         <View className="printing_container">
             <LoginModal isTabbar={false}/>
@@ -1257,16 +1284,24 @@ const PrintChange: Taro.FC<any> = () => {
                 <View className="right">
                     {
                         discountInfo.status
-                            ? <View className="more_price_info" onClick={() => setDiscountStatus(true)}>
+                            ? <View className="more_price_info" onClick={showMoreMeal}>
                                 <Text className="red_txt">{setMealTxt.desc}</Text>
-                                <IconFont name="24_xiayiye" color="#FF4966" size={28}/>
+                                {
+                                    setMealSuccess.current && setMealArr.length > 1
+                                        ? <IconFont name="24_xiayiye" color="#FF4966" size={28} />
+                                        : null
+                                }
+                                {
+                                    distCountList.length > 1
+                                        ? <IconFont name="24_xiayiye" color="#FF4966" size={28} />
+                                        : null
+                                }
                             </View>
                             : null
                     }
                 </View>
             </View>
-            <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}}
-                        onScroll={onScroll}>
+            <ScrollView scrollY enableFlex className="printing_scroll_container" style={{height: getScrollHeight()}} onScroll={onScroll}>
                 <View className="printing_change_main"
                       style={
                           deviceInfo.env === "weapp"
@@ -1275,8 +1310,8 @@ const PrintChange: Taro.FC<any> = () => {
                                   paddingBottom: 22 + "px"
                               }
                               : {
-                                  paddingBottom: "88px",
-                                  paddingTop: 56
+                                paddingBottom: "88px",
+                                paddingTop: 56
                               }
                       }
                 >
@@ -1343,7 +1378,7 @@ const PrintChange: Taro.FC<any> = () => {
                         {
                             !notNull(describe)
                                 ? <View className="top">
-                                    <Image src={require("../../../../source/waing.png")} className="top_icon"/>
+                                    <Image src={require("../../../../source/waing.png")} className="top_icon" />
                                     <Text className="v_txt">{describe}</Text>
                                 </View>
                                 : null
@@ -1403,11 +1438,11 @@ const PrintChange: Taro.FC<any> = () => {
                     ? <TipModal
                         isShow={tipStatus}
                         title="超出打印照片数量"
-                        tip={`当前套餐照片数量最多打印${currentSetMeal.value}张照片，是否更改套餐打印更多照片？`}
+                        tip={`当前套餐照片数量最多打印${currentSetMeal.value}张照片${setMealArr.length > 1 ? "，是否更改套餐打印更多照片？" : ""}`}
                         cancelText="取消"
-                        okText="更换套餐"
+                        okText={setMealArr.length > 1 ? "更换套餐" : "知道了"}
                         onCancel={() => showTip(false)}
-                        onOK={() => setDiscountStatus(true)}
+                        onOK={() => setMealArr.length > 1 ? setDiscountStatus(true) : showTip(false)}
                     />
                     : null
             }

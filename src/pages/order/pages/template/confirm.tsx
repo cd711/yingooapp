@@ -274,17 +274,20 @@ export default class Confirm extends Component<any, {
                         if (value != null && value != undefined && value) {
                             const currentAddBuyItem = value.currentAddBuyItem
                             debuglog("加购回来的参数",value)
-                            if (value.isOk && currentAddBuyItem.checked == false) {
-                                this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
-                            }else{
-                                const temp = value.mainProduct.merge_products.filter((item)=>{
-                                    return item.product.id == currentAddBuyItem.id
-                                })
-                                debuglog("temp",temp)
-                                this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+                            if (value.isOk) {
+                                if (currentAddBuyItem.checked == false) {
                                     this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
-                                });
+                                }else{
+                                    const temp = value.mainProduct.merge_products.filter((item)=>{
+                                        return item.product.id == currentAddBuyItem.id
+                                    })
+                                    debuglog("temp",temp)
+                                    this.delBuyProduct(value.prepay_id,value.pre_order_id,value.product_id,temp[0].id,()=>{
+                                        this.addBuyProduct(value.pre_order_id, value.product_id, value.selectSkuId, value.buyTotal);
+                                    });
+                                }
                             }
+
                         }
                         setTempDataContainer(this.tempContainerKey,null);
                     })
@@ -607,7 +610,8 @@ export default class Confirm extends Component<any, {
     onAddBuyItemDetailClick = (mainProduct, preOrderId, mainProductId, item) => {
         debuglog("onAddBuyItemDetailClick")
         const {data} = this.state;
-        const subItem = mainProduct.merge_products.find((obj) => obj.product.id == item.id)
+        const subItem = mainProduct.merge_products.find((obj) => obj.product.id == item.id);
+        console.log("当前选的——————————",subItem)
         setTempDataContainer(`${item.id}_${mainProductId}`, {
             prepay_id: data.prepay_id,
             pre_order_id: preOrderId,
@@ -667,7 +671,7 @@ export default class Confirm extends Component<any, {
                     mainProduct:mainProduct,
                     currentAddBuyItem:item,
                     hasOldSku:item.sku != null ?true:false,
-                    selectSku:subItem && subItem.sku ? subItem.sku : null
+                    selectSku:subItem && subItem.sku ? subItem.sku : null,
                 },(is)=>{
                     if (is) {
                         this.tempContainerKey = `${item.id}_${mainProductId}`;
@@ -807,8 +811,8 @@ export default class Confirm extends Component<any, {
                                                         <Text className='num'>{product.price}</Text>
                                                     </View>
                                                     {
-                                                        this.isPhoto ? <Text className='nums_right'>x{parseInt(product.quantity)}</Text> :
-                                                            <Counter num={parseInt(product.quantity)}
+                                                        this.isPhoto ? <Text className='nums_right'>x{parseInt(product.quantity)>0?parseInt(product.quantity):1}</Text> :
+                                                            <Counter num={parseInt(product.quantity)>0?parseInt(product.quantity):1}
                                                                      onButtonClick={(e) => {
                                                                          this.onCounterChange(e, data.prepay_id, item.pre_order_id, product);
                                                                      }}/>
