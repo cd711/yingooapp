@@ -169,14 +169,14 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     }
 
-    componentWillMount() {
-        if (deviceInfo.env === "weapp") {
-            this.initPropsToState()
-            this.getList({start: 0}).then(() => {
-                this.getListAgain()
-            })
-        }
-    }
+    // componentWillMount() {
+    //     if (deviceInfo.env === "weapp") {
+    //         this.initPropsToState()
+    //         this.getList({start: 0}).then(() => {
+    //             this.getListAgain()
+    //         })
+    //     }
+    // }
 
 
     componentDidMount() {
