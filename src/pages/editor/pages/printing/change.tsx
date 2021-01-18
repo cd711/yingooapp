@@ -99,10 +99,15 @@ const PrintChange: Taro.FC<any> = () => {
     const setMealSuccess = useRef(false);
 
 
-    const backPressHandle = () => {
+    const backPressHandle = async () => {
         if (deviceInfo.env === "h5") {
             if (photoVisible) {
                 setPhotoPickerVisible(false)
+            }
+            try {
+                await photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
+            } catch (e) {
+
             }
         }
     }
