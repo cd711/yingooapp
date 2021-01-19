@@ -1,0 +1,102 @@
+.doc_origin{
+    display: flex;
+    flex-direction: column;
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 88px;
+        width: 100%;
+        background: #FFF;
+        position: relative;
+        .left{
+            padding-left: 32px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
+            .title{
+                font-size: 36px;
+                font-weight: 500;
+                color: #121314;
+            }
+        }
+    }
+    .origin_title{
+        padding: 64px 40px 40px;
+        .txt{
+            font-size: 44px;
+            font-weight: 500;
+            color: #121314;
+        }
+    }
+    .origin_way_list{
+        padding: 0 40px;
+        .origin_way_item{
+            height: 250px;
+            margin-bottom: 32px;
+            border-radius: 32px;
+            position: relative;
+            .box{
+                display: flex;
+                flex-direction: column;
+                padding-left: 32px;
+                padding-top: 48px;
+                
+                .wechat_chat{
+                    display: flex;
+                    font-size: 36px;
+                    font-weight: 500;
+                    color: #FFFFFF; 
+                    line-height: 52px;
+                }
+                .from_chat{
+                    display: flex;                  
+                    font-size: 24px;
+                    font-weight: 400;
+                    color: #FFFFFF;
+                    line-height: 40px;
+                    margin-bottom: 20px;
+                }
+                .push_right{
+                    width: 56px;
+                    height: 56px;
+                    background: rgba(255, 255, 255, 0.15);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .icon{
+                        width: 40px;
+                        height: 40px;
+                    }
+                }
+            }
+            .t_wechat{
+                position: absolute;
+                width: 64px;
+                height: 64px;
+                top: 36px;
+                right: 128px;
+            }
+            .b_wechat{
+                position: absolute;
+                width: 128px;
+                height: 110px;
+                top: 140px;
+                right: 48px;
+            }
+        }
+        .origin_way_item_green{
+            background: #42CC8B;
+        }
+        .origin_way_item_orange{
+            background: #FF8040;
+        }
+    }
+
+}
