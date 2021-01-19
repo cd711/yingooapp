@@ -66,6 +66,7 @@ const PrintChange: Taro.FC<any> = () => {
     // 图片数量状态   1:低于{min}张、2：刚好满足{min}/{max}的值、3：最大{max}的值、4：{min}{max}值相等
     const [countStatus, setCountStatus] = useState<1 | 2 | 3 | 4>(1);
     // 根据当前的总数要展示的SKU价格
+    // @ts-ignore
     const [price, setPrice] = useState<string[]>(["0.00"]);
     const [scrolling, setScrolling] = useState<boolean>(false);
     const [tipStatus, showTip] = useState(false);
