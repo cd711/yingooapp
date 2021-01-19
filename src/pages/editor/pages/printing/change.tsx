@@ -100,12 +100,13 @@ const PrintChange: Taro.FC<any> = () => {
     const setMealSuccess = useRef(false);
 
 
-    const backPressHandle = async () => {
+    const backPressHandle = async (e) => {
+        console.log(222222222222222, "浏览器返回：", e, router.path)
         if (deviceInfo.env === "h5") {
             if (photoVisible) {
                 setPhotoPickerVisible(false)
             }
-            photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
+            // photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
         }
     }
 
@@ -214,7 +215,22 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     useEffect(() => {
-        setFillStyleStatus(true)
+        try {
+            const res = Taro.getStorageSync(`${userStore.id}_fillStyleGuide`);
+            if (!res || res == -1) {
+                setFillStyleStatus(true)
+                Taro.setStorage({
+                    key: `${userStore.id}_fillStyleGuide`,
+                    data: 1
+                })
+            }
+        } catch (e) {
+            setFillStyleStatus(true);
+            Taro.setStorage({
+                key: `${userStore.id}_fillStyleGuide`,
+                data: 1
+            })
+        }
     }, [])
 
     // 根据改变的相框展示方式(fillStyle)作出更新
@@ -231,7 +247,10 @@ const PrintChange: Taro.FC<any> = () => {
                 height
             }
         });
-        setPhotos([...arr])
+        setPhotos([...arr]);
+        photoStore.updateServerParams(photoStore.printKey, {
+            fillStyle
+        })
     }, [fillStyle])
 
     useEffect(() => {
@@ -616,7 +635,6 @@ const PrintChange: Taro.FC<any> = () => {
                     }
 
                     if (idx > -1 && !opt.onlyInitPrice) {
-
                         // 向本地存储attrItems
                         await photoStore.setActionParamsToServer(getUserKey(), {
                             photo: obj,
@@ -624,7 +642,6 @@ const PrintChange: Taro.FC<any> = () => {
                             index: idx,
                             numIdx,
                             setMealIdx,
-                            // pictureSize: serPar.attrItems[idx][0].value,
                             pictureSize,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
@@ -776,7 +793,10 @@ const PrintChange: Taro.FC<any> = () => {
         debuglog("读取的photo params：", params)
 
         const pix = photoStore.photoProcessParams.pictureSize;
-        _imgstyle.current = photoStore.photoProcessParams.photoStyle
+        _imgstyle.current = photoStore.photoProcessParams.photoStyle;
+        if (!notNull(photoStore.photoProcessParams.fillStyle) && Object.keys(photoStore.photoProcessParams.fillStyle).length > 0) {
+            setFillStyle({...photoStore.photoProcessParams.fillStyle})
+        }
 
         debuglog("尺寸参数：", pix)
         if (!notNull(pix)) {
@@ -1280,18 +1300,14 @@ const PrintChange: Taro.FC<any> = () => {
         jumpToPrintEditor(obj)
     }
 
-    const onBackHandle = async () => {
+    const onBackHandle = () => {
         if (photoStore.photoProcessParams.limit) {
             Taro.navigateBack({
                 delta: 2
             });
             return
         }
-        try {
-            await photoStore.updateServerParams(getUserKey(), new PhotoParams())
-        } catch (e) {
-
-        }
+        photoStore.updateServerParams(getUserKey(), new PhotoParams())
         if (Taro.getCurrentPages().length > 1) {
             Taro.navigateBack();
         } else {
