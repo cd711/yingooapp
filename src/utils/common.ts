@@ -1138,3 +1138,31 @@ export function debuglog(arg, ...rest) {
         console.log(arg, ...rest)
     }
 }
+
+/**
+ * 根据选择的尺寸SKU子项ID查找对应尺寸的大小
+ * @param idArr 子项ID数组
+ * @param sizeItems 尺寸数组
+ */
+export function findPictureSizeForID(idArr: any[], sizeItems: any[]): string {
+    debuglog("findSizeForID传进来的参数：", idArr, sizeItems)
+    let size = "";
+    if (notNull(idArr) || idArr.length === 0) {
+        return sizeItems[0].value
+    }
+    for (let i = 0; i < sizeItems.length; i++) {
+        let has = false;
+        for (let j = 0; j < idArr.length; j++) {
+            if (parseInt(idArr[j]) === parseInt(sizeItems[i].id)) {
+                has = true;
+                break;
+            }
+        }
+        if (has) {
+            size = sizeItems[i].value;
+            break;
+        }
+    }
+    debuglog("findSizeForID找到的尺寸值：", size)
+    return size
+}

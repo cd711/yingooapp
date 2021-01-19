@@ -6,7 +6,7 @@ import IconFont from "../../../../components/iconfont";
 import {
     debounce,
     debuglog,
-    deviceInfo,
+    deviceInfo, findPictureSizeForID,
     getURLParamsStr,
     getUserKey,
     jumpOrderConfimPreview,
@@ -51,8 +51,8 @@ const PrintChange: Taro.FC<any> = () => {
     const [skuInfoID, setSkuInfoID] = useState<any>(0);
     const [photoVisible, setPhotoPickerVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
-    const _imgstyle = Taro.useRef("");
-    const sizeArr = Taro.useRef<any[]>([]);
+    const _imgstyle = useRef("");
+
     const [fillStyleStatus, setFillStyleStatus] = useState(false);
 
     const [fillStyle, setFillStyle] = useState<{style: "fill" | "allowBlank", exclude: boolean}>({style: "fill", exclude: true});
@@ -113,7 +113,7 @@ const PrintChange: Taro.FC<any> = () => {
         setCountStatus(status)
     }
 
-    // 检查图片的数量
+    // 检查图片的数量是否在套餐允许的最大数量内
     function inspectionQuantityLimit(arr = []) {
         return new Promise<boolean>((resolve, _) => {
             if (setMealSuccess.current) {
@@ -508,6 +508,7 @@ const PrintChange: Taro.FC<any> = () => {
                     const setMealIdx = serPar.attrGroup.findIndex(v => v.special_show === "setmeal");
                     debuglog("查找的下标：", idx, numIdx, setMealIdx);
 
+                    let pictureSize = "";
                     // if (opt.isSetMeal && setMealIdx > -1) {
                     //
                     //     updateSetMealArr([...serPar.attrItems[setMealIdx]])
@@ -522,6 +523,7 @@ const PrintChange: Taro.FC<any> = () => {
                             if (opt.isSetMeal) {
                                 const setMealList = [...serPar.attrItems[setMealIdx]];
                                 const skuVal = tArr[0].value.split(",");
+                                pictureSize = findPictureSizeForID(skuVal, serPar.attrItems[idx])
                                 if (skuVal.length === serPar.attrGroup.length) {
                                     /**
                                      * 查询套餐下对应的价格，形成一个包含价格的新的套餐列表
@@ -601,6 +603,8 @@ const PrintChange: Taro.FC<any> = () => {
                                 })
                             }
                         }
+                    } else {
+                        pictureSize = findPictureSizeForID(obj.sku.split(","),  serPar.attrItems[idx])
                     }
 
                     if (idx > -1 && !opt.onlyInitPrice) {
@@ -613,6 +617,7 @@ const PrintChange: Taro.FC<any> = () => {
                             numIdx,
                             setMealIdx,
                             // pictureSize: serPar.attrItems[idx][0].value,
+                            pictureSize,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
                             max: serPar.max,
@@ -633,7 +638,7 @@ const PrintChange: Taro.FC<any> = () => {
     // 检测是否需要旋转
     function checkHasRotate(attribute: string): boolean {
         if (router.params.id) {
-            const pixArr = sizeArr.current;
+            const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
             const imgPix = attribute.split("*");
             // 容器宽高比
             const num = Number(pixArr[0]) / Number(pixArr[1]);
@@ -769,7 +774,6 @@ const PrintChange: Taro.FC<any> = () => {
         if (!notNull(pix)) {
             const pixArr = pix.split("*");
             debuglog("格式化素组：", pixArr)
-            sizeArr.current = pixArr;
             const tArr = [
                 {key: "w", val: pixArr[0]},
                 {key: "h", val: pixArr[1]},
@@ -1184,10 +1188,11 @@ const PrintChange: Taro.FC<any> = () => {
             }
 
             let exArr = [...arr];
-            if (sizeArr.current[0] && sizeArr.current[1]) {
+            const sizeArr = photoStore.photoProcessParams.pictureSize.split("*");
+            if (sizeArr[0] && sizeArr[1]) {
                 const tArr = [
-                    {key: "w", val: sizeArr.current[0]},
-                    {key: "h", val: sizeArr.current[1]},
+                    {key: "w", val: sizeArr[0]},
+                    {key: "h", val: sizeArr[1]},
                     {key: "r", val: 0},
                 ];
                 exArr = arr.map(v => {
@@ -1197,17 +1202,25 @@ const PrintChange: Taro.FC<any> = () => {
                     if (allowRotate) {
                         arr[2].val = 90;
                     }
-                    debuglog("处理后的旋转度：", arr[2], allowRotate, sizeArr.current, v.attr)
-                    const {width, height} = computedHeightAccordingToSize(v.attr, itemStyle.height, 1, fillStyle.style)
                     return {
                         ...v,
                         hasRotate: allowRotate,
                         osx: getTailoringImg(arr),
                         url: v.url,
-                        width, height
                     }
                 })
             }
+
+            exArr = exArr.map(value => {
+                if (fillStyle.exclude && value.edited === true) {
+                    return value
+                }
+                const {width, height} = computedHeightAccordingToSize(value.attr, itemStyle.height, 1, fillStyle.style);
+                return {
+                    ...value,
+                    width, height
+                }
+            })
 
             const allow = await inspectionQuantityLimit(exArr);
             if (allow) {

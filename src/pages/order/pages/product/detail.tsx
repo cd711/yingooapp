@@ -15,7 +15,7 @@ import {
     sleep, updateChannelCode,
     urlEncode,
     isEmptyX,
-    jumpOrderConfimPreview, removeDuplicationForArr, debuglog
+    jumpOrderConfimPreview, removeDuplicationForArr, debuglog, findPictureSizeForID
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -419,22 +419,6 @@ export default class Login extends Component<{}, {
         // 查询是否有套餐价
         const setMealIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "setmeal");
         const sizeIdx = data.attrGroup.findIndex(v => !notNull(v.special_show) && v.special_show === "photosize");
-        let skuSizeIdx = -1;
-        for (let i = 0; i < data.attrItems[sizeIdx].length; i ++) {
-            let has = false;
-            for (let j = 0; j < sku.length; j++) {
-                if (parseInt(sku) == parseInt(data.attrItems[sizeIdx][i].id)) {
-                    has = true;
-                    break;
-                }
-            }
-            if (has) {
-                skuSizeIdx = i;
-                break;
-            }
-        }
-        const pixSize = data.attrItems[sizeIdx][skuSizeIdx].value || "";
-        debuglog("当前打印的尺寸参数：", pixSize)
         try {
             await photoStore.setActionParamsToServer(getUserKey(), {
                 photo: {
@@ -446,7 +430,7 @@ export default class Login extends Component<{}, {
                     newArr: ids.map((v, idx) => ({id: v, url: imgs[idx]})),
                     oldArr: photoStore.photoProcessParams.usefulImages
                 }),
-                pictureSize: pixSize
+                pictureSize: findPictureSizeForID(sku, data.attrItems[sizeIdx])
             })
             Taro.hideLoading()
             const tmp = {
@@ -504,9 +488,6 @@ export default class Login extends Component<{}, {
             showPicSelector,
             toast,
             toastStatus,
-            goodsPrice,
-            selectSkuId,
-            goodsMarketPrice
         } = this.state;
         const image: Array<any> = data && data.image && data.image.length > 0 ? data.image : [];
         // const flag_text: Array<any> = data && !notNull(data.flag_text) ? data.flag_text : [];
