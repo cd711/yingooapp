@@ -100,12 +100,12 @@ const PrintChange: Taro.FC<any> = () => {
     const setMealSuccess = useRef(false);
 
 
-    const backPressHandle = async () => {
+    const backPressHandle = async (e) => {
         if (deviceInfo.env === "h5") {
             if (photoVisible) {
                 setPhotoPickerVisible(false)
             }
-            photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
+            // photoStore.updateServerParams(photoStore.printKey, new PhotoParams())
         }
     }
 
@@ -231,7 +231,10 @@ const PrintChange: Taro.FC<any> = () => {
                 height
             }
         });
-        setPhotos([...arr])
+        setPhotos([...arr]);
+        photoStore.updateServerParams(photoStore.printKey, {
+            fillStyle
+        })
     }, [fillStyle])
 
     useEffect(() => {
@@ -616,7 +619,6 @@ const PrintChange: Taro.FC<any> = () => {
                     }
 
                     if (idx > -1 && !opt.onlyInitPrice) {
-
                         // 向本地存储attrItems
                         await photoStore.setActionParamsToServer(getUserKey(), {
                             photo: obj,
@@ -624,7 +626,6 @@ const PrintChange: Taro.FC<any> = () => {
                             index: idx,
                             numIdx,
                             setMealIdx,
-                            // pictureSize: serPar.attrItems[idx][0].value,
                             pictureSize,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
@@ -776,7 +777,10 @@ const PrintChange: Taro.FC<any> = () => {
         debuglog("读取的photo params：", params)
 
         const pix = photoStore.photoProcessParams.pictureSize;
-        _imgstyle.current = photoStore.photoProcessParams.photoStyle
+        _imgstyle.current = photoStore.photoProcessParams.photoStyle;
+        if (!notNull(photoStore.photoProcessParams.fillStyle) && Object.keys(photoStore.photoProcessParams.fillStyle).length > 0) {
+            setFillStyle({...photoStore.photoProcessParams.fillStyle})
+        }
 
         debuglog("尺寸参数：", pix)
         if (!notNull(pix)) {
