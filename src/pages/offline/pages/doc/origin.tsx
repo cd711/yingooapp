@@ -12,7 +12,7 @@ import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../.
 @observer
 export default class Origin extends Component<any,{
     tipModalShow:boolean;
-    centerPartyHeight:number
+    centerPartyHeight:number;
 }> {
 
     config: Config = {
@@ -24,7 +24,8 @@ export default class Origin extends Component<any,{
         super(props);
         this.state = {
             tipModalShow:false,
-            centerPartyHeight:500
+            centerPartyHeight:500,
+
         }
     }
     componentDidMount(){
@@ -84,6 +85,7 @@ export default class Origin extends Component<any,{
                             type:"file",
                             success:(res)=>{
                                 console.log(res);
+
                             }
                         })
                     }}>
@@ -97,7 +99,9 @@ export default class Origin extends Component<any,{
                         <Image className='t_wechat' src={require("../../source/t_wechat.png")} />
                         <Image className='b_wechat' src={require("../../source/wechat_chat.png")} />
                     </View>
-                    <View className='origin_way_item origin_way_item_orange'>
+                    <View className='origin_way_item origin_way_item_orange' onClick={()=>{
+
+                    }}>
                         <View className='box'>
                             <Text className='wechat_chat'>我的文档</Text>
                             <Text className='from_chat'>从我的文档库中上传</Text>
