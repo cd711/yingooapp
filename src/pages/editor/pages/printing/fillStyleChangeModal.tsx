@@ -3,6 +3,7 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Image, Text} from "@tarojs/components";
 import IconFont from "../../../../components/iconfont";
 import {notNull} from "../../../../utils/common";
+import {options} from "../../../../utils/net";
 
 interface FillStyleChangeProps {
     onClose?: () => void;
@@ -14,8 +15,8 @@ const FillStyleChange: Taro.FC<FillStyleChangeProps> = props => {
 
     const {onClose, visible, onConfirm, defaultFill} = props;
     const data = [
-        {key: 1, name: "留白相纸", value: "allowBlank", icon: require("../../../../source/bai.png")},
-        {key: 2, name: "填充相纸", value: "fill", icon: require("../../../../source/tianchong.png")},
+        {key: 1, name: "留白相纸", value: "allowBlank", icon: `${options.sourceUrl}appsource/bai.png`},
+        {key: 2, name: "填充相纸", value: "fill", icon: `${options.sourceUrl}appsource/tianchong.png`},
     ];
 
     const [current, setCurrent] = useState<"allowBlank" | "fill">("fill");
