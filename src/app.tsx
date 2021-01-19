@@ -132,6 +132,12 @@ class App extends Component {
                     // 'pages/me/refund',
                 ]
             },
+            {
+                root:"pages/offline",
+                pages:[
+                    "pages/doc/origin"
+                ]
+            },
         ],
         window: {
             navigationStyle: "custom",

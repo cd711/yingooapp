@@ -86,21 +86,23 @@ export default class Preview extends Component<any, {
         }
     }
     componentDidMount() {
+
+        // else {
+        //     editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
+        //     window.addEventListener("message", this.onMsg);
+        // }
+    }
+    componentDidShow() {
         const {workid} = this.$router.params;
         if (workid && parseInt(workid)>0) {
             this.getWorkInfo(workid);
             this.setState({
                 workId:parseInt(workid)
             })
-        } else {
-            editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
-            window.addEventListener("message", this.onMsg);
-        }
-    }
-    componentDidShow() {
-        if (userStore.isLogin) {
-            setTempDataContainer("product_preview_sku", null);
-        }
+        } 
+        // if (userStore.isLogin) {
+        //     setTempDataContainer("product_preview_sku", null);
+        // }
     }
 
     getWorkInfo = (id) => {

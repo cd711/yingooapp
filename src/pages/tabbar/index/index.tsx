@@ -583,8 +583,21 @@ class Index extends Component<any, IndexState> {
             this.loadRefresh()
         }
     }
-
-
+    /**
+     * 线下打印文档
+     * @param {*}
+     * @return {*}
+     */    
+    offlinePrintDoc = () => {
+        // Taro.scanCode({
+        //     success:(res)=>{
+        //         console.log("扫描结果",res);
+        //     }
+        // })
+        Taro.navigateTo({
+            url:"/pages/offline/pages/doc/origin"
+        })
+    }
     render() {
         const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresherTriggered, isTop, topFix} = this.state;
         return (
@@ -911,7 +924,7 @@ class Index extends Component<any, IndexState> {
                                                             </View>
                                                         </View>
                                                         <View className="read_fast_link_wrap">
-                                                            <View className="read_fast_link" onClick={this.uncShow}>
+                                                            <View className="read_fast_link" onClick={this.offlinePrintDoc}>
                                                                 <Image src={`${options.sourceUrl}appsource/cnxh.svg`} className="fast_img" mode="widthFix" />
                                                                 <View className="info">
                                                                     <Text className="h2">当面冲印文档</Text>
