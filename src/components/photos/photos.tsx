@@ -402,6 +402,25 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 scrollWithAnimation
                                 ref={r => this.scrollView = r}
                                 onScrollToLower={this.loadMore}>
+                        <View className="list_filter">
+                            {
+                                navSwitchActive === 0 && imageList.length > 0
+                                    ? <View className="filter_txt" onClick={() => this.setState({visible: true})}>
+                                        <Text className="tit">{active > -1 ? this.popoverItem[active].title : "排序"}</Text>
+                                        <Image src={require("../../source/down.png")} className="filter_icon" />
+                                    </View>
+                                    : <View />
+                            }
+                            <View className="filter_switch_bar">
+                                {tabs.map((value, index) => (
+                                    <View className={`filter_switch_item ${index === navSwitchActive ? "active" : ""}`}
+                                          key={index.toString()}
+                                          onClick={() => this.changeType(index)}>
+                                        <Text className="txt">{value}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
                         {
                             list.length === 0 && navSwitchActive === 0
                                 ? <View className='empty'>
@@ -417,25 +436,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     </UploadFile>
                                 </View>
                                 : <View className="list_container">
-                                    <View className="list_filter">
-                                        {
-                                            navSwitchActive === 0
-                                                ? <View className="filter_txt" onClick={() => this.setState({visible: true})}>
-                                                    <Text className="tit">{active > -1 ? this.popoverItem[active].title : "排序"}</Text>
-                                                    <Image src={require("../../source/down.png")} className="filter_icon" />
-                                                </View>
-                                                : <View />
-                                        }
-                                        <View className="filter_switch_bar">
-                                            {tabs.map((value, index) => (
-                                                <View className={`filter_switch_item ${index === navSwitchActive ? "active" : ""}`}
-                                                      key={index.toString()}
-                                                      onClick={() => this.changeType(index)}>
-                                                    <Text className="txt">{value}</Text>
-                                                </View>
-                                            ))}
-                                        </View>
-                                    </View>
                                     <View className="list_main">
                                         {
                                             navSwitchActive === 0
