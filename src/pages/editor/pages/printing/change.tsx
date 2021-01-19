@@ -202,6 +202,13 @@ const PrintChange: Taro.FC<any> = () => {
             obj.width = radio * containerW;
             obj.height = containerW / scaleI
         }
+
+        if (hasRotate) {
+            const [w, h] = [obj.width, obj.height];
+            obj.width = h;
+            obj.height = w;
+        }
+
         debuglog("图片计算的值：", obj)
         return obj
     }
