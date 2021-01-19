@@ -64,7 +64,7 @@ const FillStyleChange: Taro.FC<FillStyleChangeProps> = props => {
                             </View>
                             <View className="change_items">
                                 <View className="item">
-                                    <Image src={require("../../../../source/yuantu.png")} className="item_img" />
+                                    <Image src={`${options.sourceUrl}appsource/yuantu.png`} className="item_img" />
                                     <Text className="v_txt">原图</Text>
                                 </View>
                                 {
