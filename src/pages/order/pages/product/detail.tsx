@@ -27,6 +27,7 @@ import LoginModal from '../../../../components/login/loginModal';
 import {userStore} from "../../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import {observe} from 'mobx';
+import {PhotoParams} from "../../../../modal/modal";
 
 @inject("userStore")
 @observer
@@ -119,6 +120,11 @@ export default class Login extends Component<{}, {
             this.toastClose()
         }
     }
+
+    componentDidShow() {
+        photoStore.setActionParamsToServer(getUserKey(), new PhotoParams())
+    }
+
     componentWillMount() {
         if (process.env.TARO_ENV == "h5") {
             document.title = this.config.navigationBarTitleText || "商品详情";

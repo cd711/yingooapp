@@ -101,6 +101,7 @@ const PrintChange: Taro.FC<any> = () => {
 
 
     const backPressHandle = async (e) => {
+        console.log(222222222222222, "浏览器返回：", e, router.path)
         if (deviceInfo.env === "h5") {
             if (photoVisible) {
                 setPhotoPickerVisible(false)
