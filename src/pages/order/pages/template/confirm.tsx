@@ -129,7 +129,7 @@ export default class Confirm extends Component<any, {
                             Object.assign(params,resp)
                         } catch (e) {
                             debuglog("读取参数出错：", e)
-    
+
                         }
                     } else {
                         params = resp
@@ -167,7 +167,7 @@ export default class Confirm extends Component<any, {
                                 disableAddressId:isEmptyX(res.address) && !isEmptyX(data["address_id"]) ? data["address_id"]:0
                             })
                         }
-                        
+
                         Object.assign(resp,{addressId:res.address && res.address.id?res.address.id:0});
                         addOrderConfimPreviewData(this.unixOrder,resp)
                         this.filterUsedTicket(res.orders);
@@ -828,7 +828,7 @@ export default class Confirm extends Component<any, {
                                                 <View className='add_buy_title'>
                                                     <View className='line'>
                                                         <Image className='ygyp'
-                                                               src={require("../../../../source/ygyp.svg")}/>
+                                                               src={`${options.sourceUrl}appsource/ygyp.svg`}/>
                                                         <Text
                                                             className='adv'>{item.merge_discount_rule.value}</Text>
                                                         {

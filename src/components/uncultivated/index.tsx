@@ -1,6 +1,7 @@
 import "./index.less"
 import Taro from "@tarojs/taro";
 import {View, Image, Text} from "@tarojs/components";
+import {options} from "../../utils/net";
 
 interface UncultivatedProps {
     onClose?: () => void;
@@ -17,7 +18,7 @@ const Uncultivated: Taro.FC<UncultivatedProps> = props => {
         <View className="uncultivated_container">
             <View className="uncultivated_main">
                 <View className="uncultivated_img">
-                    <Image src={require("../../source/login.png")} className="unc_img"  />
+                    <Image src={`${options.sourceUrl}appsource/login.png`} className="unc_img"  />
                 </View>
                 <View className="uncultivated_info">
                     <Text className="h1">{title || "功能即将上线~"}</Text>

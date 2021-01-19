@@ -12,7 +12,7 @@ import {
     updateChannelCode,
     updateTabBarChannelCode
 } from '../../../utils/common';
-import {api} from '../../../utils/net';
+import {api, options} from '../../../utils/net';
 import CartLeftIcon from '../../../components/icon/CartLeftIcon';
 import CartRightIcon from '../../../components/icon/CartRightIcon';
 import {Base64} from 'js-base64';
@@ -284,7 +284,7 @@ export default class Cart extends Component<{}, {
                             }
                         </View>
                         </ScrollView>:<View className='blank'>
-                            <Image src={require("../../../source/nocart.svg")} className='img'/>
+                            <Image src={`${options.sourceUrl}appsource/nocart.svg`} className='img'/>
                             <Text className='tip'>购物车是空的</Text>
                             <Button className='go_gg_btn' onClick={()=>{
                                 if (userStore.isLogin) {

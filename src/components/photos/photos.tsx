@@ -407,7 +407,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 navSwitchActive === 0 && imageList.length > 0
                                     ? <View className="filter_txt" onClick={() => this.setState({visible: true})}>
                                         <Text className="tit">{active > -1 ? this.popoverItem[active].title : "排序"}</Text>
-                                        <Image src={require("../../source/down.png")} className="filter_icon" />
+                                        <Image src={`${options.sourceUrl}appsource/down.png`} className="filter_icon" />
                                     </View>
                                     : <View />
                             }

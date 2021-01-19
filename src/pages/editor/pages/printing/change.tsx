@@ -1428,7 +1428,9 @@ const PrintChange: Taro.FC<any> = () => {
                                         <View className='counter-fc'>
                                             <View className='reduce' onClick={() => onReducer(value.count, index)}>
                                                 <Image
-                                                    src={require(`../../../../source/${value.count > 1 ? "reduceActive" : "reduce"}.png`)}
+                                                    src={value.count > 1
+                                                        ? `${options.sourceUrl}appsource/reduceActive.png`
+                                                        : `${options.sourceUrl}appsource/reduce.png`}
                                                     className='img'/>
                                             </View>
                                             <Text className='num'>{value.count || 1}</Text>
@@ -1456,7 +1458,7 @@ const PrintChange: Taro.FC<any> = () => {
                         {
                             !notNull(describe)
                                 ? <View className="top">
-                                    <Image src={require("../../../../source/waing.png")} className="top_icon" />
+                                    <Image src={`${options.sourceUrl}appsource/waing.png`} className="top_icon" />
                                     <Text className="v_txt">{describe}</Text>
                                 </View>
                                 : null

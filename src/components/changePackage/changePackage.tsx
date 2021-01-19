@@ -2,6 +2,7 @@ import Taro from '@tarojs/taro'
 import {Button, ScrollView, Text, View, Image} from '@tarojs/components'
 import './changePackage.less'
 import IconFont from '../iconfont';
+import {options} from "../../utils/net";
 
 
 interface SetMealSelectorModalProps {
@@ -97,7 +98,7 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
                                               onClick={() => _onChange(item, index)}>
                                             <View className='vote_left'>
                                                 {item.disable
-                                                    ? <Image src={require("../../source/disable.png")} className="disable_img" />
+                                                    ? <Image src={`${options.sourceUrl}appsource/disable.png`} className="disable_img" />
                                                     : <IconFont name={item.id == current.id ? "22_yixuanzhong" : "22_touming-weixuanzhong"} size={44} />
                                                 }
                                                 <View className="vote_num_txt">
@@ -116,7 +117,7 @@ const SetMealSelectorModal: Taro.FC<SetMealSelectorModalProps> = props => {
                                                     item.disable
                                                         ? <View className="item_popover_info" onClick={() => onChangeTip(index)}>
                                                             <View className="pop_icon">
-                                                                <Image src={require("../../source/waing.png")} className="i_pop_img" />
+                                                                <Image src={`${options.sourceUrl}appsource/waing.png`} className="i_pop_img" />
                                                             </View>
                                                             {
                                                                 disableIdx === index

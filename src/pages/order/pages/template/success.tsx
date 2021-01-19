@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import { observer, inject } from '@tarojs/mobx';
 import SuccessIcon from '../../../../components/icon/SuccessIcon';
 import WarmIcon from '../../../../components/icon/WarmIcon';
-import { api } from '../../../../utils/net';
+import { api, options } from '../../../../utils/net';
 import { Base64 } from 'js-base64';
 import { deviceInfo, fixStatusBarHeight,jumpUri } from '../../../../utils/common';
 import { userStore } from '../../../../store/user';
@@ -142,7 +142,7 @@ export default class Success extends Component<{},{
                             <Text className='txt'>支付成功</Text>
                         </View>:<View className='tip'>
                             {/* <SuccessIcon width={232} height={240} /> */}
-                            <Image src={require("../../../../source/paying.svg")} className='img' />
+                            <Image src={`${options.sourceUrl}appsource/paying.svg`} className='img' />
                             <Text className='txt'>支付中...</Text>
                         </View>
                     }

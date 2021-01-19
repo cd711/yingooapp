@@ -2,7 +2,7 @@ import Taro, {Component, Config} from '@tarojs/taro'
 import {Image, ScrollView, Text, View} from '@tarojs/components'
 import './index.less'
 import IconFont from '../../../../components/iconfont'
-import {api} from '../../../../utils/net'
+import {api, options} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx'
 import {
     deviceInfo,
@@ -529,7 +529,7 @@ export default class Template extends Component<any, {
                                           }}>
                                         <View className='print-warp'
                                               style={`width:${(mainRightWidth - (14 * 3)) / 2}px;height:${(mainRightWidth - (14 * 3)) / 2}px;`}>
-                                            <Image src={require("../../../../source/editor-print.png")}
+                                            <Image src={`${options.sourceUrl}appsource/editor-print.png`}
                                                    className='print'/>
                                             <Text className='print-txt'>直接冲印</Text>
                                         </View>
@@ -550,7 +550,7 @@ export default class Template extends Component<any, {
                                                 <Image src={ossUrl(item.thumb_image, 1)} className='item'
                                                        style={`width:${item.width}px;height:${item.height}px;border-radius: ${Taro.pxTransform(48)};`}
                                                        mode='scaleToFill'/>
-                                                <Image src={require('../../../../source/ke.png')} className='phone'
+                                                <Image src={`${options.sourceUrl}appsource/ke.png`} className='phone'
                                                        style={`width:${item.width}px;height:${item.height}px;`}
                                                        mode='scaleToFill'/>
                                             </View> : <Image src={ossUrl(item.thumb_image, 1)} className='item'

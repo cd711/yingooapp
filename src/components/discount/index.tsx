@@ -1,6 +1,7 @@
 import "./index.less";
 import Taro from "@tarojs/taro";
 import {View, Text, Image} from "@tarojs/components";
+import {options} from "../../utils/net";
 
 interface DiscountProps {
     list: Array<{id: string | number, name: string, price: string}>;
@@ -13,7 +14,7 @@ const Discount: Taro.FC<DiscountProps> = props => {
     return (
         <View className="discount_modal_container">
            <View className="discount_modal_body">
-               <Image src={require("../../source/rect.png")} className="bg_img" mode="widthFix" />
+               <Image src={`${options.sourceUrl}appsource/rect.png`} className="bg_img" mode="widthFix" />
                <View className="discount_modal_main">
                    <View className="tit_header">
                        <Text className="b_t">印的越多越</Text><Text className="r_t">优惠</Text>
@@ -35,7 +36,7 @@ const Discount: Taro.FC<DiscountProps> = props => {
                </View>
            </View>
            <View className="discount_modal_close" onClick={onClose}>
-               <Image src={require("../../source/guanb.png")} className="close_btn" mode="aspectFit" />
+               <Image src={`${options.sourceUrl}appsource/guanb.png`} className="close_btn" mode="aspectFit" />
            </View>
         </View>
     )

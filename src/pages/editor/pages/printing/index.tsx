@@ -13,7 +13,7 @@ import {
     sleep, updateChannelCode,
     urlEncode
 } from "../../../../utils/common";
-import {api} from "../../../../utils/net";
+import {api, options} from "../../../../utils/net";
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import {PhotoParams} from "../../../../modal/modal";
@@ -280,7 +280,7 @@ const Index: Taro.FC<any> = () => {
                         sizeItem.map((item, index) => (
                             <View className="printing_item" key={index+""} onClick={() => selectSize(item.id, item.value)}>
                                 <View className="left">
-                                    <Image src={require("../../../../source/print.png")} className="icon"/>
+                                    <Image src={`${options.sourceUrl}appsource/print.png`} className="icon"/>
                                     <View className="info">
                                         <Text className="h2">{item.name}</Text>
                                         <Text className="txt">{getBoxSize(item.value)}</Text>

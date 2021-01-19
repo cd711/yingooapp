@@ -34,7 +34,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             }
             number > 1 ? setNumber(number - 1) : setNumber(1);
         }}>
-            <Image src={number>1?require("../../source/reduceActive.png"):require("../../source/reduce.png")} className='img'/>
+            <Image src={number>1?`${options.sourceUrl}appsource/reduceActive.png`:`${options.sourceUrl}appsource/reduce.png`} className='img'/>
         </View>
         <Text className='num'>{number}</Text>
         <View className='add' onClick={(e) => {
@@ -52,7 +52,7 @@ const Counter: Taro.FC<CounterProps> = ({num, onCounterChange, onButtonClick, ma
             }
             setNumber(number + 1);
         }}>
-            <Image src={!notNull(max) && number >= parseInt(max+"")?require("../../source/disable_add.png"):`${options.sourceUrl}appsource/add.png`} className='img'/>
+            <Image src={!notNull(max) && number >= parseInt(max+"")?`${options.sourceUrl}appsource/disable_add.png`:`${options.sourceUrl}appsource/add.png`} className='img'/>
         </View>
     </View>
 }
