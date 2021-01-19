@@ -587,7 +587,7 @@ class Index extends Component<any, IndexState> {
      * 线下打印文档
      * @param {*}
      * @return {*}
-     */    
+     */
     offlinePrintDoc = () => {
         // Taro.scanCode({
         //     success:(res)=>{
@@ -704,7 +704,7 @@ class Index extends Component<any, IndexState> {
                                                     {
                                                         !notNull(list[0].coupon) && Object.keys(list[0].coupon).length > 0
                                                             ? <View className="single_prod_coupon">
-                                                                <Image src={require("../../../source/yhq.svg")} className="prod_yhq" />
+                                                                <Image src={`${options.sourceUrl}appsource/yhq.svg`} className="prod_yhq" />
                                                                 <View className="single_prod_info">
                                                                     <View className="left">
                                                                         <Text className="pri">¥</Text>
@@ -772,7 +772,7 @@ class Index extends Component<any, IndexState> {
                                                             <View className="single_phone_shell_view">
                                                                 <View className="single_phone_shell"
                                                                       onClick={() => this.onItemClick(item.clist[0], index)}>
-                                                                    <Image src={require("../../../source/sjk.png")} className="shell_ke" />
+                                                                    <Image src={`${options.sourceUrl}appsource/sjk.png`} className="shell_ke" />
                                                                     <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
                                                                     <Image src={ossUrl(this.getImage(item.clist[0]), 1)}
                                                                            className='photo' mode='aspectFill'/>
@@ -807,7 +807,7 @@ class Index extends Component<any, IndexState> {
                                                                         <View className="single_phone_shell_wrap" key={phoneIdx+""}>
                                                                             <View className="single_phone_shell rectangle_ke" key={phoneIdx+""}
                                                                                   onClick={() => this.onItemClick(phone, index)}>
-                                                                                <Image src={require("../../../source/sjk.png")} className="shell_ke rectangle_ke" />
+                                                                                <Image src={`${options.sourceUrl}appsource/sjk.png`} className="shell_ke rectangle_ke" />
                                                                                 <Image src={require("../../../source/sxt.png")} className="shell_ke_tou" />
                                                                                 <Image src={ossUrl(this.getImage(phone), 1)}
                                                                                        className='photo rectangle_ke' mode='aspectFill'/>
@@ -873,7 +873,7 @@ class Index extends Component<any, IndexState> {
                                                                     <View className="photo_item_view_wrap" key={photoIdx+""}>
                                                                         <View className="photo_item_view" onClick={() => this.onItemClick(childPhoto, index)}>
                                                                             <View className="photo_item_hidden transverse">
-                                                                                <Image src={require("../../../source/transverse.svg")} className="hidden_view transverse" />
+                                                                                <Image src={`${options.sourceUrl}appsource/transverse.svg`} className="hidden_view transverse" />
                                                                                 <Image src={ossUrl(this.getImage(childPhoto), 1)} className="transverse_img" mode="aspectFill" />
                                                                             </View>
                                                                         </View>
@@ -916,7 +916,7 @@ class Index extends Component<any, IndexState> {
                                                     <View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
                                                         <View className="read_fast_link_wrap">
                                                             <View className="read_fast_link" onClick={this.uncShow}>
-                                                                <Image src={require("../../../source/il.svg")} className="fast_img" mode="widthFix" />
+                                                                <Image src={`${options.sourceUrl}appsource/il.svg`} className="fast_img" mode="widthFix" />
                                                                 <View className="info">
                                                                     <Text className="h2">当面冲印照片</Text>
                                                                     <Text className="txt">高清冲印照片</Text>
@@ -936,7 +936,7 @@ class Index extends Component<any, IndexState> {
                                                     <View className="index_fast_link_view fixed_padding" style={{paddingBottom: "0px"}}>
                                                         <View className="fast_order_link_wrap">
                                                             <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>
-                                                                <Image src={require("../../../source/pz.svg")} className="fast_img" />
+                                                                <Image src={`${options.sourceUrl}appsource/pz.svg`} className="fast_img" />
                                                                 <Text className="h2">照片冲印</Text>
                                                                 <Text className="info">高清盐印冲印</Text>
                                                             </View>
@@ -950,7 +950,7 @@ class Index extends Component<any, IndexState> {
                                                         </View>
                                                         <View className="fast_order_link_wrap">
                                                             <View className="fast_order_link" onClick={() => this.jumpToTemplate(3)}>
-                                                                <Image src={require("../../../source/iall.svg")} className="fast_img" />
+                                                                <Image src={`${options.sourceUrl}appsource/iall.svg`} className="fast_img" />
                                                                 <Text className="h2">更多定制</Text>
                                                                 <Text className="info">各种惊喜不断</Text>
                                                             </View>

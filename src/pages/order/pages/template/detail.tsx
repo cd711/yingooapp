@@ -2,7 +2,7 @@ import Taro, {Component, Config} from '@tarojs/taro'
 import {Image, ScrollView, Text, View} from '@tarojs/components'
 import './detail.less';
 import IconFont from '../../../../components/iconfont';
-import {api} from '../../../../utils/net'
+import {api, options} from '../../../../utils/net'
 import {inject, observer} from '@tarojs/mobx';
 import {
     debuglog,
@@ -218,7 +218,7 @@ export default class Detail extends Component<{}, {
                     <View className='shell_thumb' style={`height:${Taro.pxTransform(472 / (795 / 1635))}`}>
                         <Image src={ossUrl(currentItem.thumb_image, 1)} className='thumb' mode='aspectFill'
                                style={`height:${Taro.pxTransform(472 / (795 / 1635))}`}/>
-                        <Image src={require('../../../../source/ke.png')} className='shell' mode='scaleToFill'
+                        <Image src={`${options.sourceUrl}appsource/ke.png`} className='shell' mode='scaleToFill'
                                style={`height:${Taro.pxTransform(472 / (795 / 1635))}`}/>
                     </View>
                     <View className='doyoulike'>

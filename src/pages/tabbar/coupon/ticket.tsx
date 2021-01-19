@@ -1,7 +1,7 @@
 import Taro, {Component, Config} from '@tarojs/taro'
 import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './ticket.less'
-import {api} from '../../../utils/net'
+import {api, options} from '../../../utils/net'
 import {userStore} from "../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import {
@@ -236,7 +236,7 @@ export default class Login extends Component<{}, {
                                                         }
                                                         {
                                                             item.status_tip.value == 3 ? <Image className='ticket_fuck'
-                                                                                                src={require("../../../source/ticket_fuck.svg")}/> : null
+                                                                                                src={`${options.sourceUrl}appsource/ticket_fuck.svg`}/> : null
                                                         }
                                                     </View>
                                                 </Ticket>
@@ -247,7 +247,7 @@ export default class Login extends Component<{}, {
                                     {/*<View style={{height: 16}}/>*/}
                                 </View>
                             </ScrollView> : (listLoading ? <LoadMore status="loading"/> : <View className='black'>
-                                <Image src={require("../../../source/ticket_black.svg")} className='img'/>
+                                <Image src={`${options.sourceUrl}appsource/ticket_black.svg`} className='img'/>
                                 <Text className='txt'>暂无优惠券</Text>
                             </View>)
                     }

@@ -3,6 +3,7 @@ import Taro, {useEffect, useState} from "@tarojs/taro";
 import {View, Image, Text} from "@tarojs/components";
 import {AtFloatLayout} from "taro-ui";
 import {debuglog, notNull} from "../../utils/common";
+import {options} from "../../utils/net";
 
 export interface PopLayoutItemProps {
     title: string;
@@ -48,7 +49,7 @@ const PopLayout: Taro.FC<PopLayoutProps> = props => {
                                 <Text className="name">{value.title}</Text>
                                 {
                                     selected === index
-                                        ? <Image src={require("../../source/gx.png")} className="selected_item" />
+                                        ? <Image src={`${options.sourceUrl}appsource/gx.png`} className="selected_item" />
                                         : <View />
                                 }
                             </View>

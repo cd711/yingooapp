@@ -2,6 +2,7 @@ import "./photoSwiper.less"
 import Taro, {useEffect, useState} from "@tarojs/taro";
 import {Button, Image, Swiper, SwiperItem, Text, View} from "@tarojs/components";
 import {ossUrl} from "../../../utils/common";
+import {options} from "../../../utils/net";
 
 interface PhotoSwiperProps {
     data: any[];
@@ -67,10 +68,10 @@ const PhotoSwiper: Taro.FC<PhotoSwiperProps> = props => {
                                         <View className={`over_hiden_view ${child.imgType === 1 ? "rectangle" : child.imgType === 2 ? "transverse" : "square_img"}`}>
                                             {
                                                 child.imgType === 1
-                                                    ? <Image src={require("../../../source/rectangle.svg")} mode="heightFix" className="square_view rectangle" />
+                                                    ? <Image src={`${options.sourceUrl}appsource/rectangle.svg`} mode="heightFix" className="square_view rectangle" />
                                                     : child.imgType === 2
-                                                    ? <Image src={require("../../../source/transverse.svg")} mode="heightFix" className="square_view transverse" />
-                                                    : <Image src={require("../../../source/square.svg")} mode="heightFix" className="square_view square" />
+                                                    ? <Image src={`${options.sourceUrl}appsource/transverse.svg`} mode="heightFix" className="square_view transverse" />
+                                                    : <Image src={`${options.sourceUrl}appsource/square.svg`} mode="heightFix" className="square_view square" />
                                             }
                                             <Image src={ossUrl(child.thumb_image, 1)}
                                                    className={`${child.imgType === 1 ? "rectangle_img" : child.imgType === 2 ? "transverse_img" : "square_img"}`}
