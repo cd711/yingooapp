@@ -1280,18 +1280,14 @@ const PrintChange: Taro.FC<any> = () => {
         jumpToPrintEditor(obj)
     }
 
-    const onBackHandle = async () => {
+    const onBackHandle = () => {
         if (photoStore.photoProcessParams.limit) {
             Taro.navigateBack({
                 delta: 2
             });
             return
         }
-        try {
-            await photoStore.updateServerParams(getUserKey(), new PhotoParams())
-        } catch (e) {
-
-        }
+        photoStore.updateServerParams(getUserKey(), new PhotoParams())
         if (Taro.getCurrentPages().length > 1) {
             Taro.navigateBack();
         } else {
