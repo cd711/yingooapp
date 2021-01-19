@@ -214,7 +214,22 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     useEffect(() => {
-        setFillStyleStatus(true)
+        try {
+            const res = Taro.getStorageSync(`${userStore.id}_fillStyleGuide`);
+            if (!res || res == -1) {
+                setFillStyleStatus(true)
+                Taro.setStorage({
+                    key: `${userStore.id}_fillStyleGuide`,
+                    data: 1
+                })
+            }
+        } catch (e) {
+            setFillStyleStatus(true);
+            Taro.setStorage({
+                key: `${userStore.id}_fillStyleGuide`,
+                data: 1
+            })
+        }
     }, [])
 
     // 根据改变的相框展示方式(fillStyle)作出更新
