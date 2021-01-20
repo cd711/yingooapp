@@ -16,6 +16,7 @@ import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
 import {userStore} from "../../../../store/user";
 import page from '../../../../utils/ext'
+import serverConfig from "../../../../config/config";
 
 interface TagData {
     list: Array<any>,
@@ -332,9 +333,10 @@ export default class Template extends Component<any, {
 
     onTagItemClick = async (item, cid, tpl_type) => {
         Taro.showLoading({title: "加载中..."});
+        debuglog(cid)
         try {
             const res = await api("app.product/info", {
-                id: cid,
+                id: tpl_type == "phone" ? serverConfig.goodsID.phoneID : serverConfig.goodsID.photoID ,
                 is_fixed: 1
             })
             if (tpl_type == "phone") {
@@ -369,16 +371,8 @@ export default class Template extends Component<any, {
         }
         Taro.showLoading({title: "加载中..."});
         try {
-            let id = "34";
-            const {cates} = this.state;
-            for (let i = 0; i < cates.length; i++) {
-                if (cates[i].tpl_type === "photo") {
-                    id = cates[i].tpl_category_id;
-                    break;
-                }
-            }
             const res = await api("app.product/info", {
-                id: id,
+                id: serverConfig.goodsID.photoID,
                 is_fixed: 1
             });
             Taro.navigateTo({

@@ -1435,6 +1435,9 @@ export default class Shell extends Component<{}, {
 
     }
 
+    componentDidShow() {
+        debuglog("--------------show")
+    }
 
     componentWillUnmount() {
         editorProxy = null;
@@ -1442,6 +1445,7 @@ export default class Shell extends Component<{}, {
     }
 
     onLoad = async (_?: number) => {
+        debuglog("onLoad", this.defaultModel)
         if (this.defaultModel) {
             const mod = this.defaultModel;
             sendMessage("phoneshell", {id: mod.id, mask: mod.mask});
@@ -1451,7 +1455,7 @@ export default class Shell extends Component<{}, {
 
     onLoadEmpty = async () => {
         const {tpl_id, id} = this.$router.params;
-        debuglog(tpl_id, id)
+        debuglog("onLoadEmpty", tpl_id, id)
         if (tpl_id == "0" || notNull(tpl_id)) {
             try {
                 const doc = await getFirstTemplateDoc(this.$router.params.cid)

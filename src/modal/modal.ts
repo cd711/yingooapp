@@ -55,7 +55,7 @@ export class PhotoParams {
     // 在照片冲印列表需要使用的路由参数
     public changeUrlParams: any = {};
     // 照片冲印列表选择参数
-    public photoStyle: string = "";
+    public photoStyle: { allowBlank: string, fill: string } = {allowBlank: "", fill: ""};
     // 从照片冲印模板点击过后要存储的模板ID
     public photoTplId: string = "";
     // 照片冲印列表最多允许增加的数量
@@ -86,7 +86,7 @@ export class PhotoParams {
         this.imageCount = !notNull(json.imageCount) ? parseInt(json.imageCount) : 0;
         this.changeUrlParams = json.changeUrlParams || {};
         this.currentSetMeal = json.currentSetMeal || {};
-        this.photoStyle = json.photoStyle || "";
+        this.photoStyle = json.photoStyle || {allowBlank: "", fill: ""};
         this.photoTplId = !notNull(json.photoTplId) ? json.photoTplId : "";
         this.max = !notNull(json.max) ? parseInt(json.max) : 100;
         this.limit = json.limit || false;

@@ -33,6 +33,7 @@ import {LocalCoupon} from "../../../modal/modal";
 import dayjs from "dayjs";
 import page from '../../../utils/ext'
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
+import serverConfig from "../../../config/config";
 
 
 interface IndexState {
@@ -413,6 +414,7 @@ class Index extends Component<any, IndexState> {
         let picID = "63";
         // @ts-ignore
         let firstPicID = "";
+        // @ts-ignore
         let phoneID = "41";
         // @ts-ignore
         let firstPhoneID = "";
@@ -455,7 +457,7 @@ class Index extends Component<any, IndexState> {
                 return
             }
             const res = await api("app.product/info", {
-                id: type === 1 ? picID : phoneID,
+                id: type === 1 ? serverConfig.goodsID.photoID : serverConfig.goodsID.phoneID,
                 is_fixed: 1
             })
             if (type === 1) {
