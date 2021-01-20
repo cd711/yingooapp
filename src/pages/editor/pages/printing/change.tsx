@@ -955,12 +955,11 @@ const PrintChange: Taro.FC<any> = () => {
                     extraIds: arr[idx].extraIds || undefined
                 })
             })
+            arr.splice(idx, 1);
+            setPhotos([...arr])
         } catch (e) {
             debuglog("更新数量出错：", e)
         }
-
-        arr.splice(idx, 1);
-        setPhotos([...arr])
     }
 
     function setCount(_, id) {
