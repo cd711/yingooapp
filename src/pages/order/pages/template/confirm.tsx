@@ -41,7 +41,7 @@ export default class Confirm extends Component<any, {
     showPayWayModal: boolean;
 
     data: any;
-    tickets: [],
+    tickets: Array<any>,
     ticketId: number | string | null,
     usedTicket: boolean,
     currentTicketOrderId: string,
@@ -176,6 +176,7 @@ export default class Confirm extends Component<any, {
                             data: this.handleData(res),
                             orderid: res.prepay_id
                         });
+                        // this.autoSelectTicket(res);
                         if (parseInt(data["address_id"]+"") > 0 && !isEmptyX(data["address_id"]) && data["address_id"] == userStore.address.id && res.address == null && !res.delivery) {
                             Taro.showToast({
                                 title:"默认收货地址无法配送,请重新选择",
@@ -398,9 +399,54 @@ export default class Confirm extends Component<any, {
         }
         this.setState({
             usedTickets: temp
-        })
+        }) 
     }
+    /**
+     * 推荐选中优惠券
+     * @param {*}
+     * @return {*}
+     */   
+    autoSelectTicket = (res) => {
+        const {orders,prepay_id} = res;
+        const {usedTickets} = this.state;
+        orders.forEach(element => {
+            let tid = 0;
+            if (isEmptyX(element.use_coupon) && !isEmptyX(element.usable_discounts) && element.usable_discounts.length>0) {
+                let discounts:Array<any> = element.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != element.pre_order_id));
+                const tmp = JSON.parse(JSON.stringify(discounts));
+                tmp.sort((a,b)=>parseFloat(a.coupon.money)-parseFloat(b.coupon.money));
+                if (tmp.length>0) {
+                    if (tmp.length == 1) {
+                        tid = tmp[0].id
+                    } else {
+                        if (parseFloat(tmp[0].coupon.money) == parseFloat(tmp[tmp.length - 1].coupon.money)) {
+                            tmp.sort((a,b)=>parseInt(a.use_end_time)-parseInt(b.use_end_time));
+                            if (parseInt(tmp[0].use_end_time) == parseInt(tmp[tmp.length - 1].use_end_time)) {
+                                tmp.sort((a,b)=>parseInt(a.id)-parseInt(b.id));
+                                tid = tmp[0].id
+                            } else {
+                                tid = tmp[0].id
+                            }
+                        } else {
+                            tid = tmp[tmp.length - 1].id;
+                        }
+                    }
+                }
+                discounts = discounts.map((item) => {
+                    item["checked"] = false;
+                    if (tid == item.id) {
+                        item["checked"] = true;
+                    }
+                    return item;
+                });
+                
+            }
+            if (parseInt(tid+"")>0) {
+                this.useTicket(prepay_id,element.pre_order_id,tid);
+            }
+        });
 
+    }
     onSubmitOrder = () => {
         // this.setState({
         //     showPayWayModal:true
@@ -450,21 +496,6 @@ export default class Confirm extends Component<any, {
 
     }
 
-    // 选择优惠券
-    onSelectTicket = (tickets, tId) => {
-        debuglog(tickets, tId)
-        const discounts = tickets.map((item) => {
-            item["checked"] = false;
-            if (tId == item.id) {
-                item["checked"] = true;
-            }
-            return item;
-        });
-        this.setState({
-            tickets: discounts,
-            ticketId: Number(tId)
-        })
-    }
 
     //计数器更改
     onCounterChange = (num, payid, orderid, product) => {
@@ -496,47 +527,7 @@ export default class Confirm extends Component<any, {
             })
         }
     }
-    onTicketUsed = (payId) => {
-        const {ticketId, currentTicketOrderId} = this.state;
-        if (!notNull(ticketId) && Number(ticketId) > 0) {
-            Taro.showLoading({title: "加载中"});
-            api("app.order_temp/coupon", {
-                prepay_id: payId,
-                pre_order_id: currentTicketOrderId,
-                usercoupon_id: ticketId
-            }).then((res) => {
-                Taro.hideLoading();
-                this.filterUsedTicket(res.orders);
-                this.setState({
-                    data: this.handleData(res)
-                });
-            }).catch((e) => {
-                Taro.hideLoading();
-                setTimeout(() => {
-                    Taro.switchTab({
-                        url: updateChannelCode('/pages/tabbar/index/index')
-                    })
-                }, 2000);
-                Taro.showToast({
-                    title: e,
-                    icon: "none",
-                    duration: 2000
-                })
-            })
-            this.setState({
-                showTickedModal: false,
-                usedTicket: true,
-                currentTicketOrderId: "",
-                currentOrderTicketId: 0
-            });
-        }
 
-        this.setState({
-            showTickedModal: false,
-            currentTicketOrderId: "",
-            currentOrderTicketId: 0
-        })
-    }
     onResult = (res) => {
         debuglog("支付订单号码:",res.data)
         this.setState({
@@ -584,6 +575,9 @@ export default class Confirm extends Component<any, {
             }
         }, 2000);
     }
+    private ticketOnChangeCallBack:(id:number,state:boolean)=>void = undefined;
+    private onUseTicketCallBack:()=>void = undefined;
+    //点击商品优惠券
     onGoodsItemClick = (item, usedTickets) => {
         let discounts = item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id));
         if (discounts == 0) {
@@ -597,13 +591,72 @@ export default class Confirm extends Component<any, {
             }
             return item;
         })
+        const { data } = this.state;
+        const {prepay_id} = data;
+        let currentSelectId = 0;
+        //优惠券选中回调
+        this.ticketOnChangeCallBack = (id:number,state:boolean)=> {
+            const tmpcounts = discounts.map((item) => {
+                item["checked"] = false;
+                if (id == item.id) {
+                    item["checked"] = !state;
+                }
+                return item;
+            });
+            if(!state){
+                currentSelectId = id;
+            }
+            this.setState({
+                tickets: tmpcounts,
+                // ticketId: Number(tId)
+            })
+        }
+        //优惠券列表确定按钮回调
+        this.onUseTicketCallBack = () => {
+            if(ticketId == currentSelectId){
+                this.setState({
+                    showTickedModal: false
+                });
+                return;
+            }
+            this.useTicket(prepay_id,item.pre_order_id,currentSelectId)
+            this.setState({
+                showTickedModal: false
+            })
+        }
+
         this.setState({
             showTickedModal: true,
-            tickets: discounts,
-            currentTicketOrderId: item.pre_order_id,
-            currentOrderTicketId: ticketId
+            tickets: discounts
         })
     }
+    useTicket = (prepay_id,pre_order_id,currentSelectId) => {
+        Taro.showLoading({title: "加载中"});
+        api("app.order_temp/coupon", {
+            prepay_id: prepay_id,
+            pre_order_id: pre_order_id,
+            usercoupon_id: currentSelectId
+        }).then((res) => {
+            Taro.hideLoading();
+            this.filterUsedTicket(res.orders);
+            this.setState({
+                data: this.handleData(res)
+            });
+        }).catch((e) => {
+            Taro.hideLoading();
+            setTimeout(() => {
+                Taro.switchTab({
+                    url: updateChannelCode('/pages/tabbar/index/index')
+                })
+            }, 2000);
+            Taro.showToast({
+                title: e,
+                icon: "none",
+                duration: 2000
+            })
+        })  
+    }
+
     getAddBuyProduct = () => {
 
     }
@@ -970,7 +1023,9 @@ export default class Confirm extends Component<any, {
                                             <Ticket key={index + ""}
                                                     isSelected={value.checked}
                                                     ticket={value.coupon}
-                                                    onChange={() => this.onSelectTicket(tickets, value.id)} hasCheckBox>
+                                                    onChange={() => {
+                                                        this.ticketOnChangeCallBack(value.id,value.checked);
+                                                    }} hasCheckBox>
                                                         {/* <View ></View> */}
                                                     </Ticket>
                                         ))
@@ -979,8 +1034,8 @@ export default class Confirm extends Component<any, {
                             </ScrollView>
                             <View className='yh_ops'>
                                 <Button className='use-btn' onClick={() => {
-                                    this.onTicketUsed(data.prepay_id)
-                                }}>使用</Button>
+                                    this.onUseTicketCallBack();
+                                }}>确定</Button>
                             </View>
                         </FloatModal>
                         : null

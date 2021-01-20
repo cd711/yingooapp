@@ -6,6 +6,8 @@ import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
 import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
+import { options } from '../../../../utils/net';
+import { AtActivityIndicator } from 'taro-ui'
 
 
 @inject("userStore")
@@ -75,7 +77,43 @@ export default class Printing extends Component<any,{
                         <Text className='title'>{this.config.navigationBarTitleText}</Text>
                     </View>
                 </View>
-                
+                <View className='print_top'>
+                    {/* 打印文档 ${options.sourceUrl}appsource/printing_doc.gif */}
+                    {/* 打印照片 ${options.sourceUrl}appsource/printing_photo.gif */}
+                    <Image className='print_gif' src={`${options.sourceUrl}appsource/printing_doc.gif`} />
+                </View>
+                <View className='printing_time_line'>
+                    <View className='time_line_item'>
+                        <View className='state'>
+                            <IconFont name='22_yixuanzhong' size={30} />
+                            <Text className='txt finished'>订单处理成功</Text>
+                        </View>
+                        <View className='line'></View>
+                    </View>
+
+                    <View className='time_line_item'>
+                        <View className='state'>
+                            <AtActivityIndicator size={30} color="#FF4966"></AtActivityIndicator>
+                            <Text className='txt finished'>处理中...</Text>
+                        </View>
+                        <View className='line'></View>
+                    </View>
+
+                    <View className='time_line_item'>
+                        <View className='state'>
+                            <View className='wait_circle'></View>
+                            <Text className='txt wait'>等待处理</Text>
+                        </View>
+                        <View className='line'></View>
+                    </View>
+
+                    <View className='time_line_item'>
+                        <View className='state'>
+                            <View className='wait_circle'></View>
+                            <Text className='txt wait'>处理完成</Text>
+                        </View>
+                    </View>
+                </View>
             </View>
         )
     }

@@ -50,7 +50,7 @@ const Ticket: Taro.FC<any> = ({isNew, hasCheckBox = false,isSelected, onChange, 
                 </View>
             </View>
             {
-                hasCheckBox ? <View className='checkbox'><Checkboxs isChecked={isSelected} disabled /></View> : null
+                hasCheckBox ? <View className='checkbox'><Checkboxs isChecked={isSelected} disabled onCheckedClick={onSelect}/></View> : null
             }
             {
                 children ? children : null
