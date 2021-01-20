@@ -100,8 +100,7 @@ const PrintChange: Taro.FC<any> = () => {
     const setMealSuccess = useRef(false);
 
 
-    const backPressHandle = async (e) => {
-        console.log(222222222222222, "浏览器返回：", e, router.path)
+    const backPressHandle = async () => {
         if (deviceInfo.env === "h5") {
             if (photoVisible) {
                 setPhotoPickerVisible(false)
@@ -610,11 +609,7 @@ const PrintChange: Taro.FC<any> = () => {
                     const setMealIdx = serPar.attrGroup.findIndex(v => v.special_show === "setmeal");
                     debuglog("查找的下标：", idx, numIdx, setMealIdx);
 
-                    let pictureSize = "";
-                    // if (opt.isSetMeal && setMealIdx > -1) {
-                    //
-                    //     updateSetMealArr([...serPar.attrItems[setMealIdx]])
-                    // }
+                    let pictureSize = photoStore.photoProcessParams.pictureSize;
 
                     // 如果是完整的SkuID
                     if (opt.forDetail) {
@@ -711,6 +706,7 @@ const PrintChange: Taro.FC<any> = () => {
 
                     if (idx > -1 && !opt.onlyInitPrice) {
                         // 向本地存储attrItems
+                        debuglog("开始向容器更新数据：", pictureSize)
                         await photoStore.setActionParamsToServer(getUserKey(), {
                             photo: obj,
                             attrItems: serPar.attrItems,
@@ -810,7 +806,7 @@ const PrintChange: Taro.FC<any> = () => {
         }
 
 
-        debuglog("读取的photo params：", params)
+        debuglog("读取的photo params：", JSON.parse(JSON.stringify(params)))
 
         const pix = photoStore.photoProcessParams.pictureSize;
         _imgstyle.current = photoStore.photoProcessParams.photoStyle[fillStyle.style];
