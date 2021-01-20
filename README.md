@@ -6,3 +6,6 @@
 
 - 本项目小程序APPID：wx917e699bf3473296
 - 独立部署小程序APPID：wxad676e832787af6b
+
+- 本项目公众号APPID：wx70219c081fcfe75c
+- 独立部署公众号APPID：wxbaf3b5c8f68d08a7
