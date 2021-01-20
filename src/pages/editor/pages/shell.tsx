@@ -155,8 +155,8 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
                     break;
                 }
             }
-            getListOfCategory({tagId: arr[0].id, page: 1})
             setTypeList([...arr])
+            getListOfCategory({tagId: arr[0].id, page: 1})
         }).catch(e => {
             debuglog("获取商品分类出错：", e)
         })
@@ -1658,7 +1658,10 @@ export default class Shell extends Component<{}, {
                 doc: doc
             });
             Taro.hideLoading();
-            window.location.replace(updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`));
+            Taro.navigateTo({
+                url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`)
+            })
+            // window.location.replace(updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`));
         } catch (e) {
             Taro.hideLoading();
             Taro.showToast({

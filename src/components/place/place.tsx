@@ -281,7 +281,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
 
 
     useEffect(() => {
-        debuglog("data被初始化", data)
+
         if (!isEmpty(data) && data != undefined && data != null) {
             setIsLoad(true);
             initSku(data.attrGroup, data.attrItems, data.skus)
