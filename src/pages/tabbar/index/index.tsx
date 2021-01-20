@@ -935,7 +935,7 @@ class Index extends Component<any, IndexState> {
                                                             </View>
                                                         </View>
                                                         <View className="read_fast_link_wrap">
-                                                            <View className="read_fast_link" onClick={this.offlinePrintDoc}>
+                                                            <View className="read_fast_link" onClick={this.uncShow}>
                                                                 <Image src={`${options.sourceUrl}appsource/cnxh.svg`} className="fast_img" mode="widthFix" />
                                                                 <View className="info">
                                                                     <Text className="h2">当面冲印文档</Text>

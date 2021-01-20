@@ -1,4 +1,3 @@
-
 import Taro, { useState,useEffect } from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import './checkbox.less'
