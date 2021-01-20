@@ -6,6 +6,7 @@ import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
 import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
+import ScanTipModal from '../../../../components/scanTipModal/scantipmodal';
 
 
 @inject("userStore")
@@ -100,11 +101,13 @@ export default class Origin extends Component<any,{
                         <Image className='b_wechat' src={require("../../source/wechat_chat.png")} />
                     </View>
                     <View className='origin_way_item origin_way_item_orange' onClick={()=>{
-
+                        Taro.navigateTo({
+                            url:"/pages/offline/pages/doc/mydoc"
+                        })
                     }}>
                         <View className='box'>
                             <Text className='wechat_chat'>我的文档</Text>
-                            <Text className='from_chat'>从我的文档库中上传</Text>
+                            <Text className='from_chat'>从我的文档库中选择</Text>
                             <View className='push_right'>
                                 <Image className='icon' src={require("../../source/right.png")} />
                             </View>
@@ -113,7 +116,11 @@ export default class Origin extends Component<any,{
                         <Image className='b_wechat' src={require("../../source/doc.png")} />
                     </View>
                 </View>
-
+                <ScanTipModal isShow={false}>
+                    <View className='ScanTipModal_title'>
+                        <Text className='txt'>设备状态不正常</Text>
+                    </View>
+                </ScanTipModal>
             </View>
         )
     }

@@ -135,7 +135,9 @@ class App extends Component {
             {
                 root:"pages/offline",
                 pages:[
-                    "pages/doc/origin"
+                    "pages/doc/origin",
+                    "pages/doc/mydoc",
+                    "pages/doc/printing"
                 ]
             },
         ],
