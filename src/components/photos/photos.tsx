@@ -8,7 +8,6 @@ import UploadFile from "../../components/Upload/Upload";
 import {debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
-import {observer} from "@tarojs/mobx";
 import PopLayout, {PopLayoutItemProps} from "../popLayout";
 
 
@@ -44,7 +43,6 @@ interface PhotosEleState {
     active: number;
 }
 
-@observer
 export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState> {
 
     static defaultProps = {
@@ -81,15 +79,34 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         }
     }
 
-    private total: number = 0;
+    // 在排除已使用的图片后可能存在数量不够导致的不能上拉加载更多的问题
+    getListAgain = async () => {
+        let imageList = this.state.imageList;
+        const arr = imageList.filter(v => !notNull(v.display));
+        if (arr.length < 25) {
+            try {
+                const res = await api("app.profile/imgs", {
+                    start: arr.length,
+                    size: 25 - arr.length,
+                    type: "image"
+                });
+                imageList = imageList.concat(res.list);
+                this.setState({imageList})
+            } catch (e) {
 
+            }
+        }
+
+    }
+
+    private total: number = 0;
     getList(data) {
         return new Promise<void>(async (resolve, reject) => {
             const opt = {
                 start: data.start || 0,
                 size: data.size || 25,
                 type: data.type || this.state.navSwitchActive,
-                loadMore: data.loadMore || false
+                loadMore: data.loadMore || false,
             };
             const temp = {
                 start: opt.start, size: opt.size, type: "image"
@@ -124,6 +141,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             }
                         }
                     }
+                    debuglog("进入的已使用列表：", JSON.parse(JSON.stringify(defaultSelect)), usefulList)
                     this.setState({usefulList})
                 }
 
@@ -155,29 +173,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             _max
         });
     }
-
-    // 在排除已使用的图片后可能存在数量不够导致的不能上拉加载更多的问题
-    getListAgain = () => {
-        const {imageList} = this.state;
-        const arr = imageList.filter(v => !notNull(v.display));
-        if (arr.length !== 25) {
-            this.getList({
-                start: arr.length,
-                size: 25 - arr.length
-            })
-        }
-
-    }
-
-    // componentWillMount() {
-    //     if (deviceInfo.env === "weapp") {
-    //         this.initPropsToState()
-    //         this.getList({start: 0}).then(() => {
-    //             this.getListAgain()
-    //         })
-    //     }
-    // }
-
 
     componentDidMount() {
         this.initPropsToState()

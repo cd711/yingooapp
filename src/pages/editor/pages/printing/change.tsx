@@ -110,6 +110,61 @@ const PrintChange: Taro.FC<any> = () => {
         }
     }
 
+    // 检测是否需要旋转
+    function checkHasRotate(attribute: string): boolean {
+        if (router.params.id) {
+            const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
+            const imgPix = attribute.split("*");
+            // 容器宽高比
+            const num = Number(pixArr[0]) / Number(pixArr[1]);
+            // 图片宽高比
+            const cNum = Number(imgPix[0]) / Number(imgPix[1])
+            debuglog("旋转计算：", {imgPix, cNum, num})
+            /**
+             * pixArr: 打印尺寸, imgPix：图片尺寸
+             * 打印尺寸 大于 1，就判定为打印的是横图，图片尺寸不满足条件（也就是图片尺寸小于1）的话就旋转
+             * 或
+             * 打印尺寸小于1，就能判定为竖图，但是图片尺寸不满足条件的话（也就是图片尺寸大于1）就旋转
+             */
+                // return cNum > 1 && num < 1 || cNum < 1 && num > 1
+            let rotate = false;
+            if (num > 1) {
+                rotate = cNum < 1;
+            } else if (num < 1) {
+                if (cNum > 1) {
+                    rotate = true
+                }
+            }
+            return rotate
+        }
+        return false
+    }
+
+    function getTailoringImg(arr: any[]) {
+        if (notNull(_imgstyle.current) && arr.length !== 3) {
+            return ""
+        }
+        let path = "";
+
+        const getUrl = (arr: any[], url: string, i: number) => {
+            let c = i;
+            let str = url;
+            if (c === arr.length) {
+                path = str;
+                return
+            } else {
+                const reg = new RegExp(`#${arr[c].key}#`);
+                str = url.replace(reg, arr[c].val)
+                c += 1;
+                getUrl(arr, str, c)
+            }
+        }
+
+        getUrl(arr, _imgstyle.current, 0)
+
+        return path
+    }
+
     function updateDescribe(title: string, status: 1 | 2 | 3 | 4) {
         setDescribe(title);
         setCountStatus(status)
@@ -145,7 +200,7 @@ const PrintChange: Taro.FC<any> = () => {
      * 7寸：1500*2102  --->  161*225
      * 8寸：1795*2398  --->  161*215
      */
-    function computedHeightAccordingToSize(imgSize: string, containerH: number, radio: number = 1, style: "fill" | "allowBlank" = "fill"): { width: number, height: number } {
+    function computedHeightAccordingToSize(imgSize: string, containerH: number, radio: number = 1, style: "fill" | "allowBlank" = "fill"): { width: number, height: number, hasRotate: boolean } {
         debuglog("-----------------分割线-------------------")
 
         // w: 304, h: 406
@@ -154,7 +209,10 @@ const PrintChange: Taro.FC<any> = () => {
             height: 203
         };
         if (notNull(imgSize) || imgSize.indexOf("*") === -1) {
-            return obj
+            return {
+                ...obj,
+                hasRotate: false
+            }
         }
 
         let imgW = parseInt(imgSize.split("*")[0]);
@@ -169,13 +227,16 @@ const PrintChange: Taro.FC<any> = () => {
         if (style === "fill") {
             if (hasRotate) {
                 return {
-                    width: containerH,
-                    height: itemStyle.width
+                    // width: containerH,
+                    height: containerH,
+                    width: itemStyle.width,
+                    hasRotate
                 }
             }
             return {
                 width: itemStyle.width,
-                height: containerH
+                height: containerH,
+                hasRotate
             }
         }
 
@@ -205,13 +266,16 @@ const PrintChange: Taro.FC<any> = () => {
         }
 
         if (hasRotate) {
-            const [w, h] = [obj.width, obj.height];
-            obj.width = h;
-            obj.height = w;
+            // const [w, h] = [obj.width, obj.height];
+            // obj.width = h;
+            // obj.height = w;
         }
 
         debuglog("图片计算的值：", obj)
-        return obj
+        return {
+            ...obj,
+            hasRotate
+        }
     }
 
     useEffect(() => {
@@ -236,13 +300,23 @@ const PrintChange: Taro.FC<any> = () => {
     // 根据改变的相框展示方式(fillStyle)作出更新
     useEffect(() => {
         let arr = [...photos];
+        _imgstyle.current = photoStore.photoProcessParams.photoStyle[fillStyle.style]
         arr = arr.map(val => {
-            const {width, height} = computedHeightAccordingToSize(val.attr, itemStyle.height, 1, fillStyle.style)
+            const {width, height, hasRotate} = computedHeightAccordingToSize(val.attr, itemStyle.height, 1, fillStyle.style)
             if (fillStyle.exclude && val.edited === true) {
                 return val
             }
+            const tArr = [
+                {key: "w", val: parseInt(`${width}`)},
+                {key: "h", val: parseInt(`${height}`)},
+                {key: "r", val: 0},
+            ];
+            if (hasRotate) {
+                tArr[2].val = 90;
+            }
             return {
                 ...val,
+                osx: getTailoringImg(tArr),
                 width,
                 height
             }
@@ -251,6 +325,7 @@ const PrintChange: Taro.FC<any> = () => {
         photoStore.updateServerParams(photoStore.printKey, {
             fillStyle
         })
+        debuglog("改变fillstyle后的列表：", arr)
     }, [fillStyle])
 
     useEffect(() => {
@@ -660,61 +735,6 @@ const PrintChange: Taro.FC<any> = () => {
         })
     }
 
-    // 检测是否需要旋转
-    function checkHasRotate(attribute: string): boolean {
-        if (router.params.id) {
-            const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
-            const imgPix = attribute.split("*");
-            // 容器宽高比
-            const num = Number(pixArr[0]) / Number(pixArr[1]);
-            // 图片宽高比
-            const cNum = Number(imgPix[0]) / Number(imgPix[1])
-            debuglog("旋转计算：", {imgPix, cNum, num})
-            /**
-             * pixArr: 打印尺寸, imgPix：图片尺寸
-             * 打印尺寸 大于 1，就判定为打印的是横图，图片尺寸不满足条件（也就是图片尺寸小于1）的话就旋转
-             * 或
-             * 打印尺寸小于1，就能判定为竖图，但是图片尺寸不满足条件的话（也就是图片尺寸大于1）就旋转
-             */
-            // return cNum > 1 && num < 1 || cNum < 1 && num > 1
-            let rotate = false;
-            if (num > 1) {
-                rotate = cNum < 1;
-            } else if (num < 1) {
-                if (cNum > 1) {
-                    rotate = true
-                }
-            }
-            return rotate
-        }
-        return false
-    }
-
-    function getTailoringImg(arr: any[]) {
-        if (!_imgstyle.current && arr.length !== 3) {
-            return ""
-        }
-        let path = "";
-
-        const getUrl = (arr: any[], url: string, i: number) => {
-            let c = i;
-            let str = url;
-            if (c === arr.length) {
-                path = str;
-                return
-            } else {
-                const reg = new RegExp(`#${arr[c].key}#`);
-                str = url.replace(reg, arr[c].val)
-                c += 1;
-                getUrl(arr, str, c)
-            }
-        }
-
-        getUrl(arr, _imgstyle.current, 0)
-
-        return path
-    }
-
     const selectPhoto = () => {
         let num = 0;
         for (const item of photos) {
@@ -793,7 +813,7 @@ const PrintChange: Taro.FC<any> = () => {
         debuglog("读取的photo params：", params)
 
         const pix = photoStore.photoProcessParams.pictureSize;
-        _imgstyle.current = photoStore.photoProcessParams.photoStyle;
+        _imgstyle.current = photoStore.photoProcessParams.photoStyle[fillStyle.style];
         if (!notNull(photoStore.photoProcessParams.fillStyle) && Object.keys(photoStore.photoProcessParams.fillStyle).length > 0) {
             setFillStyle({...photoStore.photoProcessParams.fillStyle})
         }
@@ -823,18 +843,17 @@ const PrintChange: Taro.FC<any> = () => {
 
             debuglog("path:", params.photo.path)
             params.photo.path = params.photo.path.map((v) => {
-                const allowRotate = checkHasRotate(v.attr);
-                const arr = [...tArr];
-                if (allowRotate) {
-                    arr[2].val = 90;
+                const styleArr = [...tArr];
+                const {width, height, hasRotate} = computedHeightAccordingToSize(v.attr, containerH, 1, fillStyle.style);
+                if (hasRotate) {
+                    styleArr[2].val = 90;
                 }
-                const {width, height} = computedHeightAccordingToSize(v.attr, containerH, 1, fillStyle.style)
                 return {
                     ...v,
                     url: v.url,
                     count: notNull(v.count) ? 1 : parseInt(v.count),
-                    hasRotate: allowRotate,
-                    osx: getTailoringImg(arr),
+                    hasRotate: hasRotate,
+                    osx: getTailoringImg(styleArr),
                     readLocal: v.originalData && v.originalData.length > 0,
                     width,
                     height
@@ -930,18 +949,17 @@ const PrintChange: Taro.FC<any> = () => {
                     path: photo
                 },
                 usefulImages: removeDuplicationForArr({
-                    newArr: arr.map(v => ({id: v.id, url: v.url})),
+                    newArr: [{id: arr[idx].id, url: arr[idx].url}],
                     oldArr: photoStore.photoProcessParams.usefulImages,
                     deleteID: arr[idx].id,
                     extraIds: arr[idx].extraIds || undefined
                 })
             })
+            arr.splice(idx, 1);
+            setPhotos([...arr])
         } catch (e) {
             debuglog("更新数量出错：", e)
         }
-
-        arr.splice(idx, 1);
-        setPhotos([...arr])
     }
 
     function setCount(_, id) {
@@ -1158,6 +1176,7 @@ const PrintChange: Taro.FC<any> = () => {
             skuid: skuInfoID,
             total: count,
             page: "photo",
+            crop: fillStyle.style,
             parintImges: photos.map(v => {
                 const pixArr = pix.split("*");
                 debuglog("选择的宽高：", pixArr)
@@ -1226,15 +1245,15 @@ const PrintChange: Taro.FC<any> = () => {
                 ];
                 exArr = arr.map(v => {
                     const allowRotate = checkHasRotate(v.attr);
-                    const arr = [...tArr];
+                    const fixArr = [...tArr];
 
                     if (allowRotate) {
-                        arr[2].val = 90;
+                        fixArr[2].val = 90;
                     }
                     return {
                         ...v,
                         hasRotate: allowRotate,
-                        osx: getTailoringImg(arr),
+                        osx: getTailoringImg(fixArr),
                         url: v.url,
                     }
                 })
@@ -1244,10 +1263,20 @@ const PrintChange: Taro.FC<any> = () => {
                 if (fillStyle.exclude && value.edited === true) {
                     return value
                 }
-                const {width, height} = computedHeightAccordingToSize(value.attr, itemStyle.height, 1, fillStyle.style);
+                const {width, height, hasRotate} = computedHeightAccordingToSize(value.attr, itemStyle.height, 1, fillStyle.style);
+                const tArr = [
+                    {key: "w", val: parseInt(`${width}`)},
+                    {key: "h", val: parseInt(`${height}`)},
+                    {key: "r", val: 0},
+                ];
+                if (hasRotate) {
+                    tArr[2].val = 90;
+                }
                 return {
                     ...value,
-                    width, height
+                    osx: getTailoringImg(tArr),
+                    width,
+                    height
                 }
             })
 
@@ -1429,13 +1458,13 @@ const PrintChange: Taro.FC<any> = () => {
                                           }}
                                     >
                                         <Image
-                                            // src={value.hasRotate ? `${value.url}?${value.osx}` : value.url}
-                                            src={value.url}
+                                            src={`${value.url}?${value.osx}`}
+                                            // src={value.url}
                                             className="p_img"
                                             mode="aspectFill"
                                             onClick={() => onEditClick(value, index)}
                                             style={{
-                                                transform: value.hasRotate ? "rotateZ(90deg)" : "none",
+                                                // transform: value.hasRotate ? "rotateZ(90deg)" : "none",
                                                 width: `${value.width}px`,
                                                 height: `${value.height}px`
                                             }}
