@@ -141,7 +141,6 @@ const PrintChange: Taro.FC<any> = () => {
     }
 
     function getTailoringImg(arr: any[]) {
-        debuglog(111111111111, arr)
         if (notNull(_imgstyle.current) && arr.length !== 3) {
             return ""
         }
@@ -154,7 +153,6 @@ const PrintChange: Taro.FC<any> = () => {
                 path = str;
                 return
             } else {
-                debuglog("getTailoringImg内部循环：", arr, c, arr[c].key)
                 const reg = new RegExp(`#${arr[c].key}#`);
                 str = url.replace(reg, arr[c].val)
                 c += 1;
@@ -951,7 +949,7 @@ const PrintChange: Taro.FC<any> = () => {
                     path: photo
                 },
                 usefulImages: removeDuplicationForArr({
-                    newArr: arr.map(v => ({id: v.id, url: v.url})),
+                    newArr: [{id: arr[idx].id, url: arr[idx].url}],
                     oldArr: photoStore.photoProcessParams.usefulImages,
                     deleteID: arr[idx].id,
                     extraIds: arr[idx].extraIds || undefined
@@ -1179,6 +1177,7 @@ const PrintChange: Taro.FC<any> = () => {
             skuid: skuInfoID,
             total: count,
             page: "photo",
+            crop: fillStyle.style,
             parintImges: photos.map(v => {
                 const pixArr = pix.split("*");
                 debuglog("选择的宽高：", pixArr)
