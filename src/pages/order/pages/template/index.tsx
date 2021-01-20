@@ -330,26 +330,64 @@ export default class Template extends Component<any, {
         }
     }
 
-    onTagItemClick = (item, cid, tpl_type) => {
-        if (tpl_type == "phone") {
-            const str = getURLParamsStr(urlEncode({
-                id: item.id,
-                cid,
-            }))
-            Taro.navigateTo({
-                url: updateChannelCode(`/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`)
-            });
+    onTagItemClick = async (item, cid, tpl_type) => {
+        Taro.showLoading({title: "加载中..."});
+        try {
+            const res = await api("app.product/info", {
+                id: cid,
+                is_fixed: 1
+            })
+            if (tpl_type == "phone") {
+                const str = getURLParamsStr(urlEncode({
+                    id: item.id,
+                    cid: res.id,
+                }))
+                Taro.navigateTo({
+                    url: updateChannelCode(`/pages/order/pages/template/detail?${str}&cp=${getSpecialRouter(this.$router)}`)
+                });
+            }
+            if (tpl_type == "photo") {
+                const str = getURLParamsStr(urlEncode({
+                    id: res.id,
+                    tplid: item.id,
+                    limit: "t"
+                }))
+                Taro.navigateTo({
+                    url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
+                });
+            }
+        } catch (e) {
+
         }
-        if (tpl_type == "photo") {
-            const str = getURLParamsStr(urlEncode({
-                id: 34,
-                tplid: item.id,
-                limit: "t"
-            }))
-            Taro.navigateTo({
-                url: updateChannelCode(`/pages/editor/pages/printing/index?${str}`)
-            });
+        Taro.hideLoading()
+    }
+
+    onFastJumpPrint = async () => {
+        if (!userStore.isLogin) {
+            userStore.showLoginModal = true;
+            return
         }
+        Taro.showLoading({title: "加载中..."});
+        try {
+            let id = "34";
+            const {cates} = this.state;
+            for (let i = 0; i < cates.length; i++) {
+                if (cates[i].tpl_type === "photo") {
+                    id = cates[i].tpl_category_id;
+                    break;
+                }
+            }
+            const res = await api("app.product/info", {
+                id: id,
+                is_fixed: 1
+            });
+            Taro.navigateTo({
+                url: updateChannelCode(`/pages/editor/pages/printing/index?id=${res.id}`)
+            })
+        } catch (e) {
+
+        }
+        Taro.hideLoading()
     }
 
     onCateSwitch = (index, tags) => {
@@ -518,15 +556,7 @@ export default class Template extends Component<any, {
                                 tpl_type == "photo" && loadStatus != LoadMoreEnum.loading && tagList.length > 0 ?
                                     <View className='print-box'
                                           style={`width:${(mainRightWidth - (14 * 3)) / 2}px;height:${(mainRightWidth - (14 * 3)) / 2}px;position: absolute;top:0;left:14px`}
-                                          onClick={() => {
-                                              if (!userStore.isLogin) {
-                                                  userStore.showLoginModal = true;
-                                                  return
-                                              }
-                                              Taro.navigateTo({
-                                                  url: updateChannelCode(`/pages/editor/pages/printing/index?id=34`)
-                                              })
-                                          }}>
+                                          onClick={this.onFastJumpPrint}>
                                         <View className='print-warp'
                                               style={`width:${(mainRightWidth - (14 * 3)) / 2}px;height:${(mainRightWidth - (14 * 3)) / 2}px;`}>
                                             <Image src={`${options.sourceUrl}appsource/editor-print.png`}

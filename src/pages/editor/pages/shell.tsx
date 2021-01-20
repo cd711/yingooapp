@@ -1347,7 +1347,8 @@ export default class Shell extends Component<{}, {
     data?: number;
     loadingTemplate?: boolean;
     textInfo: any,
-    showTip: boolean
+    showTip: boolean,
+    url: string
 }> {
 
     config: Config = {
@@ -1367,7 +1368,8 @@ export default class Shell extends Component<{}, {
         this.state = {
             loadingTemplate: true,
             textInfo: null,
-            showTip: false
+            showTip: false,
+            url: ""
         };
     }
 
@@ -1391,11 +1393,8 @@ export default class Shell extends Component<{}, {
 
     }
 
-
-
     async componentDidMount() {
 
-        // @ts-ignore
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);
@@ -1456,7 +1455,7 @@ export default class Shell extends Component<{}, {
         if (tpl_id == "0" || notNull(tpl_id)) {
             try {
                 const doc = await getFirstTemplateDoc(this.$router.params.cid)
-                debuglog(doc)
+
                 if (doc) {
                     await callEditor("setDoc", doc);
                 }
@@ -1562,7 +1561,6 @@ export default class Shell extends Component<{}, {
         }
     }
 
-
     back = () => {
 
         if (Taro.getCurrentPages().length > 1) {
@@ -1576,6 +1574,12 @@ export default class Shell extends Component<{}, {
         }
     }
 
+    getUrl = () => {
+        return updateChannelCode(process.env.NODE_ENV == 'production'
+            ? `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
+            : `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`)
+    }
+
     saveShellHandle = async () => {
         Taro.showLoading({
             title: "请稍候"
@@ -1584,9 +1588,20 @@ export default class Shell extends Component<{}, {
         const params = this.$router.params;
 
         if (!notNull(params.workid) && params.workid !== "f") {
-            wx.miniProgram.navigateTo({
-                url: updateChannelCode(`/pages/order/pages/template/preview?workid=${params.workid}`),
-            })
+            try {
+                const doc = await callEditor("getDoc");
+                const obj = {
+                    doc: JSON.stringify(doc),
+                    id: params.workid
+                }
+                const res = await api("editor.user_tpl/add",obj);
+                debuglog("已编辑过的模板--->更新后再次编辑：", res)
+                wx.miniProgram.navigateTo({
+                    url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`),
+                })
+            } catch (e) {
+
+            }
             return
         }
 
@@ -1594,7 +1609,7 @@ export default class Shell extends Component<{}, {
 
             const doc = await callEditor("getDoc");
             const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
-            debuglog(res)
+            debuglog("小程序编辑模板后提交：editor.user_tpl/add--->", res)
             wx.miniProgram.navigateTo({
                 url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`),
             })
@@ -1648,7 +1663,6 @@ export default class Shell extends Component<{}, {
             })
         }
     }
-
 
     changeImage = () => {
         this.store.tool = 4;
@@ -1765,12 +1779,6 @@ export default class Shell extends Component<{}, {
         }
     }
 
-    getUrl = () => {
-        return updateChannelCode(process.env.NODE_ENV == 'production'
-            ? `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`
-            : `${config.editorUrl}/editor/mobile?token=${getToken()}&tpl_id=${this.tplId}&doc_id=${this.docId}&t=9998`)
-    }
-
     render() {
         const {loadingTemplate, size, showTip} = this.state;
         const {tool} = this.store;
@@ -1796,7 +1804,7 @@ export default class Shell extends Component<{}, {
                 <View onClick={this.next} className='right'>保存</View>
             </View>
             <View className="editor" style={size ? {height: size.height} : undefined}>
-                <iframe className="editor_frame" src={this.getUrl()}/>
+                <iframe className="editor_frame" src={this.getUrl()} />
                 {loadingTemplate ?
                     <View className='loading'><AtActivityIndicator size={64} mode='center'/></View>
                     : null}

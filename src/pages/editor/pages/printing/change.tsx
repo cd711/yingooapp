@@ -967,6 +967,7 @@ const PrintChange: Taro.FC<any> = () => {
             skuid: skuId,
             total: isSetMeal ? 1 : count,
             page: "photo",
+            crop: fillStyle.style,
             parintImges: photos.map(v => {
                 const pixArr = photoStore.photoProcessParams.pictureSize.split("*");
                 debuglog("当前的尺寸参数：", pixArr)

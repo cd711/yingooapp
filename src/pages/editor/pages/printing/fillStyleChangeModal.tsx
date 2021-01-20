@@ -57,10 +57,11 @@ const FillStyleChange: Taro.FC<FillStyleChangeProps> = props => {
                                 <View className="left">
                                     <Text className="txt">选择图片的显示方式</Text>
                                 </View>
-                                <View className="right" onClick={() => setExclude(!exclude)}>
-                                    <IconFont name={exclude ? "22_yixuanzhong" : "22_touming-weixuanzhong"} size={32} />
-                                    <Text className="txt">排除已编辑的照片</Text>
-                                </View>
+                                <View />
+                                {/*<View className="right" onClick={() => setExclude(!exclude)}>*/}
+                                {/*    <IconFont name={exclude ? "22_yixuanzhong" : "22_touming-weixuanzhong"} size={32} />*/}
+                                {/*    <Text className="txt">排除已编辑的照片</Text>*/}
+                                {/*</View>*/}
                             </View>
                             <View className="change_items">
                                 <View className="item">

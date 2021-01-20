@@ -407,7 +407,7 @@ class Index extends Component<any, IndexState> {
         // Taro.hideTabBar()
     }
 
-    jumpToTemplate = type => {
+    jumpToTemplate = async type => {
         let url = "";
         // @ts-ignore
         let picID = "63";
@@ -441,28 +441,37 @@ class Index extends Component<any, IndexState> {
             case 3: url = `c=${cateInfo[0].tpl_category_id}&t=${cateInfo[0].tags[0].id}`; break;  // 全部
         }
 
-        if (type === 1) {
-            if (!userStore.isLogin) {
-                userStore.showLoginModal = true
-                return
-            }
-            Taro.navigateTo({
-                url: updateChannelCode("/pages/editor/pages/printing/index?id=34")
-            })
-        } else if (type === 2) {
-            if (!userStore.isLogin) {
-                userStore.showLoginModal = true
-                return
-            }
-            jumpToEditor({
-                cid: phoneID,
-                allowinit: "t"
-            })
-        } else {
+        if (type === 3) {
             Taro.navigateTo({
                 url: updateChannelCode(`/pages/order/pages/template/index?${url}`)
             })
+            return
         }
+
+        Taro.showLoading({title: "加载中..."});
+        try {
+            if (!userStore.isLogin) {
+                userStore.showLoginModal = true
+                return
+            }
+            const res = await api("app.product/info", {
+                id: type === 1 ? picID : phoneID,
+                is_fixed: 1
+            })
+            if (type === 1) {
+                Taro.navigateTo({
+                    url: updateChannelCode(`/pages/editor/pages/printing/index?id=${res.id}`)
+                })
+            } else if (type === 2) {
+                jumpToEditor({
+                    cid: res.id,
+                    allowinit: "t"
+                })
+            }
+        } catch (e) {
+
+        }
+        Taro.hideLoading()
     }
 
     filterArrForType = (arr = [], type: "photo" | "phone") => {
