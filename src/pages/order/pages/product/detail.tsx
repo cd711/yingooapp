@@ -47,7 +47,8 @@ export default class Login extends Component<{}, {
     selectSkuId: number;
     toastStatus: boolean;
     goodsPrice:string;
-    goodsMarketPrice:string
+    goodsMarketPrice:string;
+    imageCount: number
 }> {
 
     config: Config = {
@@ -76,7 +77,8 @@ export default class Login extends Component<{}, {
             toastStatus: false,
             selectSkuId: 0,
             goodsPrice:"0.00",
-            goodsMarketPrice:"0.00"
+            goodsMarketPrice:"0.00",
+            imageCount: 10,
         }
     }
 
@@ -136,6 +138,7 @@ export default class Login extends Component<{}, {
             });
         }
     }
+
     onShareAppMessage(){
         const {data} = this.state;
         if (data && data.id) {
@@ -174,6 +177,7 @@ export default class Login extends Component<{}, {
             imageUrl: shareInfo.imgUrl
         }
     }
+
     componentDidMount() {
         if (userStore.isLogin) {
             this.receiveCoupon()
@@ -481,6 +485,10 @@ export default class Login extends Component<{}, {
         })
     }
 
+    onSetMealCount = count => {
+        this.setState({imageCount: count || 10})
+    }
+
     render() {
         const {
             data,
@@ -493,6 +501,7 @@ export default class Login extends Component<{}, {
             maxBuyNum,
             showPicSelector,
             toast,
+            imageCount,
             toastStatus,
         } = this.state;
         const image: Array<any> = data && data.image && data.image.length > 0 ? data.image : [];
@@ -729,6 +738,7 @@ export default class Login extends Component<{}, {
                             productType={data && data.product_type ? data.product_type : ""}
                             defaultSelectIds={defalutSkuIds} data={data} showOkButton={showOkButton}
                             isShow={placeOrderShow} onClose={this.onPlaceOrderClose}
+                            onSetMealCount={this.onSetMealCount}
                             onBuyNumberChange={(n) => {
 
                                 this.setState({
@@ -856,6 +866,7 @@ export default class Login extends Component<{}, {
                         ? <View className="photo_picker_container">
                             <PhotosEle editSelect={showPicSelector} onClose={() => this.setState({showPicSelector: false})}
                                        defaultSelect={photoStore.photoProcessParams.usefulImages}
+                                       max={imageCount}
                                        onPhotoSelect={this.onPhotoSelect}/>
                         </View>
                         : null

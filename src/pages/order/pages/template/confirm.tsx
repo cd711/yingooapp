@@ -120,7 +120,7 @@ export default class Confirm extends Component<any, {
                 } else {
                     const {page, skuid, total}: any = resp;
                     this.isPhoto = page && page === "photo";
-                    let params = {};
+                    let params: any = {};
                     if (this.isPhoto) {
                         try {
                             await photoStore.getServerParams({setLocal: true});
@@ -134,7 +134,7 @@ export default class Confirm extends Component<any, {
                     } else {
                         params = resp
                     }
-                    const {tplid, model, orderid, cartIds, parintImges}: any = params;
+                    const {tplid, model, cartIds, parintImges}: any = params;
                     let data: any = {
                         sku_id: skuid,
                         quantity: total,
@@ -156,7 +156,11 @@ export default class Confirm extends Component<any, {
                         data["address_id"] = userStore.address.id;
                     }
                     if (this.isPhoto && parintImges) {
-                        data = {...data, print_images: JSON.stringify(parintImges)}
+                        data = {
+                            ...data,
+                            print_images: JSON.stringify(parintImges),
+                            crop: params.crop
+                        }
                     }
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;

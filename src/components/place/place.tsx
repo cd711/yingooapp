@@ -5,7 +5,7 @@ import IconFont from '../iconfont'
 import Counter from '../counter/counter'
 import isEmpty from 'lodash/isEmpty';
 import {flattens, intersection} from '../../utils/tool'
-import {debuglog} from "../../utils/common";
+import {debuglog, notNull} from "../../utils/common";
 
 interface OderParams {
     //商品信息
@@ -39,8 +39,10 @@ interface OderParams {
     //价格变化回调,参数一实际销售价格区间或者某一个价格，参数二为市场价格，当为空字符串时，说明市场价格没有
     onPriceChange?: (price: string, marketPrice: string) => void;
     // 引用类型，"photo" | "base"
-    quoteType?: "photo" | "base",
-    buyNumber?: number
+    quoteType?: "photo" | "base";
+    buyNumber?: number;
+    // 当套餐选择图片张数时改变的回调
+    onSetMealCount?: (count: number) => void;
 }
 
 const PlaceOrder: Taro.FC<OderParams> = props => {
@@ -56,7 +58,7 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
         buyNumber = 1,
         onClose, onBuyNumberChange,
         onSkuChange, onAddCart, onNowBuy, onOkButtonClick,
-        onNowButtonClick, onNamesChange, onPriceChange
+        onNowButtonClick, onNamesChange, onPriceChange, onSetMealCount
     } = props;
 
     const [price, setPrice] = useState("0");
@@ -271,6 +273,12 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
         }
     }
 
+    const onSelectSetMeal = (status, count) => {
+        if (status) {
+            onSetMealCount && onSetMealCount(parseInt(count))
+        }
+    }
+
 
     useEffect(() => {
         debuglog("data被初始化", data)
@@ -332,6 +340,9 @@ const PlaceOrder: Taro.FC<OderParams> = props => {
                                                         <View key={`${index}-${idx}`}
                                                             className={tag.over ? 'item over' : (tag.selected ? 'item active' : 'item')}
                                                             onClick={() => {
+                                                                if (!notNull(item.special_show) && item.special_show === "setmeal") {
+                                                                    onSelectSetMeal(!tag.selected, attrItems[index][idx].value)
+                                                                }
                                                                 if (item.disable && item.disable === true) {
                                                                     return
                                                                 }

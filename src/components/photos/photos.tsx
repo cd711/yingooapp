@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api,options} from "../../utils/net";
 import UploadFile from "../../components/Upload/Upload";
-import {debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
+import {debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import PopLayout, {PopLayoutItemProps} from "../popLayout";
@@ -80,18 +80,17 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     }
 
     // 在排除已使用的图片后可能存在数量不够导致的不能上拉加载更多的问题
-    getListAgain = async () => {
-        let imageList = this.state.imageList;
-        const arr = imageList.filter(v => !notNull(v.display));
-        if (arr.length < 25) {
+    getListAgain = async (list = []) => {
+        if (list.length < 25) {
             try {
+                let tempArr = [];
                 const res = await api("app.profile/imgs", {
-                    start: arr.length,
-                    size: 25 - arr.length,
+                    start: list.length,
+                    size: 25 - list.length,
                     type: "image"
                 });
-                imageList = imageList.concat(res.list);
-                this.setState({imageList})
+                tempArr = list.concat(res.list);
+                this.setState({imageList: tempArr})
             } catch (e) {
 
             }
@@ -101,7 +100,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     private total: number = 0;
     getList(data) {
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<Array<any>>(async (resolve, reject) => {
             const opt = {
                 start: data.start || 0,
                 size: data.size || 25,
@@ -149,7 +148,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     imageList: list,
                     loadStatus: Number(res.total) === list.length ? "noMore" : "more"
                 }, () => {
-                    resolve()
+                    resolve(list)
                 })
             } catch (e) {
                 reject(e)
@@ -163,7 +162,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     initPropsToState = () => {
 
         const {editSelect, count, max} = this.props;
-
         const _editSelect = editSelect || false;
         const _count = count || 0;
         const _max = max || 100;
@@ -176,8 +174,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
 
     componentDidMount() {
         this.initPropsToState()
-        this.getList({start: 0}).then(() => {
-            this.getListAgain()
+        this.getList({start: 0}).then((res) => {
+            this.getListAgain(res)
         })
     }
 

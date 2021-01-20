@@ -1089,13 +1089,11 @@ const PrintChange: Taro.FC<any> = () => {
                 const len = photoStore.photoProcessParams.attrItems[idx].length
                 for (let i = 0; i < len; i++) {
                     const item = photoStore.photoProcessParams.attrItems[idx][i];
-                    debuglog(1111, JSON.parse(JSON.stringify(item)))
                     if (parseInt(item.value) >= count) {
                         let c = i - 1;
                         if (c <= 0) {
                             c = 0
                         }
-                        debuglog("c：", c, i)
                         setCount(res, photoStore.photoProcessParams.attrItems[idx][i].id)
                         break;
                     } else {
