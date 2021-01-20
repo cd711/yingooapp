@@ -200,7 +200,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
         if (total.current === templateList.length || total.current <= 15) {
             return
         }
-        setPage(pagtion.page)
+        setPage(pagtion.page);
         setStatus("loading")
         getListOfCategory({
             tagId: typeList[active].id,
