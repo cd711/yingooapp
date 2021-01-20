@@ -416,7 +416,7 @@ export default class Confirm extends Component<any, {
         orders.forEach(element => {
             let tid = 0;
             if (isEmptyX(element.use_coupon) && !isEmptyX(element.usable_discounts) && element.usable_discounts.length>0) {
-                let discounts:Array<any> = element.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != element.pre_order_id));
+                const discounts:Array<any> = element.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != element.pre_order_id));
                 const tmp = JSON.parse(JSON.stringify(discounts));
                 tmp.sort((a,b)=>parseFloat(a.coupon.money)-parseFloat(b.coupon.money));
                 if (tmp.length>0) {
@@ -436,13 +436,6 @@ export default class Confirm extends Component<any, {
                         }
                     }
                 }
-                discounts = discounts.map((item) => {
-                    item["checked"] = false;
-                    if (tid == item.id) {
-                        item["checked"] = true;
-                    }
-                    return item;
-                });
                 
             }
             if (parseInt(tid+"")>0) {
@@ -583,6 +576,7 @@ export default class Confirm extends Component<any, {
     private onUseTicketCallBack:()=>void = undefined;
     //点击商品优惠券
     onGoodsItemClick = (item, usedTickets) => {
+        console.log("当前已选的优惠券",usedTickets);
         let discounts = item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id));
         if (discounts == 0) {
             return;
