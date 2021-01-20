@@ -215,7 +215,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
     }
 
     const _onOk = () => {
-        onOk && onOk(selected)
+        onOk && onOk(selected);
     }
 
     return <View className='switch-template'>
