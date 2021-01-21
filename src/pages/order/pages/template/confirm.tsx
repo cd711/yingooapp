@@ -18,7 +18,6 @@ import {
     getTempDataContainer,
     isEmptyX,
     jumpUri,
-    notNull,
     ossUrl,
     setTempDataContainer, updateChannelCode,
 } from '../../../../utils/common';
@@ -164,6 +163,7 @@ export default class Confirm extends Component<any, {
                     }
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;
+                        Taro.getApp().finishId = null;
                         Taro.hideLoading();
                         if (resp && isEmptyX(resp.orderid)) {
                             Object.assign(resp,{
@@ -403,13 +403,13 @@ export default class Confirm extends Component<any, {
         }
         this.setState({
             usedTickets: temp
-        }) 
+        })
     }
     /**
      * 推荐选中优惠券
      * @param {*}
      * @return {*}
-     */   
+     */
     autoSelectTicket = (res) => {
         const {orders,prepay_id} = res;
         const {usedTickets} = this.state;
@@ -436,7 +436,7 @@ export default class Confirm extends Component<any, {
                         }
                     }
                 }
-                
+
             }
             if (parseInt(tid+"")>0) {
                 this.useTicket(prepay_id,element.pre_order_id,tid);
@@ -652,7 +652,7 @@ export default class Confirm extends Component<any, {
                 icon: "none",
                 duration: 2000
             })
-        })  
+        })
     }
 
     getAddBuyProduct = () => {
@@ -1039,23 +1039,25 @@ export default class Confirm extends Component<any, {
                         : null
                 }
                 {
-                    this.initPayWayModal ?<PayWayModal
-                    isShow={showPayWayModal}
-                    totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
-                    order_sn={order_sn}
-                    onResult={this.onResult}
-                    onClose={() => {
-                        this.setState({
-                            showPayWayModal: false
-                        });
-                        if (deviceInfo.env == 'h5') {
-                            window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
-                        }
-                        Taro.getApp().tab = 1;
-                        Taro.switchTab({
-                            url: updateChannelCode('/pages/tabbar/order/order?tab=1')
-                        })
-                    }}/>:null
+                    this.initPayWayModal
+                        ? <PayWayModal
+                            isShow={showPayWayModal}
+                            totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
+                            order_sn={order_sn}
+                            onResult={this.onResult}
+                            onClose={() => {
+                                this.setState({
+                                    showPayWayModal: false
+                                });
+                                if (deviceInfo.env == 'h5') {
+                                    window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
+                                }
+                                Taro.getApp().tab = 1;
+                                Taro.switchTab({
+                                    url: updateChannelCode('/pages/tabbar/order/order?tab=1')
+                                })
+                            }}/>
+                        : null
                 }
             </View>
         )

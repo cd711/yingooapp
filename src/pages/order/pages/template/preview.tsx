@@ -258,7 +258,6 @@ export default class Preview extends Component<any, {
         api('app.product/info', {
             id: 30
         }).then((res) => {
-            // debuglog("aaa",res);
             getTempDataContainer("product_preview_sku", (val) => {
 
                 if (val && val.sku.length > 0) {
@@ -286,18 +285,21 @@ export default class Preview extends Component<any, {
     onEditor = () => {
         const {workId, workInfo, doc} = this.state;
         debuglog(workId, workInfo)
-        Taro.getApp().finishId = workInfo.id && workInfo.id || workId;
         if (deviceInfo.env === "h5") {
-            window.location.replace(updateChannelCode(`/pages/editor/pages/shell?id=${workInfo.id && workInfo.id || workId}&cid=${workInfo.category_id && workInfo.category_id || doc.cid}&edited=t`));
+            const str = getURLParamsStr(urlEncode({
+                id: workInfo.id && workInfo.id || workId,
+                cid: workInfo.category_id && workInfo.category_id || doc.cid,
+                edited: "t"
+            }))
+            window.location.replace(updateChannelCode(`/pages/editor/pages/shell?${str}`));
         } else {
+            Taro.getApp().finishId = workInfo.id && workInfo.id || workId;
             Taro.navigateBack()
         }
     }
 
     onOrderIng = () => {
-        // const {workId} = this.state;
         const {isLogin} = userStore;
-        // this.initModalShow = true;
         if (isLogin) {
             this.setState({
                 placeOrderShow: true
@@ -305,18 +307,6 @@ export default class Preview extends Component<any, {
         } else {
             userStore.showLoginModal = true;
         }
-
-        // if (!id) {
-        //     this.setState({isOpened: true})
-        //     return
-        // }
-        // if (parseInt(workId+'')>0) {
-        //     this.getShellInfo()
-        // } else {
-        //     this.onSave(null,()=>{
-        //         this.getShellInfo()
-        //     });
-        // }
     }
 
     getUrl = () => {
@@ -325,31 +315,41 @@ export default class Preview extends Component<any, {
             : `/editor/mobile?token=${getToken()}&tpl_id=0&readonly=1`
     }
 
+    onBack = async () => {
+        const {workId, workInfo, doc} = this.state;
+        const {self} = this.$router.params;
+        const workid = workInfo && workInfo.id ? workInfo.id : workId;
+
+        if (!notNull(self) && self === "t") {
+            Taro.navigateBack()
+            return
+        }
+        let uri = '/pages/editor/pages/shell';
+        if (workId) {
+            const str = getURLParamsStr(urlEncode({
+                id: workInfo.id && workInfo.id || workId,
+                cid: workInfo.category_id && workInfo.category_id || doc.cid,
+                edited: "t"
+            }))
+            uri = updateChannelCode(`/pages/editor/pages/shell?${str}`);
+        }
+        if (deviceInfo.env == 'h5') {
+            window.location.replace(updateChannelCode(uri));
+        } else {
+            Taro.getApp().finishId = workid;
+            Taro.navigateBack()
+        }
+    }
+
     render() {
         const {placeOrderShow, workId, productInfo, workInfo, defalutSelectIds} = this.state;
-        const {self} = this.$router.params;
         const workid = workInfo && workInfo.id ? workInfo.id : workId;
 
         return (
             <View className='preview'>
                 <LoginModal isTabbar={false} />
                 <View className='nav-bar' style={fixStatusBarHeight()}>
-                    <View className='left' onClick={() => {
-                        if (!notNull(self) && self === "t") {
-                            Taro.navigateBack()
-                            return
-                        }
-                        let uri = '/pages/editor/pages/shell';
-                        if (workId) {
-                            uri = updateChannelCode(`/pages/editor/pages/shell?id=${workId}`);
-                        }
-                        if (deviceInfo.env == 'h5') {
-                            window.location.replace(updateChannelCode(uri));
-                        } else {
-                            Taro.getApp().finishId = workid;
-                            Taro.navigateBack()
-                        }
-                    }}>
+                    <View className='left' onClick={this.onBack}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
                     <View className='center'>

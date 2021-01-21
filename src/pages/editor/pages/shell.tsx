@@ -1435,9 +1435,6 @@ export default class Shell extends Component<{}, {
 
     }
 
-    componentDidShow() {
-        debuglog("--------------show")
-    }
 
     componentWillUnmount() {
         editorProxy = null;
@@ -1593,11 +1590,18 @@ export default class Shell extends Component<{}, {
 
         if (!notNull(params.workid) && params.workid !== "f") {
             try {
-                const doc = await callEditor("getDoc");
+                const doc:any = await callEditor("getDoc");
                 const obj = {
-                    doc: JSON.stringify(doc),
-                    id: params.workid
+                    doc: JSON.stringify({
+                        ...doc,
+                        platform_tpl_id: doc.id
+                    }),
+                    id: params.workid,
                 }
+                debuglog(`上面提交的数据：${JSON.stringify({
+                    id: params.workid,
+                    platform_tpl_id: doc.id
+                })}`)
                 const res = await api("editor.user_tpl/add",obj);
                 debuglog("已编辑过的模板--->更新后再次编辑：", res)
                 wx.miniProgram.navigateTo({
@@ -1611,8 +1615,16 @@ export default class Shell extends Component<{}, {
 
         try{
 
-            const doc = await callEditor("getDoc");
-            const res = await api("editor.user_tpl/add",{doc: JSON.stringify(doc)});
+            const doc:any = await callEditor("getDoc");
+            const res = await api("editor.user_tpl/add",{
+                doc: JSON.stringify({
+                    ...doc,
+                    platform_tpl_id: doc.id
+                }),
+            });
+            debuglog(`下面提交的数据：${JSON.stringify({
+                platform_tpl_id: doc.id
+            })}`)
             debuglog("小程序编辑模板后提交：editor.user_tpl/add--->", res)
             wx.miniProgram.navigateTo({
                 url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`),
@@ -1643,9 +1655,13 @@ export default class Shell extends Component<{}, {
             title: "请稍候"
         });
         try {
-            const doc = await callEditor("getDoc");
+            const doc:any = await callEditor("getDoc");
+            debuglog("当前模板的模板：", doc)
             const obj = {
-                doc: JSON.stringify(doc)
+                doc: JSON.stringify({
+                    ...doc,
+                    platform_tpl_id: doc.id
+                }),
             }
             if (params.id) {
                 Object.assign(obj, {id: params.id})
