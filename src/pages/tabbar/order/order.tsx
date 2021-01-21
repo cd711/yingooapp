@@ -452,7 +452,7 @@ export default class Order extends Component<any,{
                                             }
                                             Taro.hideTabBar();
                                             this.setState({
-                                                order_price:item.order_price,
+                                                order_price:item.pay_price,
                                                 order_sn:item.order_sn,
                                                 showPayWayModal:true,
                                                 orderId:item.id

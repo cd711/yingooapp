@@ -50,7 +50,8 @@ export default class Confirm extends Component<any, {
     payStatus: number,
     orderid: string,
     centerPartyHeight: number;
-    orderMessages:any
+    orderMessages:any;
+    payPrice:string
 }> {
 
     config: Config = {
@@ -73,7 +74,8 @@ export default class Confirm extends Component<any, {
             payStatus: 0,
             orderid: "",
             centerPartyHeight: 500,
-            orderMessages:{}
+            orderMessages:{},
+            payPrice:"0.00"
         }
     }
 
@@ -474,6 +476,7 @@ export default class Confirm extends Component<any, {
                 return;
             }
             this.setState({
+                payPrice:parseFloat(res.pay_price+"").toFixed(2),
                 order_sn: res.order_sn,
                 showPayWayModal: true,
                 payStatus:res.status
@@ -787,7 +790,7 @@ export default class Confirm extends Component<any, {
     }
 
     render() {
-        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight,orderMessages} = this.state;
+        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight,orderMessages,payPrice} = this.state;
         const {address} = data;
         debuglog("data数据",data)
         // @ts-ignore
@@ -1052,7 +1055,7 @@ export default class Confirm extends Component<any, {
                     this.initPayWayModal
                         ? <PayWayModal
                             isShow={showPayWayModal}
-                            totalPrice={parseFloat(data.pay_price + "") > 0 ? parseFloat(data.pay_price + "").toFixed(2) : "0.00"}
+                            totalPrice={parseFloat(payPrice + "") > 0 ? payPrice : "0.00"}
                             order_sn={order_sn}
                             onResult={this.onResult}
                             onClose={() => {
