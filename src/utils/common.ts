@@ -433,17 +433,18 @@ export function removeURLParameter(url, parameter) {
 
 /**
  * 获取改分类下第一个模板内容
- * @param cid {string}  商品分类id
  */
-export function getFirstTemplateDoc(cid) {
+export function getFirstTemplateDoc() {
     return new Promise(async (resolve, reject) => {
         api("app.product/cate").then(res => {
 
             // 获取标签分类
             let arr = [];
+            let cid = "41";
             for (const item of res) {
-                if (item.tpl_category_id == cid) {
+                if (item.tpl_type == "phone") {
                     arr = item.tags;
+                    cid = item.tpl_category_id;
                     break;
                 }
             }
