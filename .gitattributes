@@ -1,0 +1,3 @@
+src/index.html merge=ours
+src/config.ts merge=ours
+project.config.json merge=ours

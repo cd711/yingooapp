@@ -87,7 +87,6 @@ function serverPlatform() {
 
 export function api(name: string, params?: any, allowJson = false): Promise<any> {
     return new Promise<any>( (resolve, reject) => {
-
         let channel_code = "";
         if (options.channel) {
             channel_code = options.channel;

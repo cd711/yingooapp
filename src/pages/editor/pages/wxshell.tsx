@@ -6,7 +6,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {debuglog, getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
+import {debuglog, deviceInfo, getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
 import {api, getToken} from "../../../utils/net";
 import dayjs from "dayjs"
 import page from "../../../utils/ext";
@@ -60,6 +60,7 @@ export default class Shell extends Component<{}, {
         if (finishId) {
             try {
                 const res = await api("editor.user_tpl/info", {id: finishId});
+                debuglog("反查询的tpl_product_id：", res)
                 this.tplId = res.tpl_product_id
             } catch (e) {
 
@@ -70,6 +71,9 @@ export default class Shell extends Component<{}, {
 
 
     back = () => {
+        if (deviceInfo.env === "weapp") {
+            Taro.getApp().finishId = null;
+        }
         if (Taro.getCurrentPages().length > 1) {
             Taro.navigateBack();
         } else {

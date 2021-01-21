@@ -21,7 +21,7 @@ class Photo {
     // 创建操作仅仅只是在初始化选择尺寸后创建，其余要改变photoProcessParams的值只是在updateServerParams中进行
     @action
     public setActionParamsToServer(_key = "", data:{[key: string] : any} = {}) {
-        return new Promise<any>(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             debuglog("key:", getUserKey())
             try {
                 debuglog("进来的值：", JSON.parse(JSON.stringify(data)))

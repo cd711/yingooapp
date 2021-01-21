@@ -18,7 +18,6 @@ import {
     getTempDataContainer,
     isEmptyX,
     jumpUri,
-    notNull,
     ossUrl,
     setTempDataContainer, updateChannelCode,
 } from '../../../../utils/common';
@@ -164,6 +163,7 @@ export default class Confirm extends Component<any, {
                     }
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;
+                        Taro.getApp().finishId = null;
                         Taro.hideLoading();
                         if (resp && isEmptyX(resp.orderid)) {
                             Object.assign(resp,{
@@ -174,13 +174,13 @@ export default class Confirm extends Component<any, {
 
                         Object.assign(resp,{addressId:res.address && res.address.id?res.address.id:0});
                         addOrderConfimPreviewData(this.unixOrder,resp)
-                        this.filterUsedTicket(res.orders);
+                        // this.filterUsedTicket(res.orders);
                         templateStore.address = res.data;
                         this.setState({
                             data: this.handleData(res),
                             orderid: res.prepay_id
                         });
-                        // this.autoSelectTicket(res);
+                        this.autoSelectTicket(res);
                         if (parseInt(data["address_id"]+"") > 0 && !isEmptyX(data["address_id"]) && data["address_id"] == userStore.address.id && res.address == null && !res.delivery) {
                             Taro.showToast({
                                 title:"默认收货地址无法配送,请重新选择",
@@ -403,20 +403,20 @@ export default class Confirm extends Component<any, {
         }
         this.setState({
             usedTickets: temp
-        }) 
+        })
     }
     /**
      * 推荐选中优惠券
      * @param {*}
      * @return {*}
-     */   
+     */
     autoSelectTicket = (res) => {
         const {orders,prepay_id} = res;
-        const {usedTickets} = this.state;
+        const used_Tickets = [];
         orders.forEach(element => {
             let tid = 0;
             if (isEmptyX(element.use_coupon) && !isEmptyX(element.usable_discounts) && element.usable_discounts.length>0) {
-                const discounts:Array<any> = element.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != element.pre_order_id));
+                const discounts:Array<any> = element.usable_discounts.filter(obj => !used_Tickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != element.pre_order_id));
                 const tmp = JSON.parse(JSON.stringify(discounts));
                 tmp.sort((a,b)=>parseFloat(a.coupon.money)-parseFloat(b.coupon.money));
                 if (tmp.length>0) {
@@ -436,12 +436,21 @@ export default class Confirm extends Component<any, {
                         }
                     }
                 }
-                
+
             }
             if (parseInt(tid+"")>0) {
+                const t = {
+                    orderId: element.pre_order_id,
+                    ticketId: tid
+                }
+                used_Tickets.push(t);
+
                 this.useTicket(prepay_id,element.pre_order_id,tid);
             }
         });
+        this.setState({
+            usedTickets: used_Tickets
+        }) 
 
     }
     onSubmitOrder = () => {
@@ -576,7 +585,7 @@ export default class Confirm extends Component<any, {
     private onUseTicketCallBack:()=>void = undefined;
     //点击商品优惠券
     onGoodsItemClick = (item, usedTickets) => {
-        console.log("当前已选的优惠券",usedTickets);
+        
         let discounts = item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id));
         if (discounts == 0) {
             return;
@@ -628,7 +637,7 @@ export default class Confirm extends Component<any, {
             tickets: discounts
         })
     }
-    useTicket = (prepay_id,pre_order_id,currentSelectId) => {
+    useTicket = (prepay_id,pre_order_id,currentSelectId,successCallBack?:()=>void) => {
         Taro.showLoading({title: "加载中"});
         api("app.order_temp/coupon", {
             prepay_id: prepay_id,
@@ -636,6 +645,7 @@ export default class Confirm extends Component<any, {
             usercoupon_id: currentSelectId
         }).then((res) => {
             Taro.hideLoading();
+            successCallBack && successCallBack();
             this.filterUsedTicket(res.orders);
             this.setState({
                 data: this.handleData(res)
@@ -652,7 +662,7 @@ export default class Confirm extends Component<any, {
                 icon: "none",
                 duration: 2000
             })
-        })  
+        })
     }
 
     getAddBuyProduct = () => {
@@ -1039,23 +1049,25 @@ export default class Confirm extends Component<any, {
                         : null
                 }
                 {
-                    this.initPayWayModal ?<PayWayModal
-                    isShow={showPayWayModal}
-                    totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
-                    order_sn={order_sn}
-                    onResult={this.onResult}
-                    onClose={() => {
-                        this.setState({
-                            showPayWayModal: false
-                        });
-                        if (deviceInfo.env == 'h5') {
-                            window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
-                        }
-                        Taro.getApp().tab = 1;
-                        Taro.switchTab({
-                            url: updateChannelCode('/pages/tabbar/order/order?tab=1')
-                        })
-                    }}/>:null
+                    this.initPayWayModal
+                        ? <PayWayModal
+                            isShow={showPayWayModal}
+                            totalPrice={parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}
+                            order_sn={order_sn}
+                            onResult={this.onResult}
+                            onClose={() => {
+                                this.setState({
+                                    showPayWayModal: false
+                                });
+                                if (deviceInfo.env == 'h5') {
+                                    window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
+                                }
+                                Taro.getApp().tab = 1;
+                                Taro.switchTab({
+                                    url: updateChannelCode('/pages/tabbar/order/order?tab=1')
+                                })
+                            }}/>
+                        : null
                 }
             </View>
         )
