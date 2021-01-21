@@ -25,6 +25,7 @@ import config from "../../../config";
 import wx from 'weixin-js-sdk'
 import TipModal from "../../../components/tipmodal/TipModal";
 import page from "../../../utils/ext";
+import serverConfig from "../../../config/config";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -75,8 +76,6 @@ interface BrandType {
 // 换模板
 const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => void }> = ({onClose, onOk}) => {
 
-    const router = Taro.useRouter();
-
     const prodList = Taro.useRef([]);
     const [typeList, setTypeList] = useState([]);
     const [active, setActive] = useState(0);
@@ -91,7 +90,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
     async function getListOfCategory(params: { tagId?: number | string, page?: number, size?: number, loadMore?: boolean } = {}) {
 
         const opt = {
-            cid: router.params.cid,
+            cid: serverConfig.goodsID.phoneTplCategoryID,
             tagId: params.tagId || "",
             page: params.page || 1,
             size: params.size || 15,
@@ -150,7 +149,7 @@ const Template: Taro.FC<{ parent: Shell; onClose: () => void, onOk: (docId) => v
             // 获取标签分类
             let arr = [];
             for (const item of res) {
-                if (Number(item.tpl_category_id) === Number(router.params.cid)) {
+                if (item.tpl_type == "phone") {
                     arr = item.tags;
                     break;
                 }
@@ -1225,7 +1224,7 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
     async function setDefaultDoc() {
         try {
-            const res = await getFirstTemplateDoc(parent.$router.params.cid);
+            const res = await getFirstTemplateDoc();
             if (res) {
                 await callEditor("setDoc", res)
             }
@@ -1455,7 +1454,7 @@ export default class Shell extends Component<{}, {
         debuglog("onLoadEmpty", tpl_id, id)
         if (tpl_id == "0" || notNull(tpl_id)) {
             try {
-                const doc = await getFirstTemplateDoc(this.$router.params.cid)
+                const doc = await getFirstTemplateDoc()
 
                 if (doc) {
                     await callEditor("setDoc", doc);
