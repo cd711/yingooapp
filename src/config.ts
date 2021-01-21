@@ -4,6 +4,7 @@ if (process.env.TARO_ENV == "h5") {
     // @ts-ignore
     // eslint-disable-next-line no-undef
     productionUrl = common_config.url ? common_config.url : productionUrl;
+    //
 }
 const config = {
     apiUrl: process.env.NODE_ENV !== 'production' ? testApiUrl : productionUrl,
