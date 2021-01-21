@@ -519,7 +519,7 @@ export default class OrderDetail extends Component<{},{
                 </View>
                 <PayWayModal
                     isShow={showPayWayModal}
-                    totalPrice={parseFloat(data.order_price+"")>0?parseFloat(data.order_price+"").toFixed(2):"0.00"}
+                    totalPrice={parseFloat(data.pay_price+"")>0?parseFloat(data.pay_price+"").toFixed(2):"0.00"}
                     order_sn={data.order_sn}
                     onResult={this.onResult}
                     onClose={()=>{
