@@ -6,7 +6,7 @@ if (process.env.TARO_ENV == "h5") {
     productionUrl = common_config.url ? common_config.url : productionUrl;
 }
 const config = {
-    apiUrl: process.env.NODE_ENV !== 'production' ? testApiUrl : productionUrl,
+    apiUrl: process.env.NODE_ENV !== 'production' ? testApiUrl : testApiUrl,
     // apiUrl:"https://yin.gaozhenzhen.com/api/",
     // 静态资源地址
     sourceUrl: "https://cdn.playbox.yingoo.com/",
