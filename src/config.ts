@@ -12,7 +12,7 @@ const config = {
     // 静态资源地址
     sourceUrl: "https://cdn.playbox.yingoo.com/",
     // 编辑器本地地址
-    editorUrl: process.env.NODE_ENV !== 'production' ? "https://test.playbox.yingoo.com" : "https://m.playbox.yingoo.com",
+    editorUrl: process.env.NODE_ENV !== 'production' ? "https://test.playbox.yingoo.com" : "https://561454564564564564",
     // editorUrl:"https://yin.gaozhenzhen.com",
     // 本地H5地址
     h5Url: process.env.NODE_ENV !== 'production' ? "https://test.playbox.yingoo.com" : "https://m.playbox.yingoo.com",
