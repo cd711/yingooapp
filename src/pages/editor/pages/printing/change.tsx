@@ -1070,7 +1070,8 @@ const PrintChange: Taro.FC<any> = () => {
         try {
             const res = await api("app.product/info", {id: photoStore.photoProcessParams.photo.id});
             if (res.attrGroup && res.attrGroup instanceof Array) {
-                res.attrGroup = res.attrGroup.map(val => ({...val, disable: !notNull(val.special_show)}))
+                const specialArr = ["photosize", "photonumber", "setmeal"];
+                res.attrGroup = res.attrGroup.map(val => ({...val, disable: !notNull(val.special_show) && specialArr.indexOf(val.special_show) > -1}))
             }
             goodsInfo.current = res;
 
