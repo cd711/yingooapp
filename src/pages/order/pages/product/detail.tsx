@@ -124,7 +124,15 @@ export default class Login extends Component<{}, {
     }
 
     componentDidShow() {
-        photoStore.setActionParamsToServer(getUserKey(), new PhotoParams())
+        observe(userStore, "id", (change) => {
+            if (change.newValue != change.oldValue && userStore.isLogin) {
+                photoStore.setActionParamsToServer(getUserKey(), new PhotoParams())
+            }
+        })
+        if (userStore.isLogin) {
+            photoStore.setActionParamsToServer(getUserKey(), new PhotoParams())
+        }
+
     }
 
     componentWillMount() {

@@ -236,7 +236,7 @@ export default class Cart extends Component<{}, {
                                         }}>
                                             <View className='item_container'
                                                 onClick={this.onItemClick.bind(this, list, index)}>
-                                                <Checkboxs isChecked={item.checked} className='left' disabled/>
+                                                <Checkboxs isChecked={item.checked} className='left' disabled onCheckedClick={this.onItemClick.bind(this, list, index)}/>
                                                 <View className='right'>
                                                     <View className='pre-image'>
                                                         <Image src={ossUrl(item.thumb_image, 0)} className='img'
