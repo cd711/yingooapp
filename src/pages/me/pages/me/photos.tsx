@@ -436,7 +436,7 @@ export default class Photos extends Component<{}, PhotosState> {
                         />
                         : null
                 }
-                <DocumentTransfer />
+                {/*<DocumentTransfer visible={true} />*/}
             </View>
         )
     }

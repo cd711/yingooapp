@@ -118,9 +118,8 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
         });
 
         upload.progress(res => {
-            debuglog("上传进度：", res.progress, res.totalBytesSent);
+            // debuglog("上传进度：", res.progress, res.totalBytesSent);
             tempFiles[i].progress = res.totalBytesSent;
-            debuglog("当前的进度：", tempFiles[i])
             setFiles([...tempFiles]);
         })
     }
