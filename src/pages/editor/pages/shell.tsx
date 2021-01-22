@@ -1412,7 +1412,7 @@ export default class Shell extends Component<{}, {
                 }
             }
         } catch (e) {
-
+            debuglog("初始化编辑器出错：", e)
         }
         if (!this.defaultModel) {
             this.defaultModel = await this.getDefaultPhoneShell();
@@ -1676,10 +1676,10 @@ export default class Shell extends Component<{}, {
                 doc: doc
             });
             Taro.hideLoading();
-            Taro.navigateTo({
-                url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`)
-            })
-            // window.location.replace(updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`));
+            // Taro.navigateTo({
+            //     url: updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`)
+            // })
+            window.location.replace(updateChannelCode(`/pages/order/pages/template/preview?workid=${res.id}`));
         } catch (e) {
             Taro.hideLoading();
             Taro.showToast({

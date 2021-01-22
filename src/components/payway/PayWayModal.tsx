@@ -28,7 +28,7 @@ const PayWayModal: Taro.FC<{
         //     icon:'32_zhifubaozhifu',
         //     name:'支付宝',
         //     value:'alipay',
-        //     checked:false
+        //     checked:false,
         // }
     ]
     if ((is_weixin() && deviceInfo.env == 'h5') ||deviceInfo.env == 'weapp') {
