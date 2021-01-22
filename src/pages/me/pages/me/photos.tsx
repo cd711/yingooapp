@@ -13,6 +13,7 @@ import {observer} from "@tarojs/mobx";
 import {userStore} from "../../../../store/user";
 import dayjs from "dayjs";
 import page from "../../../../utils/ext";
+import DocumentTransfer from "../../../../components/documentTransfer";
 
 
 interface PhotosState {
@@ -435,6 +436,7 @@ export default class Photos extends Component<{}, PhotosState> {
                         />
                         : null
                 }
+                <DocumentTransfer />
             </View>
         )
     }
