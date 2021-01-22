@@ -976,7 +976,7 @@ export default class Confirm extends Component<any, {
                                     <View className='price'>
                                         <Text className='sym'>¥</Text>
                                         <Text
-                                            className='num'>{parseFloat(item.delivery_price + "") > 0 ? parseFloat(item.delivery_price + "").toFixed(2) : "00.00"}</Text>
+                                            className='num'>{parseFloat(item.delivery_price + "") > 0 ? parseFloat(item.delivery_price + "").toFixed(2) : "0.00"}</Text>
                                     </View>
                                 </View>
                                 <View className='goods-item'>
@@ -984,7 +984,7 @@ export default class Confirm extends Component<any, {
                                     <View className='price red'>
                                         <Text className='sym'>¥</Text>
                                         <Text
-                                            className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "00.00"}</Text>
+                                            className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "0.00"}</Text>
                                     </View>
                                 </View>
                                 <View className='goods-item'>
@@ -1007,7 +1007,7 @@ export default class Confirm extends Component<any, {
                             <View className='price'>
                                 <Text className='sym'>¥</Text>
                                 <Text
-                                    className='num'>{parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "00.00"}</Text>
+                                    className='num'>{parseFloat(data.order_price + "") > 0 ? parseFloat(data.order_price + "").toFixed(2) : "0.00"}</Text>
                             </View>
                         </View>
                         {

@@ -474,7 +474,7 @@ export default class OrderDetail extends Component<{},{
                             }}><IconFont name='20_fuzhi' size={40} color='#9C9DA6' /></View>
                         </View>
                         <Text className='order-time'>下单时间：{dayjs.unix(data.create_time).format("YYYY-MM-DD HH:mm:ss")}</Text>
-                        <Text className='pay-way'>支付方式：微信支付</Text>
+                        <Text className='pay-way'>支付方式：{data && data.pay_type != null ? (data.pay_type=="wechat"?"微信支付":data.pay_type=="alipay"?"支付宝支付":data.pay_type=="automatic"?"0元自动付款":data.pay_type=="admin"?"后台操作":"其他"):"未支付"}</Text>
                     </View>
                 </View>
                 {
