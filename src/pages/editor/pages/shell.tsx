@@ -1190,9 +1190,9 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
         let list = null;
 
         try {
-            //@ts-ignore
             const res = brandList[brandIndex] ? Taro.getStorageSync("phone_series_" + brandList[brandIndex].id) : null;
-            if (res && res.time + 3 * 86400000 > Date.now()) {
+            if (!notNull(res) && dayjs(res.time).add(3, "hours").valueOf() < dayjs().valueOf()) {
+                debuglog("当前手机型号是否到了过期时间：", "过期时间：", dayjs(res.time).add(3, "hours").format("YYYY-MM-DD"), dayjs(res.time).add(3, "hours").valueOf() < dayjs().valueOf())
                 list = res.list;
             }
         } catch (e) {
@@ -1201,7 +1201,7 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
         }
         if (!list) {
             try {
-                list = await api("/editor.phone_shell/series", {
+                list = await api("editor.phone_shell/series", {
                     id: brandList[brandIndex].id
                 });
                 debuglog(list);
@@ -1216,7 +1216,7 @@ const ToolBar0: Taro.FC<{ parent: Shell }> = ({parent}) => {
 
         Taro.setStorage({
             key: "phone_series_" + brandList[brandIndex].id, data: {
-                time: Date.now(),
+                time: dayjs().valueOf(),
                 list: list
             }
         });
@@ -1593,7 +1593,8 @@ export default class Shell extends Component<{}, {
                 const obj = {
                     doc: JSON.stringify({
                         ...doc,
-                        platform_tpl_id: doc.id
+                        platform_tpl_id: doc.id,
+                        phone_model_id: doc.r.phone_shell.id
                     }),
                     id: params.workid,
                 }
@@ -1618,7 +1619,8 @@ export default class Shell extends Component<{}, {
             const res = await api("editor.user_tpl/add",{
                 doc: JSON.stringify({
                     ...doc,
-                    platform_tpl_id: doc.id
+                    platform_tpl_id: doc.id,
+                    phone_model_id: doc.r.phone_shell.id
                 }),
             });
             debuglog(`下面提交的数据：${JSON.stringify({
@@ -1659,7 +1661,8 @@ export default class Shell extends Component<{}, {
             const obj = {
                 doc: JSON.stringify({
                     ...doc,
-                    platform_tpl_id: doc.id
+                    platform_tpl_id: doc.id,
+                    phone_model_id: doc.r.phone_shell.id
                 }),
             }
             if (params.id) {
