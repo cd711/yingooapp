@@ -391,7 +391,7 @@ export default class Preview extends Component<any, {
                         api("app.cart/add", {
                             sku_id: selectSkuId,
                             user_tpl_id: workId,
-                            phone_model_id: modalId,
+                            phone_model_id: workInfo.phone_model_id,
                             quantity: buyTotal
                         }).then(() => {
                             Taro.hideLoading();
@@ -426,7 +426,7 @@ export default class Preview extends Component<any, {
                             skuid: selectSkuId,
                             total: buyTotal,
                             tplid: workId,
-                            model: modalId
+                            model: workInfo.phone_model_id
                         })
                     } else {
                         Taro.showToast({
