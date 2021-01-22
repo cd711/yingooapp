@@ -113,6 +113,7 @@ export default class Preview extends Component<any, {
             id
         }).then((res) => {
             Taro.hideLoading();
+            console.log("预览页面作品信息",res);
             // this.initModalShow = true
             if (deviceInfo.env == 'h5') {
                 const str = getURLParamsStr(urlEncode({
