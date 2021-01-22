@@ -37,6 +37,7 @@ export default class Cart extends Component<{}, {
     isManage: boolean;
     selectIds: Array<any>;
     showDelTipModal: boolean;
+    centerPartyHeight:number
 }> {
 
     config: Config = {
@@ -52,24 +53,35 @@ export default class Cart extends Component<{}, {
             total: 0,
             isManage: false,
             selectIds: [],
-            showDelTipModal: false
+            showDelTipModal: false,
+            centerPartyHeight:550
         }
     }
 
     componentDidShow() {
         updateTabBarChannelCode("/pages/tabbar/cart/index")
+        let tHeight = 0;
+        if (process.env.TARO_ENV == 'h5') {
+            const tabbar = Object.assign([],document.querySelectorAll(".taro-tabbar__tabbar"));
+            tHeight = tabbar.length>1?tabbar.filter((item)=>item.clientHeight>0)[0].clientHeight:tabbar[0].clientHeight;    
+        }
+        if (process.env.TARO_ENV == 'weapp') {
+            tHeight = deviceInfo.screenHeight - deviceInfo.windowHeight
+        }
+        setTimeout(() => {
+            Taro.createSelectorQuery().selectAll(".nav-bar").boundingClientRect((nav_rects:any)=>{
+                const nav_rect = nav_rects.filter((obj)=>obj.height>0)[0];
+                Taro.createSelectorQuery().selectAll(".c_x_bottom").boundingClientRect((bottom_reacts:any)=>{
+                    const bottom_react = bottom_reacts.filter((obj)=>obj.height>0)[0];
+                    this.setState({
+                        centerPartyHeight:Taro.getSystemInfoSync().screenHeight-nav_rect.height-bottom_react.height-tHeight
+                    });
+                }).exec();
+            }).exec();
+        }, 100);
     }
 
     componentDidMount() {
-        // if (!userStore.isLogin) {
-        //     if (deviceInfo.env == 'h5') {
-        //         window.location.href = "/pages/tabbar/index/index";
-        //     } else {
-        //         Taro.switchTab({
-        //             url: '/pages/tabbar/index/index'
-        //         })
-        //     }
-        // }
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue) {
                 this.initData();
@@ -176,7 +188,7 @@ export default class Cart extends Component<{}, {
     }
 
     render() {
-        const {source, allSelected, total, selectIds, showDelTipModal} = this.state;
+        const {source, allSelected, total, selectIds, showDelTipModal,centerPartyHeight} = this.state;
         const list = source && source.list && source.list.length > 0 ? source.list : [];
         debuglog("list",list.length>0)
         const delOption = [{
@@ -206,7 +218,7 @@ export default class Cart extends Component<{}, {
                 </View>
 
                     {
-                        list.length>0?<ScrollView scrollY className='center'>
+                        list.length>0?<ScrollView scrollY className='center' style={`height:${centerPartyHeight}px`}>
                             <View className='list'>
                             {
                                 list.map((item, index) => (
@@ -302,9 +314,10 @@ export default class Cart extends Component<{}, {
                             }}>去逛逛</Button>
                         </View>
                     }
-                    <View className='bottom' style={deviceInfo.env=="h5"?`bottom: ${Taro.pxTransform(110)};`:`bottom: ${Taro.pxTransform(0)};`}>
+                    {/* style={deviceInfo.env=="h5"?`bottom: ${Taro.pxTransform(110)};`:`bottom: ${Taro.pxTransform(0)};`} */}
+                    <View className='c_x_bottom' >
                         <View className="all" onClick={this.onAllSelect.bind(this, list, allSelected)}>
-                            <Checkboxs isChecked={allSelected} disabled/>
+                            <Checkboxs isChecked={allSelected} disabled onCheckedClick={this.onAllSelect.bind(this, list, allSelected)}/>
                             <Text className='txt'>全选</Text>
                         </View>
                         <View className='ops'>
