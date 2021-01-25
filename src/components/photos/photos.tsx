@@ -4,11 +4,11 @@ import './photos.less'
 import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api,options} from "../../utils/net";
-import UploadFile from "../../components/Upload/Upload";
 import {debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import PopLayout, {PopLayoutItemProps} from "../popLayout";
+import DocumentTransfer from "../documentTransfer";
 
 
 interface PhotosEleProps {
@@ -41,6 +41,7 @@ interface PhotosEleState {
     _max: number;
     visible: boolean;
     active: number;
+    transferVisible: boolean;
 }
 
 export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState> {
@@ -72,6 +73,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             editSelectImgs: [],
             editSelectImgIds: [],
             editSelectAttr: [],
+            transferVisible: false,
             _editSelect: false,
             _count: 0,
             _max: 100,
@@ -355,7 +357,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             loadStatus,
             editSelectImgs,
             editSelectImgIds,
-            visible
+            visible,
+            transferVisible
         } = this.state;
         const list = navSwitchActive === 0 ? imageList : usefulList;
         // const list = imageList;
@@ -419,28 +422,39 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 ? <View className='empty'>
                                     <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
-                                    <UploadFile extraType={3}
-                                                uploadType="image"
-                                                title="上传图片"
-                                                type="button"
-                                                count={9}
-                                                onChange={this.uploadFile}>
-                                        <Button className='btn'>上传素材</Button>
-                                    </UploadFile>
+                                    {/*<UploadFile extraType={3}*/}
+                                    {/*            uploadType="image"*/}
+                                    {/*            title="上传图片"*/}
+                                    {/*            type="button"*/}
+                                    {/*            count={9}*/}
+                                    {/*            onChange={this.uploadFile}>*/}
+                                    {/*    <Button className='btn'>上传素材</Button>*/}
+                                    {/*</UploadFile>*/}
+                                    <Button className='btn' onClick={() => this.setState({transferVisible: true})}>上传素材</Button>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_main">
                                         {
                                             navSwitchActive === 0
-                                                ? <View className="list_item">
-                                                    <UploadFile
-                                                        extraType={3}
-                                                        type="card"
-                                                        count={9}
-                                                        image={`${options.sourceUrl}appsource/car.png`}
-                                                        uploadType="image"
-                                                        style={photoGetItemStyle()}
-                                                        onChange={this.uploadFile}/>
+                                                ? <View className="list_item" onClick={() => this.setState({transferVisible: true})}>
+                                                    {/*<UploadFile*/}
+                                                    {/*    extraType={3}*/}
+                                                    {/*    type="card"*/}
+                                                    {/*    count={9}*/}
+                                                    {/*    image={`${options.sourceUrl}appsource/car.png`}*/}
+                                                    {/*    uploadType="image"*/}
+                                                    {/*    style={photoGetItemStyle()}*/}
+                                                    {/*    onChange={this.uploadFile}/>*/}
+                                                    <View className="img_item" style={{
+                                                        ...photoGetItemStyle(),
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        flexDirection: "column",
+                                                        background: "rgba(20,20,43,0.87)"
+                                                    }}>
+                                                        <IconFont size={96} name="24_paizhaoshangchuan" color="#fff"/>
+                                                    </View>
                                                 </View>
                                                 : null
                                         }
@@ -518,6 +532,9 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     }
                     {loading ? <AtActivityIndicator mode='center'/> : null}
                 </View>
+                {
+                    transferVisible ? <DocumentTransfer visible={transferVisible} onClose={() => this.setState({transferVisible: false})} /> : null
+                }
             </View>
         )
     }

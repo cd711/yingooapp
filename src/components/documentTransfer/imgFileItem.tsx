@@ -2,46 +2,75 @@ import "./index.less";
 import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image} from "@tarojs/components";
 import IconFont from "../iconfont";
-import {debuglog, transformKB} from "../../utils/common";
+import {transformKB} from "../../utils/common";
 import {Files} from "./index";
 
 interface ImgFileItemProps {
     currentFile: Files;
+    starting: boolean;
+    onErrorClick?: (item: Files) => void;
+    onAnimationEnd?: (item: Files) => void;
+    onDelete?: (item: Files) => void;
 }
 const ImgFileItem: Taro.FC<ImgFileItemProps> = props => {
 
-    const {currentFile} = props;
+    const {
+        currentFile = new Files(),
+        starting,
+        onErrorClick,
+        onAnimationEnd,
+        onDelete} = props;
 
     const [hidden, setHidden] = useState(false);
 
     useEffect(() => {
-        debuglog(currentFile.name, hidden)
+        if (hidden) {
+            onAnimationEnd && onAnimationEnd(currentFile)
+        }
     }, [hidden])
 
     useEffect(() => {
-        debuglog(11111, )
         if (currentFile.completed) {
             setTimeout(() => {
                 setHidden(true)
             }, 950)
         }
-    }, [currentFile.completed])
+    }, [currentFile && currentFile.completed])
+
+    const _onErrorClick = () => {
+        onErrorClick && onErrorClick(currentFile)
+    }
+
+    const _onDelete = () => {
+        onDelete && onDelete(currentFile);
+    }
 
     return(
         <View className={`wait_item_wrap ${currentFile.completed ? "animate_wait_item_wrap" : ""}`}
-              key={currentFile.key}
               style={{display: hidden ? "none" : "block"}}
         >
             <View className="wait_item">
                 <View className="img">
-                    <Image src={currentFile.path} className="i_img"/>
+                    <Image src={currentFile.path}
+                           className="i_img"
+                           // mode="aspectFill"
+                    />
                 </View>
                 <View className="action_info">
                     <View className="head">
                         <Text className="name">{currentFile.name || " "}</Text>
-                        <View className="del"><IconFont name="20_guanbi" color="#999" size={32} /></View>
+                        {
+                            starting
+                                ? <View />
+                                : <View className="del" onClick={_onDelete}><IconFont name="20_guanbi" color="#999" size={32} /></View>
+                        }
                     </View>
-                    <View className="progress_bar" style={{height: "2px"}}>
+                    <View className="progress_bar"
+                          style={{
+                              height: "2px",
+                              background: starting && !(currentFile.total / 1048576 > 10) ? "rgba(77,148,255,0.10)" : "transparent"
+                          }}
+                    >
                         <View className="progress_line"
                               style={{
                                   width: currentFile.error ? "100%" : `${currentFile.progress / currentFile.total * 100}%`,
@@ -59,11 +88,17 @@ const ImgFileItem: Taro.FC<ImgFileItemProps> = props => {
                                     <Text className="fe_txt">图片大小不能超过10MB</Text>
                                 </View>
                                 : currentFile.error
-                                ? <View className="err_upload">
+                                ? <View className="err_upload" onClick={_onErrorClick}>
                                     <Text className="e_txt">上传出错</Text>
                                     <Image src={require("./reset.png")} className="err_icon" />
                                 </View>
-                                : <Text className="txt">{transformKB(currentFile.progress)} / {transformKB(currentFile.total)}</Text>
+                                : <Text className="txt"
+                                        style={{
+                                            color: starting ? "#4D94FF" : "#9c9da6"
+                                        }}
+                                >
+                                    {`${starting ? `${transformKB(currentFile.progress)} / ` : ""}${transformKB(currentFile.total)}`}
+                                </Text>
                         }
                     </View>
                 </View>
