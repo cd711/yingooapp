@@ -533,7 +533,12 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     {loading ? <AtActivityIndicator mode='center'/> : null}
                 </View>
                 {
-                    transferVisible ? <DocumentTransfer visible={transferVisible} onClose={() => this.setState({transferVisible: false})} /> : null
+                    transferVisible
+                        ? <DocumentTransfer
+                            visible={transferVisible}
+                            useTotal={this.total}
+                            onClose={() => this.setState({transferVisible: false})} />
+                        : null
                 }
             </View>
         )

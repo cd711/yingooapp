@@ -6,9 +6,11 @@ import ImageFile = Taro.chooseImage.ImageFile;
 import {getToken, options} from "../../utils/net";
 import {AtActivityIndicator} from "taro-ui";
 import ImgFileItem from "./imgFileItem";
+import TransferTip from "./transferTip";
 
 interface DocumentTransferProps {
     visible: boolean;
+    useTotal: number;
     onClose?: () => void;
 }
 
@@ -31,13 +33,17 @@ export interface Files extends ImageFile{
 
 const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
 
-    const {onClose} = props;
+    const {
+        onClose,
+        useTotal = 0
+    } = props;
 
     const [files, setFiles] = useState<Array<Files>>([]);
     const [starting, setStarting] = useState<boolean>(false);
     const [uploadedInfo, setUploadedInfo] = useState({uploading: 0, succeed: 0, failed: 0});
     const [uploadTimes, setUploadTimes] = useState(0);
     const [hasSelected, setHasSelected] = useState(false);
+    const [showTip, setTipStatus] = useState(false);
 
     useEffect(() => {
         debuglog(
@@ -190,6 +196,10 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
             Taro.showToast({title: "请选择图片", icon: "none"});
             return
         }
+        if (useTotal + files.length > 500) {
+            setTipStatus(true)
+            return;
+        }
         setStarting(true);
         let count = uploadTimes;
         count += 1;
@@ -317,6 +327,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
                     </View>
                 </ScrollView>
             </View>
+            {
+                showTip
+                    ? <TransferTip total={500 - parseInt(useTotal.toString())} onClose={() => setTipStatus(false)} />
+                    : null
+            }
         </View>
     )
 }

@@ -449,7 +449,12 @@ export default class Photos extends Component<{}, PhotosState> {
                         : null
                 }
                 {
-                    visible ? <DocumentTransfer visible={visible} onClose={() => this.setState({visible: false})} /> : null
+                    visible
+                        ? <DocumentTransfer
+                            useTotal={this.total}
+                            visible={visible}
+                            onClose={() => this.setState({visible: false})} />
+                        : null
                 }
             </View>
         )
