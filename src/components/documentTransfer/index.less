@@ -111,123 +111,123 @@
                 display: block;
                 padding-bottom: constant(safe-area-inset-bottom);
                 padding-bottom: env(safe-area-inset-bottom);
-                .wait_item_wrap{
+            }
+        }
+    }
+}
+
+.wait_item_wrap{
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    padding: 32px;
+    //transition: all .4s ease;
+    position: relative;
+    .wait_item{
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        .img{
+            width: 112px;
+            height: 112px;
+            display: block;
+            border-radius: 10px;
+            .i_img{
+                width: 112px;
+                height: 112px;
+                border-radius: 10px;
+            }
+        }
+        .action_info{
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            flex-direction: column;
+            width: 80%;
+            .head{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                .name{
+                    font-size: 28px;
+                    color: #121314;
+                    display: inline-block;
+                    width: 80%;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
+                .del{
+                    display: inline-block;
+                    width: auto;
+                }
+            }
+            .progress_bar{
+                box-sizing: border-box;
+                width: 100%;
+                background: rgba(77,148,255,0.10);
+                border-radius: 4px;
+                position: relative;
+                margin: 12px 0;
+                overflow: hidden;
+                .progress_line{
+                    position: absolute;
+                    top: 0;
+                    left: 0;
                     box-sizing: border-box;
-                    display: block;
-                    width: 100%;
-                    padding: 32px;
-                    //transition: all .4s ease;
-                    position: relative;
-                    .wait_item{
-                        box-sizing: border-box;
+                    border-radius: 4px;
+                    z-index: 10;
+                    transition: all .2s ease;
+                }
+            }
+            .progress_total{
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                &>.txt{
+                    display: flex;
+                    align-items: center;
+                    font-size: 24px;
+                    color: #4d94ff;
+                }
+                .err_upload{
+                    display: flex;
+                    align-items: center;
+                    .e_txt{
+                        font-size: 24px;
+                        color: #f45d5d;
                         display: flex;
                         align-items: center;
-                        justify-content: space-between;
-                        width: 100%;
-                        .img{
-                            width: 112px;
-                            height: 112px;
-                            display: block;
-                            border-radius: 10px;
-                            .i_img{
-                                width: 112px;
-                                height: 112px;
-                                border-radius: 10px;
-                            }
-                        }
-                        .action_info{
-                            position: relative;
-                            display: flex;
-                            align-items: flex-start;
-                            justify-content: center;
-                            flex-direction: column;
-                            width: 80%;
-                            .head{
-                                display: flex;
-                                align-items: center;
-                                justify-content: space-between;
-                                width: 100%;
-                                .name{
-                                    font-size: 28px;
-                                    color: #121314;
-                                    display: inline-block;
-                                    width: 80%;
-                                    text-overflow: ellipsis;
-                                    white-space: nowrap;
-                                    overflow: hidden;
-                                }
-                                .del{
-                                    display: inline-block;
-                                    width: auto;
-                                }
-                            }
-                            .progress_bar{
-                                box-sizing: border-box;
-                                width: 100%;
-                                background: rgba(77,148,255,0.10);
-                                border-radius: 4px;
-                                position: relative;
-                                margin: 12px 0;
-                                overflow: hidden;
-                                .progress_line{
-                                    position: absolute;
-                                    top: 0;
-                                    left: 0;
-                                    box-sizing: border-box;
-                                    border-radius: 4px;
-                                    z-index: 10;
-                                    transition: all .2s ease;
-                                }
-                            }
-                            .progress_total{
-                                display: block;
-                                width: 100%;
-                                box-sizing: border-box;
-                                &>.txt{
-                                    display: flex;
-                                    align-items: center;
-                                    font-size: 24px;
-                                    color: #4d94ff;
-                                }
-                                .err_upload{
-                                    display: flex;
-                                    align-items: center;
-                                    .e_txt{
-                                        font-size: 24px;
-                                        color: #f45d5d;
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                    }
-                                    .err_icon{
-                                        width: 28px;
-                                        height: 28px;
-                                        margin-left: 12px;
-                                        display: inline-block;
-                                    }
-                                }
-                                .file_err{
-                                    display: flex;
-                                    align-items: center;
-                                    .fe_txt{
-                                        font-size: 24px;
-                                        color: #f45d5d;
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                    }
-                                    .wa_icon{
-                                        width: 28px;
-                                        height: 28px;
-                                        margin: 0 12px;
-                                        display: inline-block;
-                                    }
-                                }
-                            }
-                        }
+                        justify-content: center;
+                    }
+                    .err_icon{
+                        width: 28px;
+                        height: 28px;
+                        margin-left: 12px;
+                        display: inline-block;
                     }
                 }
-
+                .file_err{
+                    display: flex;
+                    align-items: center;
+                    .fe_txt{
+                        font-size: 24px;
+                        color: #f45d5d;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .wa_icon{
+                        width: 28px;
+                        height: 28px;
+                        margin: 0 12px;
+                        display: inline-block;
+                    }
+                }
             }
         }
     }

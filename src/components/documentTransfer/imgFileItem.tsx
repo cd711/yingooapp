@@ -6,7 +6,7 @@ import {transformKB} from "../../utils/common";
 import {Files} from "./index";
 
 interface ImgFileItemProps {
-    currentFile: Files;
+    currentFile: any;
     starting: boolean;
     onErrorClick?: (item: Files) => void;
     onAnimationEnd?: (item: Files) => void;
@@ -15,7 +15,7 @@ interface ImgFileItemProps {
 const ImgFileItem: Taro.FC<ImgFileItemProps> = props => {
 
     const {
-        currentFile = new Files(),
+        currentFile = {},
         starting,
         onErrorClick,
         onAnimationEnd,

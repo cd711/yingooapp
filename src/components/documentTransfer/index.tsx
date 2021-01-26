@@ -12,42 +12,21 @@ interface DocumentTransferProps {
     onClose?: () => void;
 }
 
-export class Files implements ImageFile{
+export interface Files extends ImageFile{
     // 唯一键值
-    public key: string = "";
+    key: string;
     // 上传进度，单位bit
-    public progress: number = 0;
+    progress: number;
     // 文件名字
-    public name: string = "";
+    name: string;
     // 是否出错
-    public error: boolean = false;
+    error: boolean;
     // 是否超出限制大小
-    public outOfSize: boolean = false;
+    outOfSize: boolean;
     // 文件总大小
-    public total: number = 0;
+    total: number;
     // 是否上传完成
-    public completed: boolean = false;
-
-    // implements
-    public path: string = "";
-    public size: number = 0;
-    public type?: string = null;
-    public originalFileObj?: File;
-
-    constructor(json?: any) {
-        this.key = json.key || "";
-        this.progress = json.progress || 0;
-        this.name = json.name || "";
-        this.error = json.error || false;
-        this.outOfSize = json.outOfSize || false;
-        this.total = json.total || 0;
-        this.completed = json.completed || false;
-        this.path = json.path || "";
-        this.size = json.size || 0;
-        this.type = json.path || null;
-        this.originalFileObj = json.originalFileObj || new File([], "");
-    }
-
+    completed: boolean;
 }
 
 const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
@@ -74,14 +53,27 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     const onChooseImage = () => {
         Taro.chooseImage({
             count: 50,
+            sizeType: ['original', 'compressed'],
             sourceType: ["album", "camera"],
             success: result => {
+                debuglog("API直接选择的图片：",result)
                 const arr = result.tempFiles.map((value, index) => {
+                    let name = " ";
+                    if (deviceInfo.env === "weapp") {
+                        const matchName = value.path.match(/([^\\\/]+)\.([^\\\/]+)/g);
+                        if (matchName.length > 0) {
+                            name = matchName[0]
+                        } else {
+                            name = `image${value.size}${value.path.substring(value.path.lastIndexOf("."))}`
+                        }
+                    } else {
+                        name = value.originalFileObj.name
+                    }
                     return {
                         ...value,
                         key: `${index}-k-${value.size}`,
                         progress: 0,
-                        name: value.originalFileObj.name,
+                        name,
                         error: false,
                         total: value.size,
                         completed: false,
@@ -171,7 +163,6 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
             },
             complete: () => {
                 i++;
-                debuglog(i, files.length)
                 if (i === files.length) {
 
                     debuglog("多图上传---成功：", _success, "  失败：", _fail)
@@ -189,7 +180,6 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
         });
 
         upload.progress(res => {
-            // debuglog("上传进度：", res.progress, res.totalBytesSent);
             tempFiles[i].progress = res.totalBytesSent;
             setFiles([...tempFiles]);
         })
