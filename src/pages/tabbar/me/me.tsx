@@ -197,7 +197,7 @@ export default class Me extends Component<any, MeState> {
             } else {
                 collectionList = res.list
             }
-
+            debuglog("收藏数组",collectionList)
             this.setState({
                 collectionList,
                 loadStatus: this.total == collectionList.length ? LoadMoreEnum.noMore : LoadMoreEnum.more
@@ -646,6 +646,11 @@ export default class Me extends Component<any, MeState> {
                                             <View className="collection_item" key={index+""}
                                                   style={{
                                                       width: deviceInfo.windowWidth / 2 - 10 + "px"
+                                                  }}
+                                                  onClick={()=>{
+                                                      Taro.navigateTo({
+                                                          url:updateChannelCode(`/pages/order/pages/template/detail?id=${value.relation_id}`)
+                                                      })
                                                   }}
                                             >
                                                 <View className="collection_pic"

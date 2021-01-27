@@ -69,9 +69,8 @@ export default class Detail extends Component<{}, {
             // window.history.pushState(null, null, '/pages/order/pages/template/index');
             // window.history.pushState(null, '模板详情', url);
         }
-        const {id, cid} = this.$router.params
-        debuglog(id, cid)
-        if (!id || !cid) {
+        const {id} = this.$router.params
+        if (!id) {
             Taro.navigateBack();
         }
         if (parseInt(id) > 0) {
