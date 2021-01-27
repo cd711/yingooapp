@@ -11,9 +11,14 @@ import ResultTip from "./resultTip";
 
 interface DocumentTransferProps {
     visible: boolean;
+    // 已使用总数
     useTotal: number;
+    // 如果是选图的话可能会有上传成功返回的ID
     onClose?: (completedArr?: Array<string | number>) => void;
+    // 是否是选图模式
     selectPictureMode?: boolean;
+    // 单次上传完成的回调
+    onUploadComplete?: () => void;
 }
 
 export interface Files extends ImageFile{
@@ -38,7 +43,8 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     const {
         onClose,
         useTotal = 0,
-        selectPictureMode = false
+        selectPictureMode = false,
+        onUploadComplete
     } = props;
 
     const [files, setFiles] = useState<Array<Files>>([]);
@@ -114,10 +120,12 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     function clearCompletedFile(fileArr: Files[] = []) {
         const tempArr = [];
         for (let i = 0; i < fileArr.length; i++) {
-            debuglog("是否已经完成：", fileArr[i].name, fileArr[i].completed)
             if (!fileArr[i].completed) {
                 tempArr.push(fileArr[i]);
             }
+        }
+        if (onUploadComplete) {
+            onUploadComplete()
         }
         setFiles([...tempArr])
     }

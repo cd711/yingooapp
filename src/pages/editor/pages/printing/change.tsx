@@ -1347,7 +1347,7 @@ const PrintChange: Taro.FC<any> = () => {
     const getScrollHeight = () => {
         return deviceInfo.env === "h5"
             ? deviceInfo.windowHeight - 110 + "px"
-            : deviceInfo.windowHeight - 200 + deviceInfo.statusBarHeight - deviceInfo.menu.height + "px"
+            : deviceInfo.windowHeight - deviceInfo.menu.top - 10 + "px"
     }
 
     const debounceScroll = useDebounceFn(() => {
@@ -1424,7 +1424,7 @@ const PrintChange: Taro.FC<any> = () => {
                           deviceInfo.env === "weapp"
                               ? {
                                   paddingTop: deviceInfo.statusBarHeight + 95 + "px",
-                                  paddingBottom: 22 + "px"
+                                  paddingBottom: 80 + "px"
                               }
                               : {
                                 paddingBottom: "88px",
