@@ -7,7 +7,6 @@ import {api, getToken} from '../../../utils/net';
 import IconFont from '../../../components/iconfont';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
-import UploadFile from "../../../components/Upload/Upload";
 import {
     debounce, debuglog,
     deviceInfo,
@@ -24,6 +23,7 @@ import wx from 'weixin-js-sdk'
 import photoStore from "../../../store/photo";
 import PhotosEle from "../../../components/photos/photos";
 import page from "../../../utils/ext";
+import DocumentTransfer from "../../../components/documentTransfer";
 
 let editorProxy: WindowProxy | null | undefined;
 
@@ -264,10 +264,11 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     const [selected, setSelected] = useState(null);
     const [list, setList] = useState([]);
     const defaultDoc = Taro.useRef(null);
-    let total = 0;
+    const total = Taro.useRef(0);
     const stickersTotal = Taro.useRef(0);
     const [historyColor, setHistoryColor] = useState([]);
     const [colorActive, setColorActive] = useState(null);
+    const [transferVisible, setTransferVisible] = useState(false);
 
     const router = Taro.useRouter();
 
@@ -326,7 +327,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 size: opt.size,
                 type: opt.type === 0 ? "image" : "video"
             });
-            total = Number(res.total);
+            total.current = Number(res.total);
             debuglog(res);
             let tempArr = [];
             if (opt.loadMore) {
@@ -422,10 +423,10 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
 
     }, [])
 
-    const uploadFile = async files => {
-        debuglog(files)
-        getList({start: 0})
-    }
+    // const uploadFile = async files => {
+    //     debuglog(files)
+    //     getList({start: 0})
+    // }
 
     const changeType = idx => {
         setActive(idx);
@@ -447,7 +448,7 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
             return;
         }
         if (active === 0) {
-            if (total === list.length || list.length < 15) {
+            if (total.current === list.length || list.length < 15) {
                 return
             }
             getList({start: list.length, loadMore: true})
@@ -473,9 +474,6 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     const onSelect = async (item, idx) => {
-        debuglog("9999999999999999-------------")
-        debuglog(JSON.parse(JSON.stringify(photoStore.photoProcessParams.photo.path)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
-        debuglog(item, idx)
         const src = list[idx];
 
         if (!notNull(selected) && idx === selected) {
@@ -485,11 +483,8 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
         }
         setSelected(idx);
         if (src) {
-            const current = photoStore.photoProcessParams.photo.path[parseInt(router.params.idx)];
             const useArr = photoStore.photoProcessParams.usefulImages;
-            debuglog("历史：" ,current.originalData)
-            // if (!notNull(current.originalData) && current.originalData.length > 0) {
-                // 已编辑过的模板，存在多张图
+
                 const url = parent.currentData.r.url || undefined;
                 if (!notNull(url)) {
                     const idx = list.findIndex(value => value.url == url);
@@ -510,24 +505,6 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                         }
                     }
                 }
-            // } else {
-            //     // 没有编辑过的模板，只是单张图
-            //     const idx = useArr.findIndex(v => v.id == current.id);
-            //     if (idx > -1) {
-            //         try {
-            //             await photoStore.updateServerParams(router.params.key, {
-            //                 usefulImages: removeDuplicationForArr({
-            //                     newArr: [{id: item.id, url: item.url}],
-            //                     oldArr: useArr,
-            //                     replace: true,
-            //                     replaceIdx: idx
-            //                 })
-            //             })
-            //         } catch (e) {
-            //
-            //         }
-            //     }
-            // }
             changeEditImg(getSrc(item))
         }
 
@@ -558,6 +535,15 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     return <View className="change_image_container">
+        {
+            transferVisible
+                ? <DocumentTransfer
+                    useTotal={total.current}
+                    visible={transferVisible}
+                    onUploadComplete={() => getList({start: 0})}
+                    onClose={() => setTransferVisible(false)} />
+                : null
+        }
         <View className="change_main">
             <View className="filter_bar">
                 {bars.map((value, index) => (
@@ -572,14 +558,15 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                 <View className="list_main">
                     {active === 0
                         ? <View className="list_item">
-                            <UploadFile
-                                extraType={0}
-                                type="card"
-                                style={{
-                                    height: "124px"
-                                }}
-                                uploadType="image"
-                                onChange={uploadFile}/>
+                            <View className="img_item" style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexDirection: "column",
+                                background: "rgba(20,20,43,0.87)"
+                            }}>
+                                <IconFont size={96} name="24_paizhaoshangchuan" color="#fff"/>
+                            </View>
                         </View>
                         : null}
                     {
