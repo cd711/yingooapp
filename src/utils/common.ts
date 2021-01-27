@@ -1135,9 +1135,9 @@ export function removeDuplicationForArr(params: RemoveDuplicationForArrProps) {
 }
 
 export function debuglog(arg, ...rest) {
-    if (process.env.NODE_ENV !== 'production') {
+    // if (process.env.NODE_ENV !== 'production') {
         console.log(arg, ...rest)
-    }
+    // }
 }
 
 /**
@@ -1181,4 +1181,18 @@ export function documentConverPDF(path:string,callback?:(r:any)=>void) {
     }).catch(()=>{
         callback && callback(null);
     })
+}
+
+
+// 文件大小转换
+export function transformKB(size: number): string{
+    if (notNull(size)) {
+        return "0KB"
+    }
+    switch (true) {
+        case size < 1024: return `${size}B`;
+        case size < 1048576: return `${Math.floor((size / 1024) * 100) / 100}KB`;
+        case size < 1073741824: return `${Math.floor((size / 1048576) * 100) / 100}MB`;
+        default: return `${Math.floor((size / 1073741824) * 100) / 100}GB`
+    }
 }

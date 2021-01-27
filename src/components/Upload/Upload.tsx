@@ -1,16 +1,18 @@
 import "./upload.less";
 import Taro, {Component} from '@tarojs/taro';
-import {View, Text, Image} from "@tarojs/components";
+import {Image, Text, View} from "@tarojs/components";
 import IconFont from "../iconfont";
 import {getToken, options} from "../../utils/net";
 import {debuglog, notNull} from "../../utils/common";
 import {userStore} from "../../store/user";
 
 export interface UploadFileChangeProps {
-    id: string, cdnUrl: string, url: string
+    id: string,
+    cdnUrl: string,
+    url: string
 }
 
-interface UploadFileProps{
+interface UploadFileProps {
     type: "button" | "card",
     uploadType: "image" | "video",
     // 1=普通上传，2=作品,3=照片
@@ -29,10 +31,12 @@ interface UploadFileProps{
     // image和icon二选一,优先识别image
     icon?: string,
 }
+
 interface UploadFileState {
     files: Array<any>;
 }
-export default class UploadFile extends Component<UploadFileProps, UploadFileState>{
+
+export default class UploadFile extends Component<UploadFileProps, UploadFileState> {
 
     static defaultProps = {
         type: "button",
@@ -40,6 +44,7 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
         count: 1,
         uploadType: 'image'
     }
+
     constructor(props) {
         super(props);
         this.state = {
@@ -146,19 +151,17 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
             success: res => {
                 const jsonRes = JSON.parse(res.data)
                 if (jsonRes.code === 1) {
-                    _success ++;
-                   // successPath.push(jsonRes.data)
+                    _success++;
+                    // successPath.push(jsonRes.data)
                     const arr = this.state.files;
-                   arr.push(jsonRes.data);
-                   this.setState({files: arr})
+                    arr.push(jsonRes.data);
+                    this.setState({files: arr})
                 } else {
                     _fail++;
                 }
             },
             fail: err => {
                 debuglog("UploadFile文件上传出错：", err)
-                // Taro.hideLoading();
-                // Taro.showToast({title: "上传失败", icon: "none"})
                 _fail++
             },
             complete: () => {
@@ -198,8 +201,8 @@ export default class UploadFile extends Component<UploadFileProps, UploadFileSta
                         : <View className="card_view">
                             {
                                 image
-                                    ? <Image src={image} className="car_img" />
-                                    : <IconFont size={96} name={icon ? icon : "24_paizhaoshangchuan"} color="#fff" />
+                                    ? <Image src={image} className="car_img"/>
+                                    : <IconFont size={96} name={icon ? icon : "24_paizhaoshangchuan"} color="#fff"/>
                             }
                             {title ? <Text className="title">{title}</Text> : null}
                         </View>

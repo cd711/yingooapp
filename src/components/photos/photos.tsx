@@ -4,11 +4,11 @@ import './photos.less'
 import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api,options} from "../../utils/net";
-import UploadFile from "../../components/Upload/Upload";
-import {debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../utils/common";
+import {debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import PopLayout, {PopLayoutItemProps} from "../popLayout";
+import DocumentTransfer from "../documentTransfer";
 
 
 interface PhotosEleProps {
@@ -41,6 +41,7 @@ interface PhotosEleState {
     _max: number;
     visible: boolean;
     active: number;
+    transferVisible: boolean;
 }
 
 export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState> {
@@ -72,6 +73,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             editSelectImgs: [],
             editSelectImgIds: [],
             editSelectAttr: [],
+            transferVisible: false,
             _editSelect: false,
             _count: 0,
             _max: 100,
@@ -106,6 +108,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 size: data.size || 25,
                 type: data.type || this.state.navSwitchActive,
                 loadMore: data.loadMore || false,
+                findUseful: !notNull(data.findUseful) ? data.findUseful : true,
             };
             const temp = {
                 start: opt.start, size: opt.size, type: "image"
@@ -119,7 +122,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             try {
                 const res = await api("app.profile/imgs", temp);
                 this.total = Number(res.total);
-                debuglog(res);
                 this.setState({loading: false});
                 let list = [];
                 list = opt.loadMore ? this.state.imageList.concat(res.list) : res.list;
@@ -133,10 +135,12 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             const child = defaultSelect[d];
                             if (parent.id == child.id) {
                                 list[i].display = true;
-                                usefulList.push({
-                                    id: parent.id,
-                                    url: parent.url
-                                })
+                                if (opt.findUseful) {
+                                    usefulList.push({
+                                        id: parent.id,
+                                        url: parent.url
+                                    })
+                                }
                             }
                         }
                     }
@@ -194,15 +198,15 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         this.getList({start: 0})
     }
 
-    imageSelect = (id: any, url, attr) => {
+    imageSelect = (id: any, url, attr, directly = false) => {
         const {_editSelect, _count, _max} = this.state;
 
         if (_editSelect) {
-            const editSelectImgs = this.state.editSelectImgs;
             const editSelectImgIds = this.state.editSelectImgIds;
+            const editSelectImgs = this.state.editSelectImgs;
             const editSelectAttr = this.state.editSelectAttr;
             const idx = editSelectImgIds.findIndex(v => v == id);
-            if (idx > -1) {
+            if (idx > -1 && !directly) {
                 editSelectImgs.splice(idx, 1);
                 editSelectImgIds.splice(idx, 1);
                 editSelectAttr.splice(idx, 1)
@@ -312,6 +316,49 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         })
     }
 
+    // 上传完成后请求一次后端数据，以保证自动选择功能的正常使用
+    onUploadComplete = () => {
+        this.getList({start: 0, findUseful: false}).then((res) => {
+            this.getListAgain(res)
+        })
+    }
+
+    onTransferClose = (arr) => {
+        debuglog("关闭后进来的ID列表：", arr)
+        this.setState({transferVisible: false})
+
+        // this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)
+
+        if (arr && arr instanceof Array && arr.length > 0) {
+            const {imageList} = this.state;
+            const editSelectImgIds = this.state.editSelectImgIds;
+            const editSelectImgs = this.state.editSelectImgs;
+            const editSelectAttr = this.state.editSelectAttr;
+            for (let i = 0; i < imageList.length; i++) {
+                const item = imageList[i];
+                let has = false;
+                let repeat = false;
+                for (let j = 0; j < arr.length; j++) {
+                    repeat = editSelectImgIds.findIndex(val => parseInt(val) === parseInt(arr[j])) === -1;
+                    if (parseInt(item.id) == parseInt(arr[j])) {
+                        has = true;
+                        break;
+                    }
+                }
+
+                debuglog("has", has)
+                if (has && repeat) {
+                    editSelectImgIds.push(item.id);
+                    editSelectImgs.push(item.url);
+                    editSelectAttr.push(`${item.width}*${item.height}`)
+                }
+            }
+            this.setState({
+                editSelectImgs, editSelectAttr, editSelectImgIds
+            })
+        }
+    }
+
     private popoverItem: PopLayoutItemProps[] = [
         {
             title: "时间从远到近排序",
@@ -336,12 +383,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
     ]
 
     getScrollHeight = () => {
-        const {_editSelect} = this.state;
-        const {imageList, usefulList, navSwitchActive} = this.state;
-        const list = navSwitchActive === 0 ? imageList : usefulList;
-        const isEdit = _editSelect && (list.length > 0);
-        const h = isEdit ? deviceInfo.windowHeight - 130 - 45 : deviceInfo.windowHeight - 45;
-        return deviceInfo.env === "h5" ? h : isEdit ? deviceInfo.windowHeight - 130 - 45 + (deviceInfo.statusBarHeight / 2) : deviceInfo.screenHeight - deviceInfo.safeArea.top - deviceInfo.statusBarHeight
+        const h = deviceInfo.windowHeight - 130 - 45;
+        return deviceInfo.env === "h5" ? h : deviceInfo.windowHeight - deviceInfo.menu.bottom - 45 - (deviceInfo.statusBarHeight * 1.5)
     }
 
     render() {
@@ -355,10 +398,10 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             loadStatus,
             editSelectImgs,
             editSelectImgIds,
-            visible
+            visible,
+            transferVisible
         } = this.state;
         const list = navSwitchActive === 0 ? imageList : usefulList;
-        // const list = imageList;
         const tabs = ["未使用", "已使用"];
         return (
             <View className='photos'>
@@ -387,7 +430,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                 }
                 <View className='container'>
                     <ScrollView className="list_scrollview"
-                                style={deviceInfo.env !== "h5" && !(_editSelect && list.length > 0)
+                                style={deviceInfo.env !== "h5"
                                         ? `height: ${this.getScrollHeight()}px;padding-bottom: constant(safe-area-inset-bottom);padding-bottom: env(safe-area-inset-bottom);`
                                         : {height: this.getScrollHeight() + "px"}
                                 }
@@ -419,28 +462,39 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                 ? <View className='empty'>
                                     <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
-                                    <UploadFile extraType={3}
-                                                uploadType="image"
-                                                title="上传图片"
-                                                type="button"
-                                                count={9}
-                                                onChange={this.uploadFile}>
-                                        <Button className='btn'>上传素材</Button>
-                                    </UploadFile>
+                                    {/*<UploadFile extraType={3}*/}
+                                    {/*            uploadType="image"*/}
+                                    {/*            title="上传图片"*/}
+                                    {/*            type="button"*/}
+                                    {/*            count={9}*/}
+                                    {/*            onChange={this.uploadFile}>*/}
+                                    {/*    <Button className='btn'>上传素材</Button>*/}
+                                    {/*</UploadFile>*/}
+                                    <Button className='btn' onClick={() => this.setState({transferVisible: true})}>上传素材</Button>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_main">
                                         {
                                             navSwitchActive === 0
-                                                ? <View className="list_item">
-                                                    <UploadFile
-                                                        extraType={3}
-                                                        type="card"
-                                                        count={9}
-                                                        image={`${options.sourceUrl}appsource/car.png`}
-                                                        uploadType="image"
-                                                        style={photoGetItemStyle()}
-                                                        onChange={this.uploadFile}/>
+                                                ? <View className="list_item" onClick={() => this.setState({transferVisible: true})}>
+                                                    {/*<UploadFile*/}
+                                                    {/*    extraType={3}*/}
+                                                    {/*    type="card"*/}
+                                                    {/*    count={9}*/}
+                                                    {/*    image={`${options.sourceUrl}appsource/car.png`}*/}
+                                                    {/*    uploadType="image"*/}
+                                                    {/*    style={photoGetItemStyle()}*/}
+                                                    {/*    onChange={this.uploadFile}/>*/}
+                                                    <View className="img_item" style={{
+                                                        ...photoGetItemStyle(),
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        flexDirection: "column",
+                                                        background: "rgba(20,20,43,0.87)"
+                                                    }}>
+                                                        <IconFont size={96} name="24_paizhaoshangchuan" color="#fff"/>
+                                                    </View>
                                                 </View>
                                                 : null
                                         }
@@ -459,8 +513,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                                     {_editSelect && editSelectImgIds.indexOf(item.id) > -1
                                                         ? <View className="edit_select_index"
                                                                 onClick={() => this.imageSelect(item.id, item.url, `${item.width}*${item.height}`)}>
-                                                            <Text
-                                                                className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
+                                                            <Text className="txt">{editSelectImgIds.indexOf(item.id) + 1}</Text>
                                                         </View>
                                                         : null}
                                                 </View>
@@ -518,6 +571,16 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                     }
                     {loading ? <AtActivityIndicator mode='center'/> : null}
                 </View>
+                {
+                    transferVisible
+                        ? <DocumentTransfer
+                            visible={transferVisible}
+                            useTotal={this.total}
+                            selectPictureMode
+                            onUploadComplete={this.onUploadComplete}
+                            onClose={this.onTransferClose} />
+                        : null
+                }
             </View>
         )
     }

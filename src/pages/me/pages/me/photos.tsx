@@ -4,7 +4,6 @@ import './photos.less'
 import IconFont from '../../../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api,options} from "../../../../utils/net";
-import UploadFile from "../../../../components/Upload/Upload";
 import {debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
 import LoadMore from "../../../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../../../components/popover";
@@ -13,6 +12,7 @@ import {observer} from "@tarojs/mobx";
 import {userStore} from "../../../../store/user";
 import dayjs from "dayjs";
 import page from "../../../../utils/ext";
+import DocumentTransfer from "../../../../components/documentTransfer";
 
 
 interface PhotosState {
@@ -28,6 +28,7 @@ interface PhotosState {
     editSelectImgs: string[];
     editSelectImgIds: any[];
     editSelectAttr: string[];
+    visible: boolean;
 }
 
 @observer
@@ -57,6 +58,7 @@ export default class Photos extends Component<{}, PhotosState> {
             editSelectImgs: [],
             editSelectImgIds: [],
             editSelectAttr: [],
+            visible: false
         }
     }
 
@@ -273,7 +275,7 @@ export default class Photos extends Component<{}, PhotosState> {
     }
 
     render() {
-        const {navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened} = this.state;
+        const {navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened, visible} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片", "视频"];
         return (
@@ -322,14 +324,15 @@ export default class Photos extends Component<{}, PhotosState> {
                                 ? <View className='empty'>
                                     <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
                                     <Text className='txt'>暂无素材</Text>
-                                    <UploadFile extraType={navSwitchActive === 0 ? 3 : 4}
-                                                uploadType={navSwitchActive === 0 ? "image" : "video"}
-                                                title={navSwitchActive === 0 ? "上传图片" : "上传视频"}
-                                                type="button"
-                                                count={9}
-                                                onChange={this.uploadFile}>
-                                        <Button className='btn'>上传素材</Button>
-                                    </UploadFile>
+                                    {/*<UploadFile extraType={navSwitchActive === 0 ? 3 : 4}*/}
+                                    {/*            uploadType={navSwitchActive === 0 ? "image" : "video"}*/}
+                                    {/*            title={navSwitchActive === 0 ? "上传图片" : "上传视频"}*/}
+                                    {/*            type="button"*/}
+                                    {/*            count={9}*/}
+                                    {/*            onChange={this.uploadFile}>*/}
+                                    {/*    <Button className='btn'>上传素材</Button>*/}
+                                    {/*</UploadFile>*/}
+                                    <Button className='btn' onClick={() => this.setState({visible: true})}>上传素材</Button>
                                 </View>
                                 : <View className="list_container">
                                     {
@@ -358,14 +361,24 @@ export default class Photos extends Component<{}, PhotosState> {
                                             </View>
                                     }
                                     <View className="list_main">
-                                        <View className="list_item">
-                                            <UploadFile
-                                                extraType={navSwitchActive}
-                                                type="card"
-                                                count={9}
-                                                uploadType={navSwitchActive === 0 ? "image" : "video"}
-                                                style={photoGetItemStyle()}
-                                                onChange={this.uploadFile}/>
+                                        <View className="list_item" onClick={() => this.setState({visible: true})}>
+                                            {/*<UploadFile*/}
+                                            {/*    extraType={navSwitchActive}*/}
+                                            {/*    type="card"*/}
+                                            {/*    count={9}*/}
+                                            {/*    uploadType={navSwitchActive === 0 ? "image" : "video"}*/}
+                                            {/*    style={photoGetItemStyle()}*/}
+                                            {/*    onChange={this.uploadFile}/>*/}
+                                                <View className="img_item" style={{
+                                                    ...photoGetItemStyle(),
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    flexDirection: "column",
+                                                    background: "rgba(20,20,43,0.87)"
+                                                }}>
+                                                    <IconFont size={96} name="24_paizhaoshangchuan" color="#fff"/>
+                                                </View>
                                         </View>
                                         {
                                             list.map((item, idx) => {
@@ -433,6 +446,14 @@ export default class Photos extends Component<{}, PhotosState> {
                             onConfirm={this.handleConfirm}
                             content={`是否删除这${selects.length}${navSwitchActive === 0 ? "张照片" : "个视频"}?`}
                         />
+                        : null
+                }
+                {
+                    visible
+                        ? <DocumentTransfer
+                            useTotal={this.total}
+                            visible={visible}
+                            onClose={() => this.setState({visible: false})} />
                         : null
                 }
             </View>
