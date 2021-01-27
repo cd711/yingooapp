@@ -119,7 +119,8 @@ export default class Confirm extends Component<any, {
                 if (resp.orderid) {
                     this.checkOrder(resp.orderid);
                 } else {
-                    const {page, skuid, total}: any = resp;
+                    const {page, skuid, total,user_tpl_id}: any = resp;
+
                     this.isPhoto = page && page === "photo";
                     let params: any = {};
                     if (this.isPhoto) {
@@ -152,16 +153,20 @@ export default class Confirm extends Component<any, {
                             cart_ids: Base64.decode(cartIds)
                         }
                     }
-                    if (!isEmpty(userStore.address)) {
-                        templateStore.address = userStore.address;
-                        data["address_id"] = userStore.address.id;
-                    }
                     if (this.isPhoto && parintImges) {
                         data = {
                             ...data,
                             print_images: JSON.stringify(parintImges),
                             crop: params.crop
                         }
+                    }
+                    if (user_tpl_id && user_tpl_id == -2) {
+                        resp.print_images = JSON.stringify(resp.print_images)
+                        data = resp
+                    }
+                    if (!isEmpty(userStore.address)) {
+                        templateStore.address = userStore.address;
+                        data["address_id"] = userStore.address.id;
                     }
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;
