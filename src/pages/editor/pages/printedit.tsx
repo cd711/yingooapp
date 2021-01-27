@@ -226,7 +226,7 @@ export const Template: Taro.FC<{ parent: PrintEdit; onClose: () => void, onOk: (
             <View className="template_list">
                 {templateList.map((value, index) => (
                     <View className="template_item" key={index+""} onClick={() => onSelect(value)}
-                          // style={{width: window.screen.width / 4 - 8, height: (window.screen.width / 4 - 8) + (window.screen.width / 4 - 4) * 0.62}}
+                        // style={{width: window.screen.width / 4 - 8, height: (window.screen.width / 4 - 8) + (window.screen.width / 4 - 4) * 0.62}}
                     >
                         <Image src={value.thumbnail} mode="aspectFill" className="temp_img" />
                         {
@@ -489,27 +489,27 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
             const useArr = photoStore.photoProcessParams.usefulImages;
             debuglog("历史：" ,current.originalData)
             // if (!notNull(current.originalData) && current.originalData.length > 0) {
-                // 已编辑过的模板，存在多张图
-                const url = parent.currentData.r.url || undefined;
-                if (!notNull(url)) {
-                    const idx = list.findIndex(value => value.url == url);
-                    if (idx > -1) {
-                        const current = list[idx];
-                        const oIdx = useArr.findIndex(v => v.id == current.id);
-                        try {
-                            await photoStore.updateServerParams(router.params.key, {
-                                usefulImages: removeDuplicationForArr({
-                                    newArr: [{id: item.id, url: item.url}],
-                                    oldArr: useArr,
-                                    replace: true,
-                                    replaceIdx: oIdx
-                                })
+            // 已编辑过的模板，存在多张图
+            const url = parent.currentData.r.url || undefined;
+            if (!notNull(url)) {
+                const idx = list.findIndex(value => value.url == url);
+                if (idx > -1) {
+                    const current = list[idx];
+                    const oIdx = useArr.findIndex(v => v.id == current.id);
+                    try {
+                        await photoStore.updateServerParams(router.params.key, {
+                            usefulImages: removeDuplicationForArr({
+                                newArr: [{id: item.id, url: item.url}],
+                                oldArr: useArr,
+                                replace: true,
+                                replaceIdx: oIdx
                             })
-                        } catch (e) {
+                        })
+                    } catch (e) {
 
-                        }
                     }
                 }
+            }
             // } else {
             //     // 没有编辑过的模板，只是单张图
             //     const idx = useArr.findIndex(v => v.id == current.id);
@@ -625,13 +625,13 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                                     <View className="colors_items">
                                         {
                                             colors.map((value, index) => (
-                                                    <View className="color_wrap" key={index+""}>
-                                                        <View className="color_item"
-                                                              style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
-                                                              onClick={() => onSelectColor(value.key)}>
-                                                            <View className="color" style={{background: value.color}} />
-                                                        </View>
+                                                <View className="color_wrap" key={index+""}>
+                                                    <View className="color_item"
+                                                          style={{borderColor: Number(value.key) === Number(colorActive) ? "#DFDFE0" : "transparent"}}
+                                                          onClick={() => onSelectColor(value.key)}>
+                                                        <View className="color" style={{background: value.color}} />
                                                     </View>
+                                                </View>
                                             ))
                                         }
                                     </View>
@@ -843,26 +843,26 @@ const SelectFont: Taro.FC<BaseProps> = props => {
                 <ScrollView className="list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
                     <View className="font_change_list_main">
                         {
-                           fontList.map((value, index) => (
-                               <View className="font_change_item" key={index+""} onClick={() => onSelectFont(value)}>
-                                   <View className="left">
+                            fontList.map((value, index) => (
+                                <View className="font_change_item" key={index+""} onClick={() => onSelectFont(value)}>
+                                    <View className="left">
                                         <Image src={value.thumbnail} className="font_img"
                                                mode="aspectFit"
                                                style={{
                                                    width: window.screen.availWidth * 0.75 - 32
                                                }}
                                         />
-                                   </View>
-                                   <View className="right">
+                                    </View>
+                                    <View className="right">
                                         <View className="dowload">
                                             <IconFont name={fontSelected === Number(value.id) ? "22_yixuanzhong" : "20_congyunduanxiazai"}
                                                       size={40}
-                                                      // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
+                                                // color={fontSelected === Number(value.id) ? "#ff4966" : "#999"}
                                             />
                                         </View>
-                                   </View>
-                               </View>
-                           ))
+                                    </View>
+                                </View>
+                            ))
                         }
                     </View>
                 </ScrollView>
