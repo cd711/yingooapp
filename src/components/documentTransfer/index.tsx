@@ -1,5 +1,5 @@
 import "./index.less";
-import Taro, {useState, useEffect} from "@tarojs/taro";
+import Taro, {useState, useEffect, useRef} from "@tarojs/taro";
 import {View, Text, ScrollView} from "@tarojs/components";
 import {debuglog, deviceInfo, notNull} from "../../utils/common";
 import ImageFile = Taro.chooseImage.ImageFile;
@@ -7,11 +7,13 @@ import {getToken, options} from "../../utils/net";
 import {AtActivityIndicator} from "taro-ui";
 import ImgFileItem from "./imgFileItem";
 import TransferTip from "./transferTip";
+import ResultTip from "./resultTip";
 
 interface DocumentTransferProps {
     visible: boolean;
     useTotal: number;
-    onClose?: () => void;
+    onClose?: (completedArr?: Array<string | number>) => void;
+    selectPictureMode?: boolean;
 }
 
 export interface Files extends ImageFile{
@@ -35,7 +37,8 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
 
     const {
         onClose,
-        useTotal = 0
+        useTotal = 0,
+        selectPictureMode = false
     } = props;
 
     const [files, setFiles] = useState<Array<Files>>([]);
@@ -44,6 +47,10 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     const [uploadTimes, setUploadTimes] = useState(0);
     const [hasSelected, setHasSelected] = useState(false);
     const [showTip, setTipStatus] = useState(false);
+    const [showResult, setResultStatus] = useState(false);
+    // const [completedArr, setCompletedArr] = useState([])
+
+    const completedArr = useRef([]);
 
     useEffect(() => {
         debuglog(
@@ -53,8 +60,15 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
             "uploadedInfo: ", uploadedInfo, "\n",
             "uploadTimes: ", uploadTimes, "\n",
             "hasSelected: ", hasSelected, "\n",
+            "completedArr: ", completedArr.current, "\n",
         )
-    }, [files, starting, uploadedInfo, uploadTimes, hasSelected])
+    }, [files, starting, uploadedInfo, uploadTimes, hasSelected, completedArr.current])
+
+    useEffect(() => {
+        if (selectPictureMode && uploadedInfo.succeed > 0) {
+            setResultStatus(true)
+        }
+    }, [starting])
 
     const onChooseImage = () => {
         Taro.chooseImage({
@@ -108,6 +122,19 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
         setFiles([...tempArr])
     }
 
+    // 上传成功的图把id存起来作为在选图模式下自动选择的依据
+    function saveCompletedFileToArr(id) {
+        const arr = [...completedArr.current];
+        if (id) {
+            const has = arr.findIndex(value => parseInt(value) == parseInt(id));
+            debuglog("已有ID：", has, id)
+            if (has === -1) {
+                arr.push(id);
+                completedArr.current = arr;
+            }
+        }
+    }
+
     const uploadFileFn = (fileArr: any[], current: number, success: number, failed: number) => {
         let url = options.apiUrl + "common/upload";
         if (getToken()) {
@@ -156,6 +183,7 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
                     _success++;
                     tempFiles[i].completed = true;
                     setUploadedInfo(prev => ({...prev, succeed: _success}));
+                    saveCompletedFileToArr(jsonRes.data.id)
                 } else {
                     _fail++;
                     setUploadedInfo(prev => ({...prev, failed: _fail}));
@@ -200,6 +228,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
             setTipStatus(true)
             return;
         }
+        setUploadedInfo({
+            succeed: 0,
+            uploading: 0,
+            failed: 0
+        })
         setStarting(true);
         let count = uploadTimes;
         count += 1;
@@ -239,6 +272,14 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
             tArr.splice(idx, 1);
             setFiles([...tArr]);
         }
+    }
+
+    const onResultTipClose = (type: 1 | 2 | 3) => {
+        if (type === 1) {
+            onClose && onClose(completedArr.current)
+            return
+        }
+        setResultStatus(false)
     }
 
     const getHeight = () => {
@@ -330,6 +371,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
             {
                 showTip
                     ? <TransferTip total={500 - parseInt(useTotal.toString())} onClose={() => setTipStatus(false)} />
+                    : null
+            }
+            {
+                showResult
+                    ? <ResultTip result={uploadedInfo} onClose={onResultTipClose} />
                     : null
             }
         </View>

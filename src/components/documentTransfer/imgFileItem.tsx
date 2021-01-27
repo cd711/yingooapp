@@ -2,7 +2,7 @@ import "./index.less";
 import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image} from "@tarojs/components";
 import IconFont from "../iconfont";
-import {transformKB} from "../../utils/common";
+import {notNull, transformKB} from "../../utils/common";
 import {Files} from "./index";
 
 interface ImgFileItemProps {
@@ -30,7 +30,7 @@ const ImgFileItem: Taro.FC<ImgFileItemProps> = props => {
     }, [hidden])
 
     useEffect(() => {
-        if (currentFile.completed) {
+        if (!notNull(currentFile.completed) && currentFile.completed === true && !currentFile.outOfSize) {
             setTimeout(() => {
                 setHidden(true)
             }, 950)
@@ -47,7 +47,7 @@ const ImgFileItem: Taro.FC<ImgFileItemProps> = props => {
 
     return(
         <View className={`wait_item_wrap ${currentFile.completed ? "animate_wait_item_wrap" : ""}`}
-              style={{display: hidden ? "none" : "block"}}
+              // style={{display: hidden ? "none" : "block"}}
         >
             <View className="wait_item">
                 <View className="img">
@@ -68,16 +68,21 @@ const ImgFileItem: Taro.FC<ImgFileItemProps> = props => {
                     <View className="progress_bar"
                           style={{
                               height: "2px",
-                              background: starting && !(currentFile.total / 1048576 > 10) ? "rgba(77,148,255,0.10)" : "transparent"
+                              background: starting && !currentFile.outOfSize ? "rgba(77,148,255,0.10)" : "transparent"
                           }}
                     >
-                        <View className="progress_line"
-                              style={{
-                                  width: currentFile.error ? "100%" : `${currentFile.progress / currentFile.total * 100}%`,
-                                  background: currentFile.error ? "#f45d5d" : "#4D94FF",
-                                  height: "2px"
-                              }}
-                        />
+                        {
+                            !currentFile.outOfSize
+                                ? <View className="progress_line"
+                                        style={{
+                                            width: currentFile.error ? "100%" : `${currentFile.progress / currentFile.total * 100}%`,
+                                            background: currentFile.error ? "#f45d5d" : "#4D94FF",
+                                            height: "2px"
+                                        }}
+                                />
+                                : null
+                        }
+
                     </View>
                     <View className="progress_total">
                         {

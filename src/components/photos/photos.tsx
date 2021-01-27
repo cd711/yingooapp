@@ -537,6 +537,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                         ? <DocumentTransfer
                             visible={transferVisible}
                             useTotal={this.total}
+                            selectPictureMode
                             onClose={() => this.setState({transferVisible: false})} />
                         : null
                 }

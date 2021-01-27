@@ -317,3 +317,88 @@
         }
     }
 }
+
+.result_tip_container{
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2600;
+    background:  rgba(20,20,43,0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    .result_tip_main{
+        width: 590px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background: #fff;
+        box-sizing: border-box;
+        padding: 48px;
+        border-radius: 32px;
+        .h2{
+            font-size: 32px;
+        }
+        .ext_info{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #9c9da6;
+            margin-top: 16px;
+            padding: 32px 0;
+            .blue{
+                color: #4D94FF;
+                display: inline-block;
+                padding: 0 8px;
+                font-weight: 600;
+            }
+            .red{
+                color: #F45D5D;
+                padding: 0 8px;
+                display: inline-block;
+                font-weight: 600;
+            }
+        }
+        .sub_btn{
+            width: 462px;
+            height: 80px;
+            background: #ff4966;
+            border-radius: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 60px;
+            .txt{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 32px;
+                color: #fff;
+            }
+        }
+        .continue{
+            font-size: 28px;
+            color: #4d94ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 34px;
+        }
+    }
+    .close_btn{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 24px;
+        .close_btn{
+            width: 72px;
+            height: 72px;
+        }
+    }
+}
