@@ -16,6 +16,7 @@ class LoginModal extends Component<{
     }
     componentDidMount(){
         observe(userStore,"showLoginModal",(change)=>{
+            debuglog("showLoginModal",change)
             if (change.newValue != change.oldValue) {
                 this.setState({
                     show:change.newValue

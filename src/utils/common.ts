@@ -1167,3 +1167,18 @@ export function findPictureSizeForID(idArr: any[], sizeItems: any[]): string {
     debuglog("findSizeForID找到的尺寸值：", size)
     return size
 }
+/**
+ * 文档转pdf
+ * @param {type} params
+ * @return {*}
+ */
+export function documentConverPDF(path:string,callback?:(r:any)=>void) {
+    api("device.terminal/convert",{
+        document_url:path,
+        output_file_format_id:21
+    }).then((res)=>{
+        callback && callback(res);
+    }).catch(()=>{
+        callback && callback(null);
+    })
+}
