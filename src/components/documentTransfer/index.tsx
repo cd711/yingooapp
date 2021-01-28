@@ -77,6 +77,10 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     }, [starting])
 
     const onChooseImage = () => {
+        if (files.length > 100) {
+            Taro.showToast({title: "列表最多选择100张", icon: "none"})
+            return
+        }
         Taro.chooseImage({
             count: 50,
             sizeType: ['original', 'compressed'],
@@ -327,7 +331,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
                                     </View>
                                 </View>
                                 : <View className="btn_info">
-                                    <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                    {
+                                        files.length <= 100
+                                            ? <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                            : null
+                                    }
                                     {
                                         files.length > 0 ? <Text className="ext_txt">本次等待上传{files.length}张</Text> : null
                                     }
@@ -344,7 +352,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
                                     </View>
                                 </View>
                                 : <View className="btn_info">
-                                    <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                    {
+                                        files.length <= 100
+                                            ? <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                            : null
+                                    }
                                     {
                                         hasSelected
                                             ? <Text className="ext_txt">本次等待上传{files.length}张</Text>
