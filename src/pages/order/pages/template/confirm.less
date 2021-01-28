@@ -37,6 +37,77 @@
             padding-right: 32px;
         }
     }
+    .print_status_box{
+        height: 216px;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 0 56px;
+        display: flex;
+        align-items: center;
+        .device_status{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .icon{
+                width: 96px;
+                height: 96px;
+            }
+            .txt{
+                font-size: 24px;
+                font-weight: 500;
+                text-align: CENTER;
+                color: #4d94ff;
+                line-height: 40px;
+            }
+        }
+        .waiting_box{
+            margin-left: 150px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .waiting{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                .num{
+                    font-size: 32px;
+                    font-weight: 500;
+                    text-align: CENTER;
+                    color: #4d94ff;
+                    line-height: 48px;
+                    margin-bottom: 16px;
+                }
+                .wtip{
+                    font-size: 24px;
+                    font-weight: 400;
+                    text-align: CENTER;
+                    color: #9c9da6;
+                    line-height: 40px;
+                }
+            }
+            .time{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                .ttop{
+                    font-size: 32px;
+                    font-weight: 500;
+                    text-align: CENTER;
+                    color: #4d94ff;
+                    line-height: 48px; 
+                    margin-bottom: 16px;
+                }
+                .ttip{
+                    font-size: 24px;
+                    font-weight: 400;
+                    text-align: CENTER;
+                    color: #9c9da6;
+                    line-height: 40px;
+                }
+            }
+        }
+    }
     .address-part-has{
         position: relative;
         .c_address{

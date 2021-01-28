@@ -155,7 +155,8 @@ export default class Status extends Component<any,{
                 sku_id:currentSku.id,
                 quantity:1,
                 user_tpl_id:-2,
-                terminal_id:id
+                terminal_id:id,
+                print_type:"doc"
             })
             Taro.navigateTo({
                 url:updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)

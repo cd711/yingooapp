@@ -30,6 +30,12 @@ import photoStore from "../../../../store/photo";
 import Fragment from '../../../../components/Fragment';
 import page from '../../../../utils/ext'
 
+interface PrintDeviceStatus{
+    queue_num: number;
+    status: number;
+    status_text: string;
+}
+
 @inject("userStore", "templateStore")
 @observer
 @page({
@@ -51,7 +57,10 @@ export default class Confirm extends Component<any, {
     orderid: string,
     centerPartyHeight: number;
     orderMessages:any;
-    payPrice:string
+    payPrice:string;
+    terminalPrintType:string;
+    printDeviceInfo:PrintDeviceStatus;
+    isHasAddBuy:boolean
 }> {
 
     config: Config = {
@@ -75,7 +84,10 @@ export default class Confirm extends Component<any, {
             orderid: "",
             centerPartyHeight: 500,
             orderMessages:{},
-            payPrice:"0.00"
+            payPrice:"0.00",
+            terminalPrintType:"",
+            printDeviceInfo:null,
+            isHasAddBuy:false
         }
     }
 
@@ -109,6 +121,28 @@ export default class Confirm extends Component<any, {
             this.initData();
         }
     }
+    /**
+     * 获取线下打印机状态
+     * @param {*}
+     * @return {*}
+     */
+    getPrintDeviceStatus = (id:number,type:string) => {
+
+        api("device.terminal/status",{
+            terminal_id:id
+        }).then((res)=>{
+            console.log(res);
+            this.setState({
+                terminalPrintType:type,
+                printDeviceInfo:{
+                    queue_num:res.queue_num,
+                    status:res.status,
+                    status_text:res.status_text
+                }
+            })
+        })
+
+    }
     private unixOrder:any = ""
     initData = () => {
         Taro.showLoading({title: "加载中"});
@@ -116,10 +150,14 @@ export default class Confirm extends Component<any, {
         this.unixOrder = order;
         getOrderConfimPreviewData(this.unixOrder,async (resp,has)=>{
             if (has) {
+                if (resp && resp.user_tpl_id && resp.user_tpl_id == -2) {
+                    this.getPrintDeviceStatus(resp.terminal_id,resp.print_type)
+                }
                 if (resp.orderid) {
+
                     this.checkOrder(resp.orderid);
                 } else {
-                    const {page, skuid, total,user_tpl_id}: any = resp;
+                    const {page, skuid, total,user_tpl_id,print_type}: any = resp;
 
                     this.isPhoto = page && page === "photo";
                     let params: any = {};
@@ -160,13 +198,13 @@ export default class Confirm extends Component<any, {
                             crop: params.crop
                         }
                     }
-                    if (user_tpl_id && user_tpl_id == -2) {
-                        resp.print_images = JSON.stringify(resp.print_images)
-                        data = resp
-                    }
                     if (!isEmpty(userStore.address)) {
                         templateStore.address = userStore.address;
                         data["address_id"] = userStore.address.id;
+                    }
+                    if (print_type=="doc") {
+                        resp.print_images = JSON.stringify(resp.print_images)
+                        data = resp;
                     }
                     api("app.order_temp/add", data).then((res) => {
                         this.initPayWayModal = true;
@@ -238,6 +276,7 @@ export default class Confirm extends Component<any, {
     }
     handleData = (res: any) => {
         const temp = res;
+        let is = false;
         if (temp && temp.orders) {
             const orders = temp.orders;
             for (const iterator of orders) {
@@ -248,11 +287,15 @@ export default class Confirm extends Component<any, {
                         if (isSelectItem.length == 1) {
                             console.log("选择的加购",product,isSelectItem)
                             product["checked"] = true;
+                            is = true;
                         }
                     }
                 }
             }
         }
+        this.setState({
+            isHasAddBuy:is
+        })
         return temp
     }
 
@@ -680,7 +723,7 @@ export default class Confirm extends Component<any, {
         debuglog("onAddBuyItemDetailClick")
         const {data} = this.state;
         const subItem = mainProduct.merge_products.find((obj) => obj.product.id == item.id);
-        console.log("当前选的——————————",subItem)
+        debuglog("当前选的——————————",subItem)
         setTempDataContainer(`${item.id}_${mainProductId}`, {
             prepay_id: data.prepay_id,
             pre_order_id: preOrderId,
@@ -795,7 +838,7 @@ export default class Confirm extends Component<any, {
     }
 
     render() {
-        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight,orderMessages,payPrice} = this.state;
+        const {showTickedModal, showPayWayModal, data, tickets, usedTickets, order_sn, centerPartyHeight,orderMessages,payPrice,terminalPrintType,printDeviceInfo,isHasAddBuy} = this.state;
         const {address} = data;
         debuglog("data数据",data)
         // @ts-ignore
@@ -819,35 +862,56 @@ export default class Confirm extends Component<any, {
                 </View>
                 <ScrollView enableFlex scrollY
                             style={deviceInfo.env === 'h5' ? "flex:1" : `height:${centerPartyHeight}px`}>
+                                {
+                                    terminalPrintType=="doc"||terminalPrintType=="photo"?<View className='print_status_box'>
+                                            <View className='device_status'>
+                                                <Image src='https://cdn.playbox.yingoo.com/appsource/device_print.png' className='icon'/>
+                                                <Text className='txt'>{printDeviceInfo.status_text}</Text>
+                                            </View>
+                                            <View className='waiting_box'>
+                                                <View className='waiting'>
+                                                    <Text className='num'>{parseInt(printDeviceInfo.queue_num+"")>0?printDeviceInfo.queue_num:"无"}</Text>
+                                                    <Text className='wtip'>排队人数</Text>
+                                                </View> 
+                                                <View className='time'>
+                                                    <Text className='ttop'>直接打印</Text>
+                                                    <Text className='ttip'>预计时间</Text>
+                                                </View>
+                                            </View>
+                                        </View>:null
+                                }
                     {
-                        address ? <View className='address-part-has' onClick={() => {
-                            Taro.navigateTo({
-                                url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
-                            })
-                        }}>
-                            {/* <Image src={require('../../../../source/addressBackground.png')} className='backimg'/> */}
-                            <View className='c_address'>
-                                <View className='icon'><IconFont name='20_dingwei' size={40} color='#FF4966'/></View>
-                                <View className='info'>
-                                    <View className='youi'>
-                                        <Text className='name'>{address.contactor_name}</Text>
-                                        <Text className='phone'>{address.phone}</Text>
+                        terminalPrintType=="doc" || (terminalPrintType=="photo" && !isHasAddBuy) ? null:<Fragment>
+                            {
+                                address ? <View className='address-part-has' onClick={() => {
+                                    Taro.navigateTo({
+                                        url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
+                                    })
+                                }}>
+                                    {/* <Image src={require('../../../../source/addressBackground.png')} className='backimg'/> */}
+                                    <View className='c_address'>
+                                        <View className='icon'><IconFont name='20_dingwei' size={40} color='#FF4966'/></View>
+                                        <View className='info'>
+                                            <View className='youi'>
+                                                <Text className='name'>{address.contactor_name}</Text>
+                                                <Text className='phone'>{address.phone}</Text>
+                                            </View>
+                                            <Text className='details'>{address.area_text+address.address}</Text>
+                                        </View>
+                                        <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
                                     </View>
-                                    <Text className='details'>{address.area_text+address.address}</Text>
+                                    <Image src={`${options.sourceUrl}appsource/address_part.png`} className='address_line'/>
+                                </View> : <View className='address-part' onClick={() => {
+                                    Taro.navigateTo({
+                                        url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
+                                    })
+                                }}>
+                                    <Text className='title'>选择收货地址</Text>
+                                    <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
                                 </View>
-                                <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
-                            </View>
-                            <Image src={`${options.sourceUrl}appsource/address_part.png`} className='address_line'/>
-                        </View> : <View className='address-part' onClick={() => {
-                            Taro.navigateTo({
-                                url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
-                            })
-                        }}>
-                            <Text className='title'>选择收货地址</Text>
-                            <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
-                        </View>
+                            }
+                        </Fragment>
                     }
-
                     {
                         data.orders && data.orders.map((item) => (
                             <Fragment key={item.pre_order_id}>
@@ -1016,15 +1080,16 @@ export default class Confirm extends Component<any, {
                             </View>
                         </View>
                         {
-                            address ? <Button className='submit-order-btn submit-order-active'
-                                              onClick={this.onSubmitOrder}>提交订单</Button> :
-                                <Button className='submit-order-btn' onClick={() => {
-                                    Taro.showToast({
-                                        title: '请选择地址!',
-                                        icon: 'none',
-                                        duration: 1500
-                                    })
-                                }}>提交订单</Button>
+                            terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?<Button className='submit-order-btn submit-order-active'
+                            onClick={this.onSubmitOrder}>提交订单</Button>:(address ? <Button className='submit-order-btn submit-order-active'
+                                            onClick={this.onSubmitOrder}>提交订单</Button> :
+                            <Button className='submit-order-btn' onClick={() => {
+                                Taro.showToast({
+                                    title: '请选择地址!',
+                                    icon: 'none',
+                                    duration: 1500
+                                })
+                            }}>提交订单</Button>)
                         }
                     </View>
                 </View>
