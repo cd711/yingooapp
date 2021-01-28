@@ -3,7 +3,7 @@ import Taro, {useState, useEffect} from "@tarojs/taro";
 import {View, Text, Image} from "@tarojs/components";
 import IconFont from "../iconfont";
 import {notNull, transformKB} from "../../utils/common";
-import {Files} from "./index";
+import {Files} from "../../modal/modal";
 
 interface ImgFileItemProps {
     currentFile: any;

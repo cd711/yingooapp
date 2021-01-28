@@ -5,7 +5,7 @@ import ENV_TYPE = Taro.ENV_TYPE;
 import {userStore} from "../store/user";
 import dayjs from "dayjs";
 import {api, options} from "./net";
-import {LocalCoupon} from "../modal/modal";
+import {Files, LocalCoupon} from "../modal/modal";
 
 export function ossUrl(url: string, type: number) {
     if (!url) {
@@ -1195,4 +1195,45 @@ export function transformKB(size: number): string{
         case size < 1073741824: return `${Math.floor((size / 1048576) * 100) / 100}MB`;
         default: return `${Math.floor((size / 1073741824) * 100) / 100}GB`
     }
+}
+
+
+export function chooseImageFromSystem(): Promise<Array<Files>> {
+    return new Promise<Array<Files>>((resolve, reject) => {
+        Taro.chooseImage({
+            count: 50,
+            sizeType: ['original', 'compressed'],
+            sourceType: ["album", "camera"],
+            success: result => {
+                debuglog("API直接选择的图片：",result)
+                const arr = result.tempFiles.map((value, index) => {
+                    let name = " ";
+                    if (deviceInfo.env === "weapp") {
+                        const matchName = value.path.match(/([^\\\/]+)\.([^\\\/]+)/g);
+                        if (matchName.length > 0) {
+                            name = matchName[0]
+                        } else {
+                            name = `image${value.size}${value.path.substring(value.path.lastIndexOf("."))}`
+                        }
+                    } else {
+                        name = value.originalFileObj.name
+                    }
+                    return {
+                        ...value,
+                        key: `${index}-k-${value.size}`,
+                        progress: 0,
+                        name,
+                        error: false,
+                        total: value.size,
+                        completed: false,
+                        outOfSize: value.size / 1048576 > 10
+                    }
+                })
+                resolve([...arr])
+            },
+            fail: e => {
+                reject(e)
+            }
+        })
+    })
 }

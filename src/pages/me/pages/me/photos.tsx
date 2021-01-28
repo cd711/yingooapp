@@ -4,7 +4,7 @@ import './photos.less'
 import IconFont from '../../../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api,options} from "../../../../utils/net";
-import {debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
+import {chooseImageFromSystem, debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
 import LoadMore from "../../../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
@@ -13,6 +13,7 @@ import {userStore} from "../../../../store/user";
 import dayjs from "dayjs";
 import page from "../../../../utils/ext";
 import DocumentTransfer from "../../../../components/documentTransfer";
+import {Files} from "../../../../modal/modal";
 
 
 interface PhotosState {
@@ -29,6 +30,7 @@ interface PhotosState {
     editSelectImgIds: any[];
     editSelectAttr: string[];
     visible: boolean;
+    tempFiles: Array<Files>;
 }
 
 @observer
@@ -58,7 +60,8 @@ export default class Photos extends Component<{}, PhotosState> {
             editSelectImgs: [],
             editSelectImgIds: [],
             editSelectAttr: [],
-            visible: false
+            visible: false,
+            tempFiles: []
         }
     }
 
@@ -221,6 +224,21 @@ export default class Photos extends Component<{}, PhotosState> {
         }
     }
 
+    onUploadComplete = () => {
+        this.getList({start: 0, findUseful: false})
+    }
+
+    startChooseImg = async () => {
+        try {
+            const arr = await chooseImageFromSystem();
+            this.setState({tempFiles: [...arr]}, () => {
+                this.setState({visible: true})
+            })
+        }catch (e) {
+
+        }
+    }
+
     private popoverItem: PopoverItemProps[] = [
         {
             title: "时间从远到近排序",
@@ -275,7 +293,7 @@ export default class Photos extends Component<{}, PhotosState> {
     }
 
     render() {
-        const {navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened, visible} = this.state;
+        const {navSwitchActive, loading, imageList, selects, videoList, loadStatus, isEdit, isOpened, visible, tempFiles} = this.state;
         const list = navSwitchActive === 0 ? imageList : videoList;
         const tabs = ["图片", "视频"];
         return (
@@ -332,7 +350,7 @@ export default class Photos extends Component<{}, PhotosState> {
                                     {/*            onChange={this.uploadFile}>*/}
                                     {/*    <Button className='btn'>上传素材</Button>*/}
                                     {/*</UploadFile>*/}
-                                    <Button className='btn' onClick={() => this.setState({visible: true})}>上传素材</Button>
+                                    <Button className='btn' onClick={this.startChooseImg}>上传素材</Button>
                                 </View>
                                 : <View className="list_container">
                                     {
@@ -361,7 +379,7 @@ export default class Photos extends Component<{}, PhotosState> {
                                             </View>
                                     }
                                     <View className="list_main">
-                                        <View className="list_item" onClick={() => this.setState({visible: true})}>
+                                        <View className="list_item" onClick={this.startChooseImg}>
                                             {/*<UploadFile*/}
                                             {/*    extraType={navSwitchActive}*/}
                                             {/*    type="card"*/}
@@ -452,6 +470,8 @@ export default class Photos extends Component<{}, PhotosState> {
                     visible
                         ? <DocumentTransfer
                             useTotal={this.total}
+                            defaultFiles={tempFiles}
+                            onUploadComplete={this.onUploadComplete}
                             visible={visible}
                             onClose={() => this.setState({visible: false})} />
                         : null
