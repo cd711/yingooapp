@@ -15,7 +15,7 @@ import {
     getNextPage,
     notNull,
     ossUrl,
-    pageTotal,
+    pageTotal, setPageTitle,
     updateChannelCode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
@@ -1396,7 +1396,7 @@ export default class Shell extends Component<{}, {
     }
 
     async componentDidMount() {
-
+        setPageTitle("编辑中")
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);

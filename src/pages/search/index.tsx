@@ -9,7 +9,7 @@ import {
     deviceInfo,
     getSpecialRouter,
     getURLParamsStr,
-    notNull,
+    notNull, setPageTitle,
     shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../utils/common";
@@ -40,6 +40,7 @@ const Search:Taro.FC<any> = () => {
     }
 
     useEffect(() => {
+        setPageTitle("搜索")
         if (searchList.length === 0 && searchStore.searchList.length > 0) {
             setSearchList([...searchStore.searchList])
         }

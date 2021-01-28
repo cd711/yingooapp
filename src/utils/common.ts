@@ -1237,3 +1237,10 @@ export function chooseImageFromSystem(): Promise<Array<Files>> {
         })
     })
 }
+
+// h5设置页面标题
+export function setPageTitle(title: string) {
+    if (deviceInfo.env === "h5") {
+        document.title = title || this.config.navigationBarTitleText || " ";
+    }
+}

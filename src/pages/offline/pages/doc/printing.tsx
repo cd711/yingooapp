@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
-import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
+import {debuglog, deviceInfo, jumpToPrivacy, setPageTitle, updateChannelCode} from '../../../../utils/common';
 import { options } from '../../../../utils/net';
 import { AtActivityIndicator } from 'taro-ui'
 
@@ -31,6 +31,7 @@ export default class Printing extends Component<any,{
         }
     }
     componentDidMount(){
+        setPageTitle("打印中")
         if(deviceInfo.env == 'h5'){
             document.title = this.config.navigationBarTitleText || "打印中";
         }

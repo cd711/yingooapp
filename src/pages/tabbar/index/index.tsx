@@ -19,7 +19,7 @@ import {
     sleep,
     updateLocalCoupon,
     urlEncode,
-    setTempDataContainer, updateChannelCode, updateTabBarChannelCode, debuglog
+    setTempDataContainer, updateChannelCode, updateTabBarChannelCode, debuglog, setPageTitle
 } from "../../../utils/common";
 import Fragment from "../../../components/Fragment";
 import Uncultivated from "../../../components/uncultivated";
@@ -242,6 +242,7 @@ class Index extends Component<any, IndexState> {
 
     componentDidMount() {
         debuglog(deviceInfo)
+        setPageTitle("发现")
         if (process.env.TARO_ENV != 'h5') {
             this.setState({
                 centerPartyHeight: deviceInfo.windowHeight

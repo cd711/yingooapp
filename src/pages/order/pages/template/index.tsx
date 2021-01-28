@@ -10,7 +10,7 @@ import {
     notNull,
     ossUrl,
     urlEncode,
-    getSpecialRouter, updateChannelCode, debuglog
+    getSpecialRouter, updateChannelCode, debuglog, setPageTitle
 } from '../../../../utils/common'
 import LoadMore, {LoadMoreEnum} from "../../../../components/listMore/loadMore";
 import LoginModal from "../../../../components/login/loginModal";
@@ -69,6 +69,7 @@ export default class Template extends Component<any, {
     }
 
     async componentDidMount() {
+        setPageTitle("模板")
         if (process.env.TARO_ENV === 'h5') {
             if (window.location.href.indexOf("template") == -1) {
                 return;

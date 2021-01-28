@@ -14,7 +14,7 @@ import {
     getTempDataContainer,
     getURLParamsStr,
     jumpOrderConfimPreview,
-    notNull,
+    notNull, setPageTitle,
     updateChannelCode,
     urlEncode
 } from '../../../../utils/common';
@@ -86,7 +86,7 @@ export default class Preview extends Component<any, {
     }
 
     componentDidMount() {
-
+        setPageTitle("预览")
         // else {
         //     editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         //     window.addEventListener("message", this.onMsg);

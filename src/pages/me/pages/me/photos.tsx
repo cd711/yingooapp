@@ -4,7 +4,14 @@ import './photos.less'
 import IconFont from '../../../../components/iconfont';
 import {AtActivityIndicator, AtModal} from 'taro-ui'
 import {api,options} from "../../../../utils/net";
-import {chooseImageFromSystem, debuglog, deviceInfo, ossUrl, photoGetItemStyle} from "../../../../utils/common";
+import {
+    chooseImageFromSystem,
+    debuglog,
+    deviceInfo,
+    ossUrl,
+    photoGetItemStyle,
+    setPageTitle
+} from "../../../../utils/common";
 import LoadMore from "../../../../components/listMore/loadMore";
 import Popover, {PopoverItemClickProps, PopoverItemProps} from "../../../../components/popover";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
@@ -40,7 +47,7 @@ interface PhotosState {
 export default class Photos extends Component<{}, PhotosState> {
 
     config: Config = {
-        navigationBarTitleText: '首页'
+        navigationBarTitleText: '素材库'
     }
 
     private scrollView: ScrollViewProps;
@@ -106,6 +113,7 @@ export default class Photos extends Component<{}, PhotosState> {
 
 
     componentDidMount() {
+        setPageTitle("素材库")
         this.getList({start: 0})
     }
 

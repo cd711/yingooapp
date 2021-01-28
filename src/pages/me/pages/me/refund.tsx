@@ -4,7 +4,7 @@ import { View, Text,Image,Input, Button } from '@tarojs/components'
 import './refund.less'
 import IconFont from '../../../../components/iconfont';
 import { AtNavBar,AtTextarea} from 'taro-ui'
-import {debuglog} from "../../../../utils/common";
+import {debuglog, setPageTitle} from "../../../../utils/common";
 
 export default class Refund extends Component<any,{
     textValue:string
@@ -19,6 +19,10 @@ export default class Refund extends Component<any,{
         this.state = {
             textValue:""
         }
+    }
+
+    componentDidMount() {
+        setPageTitle("申请退款")
     }
 
     handleChange = (value) => {

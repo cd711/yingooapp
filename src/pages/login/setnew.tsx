@@ -4,7 +4,7 @@ import './index.less'
 import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
-import {debuglog, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
+import {debuglog, fixStatusBarHeight, setPageTitle, updateChannelCode} from '../../utils/common';
 
 export default class Set extends Component<any,{
     btnAtive:boolean;
@@ -25,8 +25,7 @@ export default class Set extends Component<any,{
         }
     }
     componentDidMount(){
-
-
+        setPageTitle("设置新密码")
     }
 
     onSetPassword = () => {

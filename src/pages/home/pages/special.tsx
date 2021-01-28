@@ -8,7 +8,7 @@ import {
     fixStatusBarHeight,
     getURLParamsStr,
     notNull,
-    ossUrl, shareAppExtends, updateChannelCode,
+    ossUrl, setPageTitle, shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../../utils/common";
 import {AtNavBar} from "taro-ui";
@@ -72,6 +72,7 @@ const Special: Taro.FC<any> = () => {
         if (id) {
             api("app.special/info", {special_id: id}).then(res => {
                 setInfo({...res})
+                setPageTitle(res.name)
             }).catch(e => {
                 debuglog("获取专题信息出错：", e)
             })

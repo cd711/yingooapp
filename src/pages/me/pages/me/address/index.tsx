@@ -12,7 +12,7 @@ import {
     fixStatusBarHeight,
     updateChannelCode,
     getOrderConfimPreviewData,
-    debuglog
+    debuglog, setPageTitle
 } from '../../../../../utils/common';
 
 @inject("userStore","templateStore")
@@ -32,6 +32,10 @@ export default class Address extends Component<any,{
             addressList:[],
             centerPartyHeight:500
         }
+    }
+
+    componentDidMount() {
+        setPageTitle("我的收货地址")
     }
 
     componentDidShow(){

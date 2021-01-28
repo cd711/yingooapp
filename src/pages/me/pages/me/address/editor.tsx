@@ -9,7 +9,7 @@ import { observer, inject } from '@tarojs/mobx';
 import { userStore } from '../../../../../store/user';
 import {templateStore} from '../../../../../store/template';
 import isEmpty from 'lodash/isEmpty';
-import {debuglog, fixStatusBarHeight, updateChannelCode} from '../../../../../utils/common';
+import {debuglog, fixStatusBarHeight, setPageTitle, updateChannelCode} from '../../../../../utils/common';
 
 interface CityModal {
     province:any,
@@ -50,6 +50,7 @@ export default class Editor extends Component<any,{
     }
 
     componentDidMount() {
+        setPageTitle("新增地址")
         if (process.env.TARO_ENV == "h5") {
             document.title = this.config.navigationBarTitleText || "新增地址";
         }

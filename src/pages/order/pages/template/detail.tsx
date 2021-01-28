@@ -10,7 +10,7 @@ import {
     fixStatusBarHeight,
     jumpToEditor,
     notNull,
-    ossUrl,
+    ossUrl, setPageTitle,
     setTempDataContainer,
     updateChannelCode
 } from '../../../../utils/common'
@@ -52,8 +52,7 @@ export default class Detail extends Component<{}, {
     // private lastBottomTime = 0;
 
     componentDidMount() {
-        // const {selectItem} = templateStore;
-        // centerPartyHeight
+        setPageTitle("模板详情")
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".bottom_bar").boundingClientRect((bottom_rect) => {

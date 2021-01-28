@@ -5,7 +5,7 @@ import './set.less'
 import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import { observer, inject } from '@tarojs/mobx';
-import {debuglog, fixStatusBarHeight} from '../../utils/common';
+import {debuglog, fixStatusBarHeight, setPageTitle} from '../../utils/common';
 import {userStore} from "../../store/user";
 
 @inject("userStore")
@@ -29,8 +29,7 @@ export default class Set extends Component<any,{
         }
     }
     componentDidMount(){
-
-
+        setPageTitle("设置密码")
     }
     onSetPassword = () => {
         //

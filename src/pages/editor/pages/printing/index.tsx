@@ -1,4 +1,4 @@
-import Taro, {useState, useRef} from "@tarojs/taro";
+import Taro, {useState, useRef, useEffect} from "@tarojs/taro";
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import "./index.less";
 import {AtNavBar} from "taro-ui";
@@ -9,7 +9,7 @@ import {
     getURLParamsStr,
     getUserKey,
     jumpToPrintEditor,
-    notNull, removeDuplicationForArr, shareAppExtends,
+    notNull, removeDuplicationForArr, setPageTitle, shareAppExtends,
     sleep, updateChannelCode,
     urlEncode
 } from "../../../../utils/common";
@@ -33,6 +33,10 @@ const Index: Taro.FC<any> = () => {
     const isMandatory = useRef<boolean>(false);
     const [hasChanged, setChangeStatus] = useState<boolean>(false);
     const hasTplID = useRef<boolean>(!!router.params.tplid)
+
+    useEffect(() => {
+        setPageTitle("选择尺寸")
+    }, [])
 
     async function getBasicInfo() {
         let params = {};

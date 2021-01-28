@@ -10,7 +10,7 @@ import {
     deviceInfo,
     fixStatusBarHeight,
     ListModel,
-    ossUrl,
+    ossUrl, setPageTitle,
     updateChannelCode, updateTabBarChannelCode
 } from '../../../utils/common';
 
@@ -82,6 +82,7 @@ export default class Order extends Component<any,{
     }
 
     componentDidMount(){
+        setPageTitle("我的订单")
         if (process.env.TARO_ENV == 'h5') {
             setTimeout(() => {
                 const nav_bar = Object.assign([],document.querySelectorAll(".nav-bar"));

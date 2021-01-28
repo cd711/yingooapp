@@ -15,7 +15,7 @@ import {
     getURLParamsStr, getUserKey,
     notNull,
     ossUrl,
-    pageTotal, removeDuplicationForArr, sleep, updateChannelCode,
+    pageTotal, removeDuplicationForArr, setPageTitle, sleep, updateChannelCode,
     urlDeCode, urlEncode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
@@ -473,9 +473,6 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
     }
 
     const onSelect = async (item, idx) => {
-        debuglog("9999999999999999-------------")
-        debuglog(JSON.parse(JSON.stringify(photoStore.photoProcessParams.photo.path)), JSON.parse(JSON.stringify(photoStore.photoProcessParams.usefulImages)))
-        debuglog(item, idx)
         const src = list[idx];
 
         if (!notNull(selected) && idx === selected) {
@@ -1389,6 +1386,7 @@ export default class PrintEdit extends Component<any, PrintEditState> {
     }
 
     async componentWillMount() {
+        setPageTitle("编辑中")
         if (this.routerParams.key) {
             const tok = {
                 token: this.routerParams.tok,

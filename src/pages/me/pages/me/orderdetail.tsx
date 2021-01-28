@@ -4,7 +4,14 @@ import './orderdetail.less'
 import IconFont from '../../../../components/iconfont';
 import { api } from '../../../../utils/net'
 import isEmpty from 'lodash/isEmpty';
-import {debuglog, deviceInfo, fixStatusBarHeight, ossUrl, updateChannelCode} from '../../../../utils/common';
+import {
+    debuglog,
+    deviceInfo,
+    fixStatusBarHeight,
+    ossUrl,
+    setPageTitle,
+    updateChannelCode
+} from '../../../../utils/common';
 import dayjs from "dayjs";
 import PayWayModal from '../../../../components/payway/PayWayModal';
 import { templateStore } from '../../../../store/template';
@@ -57,6 +64,7 @@ export default class OrderDetail extends Component<{},{
     private delTipModalOkCallBack: () => void = undefined;
     private confimTipModalOkCallBack:()=>void = undefined;
     componentDidMount(){
+        setPageTitle("我的订单")
         if (!userStore.isLogin) {
             if (deviceInfo.env == 'h5') {
                 window.location.href = updateChannelCode("/pages/tabbar/index/index");

@@ -4,7 +4,7 @@ import './index.less'
 import './find.less'
 import IconFont from '../../components/iconfont';
 import { observer, inject } from '@tarojs/mobx'
-import {fixStatusBarHeight, deviceInfo, updateChannelCode} from '../../utils/common';
+import {fixStatusBarHeight, deviceInfo, updateChannelCode, setPageTitle} from '../../utils/common';
 import { api } from '../../utils/net';
 
 @inject("userStore")
@@ -36,7 +36,7 @@ export default class Set extends Component<any,{
     }
     private inputRef: { inputRef: { focus: () => void; }; };
     componentDidMount(){
-        // debuglog("find~~~~~~~~~~~~~~~~")
+        setPageTitle("设置密码")
         // if (!userStore.isLogin) {
         //     if (deviceInfo.env == 'h5') {
         //         window.location.href = "/pages/tabbar/index/index";

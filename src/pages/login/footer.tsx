@@ -19,6 +19,7 @@ const LoginFooter: Taro.FC<any> = () => {
             window.location.href = url;
         }
     }
+
     return <View className={convertClassName('footer')}>
         <View className={convertClassName('otherlogin')}>
             <View className={convertClassName('line')}/>

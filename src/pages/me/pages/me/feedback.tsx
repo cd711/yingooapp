@@ -1,10 +1,10 @@
 import {Image, ScrollView, Text, View} from "@tarojs/components";
 import {AtInput, AtTextarea} from 'taro-ui'
-import Taro, {useState} from "@tarojs/taro";
+import Taro, {useState, useEffect} from "@tarojs/taro";
 import IconFont from "../../../../components/iconfont";
 import UploadFile from "../../../../components/Upload/Upload";
 import "./feedback.less";
-import {debuglog, deviceInfo, shareAppExtends} from "../../../../utils/common";
+import {debuglog, deviceInfo, setPageTitle, shareAppExtends} from "../../../../utils/common";
 import {api} from "../../../../utils/net";
 
 const Feedback: Taro.FC<any> = (_) => {
@@ -23,6 +23,10 @@ const Feedback: Taro.FC<any> = (_) => {
         {key: 5, name: "功能建议", icon: "24_gongnengjianyi"},
         {key: 6, name: "其他反馈", icon: "24_qitajianyi"},
     ];
+
+    useEffect(() => {
+        setPageTitle("反馈建议")
+    }, [])
 
     const initObj = {
         reason: 1,

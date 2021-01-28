@@ -10,7 +10,7 @@ import {
     fixStatusBarHeight,
     getSpecialRouter,
     getURLParamsStr,
-    ossUrl,
+    ossUrl, setPageTitle,
     shareAppExtends, updateChannelCode,
     urlEncode
 } from "../../utils/common";
@@ -59,6 +59,7 @@ const SearchResult:Taro.FC<any> = () => {
     }
 
     useEffect(() => {
+        setPageTitle(router.params.title ? decodeURI(router.params.title) : "搜索结果")
         getList({
             start: 0
         })
