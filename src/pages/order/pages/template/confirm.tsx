@@ -60,7 +60,8 @@ export default class Confirm extends Component<any, {
     payPrice:string;
     terminalPrintType:string;
     printDeviceInfo:PrintDeviceStatus;
-    isHasAddBuy:boolean
+    isHasAddBuy:boolean,
+    real_order_id:Array<any>
 }> {
 
     config: Config = {
@@ -87,7 +88,8 @@ export default class Confirm extends Component<any, {
             payPrice:"0.00",
             terminalPrintType:"",
             printDeviceInfo:null,
-            isHasAddBuy:false
+            isHasAddBuy:false,
+            real_order_id:[]
         }
     }
 
@@ -508,7 +510,8 @@ export default class Confirm extends Component<any, {
         //     showPayWayModal:true
         // })
         this.initPayWayModal = true;
-        const {data,orderMessages} = this.state;
+        const {data,orderMessages,terminalPrintType} = this.state;
+
         // this.checkOrder(data.prepay_id,false);
         Taro.showLoading({title: '加载中...'})
         api('app.order/add', {
@@ -517,13 +520,21 @@ export default class Confirm extends Component<any, {
         }).then((res) => {
             debuglog("ccc",res);
             Taro.hideLoading();
+            this.setState({
+                real_order_id:res.real_order_id
+            })
             if (res.status > 0) {
+                let url = updateChannelCode(`/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn + "-" + "0")}&pay_order_sn=${res.order_sn}`);
+                if (terminalPrintType == "doc" || terminalPrintType == "photo") {
+                    url = updateChannelCode(`/pages/offline/pages/doc/printing?id=${res.real_order_id[0]}&printtype=${terminalPrintType}`)
+                }
                 Taro.navigateTo({
-                    url: updateChannelCode(`/pages/order/pages/template/success?status=${Base64.encodeURI(res.order_sn + "-" + "0")}&pay_order_sn=${res.order_sn}`)
+                    url
                 });
                 return;
             }
             this.setState({
+                real_order_id:res.real_order_id,
                 payPrice:parseFloat(res.pay_price+"").toFixed(2),
                 order_sn: res.order_sn,
                 showPayWayModal: true,
@@ -594,11 +605,14 @@ export default class Confirm extends Component<any, {
         Taro.getApp().tab = 1;
         let url = '/pages/tabbar/order/order?tab=1';
         debuglog("支付订单号码:",res.data)
-
+        const {terminalPrintType,real_order_id} = this.state;
         switch (res.code) {
             case 1:
                 title = '支付成功';
                 url = deviceInfo.env == 'h5' ? `/pages/order/pages/template/success?pay_order_sn=${res.data}` : `/pages/order/pages/template/success?status=${Base64.encodeURI(res.data + "-" + "0")}&pay_order_sn=${res.data}`;
+                if ((terminalPrintType == "doc" || terminalPrintType == "photo") && real_order_id.length>0) {
+                    url = `/pages/offline/pages/doc/printing?id=${real_order_id[0]}&printtype=${terminalPrintType}`
+                }
                 break;
             case 2:
                 url = '/pages/tabbar/order/order?tab=1';
@@ -916,10 +930,10 @@ export default class Confirm extends Component<any, {
                         data.orders && data.orders.map((item) => (
                             <Fragment key={item.pre_order_id}>
                                 <View className='goods-info'>
-                                    <View className='title'>
-                                        <Text className='txt'>商品信息</Text>
+                                    {/* <View className='title'> */}
+                                        {/* <Text className='txt'>商品信息</Text> */}
                                         {/* <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/> */}
-                                    </View>
+                                    {/* </View> */}
                                     {
                                         item.products.map((product) => (
                                             <View className='info' key={product.id}>
@@ -987,7 +1001,7 @@ export default class Confirm extends Component<any, {
                                 </View>
                                 <View className='product_price'>
                                     <View className='goods-item'>
-                                        <Text className='title'>商品金额</Text>
+                                        <Text className='title'>商品共计</Text>
                                         <View className='price'>
                                             <Text className='sym'>¥</Text>
                                             <Text className='num'>{item.products_price}</Text>
@@ -1040,7 +1054,8 @@ export default class Confirm extends Component<any, {
                                     <Text className='txt'>无积分可用</Text>
                                 </View>
                             </View> */}
-                                <View className='goods-item'>
+                            {
+                                terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?null:<View className='goods-item'>
                                     <Text className='title'>运费</Text>
                                     <View className='price'>
                                         <Text className='sym'>¥</Text>
@@ -1048,6 +1063,8 @@ export default class Confirm extends Component<any, {
                                             className='num'>{parseFloat(item.delivery_price + "") > 0 ? parseFloat(item.delivery_price + "").toFixed(2) : "0.00"}</Text>
                                     </View>
                                 </View>
+                            }
+                                
                                 <View className='goods-item'>
                                     <Text className='title'>小计</Text>
                                     <View className='price red'>
@@ -1056,15 +1073,17 @@ export default class Confirm extends Component<any, {
                                             className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "0.00"}</Text>
                                     </View>
                                 </View>
-                                <View className='goods-item'>
-                                    <Text className='title'>留言</Text>
-                                    <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={({detail:{value}})=>{
-                                        orderMessages[item.pre_order_id] = value;
-                                        this.setState({
-                                            orderMessages:orderMessages
-                                        });
-                                    }}/>
-                                </View>
+                                {
+                                    terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?null:<View className='goods-item'>
+                                        <Text className='title'>留言</Text>
+                                        <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={({detail:{value}})=>{
+                                            orderMessages[item.pre_order_id] = value;
+                                            this.setState({
+                                                orderMessages:orderMessages
+                                            });
+                                        }}/>
+                                    </View>
+                                }
                             </Fragment>
                         ))
                     }
