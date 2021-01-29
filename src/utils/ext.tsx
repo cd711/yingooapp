@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import {shareInfo} from "./common";
+import {shareInfo, updateChannelCode} from "./common";
 
 
 const page = (option?: {
@@ -29,7 +29,7 @@ const page = (option?: {
                 // }
                 return {
                     title: shareInfo.title,
-                    path: shareInfo.link,
+                    path: updateChannelCode(shareInfo.link),
                     imageUrl: shareInfo.imgUrl
                 };
             };

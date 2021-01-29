@@ -1037,7 +1037,8 @@ const PrintChange: Taro.FC<any> = () => {
             jumpOrderConfimPreview({
                 skuid: skuId,
                 total: isSetMeal ? 1 : count,
-                page: "photo"
+                page: "photo",
+                ...data
             });
         } catch (e) {
             debuglog("本地存储失败：", e)

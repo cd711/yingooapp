@@ -815,9 +815,25 @@ export default class Login extends Component<{}, {
 
                 }} onSkuChange={(sku, id) => {
                     debuglog("sku change", sku, id);
+                    let count = imageCount;
+                    if (data && data.attrGroup && data.attrItems) {
+                        const attrGroup:Array<any> = data.attrGroup;
+                        const attrItems:Array<any> = data.attrItems;
+                        const index = attrGroup.findIndex((obj)=>obj.special_show=="setmeal");
+                        if (index>-1) {
+                            const items:Array<any> = attrItems[index];
+                            sku = sku.map((val)=>parseInt(val+""));
+                            const it = items.find((obj)=>sku.indexOf(parseInt(obj.id))>-1);
+                            if (it) {
+                                count = parseInt(it.value);
+                            }
+                            
+                        }
+                    }
                     this.setState({
                         sku,
-                        selectSkuId: parseInt(id + "")
+                        selectSkuId: parseInt(id + ""),
+                        imageCount:count
                     })
                 }} onOkButtonClick={() => this.onOkButtonClick()} onNowButtonClick={() => {
                     //立即制作

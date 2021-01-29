@@ -131,7 +131,7 @@ export default class Confirm extends Component<any, {
         api("device.terminal/status",{
             terminal_id:id
         }).then((res)=>{
-            console.log(res);
+            console.log("哈哈哈",res);
             this.setState({
                 terminalPrintType:type,
                 printDeviceInfo:{
@@ -150,6 +150,7 @@ export default class Confirm extends Component<any, {
         this.unixOrder = order;
         getOrderConfimPreviewData(this.unixOrder,async (resp,has)=>{
             if (has) {
+                debuglog("传递过来的参数",resp)
                 if (resp && resp.user_tpl_id && resp.user_tpl_id == -2) {
                     this.getPrintDeviceStatus(resp.terminal_id,resp.print_type)
                 }
@@ -167,6 +168,7 @@ export default class Confirm extends Component<any, {
                             params = JSON.parse(JSON.stringify(photoStore.photoProcessParams.changeUrlParams));
                             params = photoStore.photoProcessParams.changeUrlParams
                             Object.assign(params,resp)
+                            debuglog("照片读取处理",params);
                         } catch (e) {
                             debuglog("读取参数出错：", e)
 
@@ -180,6 +182,11 @@ export default class Confirm extends Component<any, {
                         quantity: total,
                         user_tpl_id: this.isPhoto ? -1 : (tplid?tplid:0),
                     };
+                    if (user_tpl_id && user_tpl_id == -2) {
+                        data.user_tpl_id = user_tpl_id;
+                        data.quantity = 1;
+                        data.terminal_id = resp.terminal_id;
+                    }
                     if (!this.isPhoto) {
                         data = {
                             ...data,
@@ -202,7 +209,7 @@ export default class Confirm extends Component<any, {
                         templateStore.address = userStore.address;
                         data["address_id"] = userStore.address.id;
                     }
-                    if (print_type=="doc") {
+                    if (print_type && print_type=="doc") {
                         resp.print_images = JSON.stringify(resp.print_images)
                         data = resp;
                     }

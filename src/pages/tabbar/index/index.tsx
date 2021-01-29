@@ -405,11 +405,11 @@ class Index extends Component<any, IndexState> {
     }
 
     uncShow = () => {
-        // this.setState({showUnc: true});
+        this.setState({showUnc: true});
         // Taro.hideTabBar()
-        Taro.navigateTo({
-            url: "/pages/offline/pages/common/status?id=1"
-        })
+        // Taro.navigateTo({
+        //     url: "/pages/offline/pages/common/status?id=1"
+        // })
     }
 
     jumpToTemplate = async type => {

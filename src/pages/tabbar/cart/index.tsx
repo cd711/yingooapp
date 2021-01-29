@@ -296,7 +296,7 @@ export default class Cart extends Component<{}, {
                                 ))
                             }
                         </View>
-                        </ScrollView>:<View className='blank'>
+                        </ScrollView>:<View className='blank' style={`height:${centerPartyHeight}px`}>
                             <Image src={`${options.sourceUrl}appsource/nocart.svg`} className='img'/>
                             <Text className='tip'>购物车是空的</Text>
                             <Button className='go_gg_btn' onClick={()=>{
