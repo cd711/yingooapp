@@ -32,7 +32,14 @@ import TipModal from "../../../../components/tipmodal/TipModal";
 import FillStyleModal from "./fillStyleModal";
 import FillStyleChange from "./fillStyleChangeModal";
 
-
+interface GetRouterParamsProps {
+    path?: any[],
+    forDetail?: boolean,
+    incomplete?: boolean,
+    onlyInitPrice?: boolean,
+    isSetMeal?: boolean,
+    isOfflinePrint?: boolean,
+}
 const PrintChange: Taro.FC<any> = () => {
 
     const router = Taro.useRouter();
@@ -98,6 +105,8 @@ const PrintChange: Taro.FC<any> = () => {
     const [currentSetMeal, setCurrentMeal] = useState<any>({})
     // 是否为套餐，且已经初始化成功了
     const setMealSuccess = useRef(false);
+    // 当前是否为线下打印的照片打印
+    const [offlineStatus, setOfflineStatus] = useState(false);
 
 
     const backPressHandle = async () => {
@@ -374,7 +383,6 @@ const PrintChange: Taro.FC<any> = () => {
 
     // 如果当前的套餐信息发生变化
     useEffect(() => {
-
         let count = 0;
         for (let i = 0; i < photos.length; i++) {
             const item = photos[i];
@@ -554,14 +562,15 @@ const PrintChange: Taro.FC<any> = () => {
      * onlyInitPrice  仅仅只是初始化currentSkus， goodsInfo, currentSkus, 不向容器发送新内容
      * isSetMeal 如果是套餐的话就为true， 并且forDetail此时也为true， sku_id是所有规格都选好了的
      */
-    function getRouterParams(params: { path?: [], forDetail?: boolean, incomplete?: boolean, onlyInitPrice?: boolean, isSetMeal?: boolean } = {}) {
+    function getRouterParams(params: GetRouterParamsProps  = {}) {
         return new Promise<void>(async (resolve, reject) => {
             const opt = {
                 path: params.path || [],
                 forDetail: params.forDetail || false,
                 incomplete: params.incomplete || false,
                 onlyInitPrice: params.onlyInitPrice || false,
-                isSetMeal: params.isSetMeal || false
+                isSetMeal: params.isSetMeal || false,
+                isOfflinePrint: params.isOfflinePrint || false,
             }
             try {
                 if ((!opt.onlyInitPrice && !router.params.sku_id) || !router.params.id) {
@@ -579,7 +588,7 @@ const PrintChange: Taro.FC<any> = () => {
                         }
                     }
                     const obj = {
-                        path: opt.forDetail || opt.incomplete ? [...photoStore.photoProcessParams.photo.path] : opt.path,
+                        path: opt.forDetail || opt.incomplete || opt.isOfflinePrint ? [...photoStore.photoProcessParams.photo.path] : opt.path,
                         sku: decodeURIComponent(router.params.sku_id),
                         id: router.params.id
                     };
@@ -608,6 +617,7 @@ const PrintChange: Taro.FC<any> = () => {
                     const idx = serPar.attrGroup.findIndex(v => v.special_show === "photosize");
                     const numIdx = serPar.attrGroup.findIndex(v => v.special_show === "photonumber");
                     const setMealIdx = serPar.attrGroup.findIndex(v => v.special_show === "setmeal");
+                    const offlinePrintIdx = serPar.attrGroup.findIndex(v => v.special_show === "printsku");
                     debuglog("查找的下标：", idx, numIdx, setMealIdx);
 
                     let pictureSize = photoStore.photoProcessParams.pictureSize;
@@ -705,7 +715,7 @@ const PrintChange: Taro.FC<any> = () => {
                         pictureSize = findPictureSizeForID(obj.sku.split(","),  serPar.attrItems[idx])
                     }
 
-                    if (idx > -1 && !opt.onlyInitPrice) {
+                    if ((idx > -1 || offlinePrintIdx > -1) && !opt.onlyInitPrice) {
                         // 向本地存储attrItems
                         debuglog("开始向容器更新数据：", pictureSize)
                         await photoStore.setActionParamsToServer(getUserKey(), {
@@ -714,6 +724,7 @@ const PrintChange: Taro.FC<any> = () => {
                             index: idx,
                             numIdx,
                             setMealIdx,
+                            offlinePrintIdx,
                             pictureSize,
                             photoStyle: serPar.photostyle,
                             photoTplId: router.params.tplid,
@@ -798,6 +809,14 @@ const PrintChange: Taro.FC<any> = () => {
                 // 如果从商品详情页跳转过来，有inc(incomplete)字段，就说明sku_id是残缺的子项ID，就需要在onCreateOrder时判断是否已经选完了，选完就直接跳转
                 await getRouterParams({incomplete: true});
                 params = {...photoStore.photoProcessParams}
+            } else if (!notNull(router.params.o) && !notNull(router.params.s) && router.params.o === "t") {
+                // 如果是从线下打印选择的照片打印，就代表sku_id是完整的id，规格是完整的
+                await getRouterParams({
+                    isOfflinePrint: true,
+                    forDetail: true,
+                });
+                params = {...photoStore.photoProcessParams};
+                setOfflineStatus(true)
             } else {
                 await getRouterParams({onlyInitPrice: true})
                 params = await photoStore.getServerParams({setLocal: true});
@@ -1001,6 +1020,14 @@ const PrintChange: Taro.FC<any> = () => {
             })
         }
 
+        if (offlineStatus) {
+            Object.assign(data, {
+                user_tpl_id: router.params.user_tpl_id,
+                terminal_id: router.params.terminal_id,
+                print_type: "photo",
+            })
+        }
+
         try {
 
             await photoStore.updateServerParams(photoStore.printKey, {
@@ -1067,11 +1094,16 @@ const PrintChange: Taro.FC<any> = () => {
             return
         }
 
+        if (offlineStatus) {
+            forIDJumpToDatail(router.params.sku_id)
+            return
+        }
+
         Taro.showLoading({title: "请稍后..."});
         try {
             const res = await api("app.product/info", {id: photoStore.photoProcessParams.photo.id});
             if (res.attrGroup && res.attrGroup instanceof Array) {
-                const specialArr = ["photosize", "photonumber", "setmeal"];
+                const specialArr = ["photosize", "photonumber", "setmeal", "printsku"];
                 res.attrGroup = res.attrGroup.map(val => ({...val, disable: !notNull(val.special_show) && specialArr.indexOf(val.special_show) > -1}))
             }
             goodsInfo.current = res;
@@ -1389,7 +1421,7 @@ const PrintChange: Taro.FC<any> = () => {
             }}>
                 <Text className="txt">显示方式</Text>
                 <View className="act_txt" onClick={() => setFillStatus(true)}>
-                    <Text className="a_txt">{fillStyle.style === "fill" ? "填充相纸" : "留白相纸"}</Text>
+                    <Text className="a_txt">{fillStyle.style === "fill" ? "裁剪" : "留白"}</Text>
                     <View className="arrow" />
                 </View>
             </View>

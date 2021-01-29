@@ -1,69 +1,69 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Button,ScrollView,Image } from '@tarojs/components'
+import Taro, {Component, Config} from '@tarojs/taro'
+import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import './status.less'
 import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
-import { observer, inject } from '@tarojs/mobx'
-// import TipModal from '../../../../components/tipmodal/TipModal'
+import {inject, observer} from '@tarojs/mobx'
 import {
-    addOrderConfimPreviewData,
     debuglog,
-    deviceInfo,
-    isEmptyX,
-    jumpToPrivacy,
+    deviceInfo, getURLParamsStr, getUserKey,
+    isEmptyX, removeDuplicationForArr,
     setPageTitle,
     setTempDataContainer,
-    updateChannelCode
+    updateChannelCode, urlEncode
 } from '../../../../utils/common';
-import { api } from '../../../../utils/net';
+import {api} from '../../../../utils/net';
 import Checkboxs from '../../../../components/checkbox/checkbox';
 import LoginModal from '../../../../components/login/loginModal';
-import {observe} from 'mobx';
 import dayjs from 'dayjs';
+import PhotosEle from "../../../../components/photos/photos";
+import photoStore from "../../../../store/photo";
 
 @inject("userStore")
 @observer
-export default class Status extends Component<any,{
-    centerPartyHeight:number;
-    status_txt:string;
-    wait_num:number;
-    deviceSupportItems:Array<any>;
-    allDeviceItems:Array<any>;
-    currentSelectIndex:number;
-    productInfo:any
+export default class Status extends Component<any, {
+    centerPartyHeight: number;
+    status_txt: string;
+    wait_num: number;
+    deviceSupportItems: Array<any>;
+    allDeviceItems: Array<any>;
+    currentSelectIndex: number;
+    productInfo: any;
+    visible: boolean;
 }> {
 
     config: Config = {
         navigationBarTitleText: '打印服务',
-        // backgroundColor:'#F5F6F9'
     }
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            centerPartyHeight:500,
-            status_txt:"设备正常",
-            wait_num:0,
-            deviceSupportItems:[],
-            allDeviceItems:[],
-            currentSelectIndex:0,
-            productInfo:null
+            centerPartyHeight: 500,
+            status_txt: "设备正常",
+            wait_num: 0,
+            deviceSupportItems: [],
+            allDeviceItems: [],
+            currentSelectIndex: 0,
+            productInfo: null,
+            visible: false
         }
     }
-    componentDidMount(){
+
+    componentDidMount() {
         setPageTitle("打印服务")
-        if(deviceInfo.env == 'h5'){
+        if (deviceInfo.env == 'h5') {
             document.title = this.config.navigationBarTitleText || "打印服务";
         }
         const {id} = this.$router.params;
         if (isEmptyX(id)) {
-            Taro.showToast({title:"参数错误，请重新扫码！",icon:'none',duration:1500})
+            Taro.showToast({title: "参数错误，请重新扫码！", icon: 'none', duration: 1500})
         }
         if (process.env.TARO_ENV != 'h5') {
-            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
-                Taro.createSelectorQuery().select(".status_bottom").boundingClientRect((bottom_rect)=>{
+            Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
+                Taro.createSelectorQuery().select(".status_bottom").boundingClientRect((bottom_rect) => {
                     this.setState({
-                        centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height-bottom_rect.height
+                        centerPartyHeight: Taro.getSystemInfoSync().windowHeight - nav_rect.height - bottom_rect.height
                     });
                 }).exec();
             }).exec();
@@ -72,26 +72,27 @@ export default class Status extends Component<any,{
             this.loadData();
         }
     }
+
     loadData = () => {
         const {id} = this.$router.params;
-        Taro.showLoading({title:"加载中..."});
-        api("device.terminal/status",{
-            terminal_id:id
-        }).then((res)=>{
-            api("app.product/info",{
-                id:49
-            }).then((result)=>{
+        Taro.showLoading({title: "加载中..."});
+        api("device.terminal/status", {
+            terminal_id: id
+        }).then((res) => {
+            api("app.product/info", {
+                id: 49
+            }).then((result) => {
                 Taro.hideLoading();
-                const attrItems=result.attrItems.length>0?result.attrItems[0]:[];
+                const attrItems = result.attrItems.length > 0 ? result.attrItems[0] : [];
                 const skuItem = [];
                 let current = 0;
                 for (let index = 0; index < attrItems.length; index++) {
                     const element = attrItems[index];
                     const v = element.value.split(",");
-                    const sku = v.length>0?v[0].split("#"):[];
-                    const tt = sku.filter((s)=>res.peripheral_feature.indexOf(parseInt(s+""))>-1);
+                    const sku = v.length > 0 ? v[0].split("#") : [];
+                    const tt = sku.filter((s) => res.peripheral_feature.indexOf(parseInt(s + "")) > -1);
                     let is = false;
-                    element["type"] = v.length>1?v[1]:"";
+                    element["type"] = v.length > 1 ? v[1] : "";
                     element["disable"] = true;
                     if (tt.length == sku.length) {
                         if (skuItem.length == 0) {
@@ -106,29 +107,30 @@ export default class Status extends Component<any,{
                     element["checked"] = is;
                 }
                 this.setState({
-                    status_txt:res.status_text,
-                    wait_num:parseInt(res.queue_num+""),
-                    deviceSupportItems:skuItem,
-                    allDeviceItems:attrItems,
-                    currentSelectIndex:current,
-                    productInfo:result
+                    status_txt: res.status_text,
+                    wait_num: parseInt(res.queue_num + ""),
+                    deviceSupportItems: skuItem,
+                    allDeviceItems: attrItems,
+                    currentSelectIndex: current,
+                    productInfo: result
                 })
-                debuglog(result,res)
-            }).catch((err)=>{
+                debuglog(result, res)
+            }).catch((err) => {
                 Taro.hideLoading();
                 debuglog(err)
             })
-        }).catch((e)=>{
+        }).catch((e) => {
             Taro.hideLoading();
             debuglog(e);
         });
     }
+
     onDeviceItemClick = (item) => {
         if (item.disable) {
             Taro.showToast({
-                title:"当前设备不支持",
-                icon:'none',
-                duration:1500
+                title: "当前设备不支持",
+                icon: 'none',
+                duration: 1500
             });
             return;
         }
@@ -144,42 +146,100 @@ export default class Status extends Component<any,{
         }
         this.setState({
             allDeviceItems,
-            currentSelectIndex:current
+            currentSelectIndex: current
         })
     }
 
-    onNextStep = () => {
+    onNextStep = async () => {
         if (!userStore.isLogin) {
             userStore.showLoginModal = true;
             return;
         }
-        const {allDeviceItems,currentSelectIndex,productInfo} = this.state;
+        const {allDeviceItems, currentSelectIndex, productInfo} = this.state;
         const {skus} = productInfo;
         const currentItem = allDeviceItems[currentSelectIndex];
-        if (currentItem.type=="doc") {
-            const currentSku = skus.find((obj)=>parseInt(obj.value+"")==parseInt(currentItem.id));
+        debuglog("大小：", currentItem)
+        const currentSku = skus.find((obj) => parseInt(obj.value + "") == parseInt(currentItem.id));
+        const {id} = this.$router.params;
+        if (currentItem.type == "doc") {
             const currentUnix = dayjs().unix()
-            const {id} = this.$router.params;
-            setTempDataContainer(currentUnix+"",{
-                sku_id:currentSku.id,
-                quantity:1,
-                user_tpl_id:-2,
-                terminal_id:id,
-                print_type:"doc"
+            setTempDataContainer(currentUnix + "", {
+                sku_id: currentSku.id,
+                quantity: 1,
+                user_tpl_id: -2,
+                terminal_id: id,
+                print_type: "doc"
             })
             Taro.navigateTo({
-                url:updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)
+                url: updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)
             })
+        } else if (currentItem.type == "photo") {
+            debuglog(11111111111)
+            this.setState({visible: true})
+        }
+    }
+
+    onPhotoSelect = async ({ids, imgs, attrs}) => {
+
+        try {
+            const path = [];
+            for (let i = 0; i < ids.length; i++) {
+                path.push({
+                    id: ids[i],
+                    url: imgs[i],
+                    attr: attrs[i],
+                    edited: false,
+                    doc: ""
+                })
+            }
+
+            const {allDeviceItems, currentSelectIndex, productInfo} = this.state;
+            const {skus} = productInfo;
+            const currentItem = allDeviceItems[currentSelectIndex];
+            debuglog("大小：", currentItem)
+            const currentSku = skus.find((obj) => parseInt(obj.value + "") == parseInt(currentItem.id));
+            const {id} = this.$router.params;
+            const size = currentItem.value.split(",")[2];
+            const str = getURLParamsStr(urlEncode({
+                // 相框尺寸
+                s: size,
+                id: productInfo.id,
+                user_tpl_id: -2,
+                terminal_id: id,
+                print_type: "photo",
+                sku_id: currentSku.id,
+                // 跳转到照片冲印列表需要使用的参数
+                o: "t"
+            }))
+
+            await photoStore.setActionParamsToServer(getUserKey(), {
+                photo: {
+                    path,
+                    id: "",
+                    sku: ""
+                },
+                usefulImages: removeDuplicationForArr({
+                    newArr: ids.map((v, idx) => ({id: v, url: imgs[idx]})),
+                    oldArr: photoStore.photoProcessParams.usefulImages
+                }),
+                pictureSize: size || ""
+            })
+            Taro.navigateTo({
+                url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
+            })
+        } catch (e) {
+            debuglog("选图后跳转出错：", e)
         }
     }
 
 
     render() {
-        const {centerPartyHeight,status_txt,wait_num,allDeviceItems} = this.state;
+        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo} = this.state;
         return (
             <View className='print_status'>
                 <LoginModal isTabbar={false}/>
-                <View className='nav-bar' style={process.env.TARO_ENV === 'h5'?"":`padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                <View className='nav-bar'
+                      style={process.env.TARO_ENV === 'h5' ? "" : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
                     <View className='left' onClick={() => {
                         Taro.navigateBack();
                     }}>
@@ -189,16 +249,18 @@ export default class Status extends Component<any,{
                         <Text className='title'>{this.config.navigationBarTitleText}</Text>
                     </View>
                 </View>
-                <ScrollView scrollY enableFlex className='print_status_scroll' style={process.env.TARO_ENV != 'h5'?`height:${centerPartyHeight}px`:""}>
+                <ScrollView scrollY enableFlex className='print_status_scroll'
+                            style={process.env.TARO_ENV != 'h5' ? `height:${centerPartyHeight}px` : ""}>
                     <View className='print_status_container'>
                         <View className='print_status_box'>
                             <View className='device_status'>
-                                <Image src='https://cdn.playbox.yingoo.com/appsource/device_print.png' className='icon'/>
+                                <Image src='https://cdn.playbox.yingoo.com/appsource/device_print.png'
+                                       className='icon'/>
                                 <Text className='txt'>{status_txt}</Text>
                             </View>
                             <View className='waiting_box'>
                                 <View className='waiting'>
-                                    <Text className='num'>{wait_num>0?wait_num:"无"}</Text>
+                                    <Text className='num'>{wait_num > 0 ? wait_num : "无"}</Text>
                                     <Text className='wtip'>排队人数</Text>
                                 </View>
                                 <View className='time'>
@@ -209,10 +271,12 @@ export default class Status extends Component<any,{
                         </View>
                         <View className='status_item'>
                             {
-                                allDeviceItems.map((item)=>(
-                                    <View className='print_item' key={item.id} onClick={()=>this.onDeviceItemClick(item)}>
+                                allDeviceItems.map((item) => (
+                                    <View className='print_item' key={item.id}
+                                          onClick={() => this.onDeviceItemClick(item)}>
                                         <Text className='left_txt'>{item.name}</Text>
-                                        <Checkboxs isChecked={item.checked} disabled unUse={item.disable} onCheckedClick={()=>this.onDeviceItemClick(item)}/>
+                                        <Checkboxs isChecked={item.checked} disabled unUse={item.disable}
+                                                   onCheckedClick={() => this.onDeviceItemClick(item)}/>
                                     </View>
                                 ))
                             }
@@ -221,9 +285,21 @@ export default class Status extends Component<any,{
                 </ScrollView>
                 <View className='status_bottom'>
                     <View className='boxs'>
-                        <Button className='next_step_button' onClick={()=>this.onNextStep()}>下一步</Button>
+                        <Button className='next_step_button' onClick={() => this.onNextStep()}>下一步</Button>
                     </View>
                 </View>
+                {
+                    visible
+                        ? <View className="photo_picker_container">
+                            <PhotosEle
+                                editSelect={visible}
+                                onClose={() => this.setState({visible: false})}
+                                onPhotoSelect={this.onPhotoSelect}
+                                max={parseInt(productInfo.max)}
+                            />
+                        </View>
+                        : null
+                }
             </View>
         )
     }

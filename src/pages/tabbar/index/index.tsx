@@ -405,8 +405,11 @@ class Index extends Component<any, IndexState> {
     }
 
     uncShow = () => {
-        this.setState({showUnc: true});
+        // this.setState({showUnc: true});
         // Taro.hideTabBar()
+        Taro.navigateTo({
+            url: "/pages/offline/pages/common/status?id=1"
+        })
     }
 
     jumpToTemplate = async type => {
@@ -595,21 +598,7 @@ class Index extends Component<any, IndexState> {
             this.loadRefresh()
         }
     }
-    /**
-     * 线下打印文档
-     * @param {*}
-     * @return {*}
-     */
-    offlinePrintDoc = () => {
-        // Taro.scanCode({
-        //     success:(res)=>{
-        //         console.log("扫描结果",res);
-        //     }
-        // })
-        Taro.navigateTo({
-            url:"/pages/offline/pages/doc/origin"
-        })
-    }
+
     render() {
         const {data, centerPartyHeight, showUnc, scrolling, curtain, loadStatus, refresherTriggered, isTop, topFix} = this.state;
         return (

@@ -11,15 +11,15 @@ const FillStyleModal: Taro.FC<FillStyleModalProps> = props => {
     return (
         <View className="fill_style_modal_container">
             <View className="fill_style_modal_main">
-                <Text className="title">默认采用了填充相纸，可根据实际情况调整图片显示方式</Text>
+                <Text className="title">默认采用了裁剪图片，可根据实际情况调整图片显示方式</Text>
                 <View className="style_exp_main">
                     <View className="item">
                         <Image src={`${options.sourceUrl}appsource/bai.png`} className="exp_img"/>
-                        <Text className="exp_txt">留白相纸</Text>
+                        <Text className="exp_txt">留白</Text>
                     </View>
                     <View className="item">
                         <Image src={`${options.sourceUrl}appsource/tianchong.png`} className="exp_img"/>
-                        <Text className="exp_txt">填充相纸</Text>
+                        <Text className="exp_txt">裁剪</Text>
                     </View>
                 </View>
                 <View className="close_btn" onClick={onClose}>
