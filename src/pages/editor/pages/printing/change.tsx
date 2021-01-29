@@ -31,6 +31,7 @@ import SetMealSelectorModal from "../../../../components/changePackage/changePac
 import TipModal from "../../../../components/tipmodal/TipModal";
 import FillStyleModal from "./fillStyleModal";
 import FillStyleChange from "./fillStyleChangeModal";
+import serverConfig from "../../../../config/config";
 
 interface GetRouterParamsProps {
     path?: any[],
@@ -1333,7 +1334,7 @@ const PrintChange: Taro.FC<any> = () => {
         const obj: any = {
             idx: index,
             cid: router.params.id,
-            tplid: router.params.cid,
+            tplid: router.params.cid || serverConfig.goodsID.photoTplCateID,
             key: photoStore.printKey,
             local: !notNull(item.readLocal) && item.readLocal === true ? "t" : "f",
             status: item.edited && !notNull(item.doc) ? "t" : "f",
@@ -1341,9 +1342,7 @@ const PrintChange: Taro.FC<any> = () => {
             img: item.url,
         };
 
-        // if (deviceInfo.env === "weapp") {
-        //     Object.assign(obj, {key: photoStore.printKey})
-        // }
+        debuglog("点击跳入编辑器的参数：", obj)
 
         try {
             if (!notNull(item.readLocal) && item.readLocal === true) {
