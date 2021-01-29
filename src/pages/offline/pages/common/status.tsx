@@ -174,7 +174,6 @@ export default class Status extends Component<any, {
                 url: updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)
             })
         } else if (currentItem.type == "photo") {
-            debuglog(11111111111)
             this.setState({visible: true})
         }
     }
