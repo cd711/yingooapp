@@ -258,7 +258,7 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     const onResultTipClose = (type: 1 | 2 | 3) => {
         if (type === 1) {
             if (completedArr.current.length + selectedCount > max) {
-                Taro.showToast({title: "上传成功的图片总数大于商品所需照片数"})
+                Taro.showToast({title: "上传成功的图片总数大于商品所需照片数",icon:"none"})
                 return;
             }
             onClose && onClose(completedArr.current)
