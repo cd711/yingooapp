@@ -19,7 +19,7 @@ const FillStyleModal: Taro.FC<FillStyleModalProps> = props => {
                     </View>
                     <View className="item">
                         <Image src={`${options.sourceUrl}appsource/tianchong.png`} className="exp_img"/>
-                        <Text className="exp_txt">裁剪</Text>
+                        <Text className="exp_txt" style={{color: "#FF4966"}}>裁剪</Text>
                     </View>
                 </View>
                 <View className="close_btn" onClick={onClose}>
