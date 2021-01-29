@@ -13,6 +13,10 @@ interface DocumentTransferProps {
     visible: boolean;
     // 已使用总数
     useTotal: number;
+    // 选图模式生效,已选择的总数
+    selectedCount?: number;
+    // 最大使用数; 选图模式生效
+    max?: number;
     // 已选择的图片;
     defaultFiles: Files[];
     // 如果是选图的话可能会有上传成功返回的ID
@@ -28,6 +32,8 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     const {
         onClose,
         useTotal = 0,
+        max = 0,
+        selectedCount = 0,
         selectPictureMode = false,
         onUploadComplete,
         defaultFiles
@@ -251,6 +257,10 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
 
     const onResultTipClose = (type: 1 | 2 | 3) => {
         if (type === 1) {
+            if (completedArr.current.length + selectedCount > max) {
+                Taro.showToast({title: "上传成功的图片总数大于商品所需照片数"})
+                return;
+            }
             onClose && onClose(completedArr.current)
             return
         }

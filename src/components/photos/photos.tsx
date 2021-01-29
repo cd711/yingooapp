@@ -414,7 +414,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             editSelectImgIds,
             visible,
             transferVisible,
-            tempFiles
+            tempFiles,
+            _max,
         } = this.state;
         const list = navSwitchActive === 0 ? imageList : usefulList;
         const tabs = ["未使用", "已使用"];
@@ -592,6 +593,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                             visible={transferVisible}
                             useTotal={this.total}
                             defaultFiles={tempFiles}
+                            max={_max}
+                            selectedCount={editSelectImgIds.length}
                             selectPictureMode
                             onUploadComplete={this.onUploadComplete}
                             onClose={this.onTransferClose} />
