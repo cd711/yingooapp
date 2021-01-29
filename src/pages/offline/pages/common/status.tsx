@@ -5,7 +5,16 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
-import {addOrderConfimPreviewData, debuglog, deviceInfo, isEmptyX, jumpToPrivacy, setTempDataContainer, updateChannelCode} from '../../../../utils/common';
+import {
+    addOrderConfimPreviewData,
+    debuglog,
+    deviceInfo,
+    isEmptyX,
+    jumpToPrivacy,
+    setPageTitle,
+    setTempDataContainer,
+    updateChannelCode
+} from '../../../../utils/common';
 import { api } from '../../../../utils/net';
 import Checkboxs from '../../../../components/checkbox/checkbox';
 import LoginModal from '../../../../components/login/loginModal';
@@ -42,7 +51,7 @@ export default class Status extends Component<any,{
         }
     }
     componentDidMount(){
-        
+        setPageTitle("打印服务")
         if(deviceInfo.env == 'h5'){
             document.title = this.config.navigationBarTitleText || "打印服务";
         }
@@ -191,7 +200,7 @@ export default class Status extends Component<any,{
                                 <View className='waiting'>
                                     <Text className='num'>{wait_num>0?wait_num:"无"}</Text>
                                     <Text className='wtip'>排队人数</Text>
-                                </View> 
+                                </View>
                                 <View className='time'>
                                     <Text className='ttop'>直接打印</Text>
                                     <Text className='ttip'>预计时间</Text>

@@ -5,7 +5,17 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
-import {debuglog, deviceInfo, documentConverPDF, getTempDataContainer, isEmptyX, jumpOrderConfimPreview, jumpToPrivacy, updateChannelCode} from '../../../../utils/common';
+import {
+    debuglog,
+    deviceInfo,
+    documentConverPDF,
+    getTempDataContainer,
+    isEmptyX,
+    jumpOrderConfimPreview,
+    jumpToPrivacy,
+    setPageTitle,
+    updateChannelCode
+} from '../../../../utils/common';
 import Checkboxs from '../../../../components/checkbox/checkbox';
 import { api, options } from '../../../../utils/net';
 import dayjs from 'dayjs';
@@ -43,6 +53,7 @@ export default class Origin extends Component<any,{
         }
     }
     componentDidMount(){
+        setPageTitle("我的文档")
         if(deviceInfo.env == 'h5'){
             document.title = this.config.navigationBarTitleText || "我的文档";
         }

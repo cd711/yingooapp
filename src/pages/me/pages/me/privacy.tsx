@@ -3,7 +3,7 @@ import Taro, {Component, Config} from "@tarojs/taro";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../../../utils/net";
 import "./privacy.less";
-import {debuglog, deviceInfo} from "../../../../utils/common";
+import {debuglog, deviceInfo, setPageTitle} from "../../../../utils/common";
 import page from "../../../../utils/ext";
 
 interface PrivacyState{
@@ -26,6 +26,7 @@ export default class Privacy extends Component<any, PrivacyState> {
 
     componentDidMount() {
         const {params} = this.$router;
+        setPageTitle(`${params.pageType && params.pageType === "privacy" ? "隐私政策" : "用户协议"}`)
         if (params.pageType) {
             api("app.about/info", {name: params.pageType}).then(privacyTxt => {
                 this.setState({privacyTxt})

@@ -18,7 +18,7 @@ import {
     getTempDataContainer,
     isEmptyX,
     jumpUri,
-    ossUrl,
+    ossUrl, setPageTitle,
     setTempDataContainer, updateChannelCode,
 } from '../../../../utils/common';
 import {Base64} from 'js-base64';
@@ -98,9 +98,7 @@ export default class Confirm extends Component<any, {
     private tempContainerKey = "";
     private initPayWayModal = false;
     componentDidMount() {
-        if (process.env.TARO_ENV == "h5") {
-            document.title = this.config.navigationBarTitleText || "确认订单";
-        }
+        setPageTitle("确认订单")
         if (userStore.isLogin) {
             setTempDataContainer("product_preview_sku",null);
         }
@@ -502,7 +500,7 @@ export default class Confirm extends Component<any, {
         });
         this.setState({
             usedTickets: used_Tickets
-        }) 
+        })
 
     }
     onSubmitOrder = () => {
@@ -650,7 +648,7 @@ export default class Confirm extends Component<any, {
     private onUseTicketCallBack:()=>void = undefined;
     //点击商品优惠券
     onGoodsItemClick = (item, usedTickets) => {
-        
+
         let discounts = item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id));
         if (discounts == 0) {
             return;

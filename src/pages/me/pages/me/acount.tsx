@@ -5,7 +5,7 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import TipModal from '../../../../components/tipmodal/TipModal'
-import {debuglog, fixStatusBarHeight, updateChannelCode} from '../../../../utils/common';
+import {fixStatusBarHeight, setPageTitle, updateChannelCode} from '../../../../utils/common';
 import { options } from '../../../../utils/net';
 
 @inject("userStore")
@@ -28,8 +28,7 @@ export default class Setting extends Component<any,{
 
 
     componentDidMount(){
-        debuglog(userStore.mobile)
-
+        setPageTitle("账号管理")
     }
 
 

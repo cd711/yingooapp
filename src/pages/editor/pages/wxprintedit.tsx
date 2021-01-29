@@ -5,7 +5,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
+import {getURLParamsStr, setPageTitle, updateChannelCode, urlEncode} from "../../../utils/common";
 import {getToken} from "../../../utils/net";
 import dayjs from "dayjs";
 import page from "../../../utils/ext";
@@ -50,6 +50,9 @@ export default class PrintEdit extends Component<any, PrintEditState> {
         navigationBarTitleText: '编辑中',
     }
 
+    componentDidMount() {
+        setPageTitle("编辑中")
+    }
 
     getUrl = () => {
         const str = getURLParamsStr(urlEncode({

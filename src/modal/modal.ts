@@ -1,4 +1,6 @@
 import {notNull} from "../utils/common";
+import Taro from "@tarojs/taro";
+import ImageFile = Taro.chooseImage.ImageFile;
 
 interface FixedTimeProps {
     id: string | number,
@@ -17,6 +19,23 @@ export class LocalCoupon {
         this.everyTime = json && json.everyTime || [];
         this.fixedTime = json && json.fixedTime || new Array<FixedTimeProps>();
     }
+}
+
+export interface Files extends ImageFile{
+    // 唯一键值
+    key: string;
+    // 上传进度，单位bit
+    progress: number;
+    // 文件名字
+    name: string;
+    // 是否出错
+    error: boolean;
+    // 是否超出限制大小
+    outOfSize: boolean;
+    // 文件总大小
+    total: number;
+    // 是否上传完成
+    completed: boolean;
 }
 
 interface PhotoParamsPathArray {

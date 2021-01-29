@@ -8,7 +8,7 @@ import {AtFloatLayout} from 'taro-ui'
 import { api,updateLocalUserInfo,options } from '../../../../utils/net';
 import dayjs from "dayjs";
 import UploadFile from "../../../../components/Upload/Upload";
-import {debuglog, fixStatusBarHeight} from '../../../../utils/common';
+import {debuglog, fixStatusBarHeight, setPageTitle} from '../../../../utils/common';
 
 const sexList = [
     '保密',
@@ -44,8 +44,7 @@ export default class Profile extends Component<any,{
 
 
     componentDidMount() {
-        debuglog(Taro.getSystemInfoSync())
-
+        setPageTitle("个人信息")
     }
 
     updateInfo = (data) => {

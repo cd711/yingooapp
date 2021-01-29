@@ -7,7 +7,7 @@ import SuccessIcon from '../../../../components/icon/SuccessIcon';
 import WarmIcon from '../../../../components/icon/WarmIcon';
 import { api, options } from '../../../../utils/net';
 import { Base64 } from 'js-base64';
-import { deviceInfo, fixStatusBarHeight,jumpUri } from '../../../../utils/common';
+import {deviceInfo, fixStatusBarHeight, jumpUri, setPageTitle} from '../../../../utils/common';
 import { userStore } from '../../../../store/user';
 
 
@@ -32,6 +32,7 @@ export default class Success extends Component<{},{
     }
 
     componentDidMount() {
+        setPageTitle("支付结果")
         if (deviceInfo.env == 'h5') {
             const url = window.location.href;
             window.history.pushState(null,null,'/pages/tabbar/me/me');

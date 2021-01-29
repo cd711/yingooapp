@@ -15,7 +15,7 @@ import {
     getNextPage,
     notNull,
     ossUrl,
-    pageTotal,
+    pageTotal, setPageTitle,
     updateChannelCode
 } from "../../../utils/common";
 import {userStore} from "../../../store/user";
@@ -531,13 +531,16 @@ const ChangeImage: Taro.FC<ChangeImageProps> = (props) => {
                     </View>
                 ))}
             </View>
-            <ScrollView className="shell_list_container" scrollY style={{height: 280}} onScrollToLower={loadMore}>
+            <ScrollView className="shell_list_container" scrollY style={{height: "280px"}} onScrollToLower={loadMore}>
                 <View className="list_main">
                     {active === 0
                         ? <View className="list_item">
                             <UploadFile
                                 extraType={0}
                                 type="card"
+                                style={{
+                                    height: "124px"
+                                }}
                                 uploadType="image"
                                 onChange={uploadFile}/>
                         </View>
@@ -1393,7 +1396,7 @@ export default class Shell extends Component<{}, {
     }
 
     async componentDidMount() {
-
+        setPageTitle("编辑中")
         this.editorProxy = document.querySelector<HTMLIFrameElement>(".editor_frame").contentWindow;
         editorProxy = this.editorProxy;
         window.addEventListener("message", this.onMsg);

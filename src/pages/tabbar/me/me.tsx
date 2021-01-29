@@ -16,7 +16,7 @@ import {
     urlEncode,
     getURLParamsStr,
     setTempDataContainer,
-    updateChannelCode, updateTabBarChannelCode, debuglog
+    updateChannelCode, updateTabBarChannelCode, debuglog, setPageTitle
 } from '../../../utils/common';
 
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
@@ -223,6 +223,7 @@ export default class Me extends Component<any, MeState> {
     }
 
     componentDidMount() {
+        setPageTitle("我的")
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue && userStore.isLogin) {
                 this.getWorksList({start: 0})

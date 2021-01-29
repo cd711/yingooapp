@@ -15,7 +15,7 @@ import {
     sleep, updateChannelCode,
     urlEncode,
     isEmptyX,
-    jumpOrderConfimPreview, removeDuplicationForArr, debuglog, findPictureSizeForID
+    jumpOrderConfimPreview, removeDuplicationForArr, debuglog, findPictureSizeForID, setPageTitle
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import './detail.less'
@@ -187,6 +187,7 @@ export default class Login extends Component<{}, {
     }
 
     componentDidMount() {
+        setPageTitle("商品详情")
         if (userStore.isLogin) {
             this.receiveCoupon()
             setTempDataContainer("product_preview_sku", null);

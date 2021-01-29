@@ -6,7 +6,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import {debuglog, deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
+import {debuglog, deviceInfo, fixStatusBarHeight, setPageTitle, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -37,6 +37,7 @@ export default class Mobile extends Component<{},{
         }
     }
     componentDidMount(){
+        setPageTitle("更换手机号")
         if (userStore.isLogin) {
             if (userStore.mobile.length!=11) {
                 this.setState({

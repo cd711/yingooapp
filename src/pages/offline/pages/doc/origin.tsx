@@ -5,7 +5,18 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
-import {debuglog, deviceInfo, getTempDataContainer, jumpToPrivacy, jumpUri, updateChannelCode,documentConverPDF, isEmptyX, jumpOrderConfimPreview} from '../../../../utils/common';
+import {
+    debuglog,
+    deviceInfo,
+    getTempDataContainer,
+    jumpToPrivacy,
+    jumpUri,
+    updateChannelCode,
+    documentConverPDF,
+    isEmptyX,
+    jumpOrderConfimPreview,
+    setPageTitle
+} from '../../../../utils/common';
 import ScanTipModal from '../../../../components/scanTipModal/scantipmodal';
 import { options,getToken } from '../../../../utils/net';
 
@@ -32,6 +43,7 @@ export default class Origin extends Component<any,{
         }
     }
     componentDidMount(){
+        setPageTitle("选择来源")
         if(deviceInfo.env == 'h5'){
             document.title = this.config.navigationBarTitleText || "选择来源";
         }

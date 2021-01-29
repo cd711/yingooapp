@@ -5,7 +5,7 @@ import IconFont from '../../components/iconfont';
 import { api } from '../../utils/net';
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
-import {debuglog, deviceInfo, fixStatusBarHeight, updateChannelCode} from '../../utils/common';
+import {debuglog, deviceInfo, fixStatusBarHeight, setPageTitle, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -30,10 +30,8 @@ export default class SMS extends Component<any,{
     }
     componentDidMount(){
 
-        // setTimeout(()=>{
-        //     debuglog(this.input);
-        //
-        // },500)
+        setPageTitle("验证码")
+
         if (deviceInfo.env == "h5") {
             this.input.inputRef.focus();
         }else {

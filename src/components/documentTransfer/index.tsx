@@ -1,18 +1,20 @@
 import "./index.less";
 import Taro, {useState, useEffect, useRef} from "@tarojs/taro";
 import {View, Text, ScrollView} from "@tarojs/components";
-import {debuglog, deviceInfo, notNull} from "../../utils/common";
-import ImageFile = Taro.chooseImage.ImageFile;
+import {chooseImageFromSystem, debuglog, deviceInfo, notNull} from "../../utils/common";
 import {getToken, options} from "../../utils/net";
 import {AtActivityIndicator} from "taro-ui";
 import ImgFileItem from "./imgFileItem";
 import TransferTip from "./transferTip";
 import ResultTip from "./resultTip";
+import {Files} from "../../modal/modal";
 
 interface DocumentTransferProps {
     visible: boolean;
     // 已使用总数
     useTotal: number;
+    // 已选择的图片;
+    defaultFiles: Files[];
     // 如果是选图的话可能会有上传成功返回的ID
     onClose?: (completedArr?: Array<string | number>) => void;
     // 是否是选图模式
@@ -21,30 +23,14 @@ interface DocumentTransferProps {
     onUploadComplete?: () => void;
 }
 
-export interface Files extends ImageFile{
-    // 唯一键值
-    key: string;
-    // 上传进度，单位bit
-    progress: number;
-    // 文件名字
-    name: string;
-    // 是否出错
-    error: boolean;
-    // 是否超出限制大小
-    outOfSize: boolean;
-    // 文件总大小
-    total: number;
-    // 是否上传完成
-    completed: boolean;
-}
-
 const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
 
     const {
         onClose,
         useTotal = 0,
         selectPictureMode = false,
-        onUploadComplete
+        onUploadComplete,
+        defaultFiles
     } = props;
 
     const [files, setFiles] = useState<Array<Files>>([]);
@@ -54,7 +40,6 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     const [hasSelected, setHasSelected] = useState(false);
     const [showTip, setTipStatus] = useState(false);
     const [showResult, setResultStatus] = useState(false);
-    // const [completedArr, setCompletedArr] = useState([])
 
     const completedArr = useRef([]);
 
@@ -71,49 +56,31 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
     }, [files, starting, uploadedInfo, uploadTimes, hasSelected, completedArr.current])
 
     useEffect(() => {
+        if (!notNull(defaultFiles) && defaultFiles instanceof Array && defaultFiles.length > 0) {
+            setFiles(prev => [...prev, ...defaultFiles])
+        }
+    }, [])
+
+    useEffect(() => {
         if (selectPictureMode && uploadedInfo.succeed > 0) {
             setResultStatus(true)
         }
     }, [starting])
 
-    const onChooseImage = () => {
-        Taro.chooseImage({
-            count: 50,
-            sizeType: ['original', 'compressed'],
-            sourceType: ["album", "camera"],
-            success: result => {
-                debuglog("API直接选择的图片：",result)
-                const arr = result.tempFiles.map((value, index) => {
-                    let name = " ";
-                    if (deviceInfo.env === "weapp") {
-                        const matchName = value.path.match(/([^\\\/]+)\.([^\\\/]+)/g);
-                        if (matchName.length > 0) {
-                            name = matchName[0]
-                        } else {
-                            name = `image${value.size}${value.path.substring(value.path.lastIndexOf("."))}`
-                        }
-                    } else {
-                        name = value.originalFileObj.name
-                    }
-                    return {
-                        ...value,
-                        key: `${index}-k-${value.size}`,
-                        progress: 0,
-                        name,
-                        error: false,
-                        total: value.size,
-                        completed: false,
-                        outOfSize: value.size / 1048576 > 10
-                    }
-                })
-                setFiles([...files, ...arr]);
-                setHasSelected(true);
-                debuglog("选择的图片列表：", arr);
-            },
-            fail: _ => {
+    const onChooseImage = async () => {
+        if (files.length > 100) {
+            Taro.showToast({title: "列表最多选择100张", icon: "none"})
+            return
+        }
+        try {
+            const arr = await chooseImageFromSystem();
+            setFiles([...files, ...arr]);
+            setHasSelected(true);
+            debuglog("选择的图片列表：", arr);
+        }catch (e) {
 
-            }
-        })
+        }
+
     }
 
     // 在所有图片上传完成后清理上传成功的图片
@@ -327,7 +294,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
                                     </View>
                                 </View>
                                 : <View className="btn_info">
-                                    <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                    {
+                                        files.length <= 100
+                                            ? <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                            : null
+                                    }
                                     {
                                         files.length > 0 ? <Text className="ext_txt">本次等待上传{files.length}张</Text> : null
                                     }
@@ -344,7 +315,11 @@ const DocumentTransfer: Taro.FC<DocumentTransferProps> = props => {
                                     </View>
                                 </View>
                                 : <View className="btn_info">
-                                    <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                    {
+                                        files.length <= 100
+                                            ? <View className="choose_btn" onClick={onChooseImage}><Text className="txt">添加图片</Text></View>
+                                            : null
+                                    }
                                     {
                                         hasSelected
                                             ? <Text className="ext_txt">本次等待上传{files.length}张</Text>

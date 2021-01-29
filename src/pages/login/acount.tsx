@@ -8,7 +8,7 @@ import { api } from '../../utils/net'
 import {userStore} from "../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 import IconFont from '../../components/iconfont'
-import {deviceInfo, updateChannelCode} from '../../utils/common';
+import {deviceInfo, setPageTitle, updateChannelCode} from '../../utils/common';
 
 @inject("userStore")
 @observer
@@ -30,8 +30,9 @@ export default class Login extends Component<{},{
             pwdShow:false
         }
     }
-    componentDidMount(){
 
+    componentDidMount(){
+        setPageTitle("账号登录")
     }
 
     onLogin = () => {

@@ -4,11 +4,12 @@ import './photos.less'
 import IconFont from '../../components/iconfont';
 import {AtActivityIndicator} from 'taro-ui'
 import {api,options} from "../../utils/net";
-import {debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
+import {chooseImageFromSystem, debuglog, deviceInfo, notNull, ossUrl, photoGetItemStyle} from "../../utils/common";
 import LoadMore from "../../components/listMore/loadMore";
 import {ScrollViewProps} from "@tarojs/components/types/ScrollView";
 import PopLayout, {PopLayoutItemProps} from "../popLayout";
 import DocumentTransfer from "../documentTransfer";
+import {Files} from "../../modal/modal";
 
 
 interface PhotosEleProps {
@@ -42,6 +43,7 @@ interface PhotosEleState {
     visible: boolean;
     active: number;
     transferVisible: boolean;
+    tempFiles: Array<Files>;
 }
 
 export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState> {
@@ -50,7 +52,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         editSelect: false,
         count: 0,
         max: 100,
-        mandatory: false
+        mandatory: false,
+
     }
 
     config: Config = {
@@ -78,6 +81,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             _count: 0,
             _max: 100,
             visible: false,
+            tempFiles: []
         }
     }
 
@@ -297,7 +301,6 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
         this.getList(temp);
     }
 
-
     changeSort = (data: PopLayoutItemProps, index: number) => {
         debuglog(data, index)
         let sort = {};
@@ -314,6 +317,17 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             start: 0,
             ...sort,
         })
+    }
+
+    startChooseImg = async () => {
+        try {
+            const arr = await chooseImageFromSystem();
+            this.setState({tempFiles: [...arr]}, () => {
+                this.setState({transferVisible: true})
+            })
+        }catch (e) {
+
+        }
     }
 
     // 上传完成后请求一次后端数据，以保证自动选择功能的正常使用
@@ -399,7 +413,8 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
             editSelectImgs,
             editSelectImgIds,
             visible,
-            transferVisible
+            transferVisible,
+            tempFiles
         } = this.state;
         const list = navSwitchActive === 0 ? imageList : usefulList;
         const tabs = ["未使用", "已使用"];
@@ -470,13 +485,13 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                                     {/*            onChange={this.uploadFile}>*/}
                                     {/*    <Button className='btn'>上传素材</Button>*/}
                                     {/*</UploadFile>*/}
-                                    <Button className='btn' onClick={() => this.setState({transferVisible: true})}>上传素材</Button>
+                                    <Button className='btn' onClick={this.startChooseImg}>上传素材</Button>
                                 </View>
                                 : <View className="list_container">
                                     <View className="list_main">
                                         {
                                             navSwitchActive === 0
-                                                ? <View className="list_item" onClick={() => this.setState({transferVisible: true})}>
+                                                ? <View className="list_item" onClick={this.startChooseImg}>
                                                     {/*<UploadFile*/}
                                                     {/*    extraType={3}*/}
                                                     {/*    type="card"*/}
@@ -576,6 +591,7 @@ export default class PhotosEle extends Component<PhotosEleProps, PhotosEleState>
                         ? <DocumentTransfer
                             visible={transferVisible}
                             useTotal={this.total}
+                            defaultFiles={tempFiles}
                             selectPictureMode
                             onUploadComplete={this.onUploadComplete}
                             onClose={this.onTransferClose} />

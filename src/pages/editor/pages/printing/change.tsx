@@ -12,7 +12,7 @@ import {
     jumpOrderConfimPreview,
     jumpToPrintEditor,
     notNull,
-    removeDuplicationForArr,
+    removeDuplicationForArr, setPageTitle,
     shareAppExtends,
     sleep,
     updateChannelCode,
@@ -328,6 +328,7 @@ const PrintChange: Taro.FC<any> = () => {
     }, [fillStyle])
 
     useEffect(() => {
+        setPageTitle("照片冲印列表")
         if (deviceInfo.env !== "h5") {
             return
         }

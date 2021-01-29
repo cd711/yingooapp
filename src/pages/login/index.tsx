@@ -4,7 +4,7 @@ import './index.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import LoginFooter from './footer'
-import {deviceInfo, updateChannelCode} from '../../utils/common';
+import {deviceInfo, setPageTitle, updateChannelCode} from '../../utils/common';
 
 
 
@@ -33,7 +33,7 @@ export default class Login extends Component<any,{
         }
     }
     componentDidMount(){
-
+        setPageTitle("登录")
     }
 
     onMobileInput = ({detail:{value}}) => {

@@ -6,7 +6,7 @@ import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";
-import {debuglog, deviceInfo, getURLParamsStr, updateChannelCode, urlEncode} from "../../../utils/common";
+import {debuglog, deviceInfo, getURLParamsStr, setPageTitle, updateChannelCode, urlEncode} from "../../../utils/common";
 import {api, getToken} from "../../../utils/net";
 import dayjs from "dayjs"
 import page from "../../../utils/ext";
@@ -52,6 +52,10 @@ export default class Shell extends Component<{}, {
             textInfo: null,
             url: ""
         };
+    }
+
+    componentDidMount() {
+        setPageTitle("编辑中")
     }
 
     async componentDidShow() {

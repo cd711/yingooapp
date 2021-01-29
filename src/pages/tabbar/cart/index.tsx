@@ -8,7 +8,7 @@ import {
     deviceInfo,
     fixStatusBarHeight,
     jumpOrderConfimPreview,
-    ossUrl,
+    ossUrl, setPageTitle,
     updateChannelCode,
     updateTabBarChannelCode
 } from '../../../utils/common';
@@ -63,7 +63,7 @@ export default class Cart extends Component<{}, {
         let tHeight = 0;
         if (process.env.TARO_ENV == 'h5') {
             const tabbar = Object.assign([],document.querySelectorAll(".taro-tabbar__tabbar"));
-            tHeight = tabbar.length>1?tabbar.filter((item)=>item.clientHeight>0)[0].clientHeight:tabbar[0].clientHeight;    
+            tHeight = tabbar.length>1?tabbar.filter((item)=>item.clientHeight>0)[0].clientHeight:tabbar[0].clientHeight;
         }
         if (process.env.TARO_ENV == 'weapp') {
             tHeight = deviceInfo.screenHeight - deviceInfo.windowHeight
@@ -82,6 +82,7 @@ export default class Cart extends Component<{}, {
     }
 
     componentDidMount() {
+        setPageTitle("购物车")
         observe(userStore,"id",(change)=>{
             if (change.newValue != change.oldValue) {
                 this.initData();

@@ -4,7 +4,7 @@ import {AtModal, AtModalContent, AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
 import "./aboutus.less";
 import copy from "copy-to-clipboard";
-import {deviceInfo, jumpToPrivacy} from "../../../../utils/common";
+import {deviceInfo, jumpToPrivacy, setPageTitle} from "../../../../utils/common";
 import page from "../../../../utils/ext";
 
 
@@ -24,6 +24,10 @@ export default class Aboutus extends Component<any, any> {
         }
     }
 
+
+    componentDidMount() {
+        setPageTitle("关于映果")
+    }
 
     render(): React.ReactNode {
         const {visible} = this.state;

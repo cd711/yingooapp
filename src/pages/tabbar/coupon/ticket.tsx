@@ -9,7 +9,7 @@ import {
     deviceInfo,
     fixStatusBarHeight,
     ListModel,
-    notNull,
+    notNull, setPageTitle,
     updateChannelCode,
     updateTabBarChannelCode
 } from '../../../utils/common';
@@ -55,6 +55,7 @@ export default class Login extends Component<{}, {
 
 
     componentDidMount() {
+        setPageTitle("优惠券")
         // if (!userStore.isLogin) {
         //     if (deviceInfo.env == 'h5') {
         //         window.location.href = "/pages/tabbar/index/index";
