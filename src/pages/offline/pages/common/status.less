@@ -3,6 +3,17 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    .photo_picker_container{
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-sizing: border-box;
+        background: #fff;
+        z-index: 2000;
+        transition: all .3s ease-in;
+    }
     .nav-bar{
         display: flex;
         align-items: center;
@@ -91,7 +102,7 @@
                         font-weight: 500;
                         text-align: CENTER;
                         color: #4d94ff;
-                        line-height: 48px; 
+                        line-height: 48px;
                         margin-bottom: 16px;
                     }
                     .ttip{
@@ -148,7 +159,7 @@
                 line-height: 88px;
             }
         }
-        
+
     }
 
 }

@@ -6,16 +6,18 @@ import {userStore} from "../../../../store/user";
 import {inject, observer} from '@tarojs/mobx'
 import {
     debuglog,
-    deviceInfo,
-    isEmptyX,
+    deviceInfo, getURLParamsStr, getUserKey,
+    isEmptyX, removeDuplicationForArr,
     setPageTitle,
     setTempDataContainer,
-    updateChannelCode
+    updateChannelCode, urlEncode
 } from '../../../../utils/common';
 import {api} from '../../../../utils/net';
 import Checkboxs from '../../../../components/checkbox/checkbox';
 import LoginModal from '../../../../components/login/loginModal';
 import dayjs from 'dayjs';
+import PhotosEle from "../../../../components/photos/photos";
+import photoStore from "../../../../store/photo";
 
 @inject("userStore")
 @observer
@@ -26,7 +28,8 @@ export default class Status extends Component<any, {
     deviceSupportItems: Array<any>;
     allDeviceItems: Array<any>;
     currentSelectIndex: number;
-    productInfo: any
+    productInfo: any;
+    visible: boolean;
 }> {
 
     config: Config = {
@@ -42,7 +45,8 @@ export default class Status extends Component<any, {
             deviceSupportItems: [],
             allDeviceItems: [],
             currentSelectIndex: 0,
-            productInfo: null
+            productInfo: null,
+            visible: false
         }
     }
 
@@ -146,7 +150,7 @@ export default class Status extends Component<any, {
         })
     }
 
-    onNextStep = () => {
+    onNextStep = async () => {
         if (!userStore.isLogin) {
             userStore.showLoginModal = true;
             return;
@@ -154,10 +158,11 @@ export default class Status extends Component<any, {
         const {allDeviceItems, currentSelectIndex, productInfo} = this.state;
         const {skus} = productInfo;
         const currentItem = allDeviceItems[currentSelectIndex];
+        debuglog("大小：", currentItem)
+        const currentSku = skus.find((obj) => parseInt(obj.value + "") == parseInt(currentItem.id));
+        const {id} = this.$router.params;
         if (currentItem.type == "doc") {
-            const currentSku = skus.find((obj) => parseInt(obj.value + "") == parseInt(currentItem.id));
             const currentUnix = dayjs().unix()
-            const {id} = this.$router.params;
             setTempDataContainer(currentUnix + "", {
                 sku_id: currentSku.id,
                 quantity: 1,
@@ -168,12 +173,68 @@ export default class Status extends Component<any, {
             Taro.navigateTo({
                 url: updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)
             })
+        } else if (currentItem.type == "photo") {
+            debuglog(11111111111)
+            this.setState({visible: true})
+        }
+    }
+
+    onPhotoSelect = async ({ids, imgs, attrs}) => {
+
+        try {
+            const path = [];
+            for (let i = 0; i < ids.length; i++) {
+                path.push({
+                    id: ids[i],
+                    url: imgs[i],
+                    attr: attrs[i],
+                    edited: false,
+                    doc: ""
+                })
+            }
+
+            const {allDeviceItems, currentSelectIndex, productInfo} = this.state;
+            const {skus} = productInfo;
+            const currentItem = allDeviceItems[currentSelectIndex];
+            debuglog("大小：", currentItem)
+            const currentSku = skus.find((obj) => parseInt(obj.value + "") == parseInt(currentItem.id));
+            const {id} = this.$router.params;
+            const size = currentItem.value.split(",")[2];
+            const str = getURLParamsStr(urlEncode({
+                // 相框尺寸
+                s: size,
+                id: productInfo.id,
+                user_tpl_id: -2,
+                terminal_id: id,
+                print_type: "photo",
+                sku_id: currentSku.id,
+                // 跳转到照片冲印列表需要使用的参数
+                o: "t"
+            }))
+
+            await photoStore.setActionParamsToServer(getUserKey(), {
+                photo: {
+                    path,
+                    id: "",
+                    sku: ""
+                },
+                usefulImages: removeDuplicationForArr({
+                    newArr: ids.map((v, idx) => ({id: v, url: imgs[idx]})),
+                    oldArr: photoStore.photoProcessParams.usefulImages
+                }),
+                pictureSize: size || ""
+            })
+            Taro.navigateTo({
+                url: updateChannelCode(`/pages/editor/pages/printing/change?${str}`)
+            })
+        } catch (e) {
+            debuglog("选图后跳转出错：", e)
         }
     }
 
 
     render() {
-        const {centerPartyHeight, status_txt, wait_num, allDeviceItems} = this.state;
+        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo} = this.state;
         return (
             <View className='print_status'>
                 <LoginModal isTabbar={false}/>
@@ -227,6 +288,18 @@ export default class Status extends Component<any, {
                         <Button className='next_step_button' onClick={() => this.onNextStep()}>下一步</Button>
                     </View>
                 </View>
+                {
+                    visible
+                        ? <View className="photo_picker_container">
+                            <PhotosEle
+                                editSelect={visible}
+                                onClose={() => this.setState({visible: false})}
+                                onPhotoSelect={this.onPhotoSelect}
+                                max={parseInt(productInfo.max)}
+                            />
+                        </View>
+                        : null
+                }
             </View>
         )
     }
