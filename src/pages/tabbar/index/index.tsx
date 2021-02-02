@@ -404,12 +404,43 @@ class Index extends Component<any, IndexState> {
         // Taro.showTabBar()
     }
 
-    uncShow = () => {
-        this.setState({showUnc: true});
+    uncShow = (type:string) => {
+        // this.setState({showUnc: true});
         // Taro.hideTabBar()
         // Taro.navigateTo({
         //     url: "/pages/offline/pages/common/status?id=1"
         // })
+        Taro.showLoading({title:"加载中"});
+        Taro.scanCode({
+            onlyFromCamera: true,
+            scanType:["qrCode"],
+            success (res) {
+                if (res.path) {
+                    const tmp = res.path.split("?");
+                    if (tmp.length>=2) {
+                        const params = tmp[1].split("=");
+                        if (params.length==2 && params[0]=="id") {
+                            Taro.hideLoading();
+                            Taro.navigateTo({
+                                url: `/pages/offline/pages/common/status?id=${params[1]}&printtype=${type}`
+                            })
+                        } else {
+                            Taro.hideLoading();
+                            Taro.showToast({title:"无法识别当前二维码",icon:"none"})
+                        }
+                    }else {
+                        Taro.hideLoading();
+                        Taro.showToast({title:"无法识别当前二维码",icon:"none"})
+                    }
+                }else {
+                    Taro.hideLoading();
+                    Taro.showToast({title:"无法识别当前二维码",icon:"none"})
+                }
+            },
+            fail(){
+                Taro.hideLoading();
+            }
+        })
     }
 
     jumpToTemplate = async type => {
@@ -916,7 +947,7 @@ class Index extends Component<any, IndexState> {
                                                 ?  <Fragment>
                                                     <View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
                                                         <View className="read_fast_link_wrap">
-                                                            <View className="read_fast_link" onClick={this.uncShow}>
+                                                            <View className="read_fast_link" onClick={()=>this.uncShow("photo")}>
                                                                 <Image src={`${options.sourceUrl}appsource/il.svg`} className="fast_img" mode="widthFix" />
                                                                 <View className="info">
                                                                     <Text className="h2">当面冲印照片</Text>
@@ -925,7 +956,7 @@ class Index extends Component<any, IndexState> {
                                                             </View>
                                                         </View>
                                                         <View className="read_fast_link_wrap">
-                                                            <View className="read_fast_link" onClick={this.uncShow}>
+                                                            <View className="read_fast_link" onClick={()=>this.uncShow("doc")}>
                                                                 <Image src={`${options.sourceUrl}appsource/cnxh.svg`} className="fast_img" mode="widthFix" />
                                                                 <View className="info">
                                                                     <Text className="h2">当面冲印文档</Text>

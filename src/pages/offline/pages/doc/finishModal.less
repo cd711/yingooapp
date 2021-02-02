@@ -1,0 +1,65 @@
+.TipModal{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    // transition: visibility 200ms ease-in;
+    z-index: 1000;
+    .TipModal__overlay{
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    .TipModal__container{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 590px;
+        // height: 322px;
+        border-radius: 32px;
+        background-color: #FFF;
+        overflow: hidden;
+        .TipModal__image{
+            width: 100%;
+            height: 274px;
+            display: flex;
+        }
+        .finish_modal_bottom{
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .i_konw_button{
+                width: 462px;
+                height: 80px;
+                background: #ff4966;
+                border-radius: 200px;
+                line-height: 80px;
+                font-size: 28px;
+                font-weight: 500;
+                text-align: CENTER;
+                color: #ffffff;
+                border: 0px;
+            }
+        }
+    }
+    .TipModal__overlay, .TipModal__container {
+        opacity: 0;
+        -webkit-transition: opacity 200ms ease-in;
+        -o-transition: opacity 200ms ease-in;
+        transition: opacity 200ms ease-in;
+    }
+
+}
+.TipModal_active{
+    visibility: visible;
+    .TipModal__overlay, .TipModal__container{
+        opacity: 1;
+    }
+}

@@ -5,9 +5,10 @@ import IconFont from '../../../../components/iconfont';
 import {userStore} from "../../../../store/user";
 import { observer, inject } from '@tarojs/mobx'
 // import TipModal from '../../../../components/tipmodal/TipModal'
-import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode,setPageTitle} from '../../../../utils/common';
+import {debuglog, deviceInfo, jumpToPrivacy, updateChannelCode,setPageTitle, jumpUri} from '../../../../utils/common';
 import { api, options } from '../../../../utils/net';
 import { AtActivityIndicator } from 'taro-ui'
+import FinishModal from './finishModal';
 
 
 @inject("userStore")
@@ -47,13 +48,11 @@ export default class Printing extends Component<any,{
         //         })
         //     }
         // }
-        // if (process.env.TARO_ENV != 'h5') {
-        //     Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
-        //         this.setState({
-        //             centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height
-        //         });
-        //     }).exec();
-        // }
+        Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect)=>{
+            this.setState({
+                centerPartyHeight:Taro.getSystemInfoSync().windowHeight-nav_rect.height
+            });
+        }).exec();
         const {id,printtype} = this.$router.params;
         const t = setInterval(()=>{
             api("device.terminal/printStatus",{
@@ -74,7 +73,7 @@ export default class Printing extends Component<any,{
 
 
     render() {
-        const {printtype,print_order_status_id} = this.state;
+        const {printtype,print_order_status_id,centerPartyHeight} = this.state;
         // const {id,nickname} = userStore;
 
         return (
@@ -97,12 +96,23 @@ export default class Printing extends Component<any,{
                         <Text className='title'>{this.config.navigationBarTitleText}</Text>
                     </View>
                 </View>
-                <View className='print_top'>
-                    {/* 打印文档 ${options.sourceUrl}appsource/printing_doc.gif */}
-                    {/* 打印照片 ${options.sourceUrl}appsource/printing_photo.gif */}
-                    <Image className='print_gif' src={printtype=="doc"?`${options.sourceUrl}appsource/printing_doc.gif`:`${options.sourceUrl}appsource/printing_photo.gif`} />
+                <View className='printing_container' style={`height:${centerPartyHeight/2}px`}>
+                    <View>
+                        <View className='print_top'>
+                            {/* 打印文档 ${options.sourceUrl}appsource/printing_doc.gif */}
+                            {/* 打印照片 ${options.sourceUrl}appsource/printing_photo.gif */}
+                            <Image className='print_gif' src={printtype=="doc"?`${options.sourceUrl}appsource/printing_doc.gif`:`${options.sourceUrl}appsource/printing_photo.gif`} />
+                        </View>
+                        <View className='printing_status'>
+                            <AtActivityIndicator size={30} color="#FF4966"></AtActivityIndicator>
+                            <Text className='txt'>打印中，请稍后...</Text> 
+                        </View>
+                    </View>
                 </View>
-                <View className='printing_time_line'>
+                <FinishModal isShow={print_order_status_id==21} onOk={()=>{
+                    jumpUri("/pages/tabbar/index/index",true);
+                }}/>
+                {/* <View className='printing_time_line'>
                     <View className='time_line_item'>
                         <View className='state'>
                             <IconFont name='22_yixuanzhong' size={30} />
@@ -157,7 +167,7 @@ export default class Printing extends Component<any,{
                             </View>
                         }
                     </View>
-                </View>
+                </View> */}
             </View>
         )
     }

@@ -1,3 +1,6 @@
+page,.taro_page{
+    background: #F5F6F9;
+}
 .doc_printing{
     display: flex;
     flex-direction: column;
@@ -26,15 +29,36 @@
             }
         }
     }
+    .printing_container{
+        // flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+    }
     .print_top{
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 448px;
-        background: #F5F6F9;
+        // height: 550px;
+        // background: #F5F6F9;
         .print_gif{
             width: 512px;
             height: 384px;
+        }
+    }
+    .printing_status{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 30px;
+        .txt{
+            font-size: 28px;
+            font-weight: 400;
+            text-align: LEFT;
+            color: #ff4966;
+            line-height: 44px;
+            padding-left: 32px;
         }
     }
     .printing_time_line{

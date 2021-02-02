@@ -7,7 +7,7 @@ import {inject, observer} from '@tarojs/mobx'
 import {
     debuglog,
     deviceInfo, getURLParamsStr, getUserKey,
-    isEmptyX, removeDuplicationForArr,
+    isEmptyX, jumpUri, removeDuplicationForArr,
     setPageTitle,
     setTempDataContainer,
     updateChannelCode, urlEncode
@@ -55,7 +55,7 @@ export default class Status extends Component<any, {
         if (deviceInfo.env == 'h5') {
             document.title = this.config.navigationBarTitleText || "打印服务";
         }
-        const {id} = this.$router.params;
+        const {id,printtype} = this.$router.params;
         if (isEmptyX(id)) {
             Taro.showToast({title: "参数错误，请重新扫码！", icon: 'none', duration: 1500})
         }
@@ -69,11 +69,11 @@ export default class Status extends Component<any, {
             }).exec();
         }
         if (!isEmptyX(id)) {
-            this.loadData();
+            this.loadData(printtype);
         }
     }
 
-    loadData = () => {
+    loadData = (printtype?:string) => {
         const {id} = this.$router.params;
         Taro.showLoading({title: "加载中..."});
         api("device.terminal/status", {
@@ -95,8 +95,14 @@ export default class Status extends Component<any, {
                     element["type"] = v.length > 1 ? v[1] : "";
                     element["disable"] = true;
                     if (tt.length == sku.length) {
-                        if (skuItem.length == 0) {
-                            is = true;
+                        if (isEmptyX(printtype)){
+                            if (skuItem.length == 0) {
+                                is = true;
+                            }
+                        } else{
+                            if (element["type"] == printtype) {
+                                is = true;
+                            }
                         }
                         element["disable"] = false
                         skuItem.push(element)
@@ -117,11 +123,20 @@ export default class Status extends Component<any, {
                 debuglog(result, res)
             }).catch((err) => {
                 Taro.hideLoading();
-                debuglog(err)
+                Taro.showToast({
+                    title: err,
+                    icon: 'none',
+                    duration: 1500
+                });
             })
         }).catch((e) => {
             Taro.hideLoading();
-            debuglog(e);
+            debuglog(e,id);
+            Taro.showToast({
+                title: e,
+                icon: 'none',
+                duration: 1500
+            });
         });
     }
 
@@ -158,24 +173,28 @@ export default class Status extends Component<any, {
         const {allDeviceItems, currentSelectIndex, productInfo} = this.state;
         const {skus} = productInfo;
         const currentItem = allDeviceItems[currentSelectIndex];
-        debuglog("大小：", currentItem)
         const currentSku = skus.find((obj) => parseInt(obj.value + "") == parseInt(currentItem.id));
         const {id} = this.$router.params;
-        if (currentItem.type == "doc") {
-            const currentUnix = dayjs().unix()
-            setTempDataContainer(currentUnix + "", {
-                sku_id: currentSku.id,
-                quantity: 1,
-                user_tpl_id: -2,
-                terminal_id: id,
-                print_type: "doc"
-            })
-            Taro.navigateTo({
-                url: updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)
-            })
-        } else if (currentItem.type == "photo") {
-            this.setState({visible: true})
+        if (currentItem.checked) {
+            if (currentItem.type == "doc") {
+                const currentUnix = dayjs().unix()
+                setTempDataContainer(currentUnix + "", {
+                    sku_id: currentSku.id,
+                    quantity: 1,
+                    user_tpl_id: -2,
+                    terminal_id: id,
+                    print_type: "doc"
+                })
+                Taro.navigateTo({
+                    url: updateChannelCode(`/pages/offline/pages/doc/origin?tp=${currentUnix}`)
+                })
+            } else if (currentItem.type == "photo") {
+                this.setState({visible: true})
+            }
+        } else {
+            Taro.showToast({title:"未选择打印类型",icon:'none',duration:2000});
         }
+
     }
 
     onPhotoSelect = async ({ids, imgs, attrs}) => {
@@ -240,7 +259,11 @@ export default class Status extends Component<any, {
                 <View className='nav-bar'
                       style={process.env.TARO_ENV === 'h5' ? "" : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
                     <View className='left' onClick={() => {
-                        Taro.navigateBack();
+                        if (Taro.getCurrentPages().length>1) {
+                            Taro.navigateBack();
+                        } else {
+                            jumpUri("/pages/tabbar/index/index",true);
+                        }
                     }}>
                         <IconFont name='24_shangyiye' size={48} color='#121314'/>
                     </View>
