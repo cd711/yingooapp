@@ -34,6 +34,7 @@ export default class Printing extends Component<any,{
             print_order_status_id:0
         }
     }
+    private tt:any = 0;
     componentDidMount(){
         setPageTitle("打印中")
         if(deviceInfo.env == 'h5'){
@@ -54,13 +55,13 @@ export default class Printing extends Component<any,{
             });
         }).exec();
         const {id,printtype} = this.$router.params;
-        const t = setInterval(()=>{
+        this.tt = setInterval(()=>{
             api("device.terminal/printStatus",{
                 order_id:id
             }).then((res)=>{
                 debuglog(res);
                 if (parseInt(res.print_order_status_id+"")>=21) {
-                    clearInterval(t);
+                    clearInterval(this.tt);
                 }
                 this.setState({
                     printtype,
@@ -70,7 +71,9 @@ export default class Printing extends Component<any,{
         },3000)
 
     }
-
+    componentWillUnmount(){
+        clearInterval(this.tt);
+    }
 
     render() {
         const {printtype,print_order_status_id,centerPartyHeight} = this.state;

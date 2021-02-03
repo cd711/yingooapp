@@ -1244,3 +1244,17 @@ export function setPageTitle(title: string) {
         document.title = title || this.config.navigationBarTitleText || " ";
     }
 }
+/**
+ * url参数解析
+ * @param {*} url
+ * @return {any}
+ */
+export const parseQueryString = url=>{
+    const json = {};
+    const arr = url.substr(url.indexOf('?') + 1).split('&');
+    arr.forEach(item=>{
+        const tmp = item.split('=');
+        json[tmp[0]] = tmp[1];
+    });
+    return json;
+}

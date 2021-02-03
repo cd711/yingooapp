@@ -18,6 +18,7 @@ import LoginModal from '../../../../components/login/loginModal';
 import dayjs from 'dayjs';
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
+import OfflinePrint from '../../../../utils/offlinePrint';
 
 @inject("userStore")
 @observer
@@ -30,6 +31,7 @@ export default class Status extends Component<any, {
     currentSelectIndex: number;
     productInfo: any;
     visible: boolean;
+    deviceStatus:number
 }> {
 
     config: Config = {
@@ -46,15 +48,13 @@ export default class Status extends Component<any, {
             allDeviceItems: [],
             currentSelectIndex: 0,
             productInfo: null,
-            visible: false
+            visible: false,
+            deviceStatus:101
         }
     }
 
     componentDidMount() {
         setPageTitle("打印服务")
-        if (deviceInfo.env == 'h5') {
-            document.title = this.config.navigationBarTitleText || "打印服务";
-        }
         const {id,printtype} = this.$router.params;
         if (isEmptyX(id)) {
             Taro.showToast({title: "参数错误，请重新扫码！", icon: 'none', duration: 1500})
@@ -69,77 +69,61 @@ export default class Status extends Component<any, {
             }).exec();
         }
         if (!isEmptyX(id)) {
-            this.loadData(printtype);
+            this.loadData(id,printtype);
         }
     }
 
-    loadData = (printtype?:string) => {
-        const {id} = this.$router.params;
+    loadData = (id:string,printtype?:string) => {
         Taro.showLoading({title: "加载中..."});
-        api("device.terminal/status", {
-            terminal_id: id
-        }).then((res) => {
-            api("app.product/info", {
-                id: 49
-            }).then((result) => {
+        OfflinePrint.terminalStatus(id).then((res)=>{
+            const status = res.status;
+            if (status>=101 && status<109) {
+                OfflinePrint.product(49,res,printtype).then((product)=>{
+                    Taro.hideLoading();
+                    this.setState({
+                        status_txt: res.status_text,
+                        wait_num: parseInt(res.queue_num + ""),
+                        deviceSupportItems: product.skuItem,
+                        allDeviceItems: product.attrItems,
+                        currentSelectIndex: product.current,
+                        productInfo: product.info,
+                        deviceStatus:res.status
+                    })
+                }).catch((err)=>{
+                    Taro.hideLoading();
+                    Taro.showToast({
+                        title: err,
+                        icon: 'none',
+                        duration: 1500
+                    });
+                })
+            } else {
                 Taro.hideLoading();
-                const attrItems = result.attrItems.length > 0 ? result.attrItems[0] : [];
-                const skuItem = [];
-                let current = 0;
-                for (let index = 0; index < attrItems.length; index++) {
-                    const element = attrItems[index];
-                    const v = element.value.split(",");
-                    const sku = v.length > 0 ? v[0].split("#") : [];
-                    const tt = sku.filter((s) => res.peripheral_feature.indexOf(parseInt(s + "")) > -1);
-                    let is = false;
-                    element["type"] = v.length > 1 ? v[1] : "";
-                    element["disable"] = true;
-                    if (tt.length == sku.length) {
-                        if (isEmptyX(printtype)){
-                            if (skuItem.length == 0) {
-                                is = true;
-                            }
-                        } else{
-                            if (element["type"] == printtype) {
-                                is = true;
-                            }
-                        }
-                        element["disable"] = false
-                        skuItem.push(element)
-                    }
-                    if (is) {
-                        current = index;
-                    }
-                    element["checked"] = is;
-                }
                 this.setState({
                     status_txt: res.status_text,
                     wait_num: parseInt(res.queue_num + ""),
-                    deviceSupportItems: skuItem,
-                    allDeviceItems: attrItems,
-                    currentSelectIndex: current,
-                    productInfo: result
+                    deviceStatus:res.status
                 })
-                debuglog(result, res)
-            }).catch((err) => {
-                Taro.hideLoading();
-                Taro.showToast({
-                    title: err,
-                    icon: 'none',
-                    duration: 1500
-                });
-            })
-        }).catch((e) => {
+            }
+        }).catch((e)=>{
             Taro.hideLoading();
-            debuglog(e,id);
             Taro.showToast({
                 title: e,
                 icon: 'none',
                 duration: 1500
             });
-        });
+        })
     }
-
+    onRescanQR = () => {
+        const {printtype} = this.$router.params;
+        OfflinePrint.scan(printtype).then((res)=>{
+            if (res.params && res.params.id) {
+                this.loadData(res.params.id,printtype);
+            }
+        }).catch(()=>{
+            Taro.showToast({title:"无法识别当前二维码",icon:"none"})
+        })
+    }
     onDeviceItemClick = (item) => {
         if (item.disable) {
             Taro.showToast({
@@ -252,7 +236,7 @@ export default class Status extends Component<any, {
 
 
     render() {
-        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo} = this.state;
+        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo,deviceStatus} = this.state;
         return (
             <View className='print_status'>
                 <LoginModal isTabbar={false}/>
@@ -307,7 +291,9 @@ export default class Status extends Component<any, {
                 </ScrollView>
                 <View className='status_bottom'>
                     <View className='boxs'>
-                        <Button className='next_step_button' onClick={() => this.onNextStep()}>下一步</Button>
+                        {
+                            deviceStatus>=109?<Button className='re_scan_qrcode_button' onClick={()=>this.onRescanQR()}>重新扫码</Button>:<Button className='next_step_button' onClick={() => this.onNextStep()}>下一步</Button>
+                        }
                     </View>
                 </View>
                 {

@@ -4,7 +4,7 @@ import {AtModal, AtModalContent, AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
 import "./aboutus.less";
 import copy from "copy-to-clipboard";
-import {deviceInfo, jumpToPrivacy, setPageTitle} from "../../../../utils/common";
+import {deviceInfo, jumpToPrivacy, setPageTitle,jumpUri} from "../../../../utils/common";
 import page from "../../../../utils/ext";
 
 
@@ -33,13 +33,28 @@ export default class Aboutus extends Component<any, any> {
         const {visible} = this.state;
         return (
             <View className="about_us_container" style={deviceInfo.env === 'h5'?{height: window.screen.availHeight}:{flex:1}}>
-                <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
+                {/* <AtNavBar onClickLeftIcon={() => Taro.navigateBack()}
                     color='#121314' title="关于映果" border fixed
                       customStyle={{
                           paddingTop: deviceInfo.env === "weapp" ? deviceInfo.statusBarHeight + "px" : "0px"
                       }}
                     leftIconType={{value:'chevron-left', color:'#121314', size:24}}
-                />
+                /> */}
+                <View className='nav-bar'
+                      style={process.env.TARO_ENV === 'h5' ? "" : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                    <View className='left' onClick={() => {
+                        if (Taro.getCurrentPages().length>1) {
+                            Taro.navigateBack();
+                        } else {
+                            jumpUri("/pages/tabbar/index/index",true);
+                        }
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>关于映果</Text>
+                    </View>
+                </View>
                 <View className="about_content">
                     <View className="logo">
                         <Image src={require("../../../../source/logo.png")} className="img" mode={deviceInfo.env !== "h5" ? "widthFix" : "scaleToFill"} />

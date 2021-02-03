@@ -34,6 +34,7 @@ import dayjs from "dayjs";
 import page from '../../../utils/ext'
 import LoadMore, {LoadMoreEnum} from "../../../components/listMore/loadMore";
 import serverConfig from "../../../config/config";
+import OfflinePrint from '../../../utils/offlinePrint'
 
 
 interface IndexState {
@@ -405,42 +406,27 @@ class Index extends Component<any, IndexState> {
     }
 
     uncShow = (type:string) => {
-        // this.setState({showUnc: true});
+        // 
         // Taro.hideTabBar()
         // Taro.navigateTo({
         //     url: "/pages/offline/pages/common/status?id=1"
         // })
-        Taro.showLoading({title:"加载中"});
-        Taro.scanCode({
-            onlyFromCamera: true,
-            scanType:["qrCode"],
-            success (res) {
-                if (res.path) {
-                    const tmp = res.path.split("?");
-                    if (tmp.length>=2) {
-                        const params = tmp[1].split("=");
-                        if (params.length==2 && params[0]=="id") {
-                            Taro.hideLoading();
-                            Taro.navigateTo({
-                                url: `/pages/offline/pages/common/status?id=${params[1]}&printtype=${type}`
-                            })
-                        } else {
-                            Taro.hideLoading();
-                            Taro.showToast({title:"无法识别当前二维码",icon:"none"})
-                        }
-                    }else {
-                        Taro.hideLoading();
-                        Taro.showToast({title:"无法识别当前二维码",icon:"none"})
-                    }
-                }else {
-                    Taro.hideLoading();
-                    Taro.showToast({title:"无法识别当前二维码",icon:"none"})
-                }
-            },
-            fail(){
+        
+        if (deviceInfo.env == "h5") {
+            this.setState({showUnc: true});
+        } else {
+            Taro.showLoading({title:"加载中"});
+            OfflinePrint.scan(type).then((result)=>{
                 Taro.hideLoading();
-            }
-        })
+                // result.params
+                Taro.navigateTo({
+                    url: result.path
+                })
+            }).catch(()=>{
+                Taro.hideLoading();
+                Taro.showToast({title:"无法识别当前二维码",icon:"none"})
+            })
+        }
     }
 
     jumpToTemplate = async type => {

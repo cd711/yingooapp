@@ -1,10 +1,11 @@
-import {RichText, View} from "@tarojs/components";
+import {RichText, View,Text, ScrollView} from "@tarojs/components";
 import Taro, {Component, Config} from "@tarojs/taro";
 import {AtNavBar} from "taro-ui";
 import {api} from "../../../../utils/net";
 import "./privacy.less";
-import {debuglog, deviceInfo, setPageTitle} from "../../../../utils/common";
+import {debuglog, deviceInfo, setPageTitle,jumpUri} from "../../../../utils/common";
 import page from "../../../../utils/ext";
+import IconFont from "../../../../components/iconfont";
 
 interface PrivacyState{
     privacyTxt: string
@@ -40,7 +41,7 @@ export default class Privacy extends Component<any, PrivacyState> {
         const {privacyTxt} = this.state;
         return (
             <View className="privacy_container">
-                <AtNavBar
+                {/* <AtNavBar
                     onClickLeftIcon={()=>{
                         Taro.navigateBack();
                     }}
@@ -56,12 +57,31 @@ export default class Privacy extends Component<any, PrivacyState> {
                         color:'#121314',
                         size:24
                     }}
-                />
-                <View className="txt" style={{
-                    paddingTop: `${deviceInfo.statusBarHeight}px`
-                }}>
-                    <RichText nodes={privacyTxt} />
+                /> */}
+                <View className='nav-bar'
+                      style={process.env.TARO_ENV === 'h5' ? "" : `padding-top:${Taro.getSystemInfoSync().statusBarHeight}px;`}>
+                    <View className='left' onClick={() => {
+                        if (Taro.getCurrentPages().length>1) {
+                            Taro.navigateBack();
+                        } else {
+                            jumpUri("/pages/tabbar/index/index",true);
+                        }
+                    }}>
+                        <IconFont name='24_shangyiye' size={48} color='#121314'/>
+                    </View>
+                    <View className='center'>
+                        <Text className='title'>{`${this.$router.params.pageType === "privacy" ? "隐私政策" : "用户协议"}`}</Text>
+                    </View>
                 </View>
+                <ScrollView scrollY style={`height:${Taro.getSystemInfoSync().windowHeight-100}px`}>
+                    <View className='privacy_container_content'>
+                        <View className="txt">
+                            <RichText nodes={privacyTxt} />
+                        </View>
+                    </View>
+                </ScrollView>
+
+
             </View>
         )
     }

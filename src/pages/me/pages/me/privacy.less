@@ -1,6 +1,35 @@
+
 .privacy_container{
     background: #fff;
-    padding: 110px 32px 32px 32px;
+    
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 88px;
+        width: 100%;
+        background: #FFF;
+        position: relative;
+        .left{
+            padding-left: 32px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
+            .title{
+                font-size: 36px;
+                font-weight: 500;
+                color: #121314;
+            }
+        }
+    }
+    .privacy_container_content{
+        padding: 0 32px 32px 32px;
+    }
     .txt{
         font-size: 28px;
         padding-bottom: constant(safe-area-inset-bottom);

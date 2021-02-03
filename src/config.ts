@@ -1,5 +1,5 @@
 const testApiUrl = "https://test.playbox.yingoo.com/api/";
-let productionUrl = "https://m.playbox.yingoo.com/api/";
+let productionUrl = "https://test.playbox.yingoo.com/api/";
 if (process.env.TARO_ENV == "h5") {
     // @ts-ignore
     // eslint-disable-next-line no-undef

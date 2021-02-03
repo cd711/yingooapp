@@ -881,6 +881,7 @@ export default class Confirm extends Component<any, {
                 </View>
                 <ScrollView enableFlex scrollY
                             style={deviceInfo.env === 'h5' ? "flex:1" : `height:${centerPartyHeight}px`}>
+                    <View className='confirm_scroll_container'>
                                 {
                                     terminalPrintType=="doc"||terminalPrintType=="photo"?<View className='print_status_box'>
                                             <View className='device_status'>
@@ -920,14 +921,14 @@ export default class Confirm extends Component<any, {
                                         <View className='right'><IconFont name='20_xiayiye' size={40} color='#9C9DA6'/></View>
                                     </View>
                                     <Image src={`${options.sourceUrl}appsource/address_part.png`} className='address_line'/>
-                                </View> : <View className='address-part' onClick={() => {
+                                </View> :<View className='goods_items_container'> <View className='address-part' onClick={() => {
                                     Taro.navigateTo({
                                         url: updateChannelCode(`/pages/me/pages/me/address/index?order=${this.unixOrder}`)
                                     })
                                 }}>
                                     <Text className='title'>选择收货地址</Text>
                                     <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
-                                </View>
+                                </View></View>
                             }
                         </Fragment>
                     }
@@ -954,7 +955,7 @@ export default class Confirm extends Component<any, {
                                                                                     size={40}/></View>
                                                 </View>
                                                 <View className='center'>
-                                                    <Text className='name'>{product.product.title}</Text>
+                                                    <Text className='name'>{product.product.title && product.product.title.length>15?product.product.title.substring(0,15)+"...":product.product.title}</Text>
                                                     <Text className='params'>规格：{product.sku.value.join("/")}</Text>
                                                 </View>
                                                 <View className='right'>
@@ -1025,73 +1026,81 @@ export default class Confirm extends Component<any, {
                                             </View> : null
                                     }
                                 </View>
-                                <View className='goods-item' onClick={() => this.onGoodsItemClick(item, usedTickets)}>
-                                    <Text className='title'>优惠券</Text>
+                                <View className='goods_items_container'>
                                     {
-                                        item.use_coupon
-                                            ? <View className='right'>
-                                                <View className='tt'>
-                                                    <Text className='n'>
-                                                        {/* @ts-ignore */}
-                                                        - ￥{item.use_coupon.coupon.money}
-                                                    </Text>
-                                                </View>
-                                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
-                                            </View> : (item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id)).length == 0
-                                            ? <View className='right'>
-                                                <Text className='txt'>无优惠券可用</Text>
-                                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                        terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?null:<View className='goods-item'>
+                                            <Text className='title'>运费</Text>
+                                            <View className='price'>
+                                                <Text className='sym'>¥</Text>
+                                                <Text
+                                                    className='num'>{parseFloat(item.delivery_price + "") > 0 ? parseFloat(item.delivery_price + "").toFixed(2) : "0.00"}</Text>
                                             </View>
-                                            : <View className='right'>
-                                                <View className='tt'>
-                                                    <Text className='has'>有</Text>
-                                                    <Text
-                                                        className='n'>{item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id)).length}</Text>
-                                                    <Text>张优惠券可用</Text>
+                                        </View>
+                                    }
+                                    {/* <View className='goods-item'>
+                                        <Text className='title'>小计</Text>
+                                        <View className='price red'>
+                                            <Text className='sym'>¥</Text>
+                                            <Text
+                                                className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "0.00"}</Text>
+                                        </View>
+                                    </View> */}
+                                </View>
+                                <View className='goods_items_container'>
+                                    <View className='goods-item' onClick={() => this.onGoodsItemClick(item, usedTickets)}>
+                                        <Text className='title'>优惠券</Text>
+                                        {
+                                            item.use_coupon
+                                                ? <View className='right'>
+                                                    <View className='tt'>
+                                                        <Text className='n'>
+                                                            {/* @ts-ignore */}
+                                                            - ￥{item.use_coupon.coupon.money}
+                                                        </Text>
+                                                    </View>
+                                                    <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                                </View> : (item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id)).length == 0
+                                                ? <View className='right'>
+                                                    <Text className='txt'>无优惠券可用</Text>
+                                                    {/* <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/> */}
                                                 </View>
-                                                <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
-                                            </View>)
+                                                : <View className='right'>
+                                                    <View className='tt'>
+                                                        <Text className='has'>有</Text>
+                                                        <Text
+                                                            className='n'>{item.usable_discounts.filter(obj => !usedTickets.some(obj1 => obj1.ticketId == obj.id && obj1.orderId != item.pre_order_id)).length}</Text>
+                                                        <Text>张优惠券可用</Text>
+                                                    </View>
+                                                    <IconFont name='20_xiayiye' size={40} color='#9C9DA6'/>
+                                                </View>)
+                                        }
+                                    </View>
+                                    
+                                    {/* <View className='goods-item'>
+                                        <Text className='title'>积分</Text>
+                                        <View className='right'>
+                                            <Text className='txt'>无积分可用</Text>
+                                        </View>
+                                    </View> */}
+                                </View>
+
+                                <View className='goods_items_container'>
+                                    {
+                                        terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?null:<View className='goods-item'>
+                                            <Text className='title'>留言</Text>
+                                            <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={({detail:{value}})=>{
+                                                orderMessages[item.pre_order_id] = value;
+                                                this.setState({
+                                                    orderMessages:orderMessages
+                                                });
+                                            }}/>
+                                        </View>
                                     }
                                 </View>
-                                {/* <View className='goods-item'>
-                                <Text className='title'>积分</Text>
-                                <View className='right'>
-                                    <Text className='txt'>无积分可用</Text>
-                                </View>
-                            </View> */}
-                            {
-                                terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?null:<View className='goods-item'>
-                                    <Text className='title'>运费</Text>
-                                    <View className='price'>
-                                        <Text className='sym'>¥</Text>
-                                        <Text
-                                            className='num'>{parseFloat(item.delivery_price + "") > 0 ? parseFloat(item.delivery_price + "").toFixed(2) : "0.00"}</Text>
-                                    </View>
-                                </View>
-                            }
-                                
-                                <View className='goods-item'>
-                                    <Text className='title'>小计</Text>
-                                    <View className='price red'>
-                                        <Text className='sym'>¥</Text>
-                                        <Text
-                                            className='num'>{parseFloat(item.order_price + "") > 0 ? parseFloat(item.order_price + "").toFixed(2) : "0.00"}</Text>
-                                    </View>
-                                </View>
-                                {
-                                    terminalPrintType=="doc"||(terminalPrintType=="photo" && !isHasAddBuy)?null:<View className='goods-item'>
-                                        <Text className='title'>留言</Text>
-                                        <Input type='text' className='order_message' placeholder="给商家留言" placeholderClass="order_message_placeholder" onInput={({detail:{value}})=>{
-                                            orderMessages[item.pre_order_id] = value;
-                                            this.setState({
-                                                orderMessages:orderMessages
-                                            });
-                                        }}/>
-                                    </View>
-                                }
                             </Fragment>
                         ))
                     }
+                    </View>
                 </ScrollView>
                 <View className='bottom'>
                     <View className='main'>
