@@ -20,6 +20,11 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import OfflinePrint from '../../../../utils/offlinePrint';
 
+interface PrintNum{
+    pages: number;
+    queue_num: number;
+}
+
 @inject("userStore")
 @observer
 export default class Status extends Component<any, {
@@ -31,7 +36,9 @@ export default class Status extends Component<any, {
     currentSelectIndex: number;
     productInfo: any;
     visible: boolean;
-    deviceStatus:number
+    deviceStatus:number;
+    printType:string;
+    currentPrintState:any
 }> {
 
     config: Config = {
@@ -49,7 +56,9 @@ export default class Status extends Component<any, {
             currentSelectIndex: 0,
             productInfo: null,
             visible: false,
-            deviceStatus:101
+            deviceStatus:101,
+            printType:"photo",
+            currentPrintState:null
         }
     }
 
@@ -77,34 +86,43 @@ export default class Status extends Component<any, {
         Taro.showLoading({title: "加载中..."});
         OfflinePrint.terminalStatus(id).then((res)=>{
             const status = res.status;
-            if (status>=101 && status<109) {
-                OfflinePrint.product(49,res,printtype).then((product)=>{
-                    Taro.hideLoading();
+            OfflinePrint.product(49,res,printtype).then((product)=>{
+                Taro.hideLoading();
+                const tmp = {};
+                for (const key in product.skuItem) {
+                    const element = product.skuItem[key];
+                    console.log("循环类型",element.type)
+                    tmp[element.type]=element.type=="doc"?res.currentPrintDoc:res.currentPrintPhoto;
+                }
+                if (status>=101 && status<109) {
                     this.setState({
                         status_txt: res.status_text,
-                        wait_num: parseInt(res.queue_num + ""),
+                        wait_num: tmp[product.skuItem[product.current].type].queue_num,
                         deviceSupportItems: product.skuItem,
                         allDeviceItems: product.attrItems,
                         currentSelectIndex: product.current,
                         productInfo: product.info,
-                        deviceStatus:res.status
+                        deviceStatus:res.status,
+                        printType:product.skuItem[product.current].type,
+                        currentPrintState:tmp
                     })
-                }).catch((err)=>{
-                    Taro.hideLoading();
-                    Taro.showToast({
-                        title: err,
-                        icon: 'none',
-                        duration: 1500
-                    });
-                })
-            } else {
+                } else {
+                    this.setState({
+                        status_txt: res.status_text,
+                        wait_num: tmp[product.skuItem[product.current].type].queue_num,
+                        deviceStatus:res.status,
+                        printType:product.skuItem[product.current].type,
+                        currentPrintState:tmp
+                    })
+                }
+            }).catch((err)=>{
                 Taro.hideLoading();
-                this.setState({
-                    status_txt: res.status_text,
-                    wait_num: parseInt(res.queue_num + ""),
-                    deviceStatus:res.status
-                })
-            }
+                Taro.showToast({
+                    title: err,
+                    icon: 'none',
+                    duration: 1500
+                });
+            })
         }).catch((e)=>{
             Taro.hideLoading();
             Taro.showToast({
@@ -133,7 +151,7 @@ export default class Status extends Component<any, {
             });
             return;
         }
-        const {allDeviceItems} = this.state;
+        const {allDeviceItems,currentPrintState} = this.state;
         let current = 0;
         for (let index = 0; index < allDeviceItems.length; index++) {
             const element = allDeviceItems[index];
@@ -145,7 +163,9 @@ export default class Status extends Component<any, {
         }
         this.setState({
             allDeviceItems,
-            currentSelectIndex: current
+            currentSelectIndex: current,
+            printType:allDeviceItems[current].type,
+            wait_num:currentPrintState[allDeviceItems[current].type].queue_num
         })
     }
 
@@ -236,7 +256,12 @@ export default class Status extends Component<any, {
 
 
     render() {
-        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo,deviceStatus} = this.state;
+        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo,deviceStatus,currentPrintState,printType} = this.state;
+        let waitNum = "直接打印"
+        if (currentPrintState) {
+            const pagen = parseInt(currentPrintState[printType].pages+"")>0 ?parseInt(currentPrintState[printType].queue_num+""):0;
+            waitNum = pagen>0?(printType=="doc"?(pagen*10)+"秒":(pagen*20)+"秒"):"直接打印"
+        }
         return (
             <View className='print_status'>
                 <LoginModal isTabbar={false}/>
@@ -270,7 +295,7 @@ export default class Status extends Component<any, {
                                     <Text className='wtip'>排队人数</Text>
                                 </View>
                                 <View className='time'>
-                                    <Text className='ttop'>直接打印</Text>
+                                    <Text className='ttop'>{waitNum}</Text>
                                     <Text className='ttip'>预计时间</Text>
                                 </View>
                             </View>

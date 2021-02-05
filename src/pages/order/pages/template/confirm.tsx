@@ -184,7 +184,9 @@ export default class Confirm extends Component<any, {
                     };
                     if (user_tpl_id && user_tpl_id == -2) {
                         data.user_tpl_id = user_tpl_id;
-                        data.quantity = 1;
+                        if (resp.print_type != "photo") {
+                            data.quantity = 1;
+                        }
                         data.terminal_id = resp.terminal_id;
                     }
                     if (!this.isPhoto) {
@@ -956,7 +958,7 @@ export default class Confirm extends Component<any, {
                                                 </View>
                                                 <View className='center'>
                                                     <Text className='name'>{product.product.title && product.product.title.length>15?product.product.title.substring(0,15)+"...":product.product.title}</Text>
-                                                    <Text className='params'>规格：{product.sku.value.join("/")}</Text>
+                                                    <Text className='params'>{product.sku.value.join("/")}</Text>
                                                 </View>
                                                 <View className='right'>
                                                     <View className='price'>

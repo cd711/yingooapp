@@ -15,21 +15,28 @@ interface Product{
     info:any;
 }
 
+interface PrintNum{
+    pages: number;
+    queue_num: number;
+}
+
 class TerminalStatus{
 
     id:number;
     terminal_code:string;
     status:number;
     status_text:string;
-    queue_num:number;
     peripheral_feature:Array<number>;
+    currentPrintDoc:PrintNum;
+    currentPrintPhoto:PrintNum
 
     constructor(result:any){
         this.id = result.id;
         this.terminal_code = result.terminal_code;
         this.status = parseInt(result.status+"");
         this.status_text = result.status_text;
-        this.queue_num = result.queue_num;
+        this.currentPrintPhoto = result.photo;
+        this.currentPrintDoc = result.doc;
         this.peripheral_feature = result.peripheral_feature;
     }
 

@@ -55,6 +55,9 @@ export default class Printing extends Component<any,{
             });
         }).exec();
         const {id,printtype} = this.$router.params;
+        this.setState({
+            printtype
+        })
         this.tt = setInterval(()=>{
             api("device.terminal/printStatus",{
                 order_id:id
@@ -64,7 +67,6 @@ export default class Printing extends Component<any,{
                     clearInterval(this.tt);
                 }
                 this.setState({
-                    printtype,
                     print_order_status_id:parseInt(res.print_order_status_id+"")
                 })
             })
