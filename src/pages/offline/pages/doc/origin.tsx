@@ -76,7 +76,7 @@ export default class Origin extends Component<any,{
                     debuglog(value);
                     const {tp} = this.$router.params;
                     Taro.showLoading({title:"正在转换文档"});
-                    documentConverPDF(value.cdnUrl,(r)=>{
+                    documentConverPDF(value.id,(r)=>{
                         if (r != null && r && r.length >0) {
                             Taro.hideLoading();
                             debuglog(r);

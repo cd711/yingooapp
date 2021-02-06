@@ -1172,9 +1172,9 @@ export function findPictureSizeForID(idArr: any[], sizeItems: any[]): string {
  * @param {type} params
  * @return {*}
  */
-export function documentConverPDF(path:string,callback?:(r:any)=>void) {
+export function documentConverPDF(id:any,callback?:(r:any)=>void) {
     api("device.terminal/convert",{
-        document_url:path,
+        document_id:id,
         output_file_format_id:21
     }).then((res)=>{
         callback && callback(res);
