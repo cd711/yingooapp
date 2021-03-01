@@ -405,22 +405,15 @@ class Index extends Component<any, IndexState> {
         // Taro.showTabBar()
     }
 
-    uncShow = (type:string) => {
-        // 
-        // Taro.hideTabBar()
-        // Taro.navigateTo({
-        //     url: "/pages/offline/pages/common/status?id=1"
-        // })
-        
+    uncShow = (type:string) => {        
         if (deviceInfo.env == "h5") {
             this.setState({showUnc: true});
         } else {
             Taro.showLoading({title:"加载中"});
             OfflinePrint.scan(type).then((result)=>{
                 Taro.hideLoading();
-                // result.params
                 Taro.navigateTo({
-                    url: result.path
+                    url: updateChannelCode(result.path)
                 })
             }).catch(()=>{
                 Taro.hideLoading();

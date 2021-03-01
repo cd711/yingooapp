@@ -73,8 +73,14 @@ export default class OfflinePrint{
                         reject();
                     }
                 },
-                fail(){
-                    reject();
+                fail(res){
+                    console.log(res);
+                    if(res && res.errMsg.includes("cancel")){
+                        Taro.hideLoading();
+                    } else {
+                        reject();
+                    }
+                    
                 }
             })
         })
