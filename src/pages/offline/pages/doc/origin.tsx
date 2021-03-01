@@ -19,7 +19,9 @@ import {
 } from '../../../../utils/common';
 import ScanTipModal from '../../../../components/scanTipModal/scantipmodal';
 import { options,getToken } from '../../../../utils/net';
+import { intersection } from '../../../../utils/tool';
 
+const uploadFileTypes = ["pdf","xls","doc","ppt","docx","xlsx","pptx"];
 
 @inject("userStore")
 @observer
@@ -71,48 +73,49 @@ export default class Origin extends Component<any,{
             success:(res)=>{
                 debuglog(res);
                 // console.log(res.tempFiles[0].path);
-
-                this.uploadFileFn(res.tempFiles[0].name,res.tempFiles[0].path,(value)=>{
-                    debuglog(value);
-                    const {tp} = this.$router.params;
-                    Taro.showLoading({title:"正在转换文档"});
-                    documentConverPDF(value.id,(r)=>{
-                        if (r != null && r && r.length >0) {
-                            Taro.hideLoading();
-                            debuglog(r);
-                            Taro.showLoading({title:"正在初始化"});
-                            getTempDataContainer(tp,(value)=>{
-                                if (value != null) {
-                                    const print_images = [];
-                                    for (let index = 0; index < r.length; index++) {
-                                        const element = r[index];
-                                        print_images.push({
-                                            url:element.file_url,
-                                            num:element.page
-                                        })
+                if (intersection(res.tempFiles[0].name.split("."),uploadFileTypes).length==1) {
+                    this.uploadFileFn(res.tempFiles[0].name,res.tempFiles[0].path,(value)=>{
+                        debuglog(value);
+                        const {tp} = this.$router.params;
+                        Taro.showLoading({title:"正在转换文档"});
+                        documentConverPDF(value.id,(r)=>{
+                            if (r != null && r && r.length >0) {
+                                Taro.hideLoading();
+                                debuglog(r);
+                                Taro.showLoading({title:"正在初始化"});
+                                getTempDataContainer(tp,(value)=>{
+                                    if (value != null) {
+                                        const print_images = [];
+                                        for (let index = 0; index < r.length; index++) {
+                                            const element = r[index];
+                                            print_images.push({
+                                                url:element.file_url,
+                                                num:element.page
+                                            })
+                                        }
+                                        Object.assign(value,{
+                                            print_images
+                                        });
+                                        Taro.hideLoading();
+                                        jumpOrderConfimPreview(value);
+                                    } else {
+                                        Taro.hideLoading();
+                                        Taro.showToast({title: "初始化失败，请重试！", icon: "none",duration:1500});
+                                        Taro.navigateBack();
                                     }
-                                    Object.assign(value,{
-                                        print_images
-                                    });
-                                    Taro.hideLoading();
-                                    jumpOrderConfimPreview(value);
-                                } else {
-                                    Taro.hideLoading();
-                                    Taro.showToast({title: "初始化失败，请重试！", icon: "none",duration:1500});
-                                    Taro.navigateBack();
-                                }
-                            })
-                        } else {
-                            Taro.hideLoading();
-                            Taro.showToast({title: "文档转换失败，请重试！", icon: "none",duration:1800});
-                            setTimeout(() => {
-                                Taro.navigateTo({
-                                    url:updateChannelCode(`/pages/offline/pages/doc/mydoc?tp=${tp}`)
                                 })
-                            }, 1810);
-                        }
+                            } else {
+                                Taro.hideLoading();
+                                Taro.showToast({title: "文档转换失败，请重试！", icon: "none",duration:1800});
+                                setTimeout(() => {
+                                    Taro.navigateTo({
+                                        url:updateChannelCode(`/pages/offline/pages/doc/mydoc?tp=${tp}`)
+                                    })
+                                }, 1810);
+                            }
+                        })
                     })
-                })
+                }
             }
         })
     }

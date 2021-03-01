@@ -32,6 +32,8 @@ import page from '../../../../utils/ext'
 
 interface PrintDeviceStatus{
     queue_num: number;
+    pages:number;
+    time:string;
     status: number;
     status_text: string;
 }
@@ -131,11 +133,13 @@ export default class Confirm extends Component<any, {
         api("device.terminal/status",{
             terminal_id:id
         }).then((res)=>{
-            console.log("哈哈哈",res);
+            console.log("哈哈哈",res,type);
             this.setState({
                 terminalPrintType:type,
                 printDeviceInfo:{
-                    queue_num:res.queue_num,
+                    queue_num:type == "doc"?res.doc.queue_num:res.photo.queue_num,
+                    pages:type == "doc"?res.doc.pages:res.photo.pages,
+                    time:type == "doc"?(parseInt(res.doc.pages+"")>0?(parseInt(res.doc.pages+"")*10)+"秒":"直接打印"):(parseInt(res.photo.pages+"")>0?(parseInt(res.photo.pages+"")*20)+"秒":"直接打印"),
                     status:res.status,
                     status_text:res.status_text
                 }
@@ -896,7 +900,7 @@ export default class Confirm extends Component<any, {
                                                     <Text className='wtip'>排队人数</Text>
                                                 </View> 
                                                 <View className='time'>
-                                                    <Text className='ttop'>直接打印</Text>
+                                                    <Text className='ttop'>{printDeviceInfo.time || "直接打印"}</Text>
                                                     <Text className='ttip'>预计时间</Text>
                                                 </View>
                                             </View>

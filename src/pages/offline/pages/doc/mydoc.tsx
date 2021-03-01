@@ -254,8 +254,8 @@ export default class Origin extends Component<any,{
                                 </View>
                             )):<View className='empty'>
                                 <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
-                                <Text className='txt'>暂无素材</Text>
-                                <Button className='btn' onClick={()=>this.onSelectWechatFile()}>上传素材</Button>
+                                <Text className='txt'>暂无文档</Text>
+                                <Button className='btn' onClick={()=>this.onSelectWechatFile()}>从微信聊天中上传文档</Button>
                             </View>
                         }
                     </View>
