@@ -924,26 +924,28 @@ class Index extends Component<any, IndexState> {
                                             </Fragment>
                                             : item.area_type === "column"
                                                 ?  <Fragment>
-                                                    <View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
-                                                        <View className="read_fast_link_wrap">
-                                                            <View className="read_fast_link" onClick={()=>this.uncShow("photo")}>
-                                                                <Image src={`${options.sourceUrl}appsource/il.svg`} className="fast_img" mode="widthFix" />
-                                                                <View className="info">
-                                                                    <Text className="h2">当面冲印照片</Text>
-                                                                    <Text className="txt">高清冲印照片</Text>
+                                                    {
+                                                        deviceInfo.env == "weapp"?<View className="index_fast_link_view" style={{padding: `0 7px 0 7px`}}>
+                                                            <View className="read_fast_link_wrap">
+                                                                <View className="read_fast_link" onClick={()=>this.uncShow("photo")}>
+                                                                    <Image src={`${options.sourceUrl}appsource/il.svg`} className="fast_img" mode="widthFix" />
+                                                                    <View className="info">
+                                                                        <Text className="h2">当面冲印照片</Text>
+                                                                        <Text className="txt">高清冲印照片</Text>
+                                                                    </View>
                                                                 </View>
                                                             </View>
-                                                        </View>
-                                                        <View className="read_fast_link_wrap">
-                                                            <View className="read_fast_link" onClick={()=>this.uncShow("doc")}>
-                                                                <Image src={`${options.sourceUrl}appsource/cnxh.svg`} className="fast_img" mode="widthFix" />
-                                                                <View className="info">
-                                                                    <Text className="h2">当面冲印文档</Text>
-                                                                    <Text className="txt">极速打印文档</Text>
+                                                            <View className="read_fast_link_wrap">
+                                                                <View className="read_fast_link" onClick={()=>this.uncShow("doc")}>
+                                                                    <Image src={`${options.sourceUrl}appsource/cnxh.svg`} className="fast_img" mode="widthFix" />
+                                                                    <View className="info">
+                                                                        <Text className="h2">当面冲印文档</Text>
+                                                                        <Text className="txt">极速打印文档</Text>
+                                                                    </View>
                                                                 </View>
                                                             </View>
-                                                        </View>
-                                                    </View>
+                                                        </View>:null
+                                                    }
                                                     <View className="index_fast_link_view fixed_padding" style={{paddingBottom: "0px"}}>
                                                         <View className="fast_order_link_wrap">
                                                             <View className="fast_order_link" onClick={() => this.jumpToTemplate(1)}>

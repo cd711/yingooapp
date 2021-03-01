@@ -17,10 +17,12 @@ import {
     updateChannelCode
 } from '../../../../utils/common';
 import Checkboxs from '../../../../components/checkbox/checkbox';
-import { api, options } from '../../../../utils/net';
+import { api, getToken, options } from '../../../../utils/net';
 import dayjs from 'dayjs';
 import { ITouchEvent } from '@tarojs/components/types/common';
+import { intersection } from '../../../../utils/tool';
 
+const uploadFileTypes = ["pdf","xls","doc","ppt","docx","xlsx","pptx"];
 interface DocListData{
     id: number,
     url: string,
@@ -80,18 +82,34 @@ export default class Origin extends Component<any,{
                 }).exec();
             }).exec();
         }
+        this.getDocList();
+    }
+
+    getDocList = () => {
+        Taro.showLoading({title:"加载中..."});
         api("app.profile/doc",{
             start:0,
             size:50,
             sort:"createtime",
             order:"desc"
         }).then((res)=>{
+            Taro.hideLoading();
             res.list.map((item)=>{
                 item["checked"] = false;
             })
             this.setState({
                 list:res.list
             })
+        }).catch(()=>{
+            Taro.hideLoading();
+            Taro.showToast({
+                title:"请求失败，请稍后再试!",
+                icon:"none",
+                duration:2000
+            });
+            setTimeout(() => {
+                Taro.navigateBack();
+            }, 2000);
         })
     }
 
@@ -146,7 +164,61 @@ export default class Origin extends Component<any,{
             list
         })
     }
+    onSelectWechatFile = () => {
+        Taro.chooseMessageFile({
+            count:1,
+            type:"file",
+            success:(res)=>{
+                if (intersection(res.tempFiles[0].name.split("."),uploadFileTypes).length==1) {
+                    this.uploadFileFn(res.tempFiles[0].name,res.tempFiles[0].path,(value)=>{
+                        debuglog(value);
+                        this.getDocList();
+                    })
+                }
+            }
+        })
+    }
+    uploadFileFn(name:string,path: string,callback?:(value:any)=>void) {
+        let url = options.apiUrl + "common/upload";
+        if (getToken()) {
+            url += (url.indexOf("?") > -1 ? "&" : "?") + "token=" + getToken();
+        }
+        Taro.showLoading({title: "上传中..."});
+        debuglog("路径",path)
+        const upload = Taro.uploadFile({
+            url,
+            filePath: path,
+            name: 'file',
+            header: {
+                "Access-Control-Allow-Origin": "*"
+            },
+            formData: {
+                'type': 6,
+                'name':name
+            },
+            success: res => {
+                Taro.hideLoading();
+                const jsonRes = JSON.parse(res.data)
+                // console.log(jsonRes);
+                if (jsonRes.code === 1) {
+                    Taro.showToast({title: "上传成功", icon: "none"})
+                    callback && callback(jsonRes.data);
+                } else {
+                    Taro.showToast({title: "上传失败", icon: "none"})
+                }
+            },
+            fail: err => {
+                debuglog("UploadFile文件上传出错：", err)
+                Taro.hideLoading();
+                Taro.showToast({title: "上传失败", icon: "none"})
+            }
+        });
 
+        // upload.progress(res => {
+        //     // 上传进度、 已上传的数据长度、 文件总长度
+        //     onProgress && onProgress(res.progress, res.totalBytesSent, res.totalBytesExpectedToSend, 0)
+        // })
+    }
     render() {
         const {centerPartyHeight,list} = this.state;
         const disable_button = list.filter((obj)=>obj.checked).length==0;
@@ -165,7 +237,7 @@ export default class Origin extends Component<any,{
                 <ScrollView scrollY enableFlex className='doc_mydoc_scroll' style={process.env.TARO_ENV != 'h5'?`height:${centerPartyHeight}px`:""}>
                     <View className='my_doc_list'>
                         {
-                            list.map((item)=>(
+                            list.length>0?list.map((item)=>(
                                 <View className='my_doc_item' key={item.id} onClick={()=>this.onDocItemClick(item)}>
                                     <Image src={`${options.sourceUrl}appsource/docicon/${item.imagetype}.png`} className='icon'/>
                                     <View className='center_party'>
@@ -180,7 +252,11 @@ export default class Origin extends Component<any,{
                                         <Checkboxs isChecked={item.checked} disabled onCheckedClick={()=>this.onDocItemClick(item)}/>
                                     </View>
                                 </View>
-                            ))
+                            )):<View className='empty'>
+                                <Image src={`${options.sourceUrl}appsource/empty/nophoto.png`} className='img'/>
+                                <Text className='txt'>暂无素材</Text>
+                                <Button className='btn' onClick={()=>this.onSelectWechatFile()}>上传素材</Button>
+                            </View>
                         }
                     </View>
                 </ScrollView>
