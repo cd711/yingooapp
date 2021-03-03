@@ -86,7 +86,7 @@ export default class Status extends Component<any, {
         Taro.showLoading({title: "加载中..."});
         OfflinePrint.terminalStatus(id).then((res)=>{
             const status = res.status;
-            OfflinePrint.product(49,res,printtype).then((product)=>{
+            OfflinePrint.product(66,res,printtype).then((product)=>{
                 Taro.hideLoading();
                 const tmp = {};
                 for (const key in product.skuItem) {
