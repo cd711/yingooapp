@@ -48,7 +48,6 @@ class App extends Component {
             'pages/tabbar/cart/index',
             'pages/tabbar/coupon/ticket',
             'pages/tabbar/order/order',
-
             'pages/login/index',
             'pages/login/set',
             'pages/login/setnew',

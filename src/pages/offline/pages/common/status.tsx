@@ -19,6 +19,8 @@ import dayjs from 'dayjs';
 import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import OfflinePrint from '../../../../utils/offlinePrint';
+import Navbar from '../../../../components/navbar';
+
 
 interface PrintNum{
     pages: number;
@@ -27,6 +29,7 @@ interface PrintNum{
 
 @inject("userStore")
 @observer
+
 export default class Status extends Component<any, {
     centerPartyHeight: number;
     status_txt: string;
@@ -337,3 +340,5 @@ export default class Status extends Component<any, {
         )
     }
 }
+
+// export default Navbar(Status)
