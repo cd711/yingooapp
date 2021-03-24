@@ -1,0 +1,50 @@
+.x_select_pick{
+
+}
+.x_select_bd {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    position: relative;
+    background-color: #fff;
+    height: 500px;
+    overflow: hidden;
+
+}
+
+
+
+.x_select_item {
+    padding: 0;
+    height: 96px;
+    line-height: 96px;
+    text-align: center;
+    color: #000;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 36px;
+}
+.x_select_bottom{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFF;
+    height: 120px;
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+    .okButton{
+        width: 670px;
+        height: 88px;
+        background: #ff4966;
+        border-radius: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .okButtonTxt{
+            font-size: 28px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+    }
+}

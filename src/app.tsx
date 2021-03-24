@@ -137,7 +137,9 @@ class App extends Component {
                     "pages/doc/origin",
                     "pages/doc/mydoc",
                     "pages/doc/printing",
-                    "pages/common/status"
+                    "pages/common/status",
+                    "pages/common/order",
+                    "pages/doc/coping"
                 ]
             },
         ],

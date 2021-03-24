@@ -20,6 +20,7 @@ import PhotosEle from "../../../../components/photos/photos";
 import photoStore from "../../../../store/photo";
 import OfflinePrint from '../../../../utils/offlinePrint';
 import Navbar from '../../../../components/navbar';
+import SelectPage from './selectpage';
 
 
 interface PrintNum{
@@ -41,7 +42,9 @@ export default class Status extends Component<any, {
     visible: boolean;
     deviceStatus:number;
     printType:string;
-    currentPrintState:any
+    currentPrintState:any;
+    selectPageModalShow:boolean;
+    slectCopyPage:number
 }> {
 
     config: Config = {
@@ -61,7 +64,9 @@ export default class Status extends Component<any, {
             visible: false,
             deviceStatus:101,
             printType:"photo",
-            currentPrintState:null
+            currentPrintState:null,
+            selectPageModalShow:false,
+            slectCopyPage:1
         }
     }
 
@@ -95,9 +100,23 @@ export default class Status extends Component<any, {
                 for (const key in product.skuItem) {
                     const element = product.skuItem[key];
                     console.log("循环类型",element.type)
-                    tmp[element.type]=element.type=="doc"?res.currentPrintDoc:res.currentPrintPhoto;
+                    tmp[element.type]=element.type=="doc"?res.currentPrintDoc:(element.type=="copy"?res.currentCopyDoc:res.currentPrintPhoto);
                 }
                 if (status>=101 && status<109) {
+                    //模拟数据
+                    if (process.env.NODE_ENV !== 'production') {
+                        product.attrItems.push({
+                            id: 365,
+                            name: "复印文档",
+                            value: "101001#102002,copy,,2,1,2,120001,1",
+                            value_text: "",
+                            type: "copy"
+                        })
+                        tmp["copy"] = {
+                            pages: 0,
+                            queue_num: 0
+                        }
+                    }
                     this.setState({
                         status_txt: res.status_text,
                         wait_num: tmp[product.skuItem[product.current].type].queue_num,
@@ -163,7 +182,7 @@ export default class Status extends Component<any, {
                 element.checked = true;
                 current = index;
             }
-        }
+        }       
         this.setState({
             allDeviceItems,
             currentSelectIndex: current,
@@ -197,6 +216,8 @@ export default class Status extends Component<any, {
                 })
             } else if (currentItem.type == "photo") {
                 this.setState({visible: true})
+            } else if (currentItem.type == "copy") {
+                this.setState({selectPageModalShow:true})
             }
         } else {
             Taro.showToast({title:"未选择打印类型",icon:'none',duration:2000});
@@ -259,12 +280,13 @@ export default class Status extends Component<any, {
 
 
     render() {
-        const {centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo,deviceStatus,currentPrintState,printType} = this.state;
+        const {selectPageModalShow,centerPartyHeight, status_txt, wait_num, allDeviceItems, visible, productInfo,deviceStatus,currentPrintState,printType} = this.state;
         let waitNum = "直接打印"
         if (currentPrintState) {
             const pagen = parseInt(currentPrintState[printType].pages+"")>0 ?parseInt(currentPrintState[printType].queue_num+""):0;
             waitNum = pagen>0?(printType=="doc"?(pagen*10)+"秒":(pagen*20)+"秒"):"直接打印"
         }
+        const {id} = this.$router.params;
         return (
             <View className='print_status'>
                 <LoginModal isTabbar={false}/>
@@ -336,9 +358,32 @@ export default class Status extends Component<any, {
                         </View>
                         : null
                 }
+                <SelectPage isShow={selectPageModalShow} onClose={()=>{
+                    this.setState({selectPageModalShow:false})
+                }} onChange={(n)=>{
+                    this.setState({
+                        slectCopyPage:n
+                    })
+                }} onOkButton={()=>{
+                    
+                    this.setState({selectPageModalShow:false});
+                    const currentUnix = dayjs().unix()
+                    const key = "order_preview_"+currentUnix;
+                    setTempDataContainer(key,{
+                        page:this.state.slectCopyPage,
+                        tid:id,
+                        pre_order_id:0
+                    },(ok)=>{
+                        if (ok) {
+                            Taro.navigateTo({
+                                url:updateChannelCode(`/pages/offline/pages/common/order?t=${currentUnix}`)
+                            })
+                        }
+                    });
+
+                }}/>
             </View>
         )
     }
 }
 
-// export default Navbar(Status)

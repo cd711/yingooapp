@@ -28,7 +28,8 @@ class TerminalStatus{
     status_text:string;
     peripheral_feature:Array<number>;
     currentPrintDoc:PrintNum;
-    currentPrintPhoto:PrintNum
+    currentPrintPhoto:PrintNum;
+    currentCopyDoc:PrintNum;
 
     constructor(result:any){
         this.id = result.id;
@@ -37,6 +38,8 @@ class TerminalStatus{
         this.status_text = result.status_text;
         this.currentPrintPhoto = result.photo;
         this.currentPrintDoc = result.doc;
+        this.currentCopyDoc = result.copy?result.copy:{ pages: 0,
+            queue_num: 0};
         this.peripheral_feature = result.peripheral_feature;
     }
 

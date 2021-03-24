@@ -1,0 +1,153 @@
+.print_coping{
+    background: #f5f6f9;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .photo_picker_container{
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-sizing: border-box;
+        background: #fff;
+        z-index: 2000;
+        transition: all .3s ease-in;
+    }
+    .nav-bar{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 88px;
+        width: 100%;
+        background: #FFF;
+        position: relative;
+        .left{
+            padding-left: 32px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%,0);
+            .title{
+                font-size: 36px;
+                font-weight: 500;
+                color: #121314;
+            }
+        }
+    }
+    .print_status_scroll{
+        flex: 1;
+    }
+    .print_status_container{
+        padding: 32px 32px 0;
+        .tops{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .img{
+                width: 512px;
+                height: 384px;
+            }
+            .txt{
+                font-size: 32px;
+                font-weight: 400;
+                text-align: CENTER;
+                color: #9c9da6;
+            }
+        }
+        .page_items{
+            border-radius: 16px;
+            background: #FFFFFF;
+            margin-top: 70px;
+            .page_item{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 112px;
+                padding: 0 32px;
+                .lefttxt{
+                    font-size: 28px;
+                    font-weight: 400;
+                    color: #121314;
+                }
+                .waitingputin{
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #ff9f40;
+                }
+                .waiting{
+                    font-size: 28px;
+                    font-weight: 400;
+                    color: #9c9da6;
+                }
+                .startButton{
+                    width: 160px;
+                    height: 56px;
+                    background: #4d94ff;
+                    border-radius: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #ffffff;
+                    line-height: 56px;
+                    text-align: center;
+                }
+                .printing{
+                    font-size: 28px;
+                    font-weight: 500;
+                    text-align: RIGHT;
+                    color: #4d94ff;
+                }
+                .printed{
+                    font-size: 28px;
+                    font-weight: 500;
+                    text-align: RIGHT;
+                    color: #4d94ff;
+                }
+            }
+        }
+    }
+    .status_bottom{
+        background: #FFF;
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
+        .boxs{
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .next_step_button,.re_scan_qrcode_button{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 686px;
+                height: 88px;
+                background: rgba(77,148,255,0.08);
+                border-radius: 48px;
+                font-size: 28px;
+                font-weight: 500;
+                text-align: CENTER;
+                color: #4d94ff;
+                line-height: 88px;
+                .button_img{
+                    width: 48px;
+                    height: 48px;
+                    display: flex;
+                }
+                .button_txt{
+                    font-size: 28px;
+                    font-weight: 500;
+                    color: #4d94ff;
+                }
+            }
+        }
+
+    }
+
+}
