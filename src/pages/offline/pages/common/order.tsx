@@ -135,12 +135,10 @@ export default class PrintOrder extends Component<any, {
                 return;
             }
             this.setState({
-                
                 real_order_id:res.real_order_id,
                 payPrice:parseFloat(res.pay_price+"").toFixed(2),
                 order_sn: res.order_sn,
                 showPayWayModal: true,
-                // payStatus:res.status
             });
         }).catch((e) => {
             Taro.hideLoading();
