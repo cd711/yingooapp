@@ -365,14 +365,40 @@ export default class Status extends Component<any, {
                         slectCopyPage:n
                     })
                 }} onOkButton={()=>{
-                    
+                    // api("device.terminal/order", {
+                    //     pages:value.page,
+                    //     number:1
+                    // }).then((res) => { 
+                    //     Taro.hideLoading();
+                    //     // {
+                    //     //     "pre_order_id": "89",
+                    //     //     "pages": 83,
+                    //     //     "number": 57,
+                    //     //     "order_price": "18",
+                    //     //     "maxprint": 96
+                    //     //   }
+                    //     setTempDataContainer(key,Object.assign(value,res.pre_order_id));
+                    // }).catch((e)=>{
+                    //     Taro.hideLoading();
+                    //     Taro.showToast({
+                    //         title:e,
+                    //         icon:"none",
+                    //         duration:2000
+                    //     });
+                    //     setTimeout(() => {
+                    //         Taro.navigateBack();
+                    //     }, 2000);
+                    // })
                     this.setState({selectPageModalShow:false});
                     const currentUnix = dayjs().unix()
                     const key = "order_preview_"+currentUnix;
                     setTempDataContainer(key,{
-                        page:this.state.slectCopyPage,
+                        pages:this.state.slectCopyPage,
                         tid:id,
-                        pre_order_id:0
+                        pre_order_id:"pre_xxxx",
+                        number:1,
+                        maxprint:200,
+                        order_price:"0.05"
                     },(ok)=>{
                         if (ok) {
                             Taro.navigateTo({
@@ -384,6 +410,6 @@ export default class Status extends Component<any, {
                 }}/>
             </View>
         )
-    }
+    } 
 }
 

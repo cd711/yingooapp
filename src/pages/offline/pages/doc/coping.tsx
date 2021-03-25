@@ -105,9 +105,7 @@ export default class Coping extends Component<any, {
                 </ScrollView>
                 <View className='status_bottom'>
                     <View className='boxs'>
-                        <Button className='re_scan_qrcode_button' onClick={()=>{
-
-                        }}>
+                        <Button className='re_scan_qrcode_button' onClick={()=>{}}>
                             <Image src={require("../../source/callphone.png")} className='button_img'/>
                             <Text className='button_txt'>联系客服</Text>
                         </Button>

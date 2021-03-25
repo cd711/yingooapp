@@ -54,7 +54,7 @@ export default class PrintOrder extends Component<any, {
     }
 
     componentDidMount() {
-        setPageTitle("提交订单")
+        setPageTitle("提交订单");
         if (process.env.TARO_ENV != 'h5') {
             Taro.createSelectorQuery().select(".nav-bar").boundingClientRect((nav_rect) => {
                 Taro.createSelectorQuery().select(".status_bottom").boundingClientRect((bottom_rect) => {
@@ -67,78 +67,38 @@ export default class PrintOrder extends Component<any, {
         const {t} = this.$router.params;
         if (t) {
             const key = "order_preview_"+t;
+            Taro.showLoading({title:"加载中..."})
             getTempDataContainer(key,(value)=>{
                 console.log(value);
-                if (value.pre_order_id === 0) {
-                        Taro.showLoading({title:"加载中..."})
-                        OfflinePrint.terminalStatus(value.tid).then((res)=>{
-                            
-                            const pagen = parseInt(res.currentCopyDoc.pages+"")>0 ?parseInt(res.currentCopyDoc.queue_num+""):0;                
-                            this.setState({
-                                terminal_status_text:res.status_text,
-                                waitingNumber:parseInt(res.currentCopyDoc.queue_num+"")>0?res.currentCopyDoc.queue_num+"":"无",
-                                waitingTime:pagen>0?(pagen*20)+"秒":"直接打印"
-                            });
-                            Taro.hideLoading();
-                            
-                            if (process.env.NODE_ENV !== 'production') {
-                                const res = {
-                                    "pre_order_id": "89",
-                                    "pages": 1,
-                                    "number": 1,
-                                    "order_price": "0.5",
-                                    "maxprint": 200,
-                                }
-                                setTempDataContainer(key,Object.assign(value,res.pre_order_id));
-                                this.setState({
-                                    number:res.number,
-                                    pages:res.pages,
-                                    payPrice:res.order_price,
-                                    pre_order_id:res.pre_order_id
-                                })
-                            }
-                            // api("device.terminal/order", {
-                            //     pages:value.page,
-                            //     number:1
-                            // }).then((res) => { 
-                            //     Taro.hideLoading();
-                            //     // {
-                            //     //     "pre_order_id": "89",
-                            //     //     "pages": 83,
-                            //     //     "number": 57,
-                            //     //     "order_price": "18",
-                            //     //     "maxprint": 96
-                            //     //   }
-                            //     setTempDataContainer(key,Object.assign(value,res.pre_order_id));
+                OfflinePrint.terminalStatus(value.tid).then((res)=>{
+                    Taro.hideLoading();
+                    const pagen = parseInt(res.currentCopyDoc.pages+"")>0 ?parseInt(res.currentCopyDoc.queue_num+""):0;                
+                    this.setState({
+                        terminal_status_text:res.status_text,
+                        waitingNumber:parseInt(res.currentCopyDoc.queue_num+"")>0?res.currentCopyDoc.queue_num+"":"无",
+                        waitingTime:pagen>0?(pagen*20)+"秒":"直接打印"
+                    });
+                    this.setState({
+                        number:value.number,
+                        pages:value.pages,
+                        payPrice:value.order_price,
+                        pre_order_id:value.pre_order_id
+                    })
+                }).catch((e)=>{
+                    Taro.hideLoading();
+                    Taro.showToast({
+                        title:e,
+                        icon:"none",
+                        duration:2000
+                    });
+                    setTimeout(() => {
+                        Taro.navigateBack();
+                    }, 2000);
+                })
 
-                            // }).catch((e)=>{
-                            //     Taro.hideLoading();
-                            //     Taro.showToast({
-                            //         title:e,
-                            //         icon:"none",
-                            //         duration:2000
-                            //     });
-                            //     setTimeout(() => {
-                            //         Taro.navigateBack();
-                            //     }, 2000);
-                            // })
-                        }).catch((e)=>{
-                            console.log(e);
-                            
-                            Taro.hideLoading();
-                            Taro.showToast({
-                                title:e,
-                                icon:"none",
-                                duration:2000
-                            });
-                            setTimeout(() => {
-                                Taro.navigateBack();
-                            }, 2000);
-                        })
-                } else {
-
-                }
-            }) 
+            });
+        } else {
+            Taro.navigateBack();
         }
         
     }
