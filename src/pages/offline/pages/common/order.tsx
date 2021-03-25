@@ -16,6 +16,7 @@ import {api} from '../../../../utils/net';
 import LoginModal from '../../../../components/login/loginModal';
 import Counter from '../../../../components/counter/counter';
 import OfflinePrint from '../../../../utils/offlinePrint';
+import PayWayModal from '../../../../components/payway/PayWayModal';
 
 
 
@@ -31,7 +32,10 @@ export default class PrintOrder extends Component<any, {
     number:number;
     payPrice:string;
     pre_order_id:string;
-    prepay_id:string
+    prepay_id:string;
+    showPayWayModal:boolean;
+    order_sn:string;
+    real_order_id:any,
 }> {
 
     config: Config = {
@@ -49,7 +53,10 @@ export default class PrintOrder extends Component<any, {
             number:1,
             payPrice:"0",
             pre_order_id:"",
-            prepay_id:""
+            prepay_id:"",
+            showPayWayModal:false,
+            order_sn:"",
+            real_order_id:0
         }
     }
 
@@ -82,7 +89,8 @@ export default class PrintOrder extends Component<any, {
                         number:value.number,
                         pages:value.pages,
                         payPrice:value.order_price,
-                        pre_order_id:value.pre_order_id
+                        pre_order_id:value.pre_order_id,
+                        prepay_id:value.prepay_id
                     })
                 }).catch((e)=>{
                     Taro.hideLoading();
@@ -108,60 +116,61 @@ export default class PrintOrder extends Component<any, {
         //     showPayWayModal:true
         // })
         this.initPayWayModal = true;
-        const {pre_order_id} = this.state;
+        const {prepay_id} = this.state;
 
-        // this.checkOrder(data.prepay_id,false);
-        // Taro.showLoading({title: '加载中...'})
-        // api('app.order/add', {
-        //     prepay_id: data.prepay_id,
-        //     remarks: isEmptyX(orderMessages)?"":JSON.stringify(orderMessages)
-        // }).then((res) => {
-        //     debuglog("ccc",res);
-        //     Taro.hideLoading();
-        //     this.setState({
-        //         real_order_id:res.real_order_id
-        //     })
-        //     if (res.status > 0) {
+        Taro.showLoading({title: '加载中...'})
+        api('app.order/add', {
+            prepay_id: prepay_id
+        }).then((res) => {
+            debuglog("ccc",res);
+            Taro.hideLoading();
+            this.setState({
+                real_order_id:res.real_order_id
+            })
+            if (res.status > 0) {
                
-        //         Taro.navigateTo({
-        //             url:updateChannelCode(`/pages/offline/pages/doc/printing?id=${res.real_order_id[0]}&printtype=${terminalPrintType}`)
-        //         });
-        //         return;
-        //     }
-        //     this.setState({
-        //         real_order_id:res.real_order_id,
-        //         payPrice:parseFloat(res.pay_price+"").toFixed(2),
-        //         order_sn: res.order_sn,
-        //         showPayWayModal: true,
-        //         payStatus:res.status
-        //     });
-        // }).catch((e) => {
-        //     Taro.hideLoading();
-        //     setTimeout(() => {
-        //         window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
-        //         Taro.getApp().tab = 1;
-        //         if (deviceInfo.env == 'h5') {
-        //             window.location.href = updateChannelCode('/pages/tabbar/order/order?tab=1')
-        //         } else {
-        //             Taro.switchTab({
-        //                 url: updateChannelCode('/pages/tabbar/order/order?tab=1')
-        //             })
-        //         }
+                Taro.navigateTo({
+                    url:updateChannelCode(`/pages/offline/pages/doc/coping`)
+                });
+                return;
+            }
+            this.setState({
+                
+                real_order_id:res.real_order_id,
+                payPrice:parseFloat(res.pay_price+"").toFixed(2),
+                order_sn: res.order_sn,
+                showPayWayModal: true,
+                // payStatus:res.status
+            });
+        }).catch((e) => {
+            Taro.hideLoading();
+            setTimeout(() => {
+                window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
+                Taro.getApp().tab = 1;
+                if (deviceInfo.env == 'h5') {
+                    window.location.href = updateChannelCode('/pages/tabbar/order/order?tab=1')
+                } else {
+                    Taro.switchTab({
+                        url: updateChannelCode('/pages/tabbar/order/order?tab=1')
+                    })
+                }
 
-        //     }, 2000);
-        //     Taro.showToast({
-        //         title: e,
-        //         duration: 2000,
-        //         icon: "none"
-        //     });
+            }, 2000);
+            Taro.showToast({
+                title: e,
+                duration: 2000,
+                icon: "none"
+            });
 
-        // })
+        })
 
     }
     
+    onResult = () => {
 
+    }
     render() {
-        const {centerPartyHeight,terminal_status_text,waitingNumber,waitingTime,pages,number,payPrice} = this.state;
+        const {centerPartyHeight,terminal_status_text,waitingNumber,waitingTime,pages,number,payPrice,showPayWayModal,order_sn} = this.state;
         return (
             <View className='print_status_order'>
                 <LoginModal isTabbar={false}/>
@@ -229,6 +238,28 @@ export default class PrintOrder extends Component<any, {
                         }}>提交订单</Button>
                     </View>
                 </View>
+
+                {
+                    this.initPayWayModal
+                        ? <PayWayModal
+                            isShow={showPayWayModal}
+                            totalPrice={parseFloat(payPrice + "") > 0 ? payPrice : "0.00"}
+                            order_sn={order_sn}
+                            onResult={this.onResult}
+                            onClose={() => {
+                                this.setState({
+                                    showPayWayModal: false
+                                });
+                                if (deviceInfo.env == 'h5') {
+                                    window.history.replaceState(null, null, updateChannelCode('/pages/tabbar/me/me'));
+                                }
+                                Taro.getApp().tab = 1;
+                                Taro.switchTab({
+                                    url: updateChannelCode('/pages/tabbar/order/order?tab=1')
+                                })
+                            }}/>
+                        : null
+                }
             </View>
         )
     }

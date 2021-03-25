@@ -23,7 +23,8 @@ import OperationTip from '../common/operation';
 @observer
 
 export default class Coping extends Component<any, {
-    centerPartyHeight:number
+    centerPartyHeight:number;
+    ShowOperationTip:boolean;
 }> {
 
     config: Config = {
@@ -33,7 +34,8 @@ export default class Coping extends Component<any, {
     constructor(props) {
         super(props);
         this.state = {
-            centerPartyHeight:0
+            centerPartyHeight:0,
+            ShowOperationTip:true
         }
     }
 
@@ -48,12 +50,15 @@ export default class Coping extends Component<any, {
                 }).exec();
             }).exec();
         }
+        // api("device.terminal/copyStatus",{
+        //     order_id:
+        // })
     }
 
     
 
     render() {
-        const {centerPartyHeight} = this.state;
+        const {centerPartyHeight,ShowOperationTip} = this.state;
         return (
             <View className='print_coping'>
                 <LoginModal isTabbar={false}/>
@@ -85,19 +90,19 @@ export default class Coping extends Component<any, {
                                 <Text className='waitingputin'>请放入复印的文件</Text>
                             </View>
                             <View className='page_item'>
-                                <Text className='lefttxt'>第一页</Text>
+                                <Text className='lefttxt'>第二页</Text>
                                 <Text className='waiting'>待打印</Text>
                             </View>
                             <View className='page_item'>
-                                <Text className='lefttxt'>第一页</Text>
+                                <Text className='lefttxt'>第三页</Text>
                                 <Button className='startButton'>点击打印</Button>
                             </View>
                             <View className='page_item'>
-                                <Text className='lefttxt'>第一页</Text>
+                                <Text className='lefttxt'>第四页</Text>
                                 <Text className='printing'>打印中</Text>
                             </View>
                             <View className='page_item'>
-                                <Text className='lefttxt'>第一页</Text>
+                                <Text className='lefttxt'>第五页</Text>
                                 <Text className='printed'>已打印</Text>
                             </View>
                         </View>
@@ -111,8 +116,14 @@ export default class Coping extends Component<any, {
                         </Button>
                     </View>
                 </View>
-                <OperationTip isShow onClose={()=>{
-                    
+                <OperationTip isShow={ShowOperationTip} onClose={()=>{
+                    this.setState({
+                        ShowOperationTip:false
+                    })
+                }} onOkButton={()=>{
+                    this.setState({
+                        ShowOperationTip:false
+                    })
                 }}/>
             </View>
         )

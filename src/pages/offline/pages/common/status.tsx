@@ -398,7 +398,8 @@ export default class Status extends Component<any, {
                         pre_order_id:"pre_xxxx",
                         number:1,
                         maxprint:200,
-                        order_price:"0.05"
+                        order_price:"0.05",
+                        prepay_id:"pre_xxx"
                     },(ok)=>{
                         if (ok) {
                             Taro.navigateTo({
