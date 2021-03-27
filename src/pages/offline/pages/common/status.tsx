@@ -103,20 +103,20 @@ export default class Status extends Component<any, {
                     tmp[element.type]=element.type=="doc"?res.currentPrintDoc:(element.type=="copy"?res.currentCopyDoc:res.currentPrintPhoto);
                 }
                 if (status>=101 && status<109) {
-                    //模拟数据
-                    if (process.env.NODE_ENV !== 'production') {
-                        product.attrItems.push({
-                            id: 365,
-                            name: "复印文档",
-                            value: "101001#102002,copy,,2,1,2,120001,1",
-                            value_text: "",
-                            type: "copy"
-                        })
-                        tmp["copy"] = {
-                            pages: 0,
-                            queue_num: 0
-                        }
-                    }
+                    //模拟数据  最后上线的时候，这块代码不需要
+                    // if (process.env.NODE_ENV !== 'production') {
+                    //     product.attrItems.push({
+                    //         id: 365,
+                    //         name: "复印文档",
+                    //         value: "101001#102002,copy,,2,1,2,120001,1",
+                    //         value_text: "",
+                    //         type: "copy"
+                    //     })
+                    //     tmp["copy"] = {
+                    //         pages: 0,
+                    //         queue_num: 0
+                    //     }
+                    // }
                     this.setState({
                         status_txt: res.status_text,
                         wait_num: tmp[product.skuItem[product.current].type].queue_num,
