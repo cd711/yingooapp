@@ -11069,8 +11069,8 @@ tar@^6.0.2:
 
 taro-iconfont-cli@^2.1.0:
   version "2.1.0"
-  resolved "https://repo.huaweicloud.com/repository/npm/taro-iconfont-cli/-/taro-iconfont-cli-2.1.0.tgz#fe612758684539ec79df1b6fb06204444ac26dde"
-  integrity sha512-rUmboM8q6ByYE1hctvCrPC+hgFEguKC+YdnvH8X1oJ71Lqm/npBFGHpusjktLzIPq9UfYTlNt/Lq3TOy+SMgqw==
+  resolved "https://registry.nlark.com/taro-iconfont-cli/download/taro-iconfont-cli-2.1.0.tgz#fe612758684539ec79df1b6fb06204444ac26dde"
+  integrity sha1-/mEnWGhFOex53xtvsGIERErCbd4=
   dependencies:
     colors "^1.4.0"
     fs-extra "^8.1.0"
@@ -11083,8 +11083,8 @@ taro-iconfont-cli@^2.1.0:
 
 taro-ui@^2.3.4:
   version "2.3.4"
-  resolved "https://repo.huaweicloud.com/repository/npm/taro-ui/-/taro-ui-2.3.4.tgz#a7a2cdd67b2b4a49d10c351d89def4d28b9bb192"
-  integrity sha512-qjAGO75bIvBGaOlpbnRKecTjmQIzJZjieFuz2UsfSJHnyGgOhlFviWWHPLQQGE2tFcjC0Zol0BDnO4r87JjdSw==
+  resolved "https://registry.npm.taobao.org/taro-ui/download/taro-ui-2.3.4.tgz#a7a2cdd67b2b4a49d10c351d89def4d28b9bb192"
+  integrity sha1-p6LN1nsrSknRDDUdid700oubsZI=
   dependencies:
     "@types/react" "^16.7.3"
     bind-decorator "^1.0.11"

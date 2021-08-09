@@ -104,7 +104,7 @@ const Logins: Taro.FC<LoginProps> = (props) => {
                 </View>
                 <View className="login_btn">
                     {
-                        deviceInfo.env=="h5" && !is_weixin() ?<Button className="phone_btn_login" onClick={onPhone}>
+                        !is_weixin() ?<Button className="phone_btn_login" onClick={onPhone}>
                             <Text className="txt">手机号登录</Text>
                         </Button>:null
                     }

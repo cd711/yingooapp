@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import React, { CSSProperties, DOMAttributes, FunctionComponent } from 'react';
+import { CSSProperties, DOMAttributes, FunctionComponent } from 'react';
 import Icon52Guan from './Icon52Guan';
 import Icon52Kai from './Icon52Kai';
 import Icon22Danxiangjinzhitianjia from './Icon22Danxiangjinzhitianjia';
