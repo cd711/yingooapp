@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text,Input } from '@tarojs/components'
-import './index.less'
+import './I.less'
 import HeaderTop from './header'
 import IconFont from '../../components/iconfont';
 import LoginFooter from './footer'
