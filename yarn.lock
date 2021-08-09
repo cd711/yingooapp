@@ -11067,10 +11067,10 @@ tar@^6.0.2:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-taro-iconfont-cli@^3.2.1:
-  version "3.2.1"
-  resolved "https://repo.huaweicloud.com/repository/npm/taro-iconfont-cli/-/taro-iconfont-cli-3.2.1.tgz#842235cb9d1dc1f6722e52acff111b158e5d3be7"
-  integrity sha512-RIkLvzuWqYAJrxVPsMX/n+EVEtkKfgCqWScT6zg6oxDQL0fuiAjc+CaaKzJ5SrQWncJoVpVXMaZ4gB+Y/9dlZw==
+taro-iconfont-cli@^2.1.0:
+  version "2.1.0"
+  resolved "https://repo.huaweicloud.com/repository/npm/taro-iconfont-cli/-/taro-iconfont-cli-2.1.0.tgz#fe612758684539ec79df1b6fb06204444ac26dde"
+  integrity sha512-rUmboM8q6ByYE1hctvCrPC+hgFEguKC+YdnvH8X1oJ71Lqm/npBFGHpusjktLzIPq9UfYTlNt/Lq3TOy+SMgqw==
   dependencies:
     colors "^1.4.0"
     fs-extra "^8.1.0"
