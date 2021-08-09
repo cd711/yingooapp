@@ -81,8 +81,7 @@ class App extends Component {
                             'pages/shell',
                             'pages/printedit',
                         ]
-                      }
-                      if (process.env.TARO_ENV === 'weapp') {
+                      } else {
                         return [
                             ...route,
                             'pages/wxshell',

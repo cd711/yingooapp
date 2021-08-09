@@ -123,11 +123,17 @@ export const jsApiList = [
     "onMenuShareQZone",
 ];
 
+let h = 0;
+try {
+    h = Taro.getSystemInfoSync().safeArea.height;
+}catch(e) {
+
+}
 export const deviceInfo = {
     ...Taro.getSystemInfoSync(),
     env: process.env.TARO_ENV,
     menu: process.env.TARO_ENV !== "h5" ? Taro.getMenuButtonBoundingClientRect() : {} as any,
-    safeBottomHeight: process.env.TARO_ENV !== "h5" ? Taro.getSystemInfoSync().screenHeight - Taro.getSystemInfoSync().safeArea.height : 0
+    safeBottomHeight: process.env.TARO_ENV !== "h5" ? Taro.getSystemInfoSync().screenHeight - h : 0
 };
 
 

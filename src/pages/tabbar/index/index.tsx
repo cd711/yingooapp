@@ -2,7 +2,7 @@ import {ComponentType} from 'react'
 import Taro, {Component, Config} from '@tarojs/taro'
 import {Button, Image, ScrollView, Text, View} from '@tarojs/components'
 import {inject, observer} from '@tarojs/mobx'
-import './index.less'
+import './I.less'
 import IconFont from '../../../components/iconfont'
 import {api,options} from "../../../utils/net";
 import {
