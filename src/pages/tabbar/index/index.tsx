@@ -464,12 +464,13 @@ class Index extends Component<any, IndexState> {
             return
         }
 
-        Taro.showLoading({title: "加载中..."});
         try {
             if (!userStore.isLogin) {
                 userStore.showLoginModal = true
                 return
             }
+            
+        Taro.showLoading({title: "加载中..."});
             const res = await api("app.product/info", {
                 id: type === 1 ? serverConfig.goodsID.photoID : serverConfig.goodsID.phoneID,
                 is_fixed: 1
