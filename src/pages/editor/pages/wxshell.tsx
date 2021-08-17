@@ -2,7 +2,6 @@ import Taro, {Component, Config} from '@tarojs/taro';
 import {View, WebView} from '@tarojs/components';
 import {AtActivityIndicator} from "taro-ui";
 import './editor.less';
-import './shell.less';
 import {observable} from 'mobx';
 import {observer} from '@tarojs/mobx';
 import config from "../../../config";

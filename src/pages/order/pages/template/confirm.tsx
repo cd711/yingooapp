@@ -891,7 +891,7 @@ export default class Confirm extends Component<any, {
                                 {
                                     terminalPrintType=="doc"||terminalPrintType=="photo"?<View className='print_status_box'>
                                             <View className='device_status'>
-                                                <Image src='https://cdn.playbox.yingoo.com/appsource/device_print.png' className='icon'/>
+                                                <Image src='https://palybox-app.oss-cn-chengdu.aliyuncs.com/appsource/device_print.png' className='icon'/>
                                                 <Text className='txt'>{printDeviceInfo.status_text}</Text>
                                             </View>
                                             <View className='waiting_box'>

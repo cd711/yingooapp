@@ -192,7 +192,7 @@ export default class PrintOrder extends Component<any, {
                     <View className='print_status_container'>
                         <View className='print_status_box'>
                             <View className='device_status'>
-                                <Image src='https://cdn.playbox.yingoo.com/appsource/device_print.png'
+                                <Image src='https://palybox-app.oss-cn-chengdu.aliyuncs.com/appsource/device_print.png'
                                        className='icon'/>
                                 <Text className='txt'>{terminal_status_text}</Text>
                             </View>

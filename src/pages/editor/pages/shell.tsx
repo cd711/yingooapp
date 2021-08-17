@@ -1,8 +1,7 @@
 import Taro, {Component, Config, useEffect, useState} from '@tarojs/taro';
 import {Image, ScrollView, Text, View} from '@tarojs/components';
 import {AtActivityIndicator, AtInput, AtSlider} from "taro-ui";
-import './editor.less';
-import './shell.less';
+import './I.less';
 import {api, getToken} from '../../../utils/net';
 import IconFont from '../../../components/iconfont';
 import {observable} from 'mobx';

@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import {api, options} from "./net";
 import {Files, LocalCoupon} from "../modal/modal";
 
+const imgStylePrefix = '?x-oss-process=style/';
 export function ossUrl(url: string, type: number) {
     if (!url) {
         return ""
@@ -14,13 +15,13 @@ export function ossUrl(url: string, type: number) {
     let u = '';
     switch (type) {
         case 0:
-            u = `${url}?x-oss-process=style/s`
+            u = `${url}${imgStylePrefix}s`
             break;
         case 1:
-            u = `${url}?x-oss-process=style/m`
+            u = `${url}${imgStylePrefix}m`
             break;
         default:
-            u = `${url}?x-oss-process=style/b`
+            u = `${url}${imgStylePrefix}b`
             break;
     }
     return u;
@@ -590,7 +591,7 @@ export const shareInfo = {
     title: "免费照片冲印个性化定制手机壳",
     desc: "[有人@你]，送你一个创意定制品，快来免费领！",
     link: deviceInfo.env=="h5"?`https://m.playbox.yingoo.com/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`:`/pages/tabbar/index/index${!notNull(options) && !notNull(options.channel) ? `?channel=${options.channel}` : ""}`,
-    imgUrl: 'https://cdn.playbox.yingoo.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png?x-oss-process=style/m',
+    imgUrl: 'https://palybox-app.oss-cn-chengdu.aliyuncs.com/uploads/file/20201230/10a88cd83a5c6d2235d9829a56260281.png/m',
 }
 
 export function shareAppExtends() {

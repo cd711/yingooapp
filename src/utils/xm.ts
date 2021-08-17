@@ -21,6 +21,9 @@ export default class Xm {
                 case "weapp":
                     this.weappLogin(params,resolve,reject);
                     break;
+                case "qq":
+                    this.weappLogin(params,resolve,reject);
+                    break;
                 default:
                     break;
             }
@@ -55,6 +58,24 @@ export default class Xm {
             });
         }
     }
+
+
+    private static qqLogin(params:LoginParams,resolve,reject){
+        if (!notNull(params.userInfo)) {
+            Taro.login().then((res)=>{
+                debuglog(res);
+                this.thirdLoginApi({
+                    platform: "qq",
+                    code: res.code,
+                    data: params.userInfo
+                },resolve,reject);
+            }).catch((e)=>{
+                debuglog(e);
+                reject(e);
+            });
+        }
+    }
+
     private static thirdLoginApi(params,resolve,reject){
         api("user/third", params).then((res) => {
             userStore.setInfo(res);

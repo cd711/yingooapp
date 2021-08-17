@@ -46,13 +46,11 @@ class LoginModal extends Component<{
     }
     render(){
         const {show} = this.state;
-        return <Fragment>
-            <Logins isShow={show} isTabBar={this.props.isTabbar || false} onClose={(is)=>{
+        return <Logins isShow={show} isTabBar={this.props.isTabbar || false} onClose={(is)=>{
                 if (userStore.showLoginModal != is) {
                     userStore.showLoginModal = is;
                 }
             }}/>
-        </Fragment>
     }
 }
 
