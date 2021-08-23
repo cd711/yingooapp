@@ -1,9 +1,9 @@
 import Taro from '@tarojs/taro'
-import {Button, Text, View} from '@tarojs/components'
-import './index.less'
+import {Button, Text, View} from '@tarojs/components';
 import IconFont from '../../components/iconfont';
 import {convertClassName, deviceInfo, is_weixin, jumpToPrivacy, updateChannelCode} from '../../utils/common';
 import Xm from '../../utils/xm';
+
 
 const LoginFooter: Taro.FC<any> = () => {
 
