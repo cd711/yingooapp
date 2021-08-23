@@ -52,7 +52,7 @@ export function is_weixin() { //判断是否是微信
     return false;
 }
 export function convertClassName(name:string){
-    return process.env.TARO_ENV === 'h5'?name:'~'+name;
+    return name;
 }
 
 export interface ListModel {

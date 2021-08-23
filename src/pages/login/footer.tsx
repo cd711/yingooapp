@@ -1,9 +1,10 @@
 import Taro from '@tarojs/taro'
-import {Button, Text, View} from '@tarojs/components';
+import {Button, Text, View} from '@tarojs/components'
+// import './index.less'
+import "./footer.less"
 import IconFont from '../../components/iconfont';
 import {convertClassName, deviceInfo, is_weixin, jumpToPrivacy, updateChannelCode} from '../../utils/common';
 import Xm from '../../utils/xm';
-
 
 const LoginFooter: Taro.FC<any> = () => {
 
@@ -20,15 +21,15 @@ const LoginFooter: Taro.FC<any> = () => {
         }
     }
 
-    return <View className={convertClassName('footer')}>
-        <View className={convertClassName('otherlogin')}>
-            <View className={convertClassName('line')}/>
-            <Text className={convertClassName('othertext')}>其他方式</Text>
-            <View className={convertClassName('line')}/>
+    return <View className={'login-footer'}>
+        <View className={'otherlogin'}>
+            <View className={'line'}/>
+            <Text className={'othertext'}>其他方式</Text>
+            <View className={'line'}/>
         </View>
-        <View className={convertClassName('qw')}>
+        <View className={'qw'}>
             {
-                deviceInfo.env == "weapp" ? <Button className={convertClassName('wechat')} openType="getUserInfo"
+                deviceInfo.env == "weapp" ? <Button className={'wechat'} openType="getUserInfo"
                                                     onGetUserInfo={({detail: {userInfo}}) => {
                                                         Taro.showLoading({title: "正在登录..."})
                                                         Xm.login({
@@ -60,20 +61,20 @@ const LoginFooter: Taro.FC<any> = () => {
                 </Button> : null
             }
             {
-                is_weixin() ? <View className={convertClassName('wechat')} onClick={wxLogin}>
+                is_weixin() ? <View className={'wechat'} onClick={wxLogin}>
                     <IconFont name='24_weixin' size={48} color='#FFF'/>
                 </View> : null
             }
             {
-                !is_weixin() && deviceInfo.env == "h5" ? <View className={convertClassName('qq')}>
+                !is_weixin() && deviceInfo.env == "h5" ? <View className={'qq'}>
                     <IconFont name='24_QQ' size={48} color='#FFF'/>
                 </View> : null
             }
         </View>
-        <View className={convertClassName('xieyi')}>
-            <Text className={convertClassName('enter')}>进入即同意</Text>
-            <View className={convertClassName('xy')}><Text onClick={() => jumpToPrivacy(1)}>《映果用户协议》</Text></View>
-            <View className={convertClassName('xy')}><Text onClick={() => jumpToPrivacy(2)}>《隐私协议》</Text></View>
+        <View className={'xieyi'}>
+            <Text className={'enter'}>进入即同意</Text>
+            <View className={'xy'}><Text onClick={() => jumpToPrivacy(1)}>《映果用户协议》</Text></View>
+            <View className={'xy'}><Text onClick={() => jumpToPrivacy(2)}>《隐私协议》</Text></View>
         </View>
     </View>
 }
