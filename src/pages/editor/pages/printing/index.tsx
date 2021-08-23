@@ -1,6 +1,6 @@
 import Taro, {useState, useRef, useEffect} from "@tarojs/taro";
 import {Image, ScrollView, Text, View} from "@tarojs/components";
-import "./I.less";
+import "./index.less";
 import {AtNavBar} from "taro-ui";
 import IconFont from "../../../../components/iconfont";
 import {
